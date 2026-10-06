@@ -1,0 +1,3648 @@
+{
+  "format": 1,
+  "sig_domain": "atlas-pca/actn/v1\\0",
+  "cap_domain": "atlas-pca/cap/v1\\0",
+  "primitives": {
+    "canonical": [
+      {
+        "value": {
+          "b": 1,
+          "a": [
+            true,
+            null,
+            "x"
+          ],
+          "c": {
+            "z": 1,
+            "y": 2
+          }
+        },
+        "expect": "{\"a\":[true,null,\"x\"],\"b\":1,\"c\":{\"y\":2,\"z\":1}}",
+        "hash": "mkd7hqbLgkPQe3W5mCM_kVvVQiX4Js6ZFJpEPF68ogc"
+      },
+      {
+        "value": {
+          "～": 1,
+          "😀": 2
+        },
+        "expect": "{\"😀\":2,\"～\":1}",
+        "hash": "xEoyQpgoPZEOQSCi_zwtd0a0pcny2WJcZ_artYdIzzE"
+      },
+      {
+        "value": {
+          "s": "café <&> \"q\" \\ \n \u0001"
+        },
+        "expect": "{\"s\":\"café <&> \\\"q\\\" \\\\ \\n \\u0001\"}",
+        "hash": "oV1mwkWVW2ZcoGH_XuokFGbBbKPaO_d9kVqio2RPBsM"
+      },
+      {
+        "value": {
+          "n": [
+            0,
+            -1,
+            1.5,
+            100000
+          ]
+        },
+        "expect": "{\"n\":[0,-1,1.5,100000]}",
+        "hash": "AqIsdwWcMBJDcO6xC1h3zwo1B5BMwGGkXBZOmFCj36E"
+      }
+    ],
+    "merkle": [
+      {
+        "leaves": [
+          {
+            "i": 0,
+            "t": "leaf"
+          },
+          {
+            "i": 1,
+            "t": "leaf"
+          },
+          {
+            "i": 2,
+            "t": "leaf"
+          }
+        ],
+        "root": "dwJSU4uIY3n8pnSC4KPP5rhPZpbRX-jV6ReTrTVXM5w",
+        "proofs": [
+          {
+            "index": 0,
+            "size": 3,
+            "path": [
+              {
+                "side": "R",
+                "hash": "yYhzVAdZaZrF3WR56nRAMjmvmGSnrDqqIWkqk38KXZs"
+              },
+              {
+                "side": "R",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "zxsw_7VLmf5UDpz_UrqiebA5bRe-fg_oZrJ8Cqa-LIQ"
+              },
+              {
+                "side": "R",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "leaves": [
+          {
+            "i": 0,
+            "t": "leaf"
+          },
+          {
+            "i": 1,
+            "t": "leaf"
+          },
+          {
+            "i": 2,
+            "t": "leaf"
+          },
+          {
+            "i": 3,
+            "t": "leaf"
+          },
+          {
+            "i": 4,
+            "t": "leaf"
+          }
+        ],
+        "root": "og5FfZ7cSDxjCOXbMmJkpH9-QzG1oQ2P8MVxHKB0dXI",
+        "proofs": [
+          {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "yYhzVAdZaZrF3WR56nRAMjmvmGSnrDqqIWkqk38KXZs"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "zxsw_7VLmf5UDpz_UrqiebA5bRe-fg_oZrJ8Cqa-LIQ"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "cDMDOBKiokpLXr9Xr70SAyUJWEK9Xn0A5yS_FTe6YqM"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "leaves": [
+          {
+            "i": 0,
+            "t": "leaf"
+          },
+          {
+            "i": 1,
+            "t": "leaf"
+          },
+          {
+            "i": 2,
+            "t": "leaf"
+          },
+          {
+            "i": 3,
+            "t": "leaf"
+          },
+          {
+            "i": 4,
+            "t": "leaf"
+          },
+          {
+            "i": 5,
+            "t": "leaf"
+          },
+          {
+            "i": 6,
+            "t": "leaf"
+          }
+        ],
+        "root": "RtcA7P3RCfw6hjyS64RS8lMOfPKbKsefyj12-iu1mvo",
+        "proofs": [
+          {
+            "index": 0,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "yYhzVAdZaZrF3WR56nRAMjmvmGSnrDqqIWkqk38KXZs"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "zxsw_7VLmf5UDpz_UrqiebA5bRe-fg_oZrJ8Cqa-LIQ"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "cDMDOBKiokpLXr9Xr70SAyUJWEK9Xn0A5yS_FTe6YqM"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "DAroCNJtz7lHiJgk0JXNwNrLp_k1jYKS0va5XWEfk6g"
+              },
+              {
+                "side": "R",
+                "hash": "YrvA3G5yOytRhX6THfM1NVajHMFH7T4vU-vxAifdSNY"
+              },
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              },
+              {
+                "side": "R",
+                "hash": "YrvA3G5yOytRhX6THfM1NVajHMFH7T4vU-vxAifdSNY"
+              },
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "VP7v3pTi44Jx7F0YdH4Mqt18n5y-D7UBwCWPWrWRmkY"
+              },
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "params_digest_empty": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o"
+  },
+  "vectors": [
+    {
+      "name": "valid-in-plan-action",
+      "description": "Valid action at plan node n2 with a 1-hop chain.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "8n0d1LmkZgLIa7Ahoz-5gld-MfF6_0M0KJ8hpXWy5Oio5_50o0yL4lipBKsqpUfiMXQ45oVBMOnD1iE2l06kAg"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "valid-plan-node-n1",
+      "description": "Valid action at plan node n1 (exercises a different Merkle path in a 5-leaf tree).",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 1,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "RS_OUYREhZjYKywjU3gN636QiVY_ol3zcL7RiwyBgtALl5-1roL-_D2UmeaBcazvnszEdPD3ThaUpk_q4OYbAQ"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "valid-plan-node-n3",
+      "description": "Valid action at plan node n3 (exercises a different Merkle path in a 5-leaf tree).",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "delete",
+          "resource": "db/orders",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "irreversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 2,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "bUfg32yLiQXnhwbtavHtdw1D7-B99Ur1cAK-wCDAMt4"
+              },
+              {
+                "side": "L",
+                "hash": "8qWWiNPPV-tUa7f4BDrju7ncH8OkRDcAda4zeKItiwI"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n3",
+          "conditions_digest": "ZTT9TZVLZyXyqbwJfmlBm_MME6dNlEWrTzslXTIaV5A"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 1,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "R69LALRDO2b3k4DNLnvSQMvdLVEEmUjLS1_-utS_fSXAgLiwE_e9A6IoYh-iiMzbzJGstuWC4HQSxePqKR2EAw"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "valid-plan-node-n4",
+      "description": "Valid action at plan node n4 (exercises a different Merkle path in a 5-leaf tree).",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 3,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "E7abCbZqC622WoR0fzIQrfKm2G9inFeLno4FdWz_fjg"
+              },
+              {
+                "side": "L",
+                "hash": "8qWWiNPPV-tUa7f4BDrju7ncH8OkRDcAda4zeKItiwI"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n4",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 1,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "zVlCPrN1D2uuktCiarUiZsa-aBZ74W6Q8nGw1eb58WYnbD6bQZzHPmJ3uo9yo271kuX2oAw8l3-Esxx7chXWDA"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "valid-plan-node-n5",
+      "description": "Valid action at plan node n5 (exercises a different Merkle path in a 5-leaf tree).",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/items",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 4,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ObS-AMWAx5nc9tqGY3-M3_4PFflGJCct3JMyDSWKwTY"
+              }
+            ]
+          },
+          "node_id": "n5",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 1,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "5DlIzvNOnUXJVzJSY1hon_yu9MJPRYnka7GsDEWtyGY0vvKv_8W9bpdR5vzNf8RobH5faj41Ta1jCD6Z5EMPDw"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "out-of-plan-action",
+      "description": "Action not in the committed plan, correctly signed: plan_inclusion fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "drop",
+          "resource": "db/everything",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "irreversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "QPCs9BNDcjrSIC4q5smIJgeW5NDrzDDpp7Uu2ktOfv72Pd8XruxphnLK02bI-NX-cq0I6x2eEwY12rhFKzUTDg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": false,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "tampered-params",
+      "description": "params_digest altered after signing: plan_inclusion and leaf_signature fail.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "dcbMpsUm_OVA3Bt5TVciDN11qyYe5Yv-pJIWp5V95-s",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "8n0d1LmkZgLIa7Ahoz-5gld-MfF6_0M0KJ8hpXWy5Oio5_50o0yL4lipBKsqpUfiMXQ45oVBMOnD1iE2l06kAg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": false,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "tampered-params-resigned",
+      "description": "params_digest altered and re-signed by the right key: only plan_inclusion fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "dcbMpsUm_OVA3Bt5TVciDN11qyYe5Yv-pJIWp5V95-s",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "FizvqUwTav9oAaz20i3OO8kRnKtGjSFuJ1QNfLkfd8nnEFwnRkVEQQ1k3j79IX-VFjQ5yKeqzIRjrbnY4Hc_BQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": false,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "wrong-key-leaf-signature",
+      "description": "Signed by a key that is not the leaf holder: leaf_signature fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "6-Vttg8GzeQoo9V3cOKMBP-_dKOSRKEr5phQR_87MHbF7S8szW-csSvU4xPtGEyB5oLV6lwkZz4iUJ85yMV4Bw"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "tampered-counter-after-signing",
+      "description": "counter modified after signing: leaf_signature fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 8,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "8n0d1LmkZgLIa7Ahoz-5gld-MfF6_0M0KJ8hpXWy5Oio5_50o0yL4lipBKsqpUfiMXQ45oVBMOnD1iE2l06kAg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "invalid-counter",
+      "description": "Negative counter (re-signed): counter check fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": -1,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "ICAJfoewGNdSSSfZwiAys_A21Ao1LtBm_DpP3g5z60sox43eM-aJVb6IcGenPtgp9ZUGPrliTeF-7CojS5ZeBA"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": false
+        }
+      }
+    },
+    {
+      "name": "tampered-merkle-proof",
+      "description": "A sibling hash in the inclusion proof is replaced: plan_inclusion fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "8n0d1LmkZgLIa7Ahoz-5gld-MfF6_0M0KJ8hpXWy5Oio5_50o0yL4lipBKsqpUfiMXQ45oVBMOnD1iE2l06kAg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": false,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "tampered-conditions-digest",
+      "description": "conditions_digest swapped for another: plan_inclusion fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "jw0j0tfuh58TG2kOTUt9zjF1hHW3P8EWMHbEBhh1ZWA"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "8n0d1LmkZgLIa7Ahoz-5gld-MfF6_0M0KJ8hpXWy5Oio5_50o0yL4lipBKsqpUfiMXQ45oVBMOnD1iE2l06kAg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": false,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "delegated-2-hop-chain",
+      "description": "Two-hop chain (agent delegates to sub-agent, appending a caveat); leaf signed by the sub-agent.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          },
+          {
+            "id": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              },
+              {
+                "prefix": "db/",
+                "type": "resource_prefix"
+              }
+            ],
+            "body_digest": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "sig": "TJw6u-5Jya8ghaiXlPazEbZKKl2ij7mvu5t0k8-LNtxrJIfSMfavdwHHM9ZC9mptvzEF7rJIvaHZD2AG_SPSAQ",
+            "parent": "NqC6ON0xNbmb3WkEEqzkGEPuCD5MvtIqS3pgz_cID10"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "-fv1PcF-j_CDTAaX8kmJMXtZoY-HJrgMXasPDuArfVQY1koouSpEfSRfOoyZlmyaaYdYD7IE0VfnJL8-sLXoBg"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "delegated-leaf-signed-by-parent-holder",
+      "description": "Chain is fine but the leaf was signed by the parent holder, not the sub-agent: leaf_signature fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          },
+          {
+            "id": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              },
+              {
+                "prefix": "db/",
+                "type": "resource_prefix"
+              }
+            ],
+            "body_digest": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "sig": "TJw6u-5Jya8ghaiXlPazEbZKKl2ij7mvu5t0k8-LNtxrJIfSMfavdwHHM9ZC9mptvzEF7rJIvaHZD2AG_SPSAQ",
+            "parent": "NqC6ON0xNbmb3WkEEqzkGEPuCD5MvtIqS3pgz_cID10"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "k4XBDJWd2n9AWJbt2qIcw0QR5JVe7FGlQ8Iu5EUcH-8qYF4vtLSi7wRTuMxUyMBtjTPteBYVDORfPsdm1HKzCQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": true,
+          "plan_inclusion": true,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "chain-dropped-caveat",
+      "description": "Child hop drops the parent caveat B (validly signed, parent-linked): chain fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          },
+          {
+            "id": "mq-9aQAuZ_8E4Eal6RdpEa0r02mNZdx0ADCHbPV_MQI",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "type": "resource_prefix",
+                "prefix": "db/"
+              }
+            ],
+            "parent": "NqC6ON0xNbmb3WkEEqzkGEPuCD5MvtIqS3pgz_cID10",
+            "body_digest": "mq-9aQAuZ_8E4Eal6RdpEa0r02mNZdx0ADCHbPV_MQI",
+            "sig": "2oKi40SQj6P2Uvfg5C2nCSzKY8qrgfsDTi1iXPTZmkTTUFnpTXqspc4iGSAoBMKlM6XOF1c93bhfyyce8_EDAA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "jSEnzVO4TRr2Ura4sB29jEnicDnR6sOwUz_A6UMHVtMGVR52k3w7eYYgCpU86n6DPlbQpqA8vtMtjrWb17ocCA"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "chain-reordered-caveat",
+      "description": "Child hop reorders the parent caveats (validly signed): chain fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          },
+          {
+            "id": "GcXl0pj-fqjVzyAC8uRH2Y8MpWVDh5XvmF8k0J9YR9o",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "note",
+                "～": 1,
+                "😀": 2,
+                "z": 3,
+                "text": "café <&> \"q\" \\ \n "
+              },
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "type": "resource_prefix",
+                "prefix": "db/"
+              }
+            ],
+            "parent": "NqC6ON0xNbmb3WkEEqzkGEPuCD5MvtIqS3pgz_cID10",
+            "body_digest": "GcXl0pj-fqjVzyAC8uRH2Y8MpWVDh5XvmF8k0J9YR9o",
+            "sig": "56wDHb-CompLpIL-UZaDMGVIJOGIVGJZ2Lwo2s6lLLzy-OkhNaVsPMbxVIMM_9p-P5lne3Bie9NMdKDkEaqABA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "pb8ybqt4FlrTloS_kfGT3_ExE9YO7j5MOzPg9biF1D_VQZOgfYU2vkaNfnOQWjb75crF_FSC0hQYdDoqd1hZCw"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "chain-edited-caveat",
+      "description": "Child hop widens a parent caveat (validly signed): chain fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          },
+          {
+            "id": "vkSaTL1NTfYaZUZLcb_ERB4ZdQlLAzC0F1WNFZGH5no",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 1000000
+              },
+              {
+                "type": "note",
+                "～": 1,
+                "😀": 2,
+                "z": 3,
+                "text": "café <&> \"q\" \\ \n "
+              },
+              {
+                "type": "resource_prefix",
+                "prefix": "db/"
+              }
+            ],
+            "parent": "NqC6ON0xNbmb3WkEEqzkGEPuCD5MvtIqS3pgz_cID10",
+            "body_digest": "vkSaTL1NTfYaZUZLcb_ERB4ZdQlLAzC0F1WNFZGH5no",
+            "sig": "T9eYRdLJ-4ZqG3h6GpNpShm9Ii4zhCX3dMlTC6SbW4yjwd87yp3tH6qjUR2d0MTZTput6jLf94xWjjCM96AdDw"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "DMFmZ3C9QWhIvujP8hXv4oR5FKbKFR54eTo0NypczQxOWFMIbX8QZZZDnHCkqhhBm4oFXpaAg21C_FyihUs3AQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "chain-hop-signed-by-wrong-key",
+      "description": "Child hop signed by a key that is not the parent holder: chain fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          },
+          {
+            "id": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              },
+              {
+                "prefix": "db/",
+                "type": "resource_prefix"
+              }
+            ],
+            "body_digest": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "sig": "wkg0MT0s5PBba2egvh_zPXDyyE_uay7O941DfLd1JS3v9w_CExAoj0Ok7x8mVzfVVc1gd3a8xwVicE-enWHcDg",
+            "parent": "NqC6ON0xNbmb3WkEEqzkGEPuCD5MvtIqS3pgz_cID10"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "6HKIhx5jLhJUgVFoLAz0wp3Q4oA2J-NmnzPzp6bWh7EKhQMsHe4gkApqJn8W8Qh07Yx1KU6JfVZj7Lku5ciDBQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "chain-hops-reordered",
+      "description": "The two hops are swapped: chain fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "cap_chain": [
+          {
+            "id": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              },
+              {
+                "prefix": "db/",
+                "type": "resource_prefix"
+              }
+            ],
+            "body_digest": "ZOh-liT1FFGjFIV_KlyyjZzA76rEbZmjVnuLKpIFSMY",
+            "sig": "TJw6u-5Jya8ghaiXlPazEbZKKl2ij7mvu5t0k8-LNtxrJIfSMfavdwHHM9ZC9mptvzEF7rJIvaHZD2AG_SPSAQ",
+            "parent": "NqC6ON0xNbmb3WkEEqzkGEPuCD5MvtIqS3pgz_cID10"
+          },
+          {
+            "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+            "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "-fv1PcF-j_CDTAaX8kmJMXtZoY-HJrgMXasPDuArfVQY1koouSpEfSRfOoyZlmyaaYdYD7IE0VfnJL8-sLXoBg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": false,
+          "plan_inclusion": true,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "chain-root-not-grant",
+      "description": "Chain root is a different principal's capability than the grant: chain fails.",
+      "grant": {
+        "id": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "😀": 2,
+            "～": 1
+          }
+        ],
+        "body_digest": "GbmO6U31KjglCoK6qLTPNbI0Zjf85DwuKW3pchz8w9M",
+        "sig": "zIh8E5INm6AdJg_bWEf9p1GdBaj2wbmIveO-7_5UFodH-7b1VHvY3pQ0KPdth_lYGykVuwklbF1xke3XK7_xDQ"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "pcactn": {
+        "ver": 1,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "IqyaH28lwIHcvgFe22bJdg3ud4ultcKsUel4Ui0rhgM",
+        "cap_chain": [
+          {
+            "id": "IqyaH28lwIHcvgFe22bJdg3ud4ultcKsUel4Ui0rhgM",
+            "issuer": "XzJ8sFL4oiS9b6dQPYwpTnQRut9pNFROpnIn7-_0OW0",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "😀": 2,
+                "～": 1
+              }
+            ],
+            "body_digest": "IqyaH28lwIHcvgFe22bJdg3ud4ultcKsUel4Ui0rhgM",
+            "sig": "98d-KnQZpzBNFt1HtD3rNbvpOBKZqOvoNrv0ePilEq0pLrd5LoDPmGWecOz02PtiezKUQYqApTn5g38WFhqADQ"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 1,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "sig": "8CBFet_bWMfhrmT3-yJzKDbDkCjWpIIfcWoVzhoq6_lu7_UTEn_iH1m2Py-pYABipI7Fw18T9xzTQlf-Oa6oDg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "chain": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    }
+  ]
+}
