@@ -1,0 +1,13 @@
+[package]
+name = "atlas-pca"
+version = "0.1.0"
+edition = "2021"
+description = "Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks, M0-M3)"
+license = "MIT"
+publish = false
+
+[dependencies]
+ed25519-dalek = "2"
+sha2 = "0.10"
+serde_json = { version = "1", features = ["float_roundtrip"] }
+base64 = "0.22"

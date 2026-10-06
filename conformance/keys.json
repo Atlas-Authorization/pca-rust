@@ -1,0 +1,18 @@
+{
+  "principal": {
+    "seed": "_AfA9PfvLvyNcBKeA2U4u1YUggdW8RW5N_uw0zAhFb0",
+    "public": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E"
+  },
+  "agent": {
+    "seed": "Td68EkHLUvauqsvBbutbl2g7FuepPNel1m45EWCHQhc",
+    "public": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA"
+  },
+  "subagent": {
+    "seed": "EAgzWZiCiX2AzvLogmd1YYZFhpIqPwE4RGyaYJTAHTw",
+    "public": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70"
+  },
+  "rogue": {
+    "seed": "YdGqQ9wplOCV2fcbs701FTDaJ7I631mXwgYLcqwOvwI",
+    "public": "XzJ8sFL4oiS9b6dQPYwpTnQRut9pNFROpnIn7-_0OW0"
+  }
+}
