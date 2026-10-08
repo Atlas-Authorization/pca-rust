@@ -1,44 +1,119 @@
 # pca-rust
 
-Proof-Carrying Authority (PCA) verifier for Rust. **Preview.**
+**The Rust implementation of Proof-Carrying Authority (PCA): the reference `authF` verifier plus the
+advanced, post-quantum and zero-knowledge crypto rungs that build on it.**
 
-PCA is authF: instead of verifying a token, you verify a proof-carrying action (a PCActn) - the capability chain, Merkle plan inclusion, Ed25519 leaf signature and counter. This is a reference verifier that passes the shared conformance vectors.
+This is the Rust counterpart to [`Atlas-Authorization/pca`](https://github.com/Atlas-Authorization/pca)
+(the spec, docs, playground and the independent language verifiers) and
+[`Atlas-Authorization/pca-js`](https://github.com/Atlas-Authorization/pca-js) (the TypeScript
+implementation). It is a single Cargo workspace.
 
-> Preview: the wire format and API may change before 1.0.
+Classic auth answers two questions:
+
+- **authN** — *who are you?* (OIDC, passkeys)
+- **authZ** — *what may you do?* (OAuth scopes, roles)
+
+Those were enough when a human was behind every action: the human *is* the policy engine, and their
+identity implies faithfulness. An autonomous agent breaks that assumption — it is a stochastic,
+externally-steerable process whose actions are unknown at grant time and manipulable (prompt injection,
+tool-poisoning) at run time. A bearer token in a hijacked agent is full impersonation.
+
+PCA adds a third question:
+
+- **authF** — *is this specific action a faithful, uncompromised execution of an authority the principal
+  actually conferred?*
+
+PCA makes `authF` cheaply verifiable by replacing the bearer token with a **Proof-Carrying Action
+(PCActn)**: with every action the agent presents a self-contained object, and the resource server
+verifies a *proof* — not the possession of a secret. The core verifier (`atlas-pca`) runs **offline**
+with a stateless set of fail-closed checks in a fixed, normative order; every higher capability
+(post-quantum signatures, transparent STARKs, in-circuit zero-knowledge, recursive folding) is an
+additive, independently-adoptable rung on top of the base wire.
+
+---
+
+## Crates
+
+| Crate | In root workspace? | What it does |
+|-------|--------------------|--------------|
+| [`atlas-pca`](crates/atlas-pca) | yes (member) | Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks, M0-M3) |
+| [`stark-pca`](crates/stark-pca) | yes (member) | Transparent, post-quantum STARK (Winterfell) proof of the PCA release gate |
+| [`zkvm-pca`](crates/zkvm-pca) | no (standalone) | Faithful port of the PCA Policy-VM release gate (full predicate DSL + fixed-point risk + caveats + native-sha256 commitments) for execution inside a zkVM guest |
+| [`folding-pca`](crates/folding-pca) | no (standalone) | Recursive PCA action-history aggregation via a Nova folding scheme (IVC): fold N per-action steps into ONE RecursiveSNARK, then compress to a CompressedSNARK proving an agent's WHOLE action history (unforgeable hash chain + cumulative Σcost ≤ bMax). |
+
+`atlas-pca` is the core verifier — start there. The other crates are heavy-crypto rungs that each prove
+a stronger property about a PCA decision or history; they are optional and independent.
+
+---
 
 ## Install
 
-`cargo add atlas-pca --git https://github.com/Atlas-Authorization/pca-rust` (crate `atlas-pca`; not yet published to crates.io)
-
-## Verify
+```toml
+# Cargo.toml — the core verifier
+[dependencies]
+atlas-pca = "0.1"
+```
 
 ```rust
-use atlas_pca::verify_pcactn_core;
+use atlas_pca::{verify_pcactn, VerifyOptions};
 
-let v = verify_pcactn_core(&pcactn, &grant); // both serde_json::Value
-if v.allow {
-    // chain, plan_inclusion, leaf_signature, counter all passed
-} else {
-    eprintln!("denied: {} {:?}", v.reason, v.checks);
+let verdict = verify_pcactn(&pcactn, &VerifyOptions {
+    audience: "https://api.example.com".into(),
+    ..Default::default()
+});
+if !verdict.ok {
+    return Err(format!("authF failed: {}", verdict.reason));
 }
 ```
 
-## Conformance tests
+The optional `axum` feature adds an ergonomic tower `Layer`/`Service` guard:
 
-The shared golden vectors are vendored in `conformance/` (synced from the hub). Run:
-
+```toml
+atlas-pca = { version = "0.1", features = ["axum"] }
 ```
+
+See each crate's own `README.md` and the [spec repo](https://github.com/Atlas-Authorization/pca) for the
+full model.
+
+---
+
+## Working in this workspace
+
+```sh
+# the root workspace (atlas-pca + stark-pca + folding-pca)
+cargo build --release
 cargo test
+
+# just the core verifier (loads the vendored conformance corpus in ./conformance)
+cargo test -p atlas-pca
+cargo test -p atlas-pca --features axum
+
+# a single crypto rung (note: folding-pca's package name is `pca-folding-ivc`)
+cargo test -p stark-pca
+cargo run  -p pca-folding-ivc --bin demo --release
 ```
 
-The reference verifier must produce the same `allow` and the same pass/fail for each of the four checks on every vector.
+### `zkvm-pca` builds on its own
 
-## Links
+`zkvm-pca` is **excluded from the root workspace** and is its own Cargo workspace. It proves the PCA
+release gate — including the in-guest Ed25519 capability-chain and leaf-PCActn verification — inside a
+[RISC Zero](https://risczero.com) zkVM, which needs a `rv32im` guest target and a pinned
+`[patch.crates-io]` set (risc0 forks of `sha2` / `curve25519-dalek` / `crypto-bigint`). A workspace root
+cannot be a member of another workspace, and those guest patches must not leak into the host graph, so it
+stands alone:
 
-- Hub (spec, other languages): https://github.com/Atlas-Authorization/pca
-- Live docs: https://atlasauth.net/pca
-- TypeScript reference: npm `@atlasauth/pca`
+```sh
+cd crates/zkvm-pca
+cargo build --release          # host + methods; risc0-build compiles the guest ELF
+cargo run --release --bin host # mint + prove + verify the fixture
+```
+
+The small proving fixtures (`image_id.json`, `public_journal.json`, succinct sample receipt, …) are
+committed; the large guest ELF and full receipts are regenerated by the build.
+
+---
 
 ## License
 
-MIT
+MIT — see [`LICENSE`](./LICENSE). (`stark-pca`, `zkvm-pca` and `folding-pca` are additionally offered
+under Apache-2.0; see each crate's `Cargo.toml`.)

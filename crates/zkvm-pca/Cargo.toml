@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = ["host", "methods", "core"]
+# methods/guest is its own workspace (declares [workspace]) and is built by risc0-build.
+
+[profile.dev]
+opt-level = 3
+
+[profile.release]
+debug = 1
+lto = true

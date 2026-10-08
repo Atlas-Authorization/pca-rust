@@ -1,0 +1,33 @@
+{
+  "description": "Public inputs for the committed sample release-gate STARK proof.",
+  "policy": {
+    "action_commitment": "0f1e2d3c4b5a69788796a5b4c3d2e1f0",
+    "bmax_scaled": 1000000,
+    "kappa": 1,
+    "policy_commitment": "a1b2c3d4e5f60718293a4b5c6d7e8f90",
+    "s": 1000000,
+    "theta1_scaled": 250000,
+    "weights": [
+      250000,
+      200000,
+      200000,
+      200000,
+      100000,
+      50000
+    ]
+  },
+  "public_field_elements": [
+    "250000",
+    "200000",
+    "200000",
+    "200000",
+    "100000",
+    "50000",
+    "1000000",
+    "250000000000",
+    "1",
+    "1000000",
+    "214933908099603316458134831733103562640",
+    "20095106327972375235668719608427373040"
+  ]
+}
