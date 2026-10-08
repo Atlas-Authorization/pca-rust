@@ -29,10 +29,26 @@
 //! enforced by in-AIR **bit-decomposition range gadgets** (`θ₁·S² − r_raw ≥ 0` and
 //! `B·S − κ·r_raw ≥ 0`), which are real algebraic STARK constraints — not a trusted bit.
 //!
+//! ## Witness ↔ commitment binding (the in-AIR hash)
+//!
+//! The private witness is now **bound in-AIR** to a public commitment. A genuine in-AIR
+//! algebraic hash (`NUM_LANES=10`-wide cube-S-box SPN: `a_k = (Hₖ + 2^row + RCₖ)³`,
+//! diffusion `H'ⱼ = Σₖ aₖ + aⱼ`, one round per trace row) absorbs the **nine quantized
+//! witness quantities** `(d, rev, bl, taint, conf, age, B, pm, co)` on row 0 (lanes 0..8) +
+//! a capacity IV (lane 9), runs `TRACE_LEN−1` rounds, and the first `COMMIT_LIMBS=4` state
+//! lanes at the final row are **asserted equal to a public input** `witness_commitment`
+//! (the resource server's algebraic commitment to the quantized action). The same
+//! witness columns drive both the risk gate and the hash, so a proof exists only for a
+//! witness whose quantized form hashes to the committed value — you cannot prove the gate
+//! for a witness that does not match the committed action. See `compute_witness_commitment`.
+//!
 //! See `README.md` for the precise honest gaps versus the Groth16 Policy-VM circuit
-//! (`packages/pca/src/zk.ts`): no in-AIR SHA-256 struct commitments (the witness is NOT
-//! bound in-AIR to `action_commitment`), predicates/caveats are reduced to booleans,
-//! the threshold ladder beyond t=1 and the attenuation chain are not encoded.
+//! (`packages/pca/src/zk.ts`). The binding above is over the **quantized preimage** via the
+//! AIR's native algebraic hash — it is **not** a recomputation of the SHA-256-of-canonical-
+//! JSON `action_commitment` in-AIR (still infeasible in this field); the two are linked
+//! off-circuit by the resource server deriving both from one action. Remaining gaps:
+//! predicates/caveats are reduced to booleans, the threshold ladder beyond t=1 and the
+//! attenuation chain are not encoded.
 
 use serde::{Deserialize, Serialize};
 use winterfell::{
@@ -65,8 +81,44 @@ const C_BGATE: usize = 11; // B≥κ·r bit
 const C_ALLOW: usize = 12; // allow == pm·co·tgate·bgate
 const C_POW: usize = 13; // 2^step
 const RC_BASE: usize = 14; // range-check columns start here (2 per check: bit, acc)
+
+// ---- in-AIR algebraic-hash (witness ↔ commitment binding) layout ---------------------
+
+/// Hash-state lanes: lanes 0..8 absorb the 9 quantized witness quantities, lane 9 = capacity.
+pub const NUM_LANES: usize = 10;
+/// Number of squeezed output limbs forming the public `witness_commitment`.
+pub const COMMIT_LIMBS: usize = 4;
+/// Hash-state columns start here (one column per lane).
+const HASH_BASE: usize = RC_BASE + 2 * NUM_RC; // 46
 /// Total trace width.
-pub const WIDTH: usize = RC_BASE + 2 * NUM_RC; // 46
+pub const WIDTH: usize = HASH_BASE + NUM_LANES; // 56
+
+/// Capacity-lane IV and per-lane round constants (nothing-up-my-sleeve; all fit in u64, so
+/// they are byte-identical to the Plonky3/Goldilocks crate's constants).
+const CAP_IV: u64 = 0x5043_4162_6967_3031; // "PCAbig01"
+const RC_SEED: u64 = 0x00A1_B2C3_D4E5_F607;
+const RC_STRIDE: u64 = 0x0000_1000_0000_01B3;
+
+#[inline]
+const fn rc_k(k: usize) -> u64 {
+    RC_SEED.wrapping_add((k as u64).wrapping_mul(RC_STRIDE))
+}
+#[inline]
+const fn h_lane(j: usize) -> usize {
+    HASH_BASE + j
+}
+/// The trace column holding the preimage element absorbed into hash lane `j` (j < 9):
+/// lanes 0..5 → the six risk inputs, lane 6 → budget, lane 7 → pm, lane 8 → co.
+#[inline]
+const fn preimage_col(j: usize) -> usize {
+    match j {
+        0 | 1 | 2 | 3 | 4 | 5 => C_X[j],
+        6 => C_BS,
+        7 => C_PM,
+        8 => C_CO,
+        _ => usize::MAX,
+    }
+}
 
 #[inline]
 const fn rc_bit(k: usize) -> usize {
@@ -98,13 +150,21 @@ pub struct PolicyParams {
     pub bmax_scaled: u64,
     /// Opaque policy commitment (hex) — bound into the proof transcript, NOT constrained in-AIR.
     pub policy_commitment: String,
-    /// Opaque action commitment (hex) — bound into the proof transcript, NOT constrained in-AIR.
+    /// Opaque action commitment (hex, SHA-256 of canonical JSON) — bound into the proof
+    /// transcript, NOT recomputed in-AIR (see the crate docs / README on the quantized binding).
     pub action_commitment: String,
+    /// The resource server's algebraic commitment to the quantized action — the
+    /// `COMMIT_LIMBS` field-element limbs (decimal) of [`compute_witness_commitment`]. These
+    /// ARE constrained in-AIR: the witness's quantized form is proven to hash to them.
+    pub witness_commitment: [String; COMMIT_LIMBS],
 }
 
 impl PolicyParams {
-    /// The default risk policy of `risk.ts` (`DEFAULT_RISK_POLICY`), scaled by S.
+    /// The default risk policy of `risk.ts` (`DEFAULT_RISK_POLICY`), scaled by S. Its
+    /// `witness_commitment` is the algebraic commitment to the paired [`Witness::compliant`]
+    /// quantized action (the default fixture), as a resource server would compute and publish.
     pub fn default_policy() -> Self {
+        let wc = compute_witness_commitment(&Witness::compliant());
         PolicyParams {
             weights: [250_000, 200_000, 200_000, 200_000, 100_000, 50_000],
             s: S,
@@ -113,6 +173,7 @@ impl PolicyParams {
             bmax_scaled: 1_000_000, // bMax = 1.0
             policy_commitment: "a1b2c3d4e5f60718293a4b5c6d7e8f90".into(),
             action_commitment: "0f1e2d3c4b5a69788796a5b4c3d2e1f0".into(),
+            witness_commitment: core::array::from_fn(|m| wc[m].as_int().to_string()),
         }
     }
 
@@ -130,6 +191,8 @@ impl PolicyParams {
     /// The public inputs embedded in / checked against the proof.
     pub fn to_public(&self) -> PublicInputs {
         let (pc, ac) = self.commitment_elems();
+        let wc: [BaseElement; COMMIT_LIMBS] =
+            core::array::from_fn(|m| BaseElement::new(self.witness_commitment[m].parse::<u128>().unwrap_or(0)));
         PublicInputs {
             weights: self.weights.map(|w| BaseElement::new(w as u128)),
             s: BaseElement::new(self.s as u128),
@@ -138,6 +201,7 @@ impl PolicyParams {
             bmax_scaled: BaseElement::new(self.bmax_scaled as u128),
             policy_commitment: pc,
             action_commitment: ac,
+            witness_commitment: wc,
         }
     }
 }
@@ -161,11 +225,12 @@ pub struct PublicInputs {
     pub bmax_scaled: BaseElement,
     pub policy_commitment: BaseElement,
     pub action_commitment: BaseElement,
+    pub witness_commitment: [BaseElement; COMMIT_LIMBS],
 }
 
 impl ToElements<BaseElement> for PublicInputs {
     fn to_elements(&self) -> Vec<BaseElement> {
-        let mut v = Vec::with_capacity(12);
+        let mut v = Vec::with_capacity(12 + COMMIT_LIMBS);
         v.extend_from_slice(&self.weights);
         v.push(self.s);
         v.push(self.t1_rraw);
@@ -173,6 +238,7 @@ impl ToElements<BaseElement> for PublicInputs {
         v.push(self.bmax_scaled);
         v.push(self.policy_commitment);
         v.push(self.action_commitment);
+        v.extend_from_slice(&self.witness_commitment);
         v
     }
 }
@@ -235,6 +301,60 @@ pub fn risk_raw(inputs: &[u64; 6], weights: &[u64; 6]) -> u128 {
     acc
 }
 
+// ---- in-AIR algebraic hash (witness ↔ commitment binding) ----------------------------
+
+/// Run the full hash-state trace. Row 0 is the initial state (lanes 0..8 = the 9 quantized
+/// preimage elements, lane 9 = capacity IV); each subsequent row applies one SPN round with
+/// a cube S-box (`a_k = (H_k + 2^row + RC_k)³`) and an invertible `(I+J)` diffusion layer
+/// (`H'_j = Σ_k a_k + a_j`). This is exactly the recurrence enforced in-AIR by
+/// [`ReleaseAir::evaluate_transition`], so prover trace and verifier constraints agree.
+fn hash_state_trace(preimage: &[BaseElement; 9]) -> [[BaseElement; NUM_LANES]; TRACE_LEN] {
+    let mut st = [[BaseElement::ZERO; NUM_LANES]; TRACE_LEN];
+    for j in 0..9 {
+        st[0][j] = preimage[j];
+    }
+    st[0][9] = BaseElement::new(CAP_IV as u128);
+    let rc: [BaseElement; NUM_LANES] = core::array::from_fn(|k| BaseElement::new(rc_k(k) as u128));
+    for r in 0..TRACE_LEN - 1 {
+        let pow = BaseElement::new(1u128 << r);
+        let mut a = [BaseElement::ZERO; NUM_LANES];
+        let mut sum = BaseElement::ZERO;
+        for k in 0..NUM_LANES {
+            let t = st[r][k] + pow + rc[k];
+            let c = t * t * t;
+            a[k] = c;
+            sum += c;
+        }
+        for j in 0..NUM_LANES {
+            st[r + 1][j] = sum + a[j];
+        }
+    }
+    st
+}
+
+/// The nine quantized witness quantities, in absorption order (= lanes 0..8).
+fn witness_preimage(w: &Witness) -> [BaseElement; 9] {
+    [
+        BaseElement::new(w.inputs[0] as u128),
+        BaseElement::new(w.inputs[1] as u128),
+        BaseElement::new(w.inputs[2] as u128),
+        BaseElement::new(w.inputs[3] as u128),
+        BaseElement::new(w.inputs[4] as u128),
+        BaseElement::new(w.inputs[5] as u128),
+        BaseElement::new(w.budget_scaled as u128),
+        if w.predicate_match { BaseElement::ONE } else { BaseElement::ZERO },
+        if w.caveats_ok { BaseElement::ONE } else { BaseElement::ZERO },
+    ]
+}
+
+/// The algebraic commitment to the quantized witness preimage: the first `COMMIT_LIMBS`
+/// hash-state lanes at the final trace row. The resource server computes the *same* value
+/// over the quantized action and publishes it as `PolicyParams::witness_commitment`.
+pub fn compute_witness_commitment(w: &Witness) -> [BaseElement; COMMIT_LIMBS] {
+    let st = hash_state_trace(&witness_preimage(w));
+    core::array::from_fn(|m| st[TRACE_LEN - 1][m])
+}
+
 // ---- the AIR --------------------------------------------------------------------------
 
 pub struct ReleaseAir {
@@ -244,6 +364,7 @@ pub struct ReleaseAir {
     t1_rraw: BaseElement,
     kappa: BaseElement,
     bmax_scaled: BaseElement,
+    witness_commitment: [BaseElement; COMMIT_LIMBS],
 }
 
 impl ReleaseAir {
@@ -305,9 +426,18 @@ impl Air for ReleaseAir {
             degrees.push(TransitionConstraintDegree::new(2));
             degrees.push(TransitionConstraintDegree::with_cycles(1, vec![TRACE_LEN]));
         }
+        // (G) hash SPN round recurrence (cube S-box → degree 3), one per lane
+        for _ in 0..NUM_LANES {
+            degrees.push(TransitionConstraintDegree::new(3));
+        }
+        // (H) hash init pins (first row only): degree-1 gated by the step-0 periodic selector
+        for _ in 0..NUM_LANES {
+            degrees.push(TransitionConstraintDegree::with_cycles(1, vec![TRACE_LEN]));
+        }
 
-        // assertions: pow[0]=1, allow[0]=1, and acc_k[last]=0 for each range check
-        let num_assertions = 2 + NUM_RC;
+        // assertions: pow[0]=1, allow[0]=1, acc_k[last]=0 per range check, and the
+        // COMMIT_LIMBS squeezed hash lanes at the last row == public witness_commitment.
+        let num_assertions = 2 + NUM_RC + COMMIT_LIMBS;
 
         ReleaseAir {
             context: AirContext::new(trace_info, degrees, num_assertions, options),
@@ -316,6 +446,7 @@ impl Air for ReleaseAir {
             t1_rraw: pub_inputs.t1_rraw,
             kappa: pub_inputs.kappa,
             bmax_scaled: pub_inputs.bmax_scaled,
+            witness_commitment: pub_inputs.witness_commitment,
         }
     }
 
@@ -380,17 +511,49 @@ impl Air for ReleaseAir {
             result[i] = s0 * (acc - self.rc_target(k, cur));
             i += 1;
         }
+
+        // (G) algebraic-hash SPN round: a_k = (H_k + pow + RC_k)³ ; H'_j = Σ_k a_k + a_j.
+        // The per-row constant is `pow` (= 2^row, column C_POW), so every round differs; the
+        // per-lane RC_k break lane symmetry. This recurrence binds the preimage (row 0) to
+        // the squeezed commitment (last row), asserted equal to the public input below.
+        let pow = cur[C_POW];
+        let mut a = [E::ZERO; NUM_LANES];
+        let mut sum = E::ZERO;
+        for k in 0..NUM_LANES {
+            let t = cur[h_lane(k)] + pow + E::from(BaseElement::new(rc_k(k) as u128));
+            let c = t * t * t;
+            a[k] = c;
+            sum += c;
+        }
+        for j in 0..NUM_LANES {
+            result[i] = next[h_lane(j)] - (sum + a[j]);
+            i += 1;
+        }
+        // (H) hash init pins (step 0 only): lanes 0..8 == the quantized preimage columns,
+        // lane 9 == the capacity IV.
+        for j in 0..9 {
+            result[i] = s0 * (cur[h_lane(j)] - cur[preimage_col(j)]);
+            i += 1;
+        }
+        result[i] = s0 * (cur[h_lane(9)] - E::from(BaseElement::new(CAP_IV as u128)));
+        i += 1;
+        debug_assert_eq!(i, result.len());
     }
 
     fn get_assertions(&self) -> Vec<Assertion<BaseElement>> {
         let last = TRACE_LEN - 1;
-        let mut a = Vec::with_capacity(2 + NUM_RC);
+        let mut a = Vec::with_capacity(2 + NUM_RC + COMMIT_LIMBS);
         a.push(Assertion::single(C_POW, 0, BaseElement::ONE)); // pow[0] = 2^0 = 1
         a.push(Assertion::single(C_ALLOW, 0, BaseElement::ONE)); // allow = 1 (the gate)
         for k in 0..NUM_RC {
             // residual decompositions all reach exactly 0 → each target is a valid
             // non-negative <2^63 bit sum (a deny witness cannot satisfy this).
             a.push(Assertion::single(rc_acc(k), last, BaseElement::ZERO));
+        }
+        // squeeze: the first COMMIT_LIMBS hash lanes at the last row must equal the public
+        // witness_commitment — this is the in-AIR witness ↔ action binding.
+        for m in 0..COMMIT_LIMBS {
+            a.push(Assertion::single(h_lane(m), last, self.witness_commitment[m]));
         }
         a
     }
@@ -470,6 +633,14 @@ pub fn build_trace(w: &Witness, policy: &PolicyParams) -> TraceTable<BaseElement
         }
         // For a valid (<2^63) target, acc[last] == 0. For an out-of-range / negative
         // (field-wrapped, ≥2^63) target it is non-zero → the acc[last]=0 assertion fails.
+    }
+
+    // in-AIR algebraic-hash columns: the full SPN state trace over the quantized preimage.
+    let st = hash_state_trace(&witness_preimage(w));
+    for row in 0..TRACE_LEN {
+        for j in 0..NUM_LANES {
+            cols[h_lane(j)][row] = st[row][j];
+        }
     }
 
     TraceTable::init(cols)

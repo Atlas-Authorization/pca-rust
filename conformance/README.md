@@ -1,13 +1,30 @@
 # PCA conformance suite (wire format v2)
 
-Golden + adversarial vectors for CORE PCActn verification: strict wire form, freshness binding, capability
-chain, Merkle plan inclusion, Ed25519 leaf signature, counter. Regenerate (deterministic) with:
+Golden + adversarial vectors for CORE PCActn verification (strict wire form, freshness binding, capability
+chain, Merkle plan inclusion, Ed25519 leaf signature, counter) PLUS the full post-quantum crypto-agility
+coverage and the v2.1 agent-leaf share binding. Regenerate (deterministic) with the TWO-STAGE pipeline — the
+base generator writes the ed25519 core corpus, then the PQ generator APPENDS all post-quantum coverage:
 
-    pnpm --filter @atlasauth/pca build && node packages/pca/scripts/gen-conformance.mjs
+    pnpm --filter @atlasauth/pca build \
+      && node packages/pca/scripts/gen-conformance.mjs \
+      && node packages/pca/scripts/gen-conformance-pq.mjs
 
-The generator asserts every vector's stated intent against the TypeScript reference
-(`packages/pca/src/conformance.test.ts` then re-runs the reference over the written file).
+Each generator asserts every vector's / primitive's stated intent against the TypeScript reference before it
+is written (`verifyPCActnCore` for PCActns; `verifyThreshold` / `verifyWithSuite` for the threshold + artifact
+primitives); `packages/pca/src/conformance.test.ts` then re-runs the reference over the whole written file.
 The language verifiers (`sdks/*-pca`) must reproduce `allow` and every listed check for EVERY vector.
+
+### Post-quantum + v2.1 coverage (`gen-conformance-pq.mjs`)
+
+- LEAF verification under ALL 10 registered suites (`requires: "pq"`): `ed25519`; the lattice `ml-dsa-65` /
+  `ml-dsa-87` and their `hybrid-ed25519-*`; the SUF-CMA `hybrid-nested-ed25519-ml-dsa-65`; the hash-based
+  `slh-dsa-sha2-128f` / `slh-dsa-sha2-256s` and their hybrids. Per suite: a positive + a corrupt-primary-sig
+  negative; per HYBRID also a corrupt-`pq_sig` and a missing-`pq_sig` (wire) negative; plus the global
+  `pq-leaf-unknown-alg`, `pq-leaf-ed25519-stray-pqpk` and `pq-leaf-pure-mldsa65-stray-pqsig` wire negatives.
+- NON-LEAF verification (`requires: "pq-nonleaf"`): a capability-chain delegation hop signed under each of the
+  9 non-ed25519 suites — positive + corrupt per suite, + a downgrade (strip `alg`/`pq_pk`/`pq_sig`) negative
+  per hybrid (the suite fields are bound into the signed hop `body_digest`).
+- `agent_leaf_binding: "2.1"` marks the clean-break agent-leaf share binding (see `primitives.threshold_share`).
 
 ## Files
 
@@ -33,7 +50,18 @@ The language verifiers (`sdks/*-pca`) must reproduce `allow` and every listed ch
 - `json_parse[]`: `{ input, accept, canonical? }` - strict JSON profile; `accept:false` MUST be rejected.
 - `b64u[]`: `{ input, valid, len? }` - strict base64url; `len` = required decoded byte length.
 - `merkle[]`, `params_digest_empty` - unchanged.
-- `threshold_share[]`: role-bound share message vectors (informational for verifiers that also check threshold shares).
+- `threshold_share[]`: role/signerSetHash/t-bound share vectors. Each `{ role, t, signer_set, threshold_message,
+  signer_set_hash, share_message, share, valid? }`. A verifier that checks threshold shares MUST confirm
+  `share` verifies over `share_message` (under `share.publicKey` / `share.pq_pk` per `share.alg`) iff
+  `valid` (default `true`). v2.1 AGENT-LEAF BINDING: the `role:"agent"` entries sign the SAME
+  `"atlas-pca/share/agent\0" || sha256(thresholdMessage) || signerSetHash || t` bytes as guardian/principal
+  (positive); the OLD bare-threshold-message agent share (`agent-bare-rejected`) and a cross-signer-set replay
+  (`agent-bound-wrong-set`) are `valid:false`. Guardian/principal share bytes are UNCHANGED by v2.1.
+- `pq_artifact[]`: representative post-quantum signatures for the non-leaf transparency/authority surfaces —
+  `sth`, `revocation`, `beacon`, `bond-settlement`, `safety-certificate`, `judge-verdict`,
+  `software-attestation` — each `{ artifact, alg, ed_pub, pq_pk?, body, message, sig, pq_sig?, valid }`. All
+  route through the SAME pq.ts agility seam as the leaf; a verifier confirms the signature over
+  `message` with the suite `alg` iff `valid`. Spans all 10 suites (positive + a corrupt-`sig` negative each).
 
 ## NORMATIVE rules (wire format v2)
 

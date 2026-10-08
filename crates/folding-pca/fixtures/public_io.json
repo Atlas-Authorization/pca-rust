@@ -38,7 +38,7 @@
   "description": "Public IO for the committed CompressedSNARK over a compliant PCA action history.",
   "final_state": {
     "budget_spent": "0x00000000000000000000000000000000000000000000000000000000000c3500",
-    "chain_digest": "0x08f859d4a7f618b4b9fa037a906eec562affd6955dd33c9838d0015e90a2aff6"
+    "chain_digest": "0x3c5fbba25dbf83bcd092ff743508c372deae0ca5b967a17603891ddc88dc02bb"
   },
   "num_steps": 8,
   "z0": [

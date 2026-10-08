@@ -1,0 +1,676 @@
+{
+  "format": 1,
+  "suite": "sha384",
+  "default_hash_suite": "sha256",
+  "description": "Optional SHA-384 hash-suite (P4) golden vectors for canonical digests and the Merkle tree. Non-breaking: the sha256 default is unchanged; sha384 is opt-in margin/agility (NOT a SHA-256 fix). The two suites are mutually fail-closed — a proof built under one never verifies under the other. hash_suite ABSENT => sha256.",
+  "hash_len_bytes": 48,
+  "primitives": {
+    "canonical": [
+      {
+        "value": {
+          "b": 1,
+          "a": [
+            true,
+            null,
+            "x"
+          ],
+          "c": {
+            "z": 1,
+            "y": 2
+          }
+        },
+        "suite": "sha384",
+        "expect": "{\"a\":[true,null,\"x\"],\"b\":1,\"c\":{\"y\":2,\"z\":1}}",
+        "hash": "jh3doU9eXc1SN0HIugyNYchAWEfqpvn4Yqffm67tfpBz2QLmPz6teiCP259kBS8l",
+        "sha256_hash": "mkd7hqbLgkPQe3W5mCM_kVvVQiX4Js6ZFJpEPF68ogc"
+      },
+      {
+        "value": {
+          "～": 1,
+          "😀": 2
+        },
+        "suite": "sha384",
+        "expect": "{\"～\":1,\"😀\":2}",
+        "hash": "slU0O3pBdFJmDsGeo_niT6tq3FYpnxc1gc9qgwyv3i97_sdQAn89K89rhCk_gpog",
+        "sha256_hash": "Wxk_IIPlG6Fjj2TuwzRfMRLGMGM83WN0DBbJVl0gadk"
+      },
+      {
+        "value": {
+          "s": "café <&> \"q\" \\ \n \u0001   "
+        },
+        "suite": "sha384",
+        "expect": "{\"s\":\"café <&> \\\"q\\\" \\\\ \\n \\u0001   \"}",
+        "hash": "nemGkxEQLV8HeNnueeWanSJqlrdgSO8Yd9ko-KGEk0B0bQucrg9mRb5rK0lESNMH",
+        "sha256_hash": "jlXPJxqo_4c4e0iW5NIJ6B3Q5jv2GUkAkEgJYukq6es"
+      },
+      {
+        "value": {
+          "n": [
+            0,
+            -1,
+            1.5,
+            100000,
+            0.1,
+            -0.25,
+            9007199254740991
+          ]
+        },
+        "suite": "sha384",
+        "expect": "{\"n\":[0,-1,1.5,100000,0.1,-0.25,9007199254740991]}",
+        "hash": "vBpGmbq7b9yYnlhMvFzSlYpe_IRBKU3iFD6R7eM3PEu4wI6mjRTbEoCT3q4FzXxy",
+        "sha256_hash": "OOd7WUIB_N-JV88tnoa_rvR-H05CfW3muGHR-ZOa1aU"
+      },
+      {
+        "value": {
+          "": 1,
+          "a": {
+            "": 2
+          },
+          "a\u0000": 3,
+          "aa": 4
+        },
+        "suite": "sha384",
+        "expect": "{\"\":1,\"a\":{\"\":2},\"a\\u0000\":3,\"aa\":4}",
+        "hash": "uYaA9H2r01ZBi9Ej6TraCju1OCzOoDqeUH_0XBedkMh_8OMYQyGXfkbYLLqHkFCQ",
+        "sha256_hash": "P4s8sgDA3omoj6r5WXKpM4O3pbgcpSSk7Z-sI_4CQUI"
+      }
+    ],
+    "merkle": [
+      {
+        "n": 3,
+        "leaves": [
+          {
+            "i": 0,
+            "t": "leaf"
+          },
+          {
+            "i": 1,
+            "t": "leaf"
+          },
+          {
+            "i": 2,
+            "t": "leaf"
+          }
+        ],
+        "suite": "sha384",
+        "root": "u6ZM6EvHmr6ZZegx02ufcTGYHlHLG2J8PKsE0p6vC1CjE7Vhwrpi3KED35kT8gN9",
+        "sha256_root": "dwJSU4uIY3n8pnSC4KPP5rhPZpbRX-jV6ReTrTVXM5w",
+        "proofs": [
+          {
+            "index": 0,
+            "size": 3,
+            "path": [
+              {
+                "side": "R",
+                "hash": "fmXZRLpV-m9l9FWxd-uzkdBHdrb2s30sIi8J6pF8zneYebE1KpembZeNY76y5T8l"
+              },
+              {
+                "side": "R",
+                "hash": "xLYjh2rIopPSFF9mnvshpFri9FLcuUrgVr4NX1WGVEQ_04ruvXgsBtEIuyWy9JO8"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 1,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "4ofksx5d8J-ecfyAgO1bGB7BCbYRBcpA1ZVcUD5-V8mm8w5loAc43tA82OxE656K"
+              },
+              {
+                "side": "R",
+                "hash": "xLYjh2rIopPSFF9mnvshpFri9FLcuUrgVr4NX1WGVEQ_04ruvXgsBtEIuyWy9JO8"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 2,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "p6zvcQgz_oX9nq8Vo4zVq3cJ9an4_Ql0RtWqG99XbFw1Q8QF-A7A-Bpbm4ZxYmDe"
+              }
+            ],
+            "hash_suite": "sha384"
+          }
+        ],
+        "sha256_proofs": [
+          {
+            "index": 0,
+            "size": 3,
+            "path": [
+              {
+                "side": "R",
+                "hash": "yYhzVAdZaZrF3WR56nRAMjmvmGSnrDqqIWkqk38KXZs"
+              },
+              {
+                "side": "R",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "zxsw_7VLmf5UDpz_UrqiebA5bRe-fg_oZrJ8Cqa-LIQ"
+              },
+              {
+                "side": "R",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "n": 5,
+        "leaves": [
+          {
+            "i": 0,
+            "t": "leaf"
+          },
+          {
+            "i": 1,
+            "t": "leaf"
+          },
+          {
+            "i": 2,
+            "t": "leaf"
+          },
+          {
+            "i": 3,
+            "t": "leaf"
+          },
+          {
+            "i": 4,
+            "t": "leaf"
+          }
+        ],
+        "suite": "sha384",
+        "root": "dCAwrMMqV7MUMQ5LSuHzBAOP7BOtP8fpOaXcFa-SADGyMUUoyZ8xr4H4Sg75rfuY",
+        "sha256_root": "og5FfZ7cSDxjCOXbMmJkpH9-QzG1oQ2P8MVxHKB0dXI",
+        "proofs": [
+          {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "fmXZRLpV-m9l9FWxd-uzkdBHdrb2s30sIi8J6pF8zneYebE1KpembZeNY76y5T8l"
+              },
+              {
+                "side": "R",
+                "hash": "WHRy17sD6dqEJ5_HCd-oulYzjtvrRo4tFYNJ0ffQoQ-gX4buvtyRf600QQAeFgQK"
+              },
+              {
+                "side": "R",
+                "hash": "uhO9sqPg8YD36Att1tZFGTjPHpsZ_BItHZb1rkeFkgGg9yBxyJg9FY2ufNLkUZLQ"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "4ofksx5d8J-ecfyAgO1bGB7BCbYRBcpA1ZVcUD5-V8mm8w5loAc43tA82OxE656K"
+              },
+              {
+                "side": "R",
+                "hash": "WHRy17sD6dqEJ5_HCd-oulYzjtvrRo4tFYNJ0ffQoQ-gX4buvtyRf600QQAeFgQK"
+              },
+              {
+                "side": "R",
+                "hash": "uhO9sqPg8YD36Att1tZFGTjPHpsZ_BItHZb1rkeFkgGg9yBxyJg9FY2ufNLkUZLQ"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 2,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "b7BhXTtEdUeUKNefcnYIkpTsF3hAhgdXkJ2oAzWyt6zQNkHiV62x_Ha8BdLY_woA"
+              },
+              {
+                "side": "L",
+                "hash": "p6zvcQgz_oX9nq8Vo4zVq3cJ9an4_Ql0RtWqG99XbFw1Q8QF-A7A-Bpbm4ZxYmDe"
+              },
+              {
+                "side": "R",
+                "hash": "uhO9sqPg8YD36Att1tZFGTjPHpsZ_BItHZb1rkeFkgGg9yBxyJg9FY2ufNLkUZLQ"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 3,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "xLYjh2rIopPSFF9mnvshpFri9FLcuUrgVr4NX1WGVEQ_04ruvXgsBtEIuyWy9JO8"
+              },
+              {
+                "side": "L",
+                "hash": "p6zvcQgz_oX9nq8Vo4zVq3cJ9an4_Ql0RtWqG99XbFw1Q8QF-A7A-Bpbm4ZxYmDe"
+              },
+              {
+                "side": "R",
+                "hash": "uhO9sqPg8YD36Att1tZFGTjPHpsZ_BItHZb1rkeFkgGg9yBxyJg9FY2ufNLkUZLQ"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 4,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "65zAtv-XuK-Xgnwr79qLmDcnPhVyh1aUKBKzwpUxBilgmahcdnS3aQjRcBIgKG6f"
+              }
+            ],
+            "hash_suite": "sha384"
+          }
+        ],
+        "sha256_proofs": [
+          {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "yYhzVAdZaZrF3WR56nRAMjmvmGSnrDqqIWkqk38KXZs"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "zxsw_7VLmf5UDpz_UrqiebA5bRe-fg_oZrJ8Cqa-LIQ"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "cDMDOBKiokpLXr9Xr70SAyUJWEK9Xn0A5yS_FTe6YqM"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "n": 7,
+        "leaves": [
+          {
+            "i": 0,
+            "t": "leaf"
+          },
+          {
+            "i": 1,
+            "t": "leaf"
+          },
+          {
+            "i": 2,
+            "t": "leaf"
+          },
+          {
+            "i": 3,
+            "t": "leaf"
+          },
+          {
+            "i": 4,
+            "t": "leaf"
+          },
+          {
+            "i": 5,
+            "t": "leaf"
+          },
+          {
+            "i": 6,
+            "t": "leaf"
+          }
+        ],
+        "suite": "sha384",
+        "root": "OLQGzGBnuZ72NrvIYyqMbixpmel3EK1yAtp5_qHQwpL6uJ0RNHIzdojHz8RM7owD",
+        "sha256_root": "RtcA7P3RCfw6hjyS64RS8lMOfPKbKsefyj12-iu1mvo",
+        "proofs": [
+          {
+            "index": 0,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "fmXZRLpV-m9l9FWxd-uzkdBHdrb2s30sIi8J6pF8zneYebE1KpembZeNY76y5T8l"
+              },
+              {
+                "side": "R",
+                "hash": "WHRy17sD6dqEJ5_HCd-oulYzjtvrRo4tFYNJ0ffQoQ-gX4buvtyRf600QQAeFgQK"
+              },
+              {
+                "side": "R",
+                "hash": "Qck6rh_WNP85t4389Z3vgSf8BfEnVeqxRPLFk4B-xtSB0Yw5TMMZjjab7UM7tSEK"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 1,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "4ofksx5d8J-ecfyAgO1bGB7BCbYRBcpA1ZVcUD5-V8mm8w5loAc43tA82OxE656K"
+              },
+              {
+                "side": "R",
+                "hash": "WHRy17sD6dqEJ5_HCd-oulYzjtvrRo4tFYNJ0ffQoQ-gX4buvtyRf600QQAeFgQK"
+              },
+              {
+                "side": "R",
+                "hash": "Qck6rh_WNP85t4389Z3vgSf8BfEnVeqxRPLFk4B-xtSB0Yw5TMMZjjab7UM7tSEK"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 2,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "b7BhXTtEdUeUKNefcnYIkpTsF3hAhgdXkJ2oAzWyt6zQNkHiV62x_Ha8BdLY_woA"
+              },
+              {
+                "side": "L",
+                "hash": "p6zvcQgz_oX9nq8Vo4zVq3cJ9an4_Ql0RtWqG99XbFw1Q8QF-A7A-Bpbm4ZxYmDe"
+              },
+              {
+                "side": "R",
+                "hash": "Qck6rh_WNP85t4389Z3vgSf8BfEnVeqxRPLFk4B-xtSB0Yw5TMMZjjab7UM7tSEK"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 3,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "xLYjh2rIopPSFF9mnvshpFri9FLcuUrgVr4NX1WGVEQ_04ruvXgsBtEIuyWy9JO8"
+              },
+              {
+                "side": "L",
+                "hash": "p6zvcQgz_oX9nq8Vo4zVq3cJ9an4_Ql0RtWqG99XbFw1Q8QF-A7A-Bpbm4ZxYmDe"
+              },
+              {
+                "side": "R",
+                "hash": "Qck6rh_WNP85t4389Z3vgSf8BfEnVeqxRPLFk4B-xtSB0Yw5TMMZjjab7UM7tSEK"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 4,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "OLLzHui34RDrArB_ZJcp9L41Rg6cTA9APqT3v4PEJgRslhvzQ9jqBztv7Su1rPp4"
+              },
+              {
+                "side": "R",
+                "hash": "5V3QngtxW6R5aOBzgOK7SfAimp-rlMwRYnh9PL6LeYMgYIxo8HC5sPRNP0ekNAUH"
+              },
+              {
+                "side": "L",
+                "hash": "65zAtv-XuK-Xgnwr79qLmDcnPhVyh1aUKBKzwpUxBilgmahcdnS3aQjRcBIgKG6f"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 5,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "uhO9sqPg8YD36Att1tZFGTjPHpsZ_BItHZb1rkeFkgGg9yBxyJg9FY2ufNLkUZLQ"
+              },
+              {
+                "side": "R",
+                "hash": "5V3QngtxW6R5aOBzgOK7SfAimp-rlMwRYnh9PL6LeYMgYIxo8HC5sPRNP0ekNAUH"
+              },
+              {
+                "side": "L",
+                "hash": "65zAtv-XuK-Xgnwr79qLmDcnPhVyh1aUKBKzwpUxBilgmahcdnS3aQjRcBIgKG6f"
+              }
+            ],
+            "hash_suite": "sha384"
+          },
+          {
+            "index": 6,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "qtWCi_vQoVD2OxEw0dT_g9YgOZTyS3wX-qcKpN6h69SNqeD1EtaMktSjyIcyAwG2"
+              },
+              {
+                "side": "L",
+                "hash": "65zAtv-XuK-Xgnwr79qLmDcnPhVyh1aUKBKzwpUxBilgmahcdnS3aQjRcBIgKG6f"
+              }
+            ],
+            "hash_suite": "sha384"
+          }
+        ],
+        "sha256_proofs": [
+          {
+            "index": 0,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "yYhzVAdZaZrF3WR56nRAMjmvmGSnrDqqIWkqk38KXZs"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "zxsw_7VLmf5UDpz_UrqiebA5bRe-fg_oZrJ8Cqa-LIQ"
+              },
+              {
+                "side": "R",
+                "hash": "uBNZuLCNVItGLX5gzkcZEMXT2rV7HMtJ9xMZiDCsG6I"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "cDMDOBKiokpLXr9Xr70SAyUJWEK9Xn0A5yS_FTe6YqM"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Tgf-b6tTtP_VmZ32_k7lRtnyC6E_WG1g4L2DJLWOzDg"
+              },
+              {
+                "side": "L",
+                "hash": "H2BFpYPtmdbAE12pEbQlZbgbIiP_-tbK2271bJUfGh8"
+              },
+              {
+                "side": "R",
+                "hash": "Oia8_R0LOyfr-llQA6EOSFLwMQ7Sv8emZ6dM3JGlfdA"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "size": 7,
+            "path": [
+              {
+                "side": "R",
+                "hash": "DAroCNJtz7lHiJgk0JXNwNrLp_k1jYKS0va5XWEfk6g"
+              },
+              {
+                "side": "R",
+                "hash": "YrvA3G5yOytRhX6THfM1NVajHMFH7T4vU-vxAifdSNY"
+              },
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "uiVugMITPTMSpUp894OFyvK6oXFWmTcBRBRopdAJHsE"
+              },
+              {
+                "side": "R",
+                "hash": "YrvA3G5yOytRhX6THfM1NVajHMFH7T4vU-vxAifdSNY"
+              },
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "size": 7,
+            "path": [
+              {
+                "side": "L",
+                "hash": "VP7v3pTi44Jx7F0YdH4Mqt18n5y-D7UBwCWPWrWRmkY"
+              },
+              {
+                "side": "L",
+                "hash": "EpLScn-6WCGzfhcmp0EcnEeGe2q3dJUABsKXraWjE00"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -15,6 +15,12 @@ nova-snark = "=0.76.0"
 # scalar's `PrimeField` impl unifies (0.76 uses ff 0.13).
 ff = "0.13"
 
+# `generic-array` only to name the Poseidon sponge arity type `typenum::U2` for the chain hash.
+# Pinned to the exact version Nova 0.76 already resolves (1.4.5, which re-exports `typenum`), so
+# the `U2` we pass is the *same* type Nova's `Arity` impls are written against and no transitive
+# version changes. `generic_array::typenum::U2` ⇒ `pub extern crate typenum` in generic-array 1.x.
+generic-array = "=1.4.5"
+
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 # bincode 1.x binary encoding for the committed proof/vk fixtures (Nova types are serde).
