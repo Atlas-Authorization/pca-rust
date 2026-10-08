@@ -13,10 +13,10 @@
 //! enforces **in-circuit**:
 //!
 //!   1. **Unforgeable action history** — `chain_digest₍ᵢ₊₁₎ = H(chain_digestᵢ, action_digestᵢ)`
-//!      where `H` is a MiMC-style algebraic hash over the field (an x⁵ S-box, which is a
-//!      permutation on the Pasta scalar field). The final `chain_digest` is therefore a
+//!      where `H` is a **Poseidon** 2-to-1 hash over the step circuit's native field (the
+//!      Pallas scalar field). The final `chain_digest` is therefore a collision-resistant
 //!      commitment to the *exact ordered sequence* of actions; no action can be inserted,
-//!      dropped or reordered without changing it.
+//!      dropped or reordered without finding a Poseidon collision.
 //!   2. **Cumulative-risk bound** — `budget_spent₍ᵢ₊₁₎ = budget_spentᵢ + costᵢ` **and**
 //!      `budget_spent₍ᵢ₊₁₎ ≤ B_MAX`, enforced by an in-circuit bit-decomposition range gadget.
 //!      Because folding carries `budget_spent` across every step, this enforces the
@@ -25,11 +25,16 @@
 //!
 //! ## Honest scope (candor)
 //!
-//! * The hash `H` here is a **didactic** fixed-round MiMC (x⁵), domain-separated but **not**
-//!   parameterised for production collision resistance (a real deployment would use Poseidon
-//!   with audited round counts — Nova re-exports Poseidon gadgets under
-//!   `nova_snark::frontend`). It is a faithful placeholder for the *structure* of the chain
-//!   invariant, not a production hash.
+//! * The hash `H` is a **production, collision-resistant Poseidon** over the circuit's native
+//!   field — the vetted `neptune` implementation vendored by `nova-snark` itself and exposed at
+//!   `nova_snark::frontend::gadgets::poseidon` (the same code path Nova uses for its own
+//!   folding random oracle). We instantiate it through the sponge API with arity 2 (absorb
+//!   `[chain_digestᵢ, action_digestᵢ]`, squeeze one element) at `Strength::Standard`, i.e. the
+//!   Poseidon-paper round numbers for width `t = 3` targeting **128-bit security** over GF(p)
+//!   with the quintic (x⁵) S-box. The in-circuit sponge ([`SpongeCircuit`]) and the native
+//!   sponge ([`Sponge`]) share identical, deterministically-derived round constants and MDS
+//!   matrix, so they compute the same digest (Nova's own `provider::poseidon` tests assert this
+//!   native/circuit equivalence). This is no longer a didactic placeholder.
 //! * Nova folds over the **Pallas/Vesta** cycle with an **IPA** PCS and a Spartan
 //!   [`CompressedSNARK`]: transparent (no trusted setup) but **not** post-quantum. "PQ-friendly"
 //!   in the roadmap sense is that folding reduces the whole history to a *single* relaxed-R1CS
@@ -39,7 +44,12 @@
 use ff::{Field, PrimeField};
 use serde::{Deserialize, Serialize};
 
+use generic_array::typenum::U2;
 use nova_snark::errors::NovaError;
+use nova_snark::frontend::gadgets::poseidon::{
+    Elt, IOPattern, PoseidonConstants, Simplex, Sponge, SpongeAPI, SpongeCircuit, SpongeOp,
+    SpongeTrait, Strength,
+};
 use nova_snark::frontend::{num::AllocatedNum, AllocatedBit, ConstraintSystem, SynthesisError};
 use nova_snark::nova::{CompressedSNARK, ProverKey, PublicParams, RecursiveSNARK, VerifierKey};
 use nova_snark::provider::{PallasEngine, VestaEngine};
@@ -83,8 +93,10 @@ pub const COST_BITS: usize = 32;
 /// Bit width for the running-budget / headroom range checks. `2^BUDGET_BITS` must exceed
 /// `B_MAX` and the largest attainable cumulative total.
 pub const BUDGET_BITS: usize = 40;
-/// MiMC rounds for the didactic chain hash (see the module-level candor note).
-pub const MIMC_ROUNDS: usize = 64;
+/// Arity (sponge rate) of the Poseidon chain hash: we absorb exactly two field elements —
+/// `[chain_digestᵢ, action_digestᵢ]` — and squeeze one, a 2-to-1 compression. Width is
+/// `t = arity + 1 = 3`.
+pub type ChainHashArity = U2;
 
 // ---- public action input -------------------------------------------------------------
 
@@ -193,80 +205,71 @@ fn enforce_range<F: PrimeField, CS: ConstraintSystem<F>>(
     Ok(())
 }
 
-/// `x⁵` via square–square–multiply (3 constraints). x⁵ is a permutation on the Pasta scalar
-/// field (gcd(5, p−1) = 1), the standard algebraic S-box.
-fn pow5<F: PrimeField, CS: ConstraintSystem<F>>(
-    mut cs: CS,
-    x: &AllocatedNum<F>,
-) -> Result<AllocatedNum<F>, SynthesisError> {
-    let x2 = x.square(cs.namespace(|| "x2"))?;
-    let x4 = x2.square(cs.namespace(|| "x4"))?;
-    x4.mul(cs.namespace(|| "x5"), x)
+/// The vetted Poseidon constants for the arity-2 chain hash: the `neptune` port shipped inside
+/// `nova-snark` at `nova_snark::frontend::gadgets::poseidon`, instantiated at
+/// `Strength::Standard` (Poseidon-paper round numbers for width `t = 3`, quintic S-box, GF(p),
+/// 128-bit security target). The derivation is deterministic in the field `F` (Grain-LFSR round
+/// constants + MDS from the field modulus), so the in-circuit [`SpongeCircuit`] and the native
+/// [`Sponge`] below use byte-for-byte identical parameters and therefore compute the same digest.
+fn chain_hash_constants<F: PrimeField>() -> PoseidonConstants<F, ChainHashArity> {
+    Sponge::<F, ChainHashArity>::api_constants(Strength::Standard)
 }
 
-/// `out = a + c` for a circuit constant `c` (one linear constraint).
-fn add_const<F: PrimeField, CS: ConstraintSystem<F>>(
-    mut cs: CS,
-    a: &AllocatedNum<F>,
-    c: F,
-) -> Result<AllocatedNum<F>, SynthesisError> {
-    let out = AllocatedNum::alloc(cs.namespace(|| "val"), || {
-        Ok(a.get_value().ok_or(SynthesisError::AssignmentMissing)? + c)
-    })?;
-    cs.enforce(
-        || "a + c == out",
-        |lc| lc + a.get_variable() + (c, CS::one()),
-        |lc| lc + CS::one(),
-        |lc| lc + out.get_variable(),
-    );
-    Ok(out)
+/// The sponge IO pattern for one 2-to-1 compression: absorb two field elements, squeeze one.
+fn chain_hash_io() -> IOPattern {
+    IOPattern(vec![SpongeOp::Absorb(2), SpongeOp::Squeeze(1)])
 }
 
-/// MiMC-style 2-to-1 algebraic hash, keyed by `right`: `state ← (state + right + Cᵣ)⁵` for
-/// `MIMC_ROUNDS` rounds, with a `+ right` feed-forward. Binds both inputs. Mirrored exactly by
-/// [`hash2_native`]. (Didactic parameters — see the module candor note.)
+/// Poseidon 2-to-1 chain hash `out = H(left, right)` **in circuit**, over the step circuit's
+/// native field. Absorbs `[left, right]` into a Poseidon sponge (arity 2) and squeezes one
+/// element. Collision resistance comes from Poseidon at `Strength::Standard`; the sponge's
+/// domain tag + IO pattern bind the (fixed, length-2) input framing. Mirrored exactly by
+/// [`hash2_native`] — same constants, same IO pattern — so the folded IVC output equals the
+/// native replay.
 fn hash2<F: PrimeField, CS: ConstraintSystem<F>>(
     mut cs: CS,
     left: &AllocatedNum<F>,
     right: &AllocatedNum<F>,
 ) -> Result<AllocatedNum<F>, SynthesisError> {
-    let constants = mimc_round_constants::<F>();
-    let mut state = left.clone();
-    for (i, c) in constants.iter().enumerate() {
-        let sr = state.add(cs.namespace(|| format!("sr_{i}")), right)?;
-        let t = add_const(cs.namespace(|| format!("t_{i}")), &sr, *c)?;
-        state = pow5(cs.namespace(|| format!("sbox_{i}")), &t)?;
-    }
-    state.add(cs.namespace(|| "feed_forward"), right)
+    let constants = chain_hash_constants::<F>();
+
+    let mut ns = cs.namespace(|| "poseidon_chain_hash");
+    let hash = {
+        let mut sponge = SpongeCircuit::new_with_constants(&constants, Simplex);
+        sponge.start(chain_hash_io(), None, &mut ns);
+        SpongeAPI::absorb(
+            &mut sponge,
+            2,
+            &[Elt::Allocated(left.clone()), Elt::Allocated(right.clone())],
+            &mut ns,
+        );
+        let output = SpongeAPI::squeeze(&mut sponge, 1, &mut ns);
+        sponge.finish(&mut ns).expect("sponge IO pattern honoured");
+        output
+    };
+    // Bind the sub-namespace to a `let` so it (and the `ns`/`constants` borrows it
+    // transitively holds) outlives the final call — a bare `ns.namespace(..)` temporary
+    // in the tail expression is dropped too early (E0597).
+    let mut ensure_ns = ns.namespace(|| "ensure_allocated");
+    let out = Elt::ensure_allocated(&hash[0], &mut ensure_ns)?;
+    Ok(out)
 }
 
 // ---- native (out-of-circuit) mirror --------------------------------------------------
 
-/// Deterministic, domain-separated MiMC round constants (an LCG seeded by the golden ratio).
-/// Shared by the circuit and the native mirror so both compute an identical hash.
-fn mimc_round_constants<F: PrimeField>() -> Vec<F> {
-    let mut v = Vec::with_capacity(MIMC_ROUNDS);
-    let mut x: u64 = 0x9e37_79b9_7f4a_7c15;
-    for _ in 0..MIMC_ROUNDS {
-        x = x
-            .wrapping_mul(6_364_136_223_846_793_005)
-            .wrapping_add(1_442_695_040_888_963_407);
-        v.push(F::from(x));
-    }
-    v
-}
-
-/// The native (non-circuit) image of [`hash2`]. Lets callers precompute the expected final
-/// `chain_digest` and cross-check the IVC output.
+/// The native (non-circuit) image of [`hash2`]: Poseidon over `F` with the identical arity-2
+/// constants and IO pattern. Lets callers precompute the expected final `chain_digest` and
+/// cross-check the IVC output. The vendored sponge guarantees this equals the in-circuit result.
 pub fn hash2_native<F: PrimeField>(left: F, right: F) -> F {
-    let mut state = left;
-    for c in mimc_round_constants::<F>() {
-        let t = state + right + c;
-        let t2 = t * t;
-        let t4 = t2 * t2;
-        state = t4 * t; // t⁵
-    }
-    state + right
+    let constants = chain_hash_constants::<F>();
+
+    let mut sponge = Sponge::new_with_constants(&constants, Simplex);
+    let acc = &mut ();
+    sponge.start(chain_hash_io(), None, acc);
+    SpongeAPI::absorb(&mut sponge, 2, &[left, right], acc);
+    let hash = SpongeAPI::squeeze(&mut sponge, 1, acc);
+    sponge.finish(acc).expect("sponge IO pattern honoured");
+    hash[0]
 }
 
 /// Natively replay a history to the expected final `(chain_digest, budget_spent)`.

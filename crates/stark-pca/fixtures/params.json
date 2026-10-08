@@ -9,9 +9,9 @@
   "min_conjectured_security_bits": 95,
   "note": "A STARK has no circuit-specific trusted setup and no verifying key; the AIR definition in src/lib.rs plus these public parameters are the complete verification artifact.",
   "num_queries": 32,
-  "proof_size_bytes": 37824,
+  "proof_size_bytes": 43876,
   "scale_S": 1000000,
   "scheme": "zk-STARK (Winterfell), transparent / hash-based / post-quantum / no trusted setup",
   "trace_length": 64,
-  "trace_width": 46
+  "trace_width": 56
 }

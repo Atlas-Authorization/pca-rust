@@ -16,9 +16,10 @@ Each step `i` consumes a per-action witness `(action_digestᵢ, costᵢ)` and en
 
 1. **Unforgeable action history (hash chain).**
    `chain_digest₍ᵢ₊₁₎ = H(chain_digestᵢ, action_digestᵢ)`,
-   where `H` is a MiMC-style algebraic hash (x⁵ S-box). The final `chain_digest` commits to the
+   where `H` is a **Poseidon** 2-to-1 hash (arity 2, `Strength::Standard`, 128-bit) over the
+   circuit's native field. The final `chain_digest` is a collision-resistant commitment to the
    *exact ordered sequence* of actions — nothing can be inserted, dropped, or reordered without
-   changing it.
+   finding a Poseidon collision.
 
 2. **Cumulative-risk bound `Σcostᵢ ≤ bMax`.**
    `budget_spent₍ᵢ₊₁₎ = budget_spentᵢ + costᵢ`, plus an in-circuit bit-decomposition range check
@@ -65,13 +66,19 @@ fixtures to `fixtures/`:
 - **Final compression:** Spartan `RelaxedR1CSSNARK`.
 - **Gadgets:** bellpepper (vendored as `nova_snark::frontend`) — `AllocatedNum`, `AllocatedBit`,
   linear constraints. No folding is hand-rolled.
+- **Chain hash:** **Poseidon** via the vetted `neptune` sponge that `nova-snark` vendors at
+  `nova_snark::frontend::gadgets::poseidon` (the same code Nova uses for its own folding random
+  oracle) — arity 2, `Strength::Standard`. No hash is hand-rolled.
 
 ## Honest scope
 
-- The chain hash `H` uses **didactic** fixed-round MiMC parameters (domain-separated, but not
-  production-hardened). A real deployment uses Poseidon with audited round counts (Nova
-  re-exports Poseidon gadgets under `nova_snark::frontend`); swapping it in does not change the
-  statement proved.
+- The chain hash `H` is a **production, collision-resistant Poseidon** over the circuit's native
+  field — the vetted `neptune` implementation vendored inside `nova-snark`
+  (`nova_snark::frontend::gadgets::poseidon`), instantiated through the sponge API at arity 2 and
+  `Strength::Standard` (Poseidon-paper round numbers for width `t = 3`, quintic S-box, 128-bit
+  security over GF(p)). The in-circuit and native hashes share identical, deterministically-derived
+  constants, so the folded IVC output matches the native replay. This is no longer a didactic
+  placeholder.
 - Nova over Pallas/Vesta with IPA is **transparent but not post-quantum**. The roadmap sense of
   "PQ-friendly" is that folding reduces the whole history to a *single* relaxed-R1CS instance
   that a PQ final SNARK (e.g. the STARK in `sdks/stark-pca-plonky3`) could compress instead;

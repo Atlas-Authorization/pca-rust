@@ -20,6 +20,8 @@ pub mod middleware;
 
 const SIG_DOMAIN: &[u8] = b"atlas-pca/actn/v2\x00";
 const CAP_DOMAIN: &[u8] = b"atlas-pca/cap/v1\x00";
+const SHARE_DOMAIN_PREFIX: &[u8] = b"atlas-pca/share/";
+const SIGNERSET_DOMAIN: &[u8] = b"atlas-pca/signerset/v1\x00";
 const DEFAULT_REV: &str = "reversible";
 
 /// Wire format version this verifier accepts.
@@ -1275,6 +1277,87 @@ pub fn threshold_message(p: &Map<String, Value>) -> Result<Vec<u8>, String> {
     let mut m = SIG_DOMAIN.to_vec();
     m.extend_from_slice(&sha(canon.as_bytes()));
     Ok(m)
+}
+
+/// Recompute the signer-set hash committed by a threshold share (v2.1):
+/// `sha256("atlas-pca/signerset/v1\0" || canonical(sort_by(role, publicKey)[{publicKey, role}]))`.
+/// FAIL-CLOSED: `None` on any malformed entry.
+fn signer_set_hash(signer_set: &[Value]) -> Option<Vec<u8>> {
+    let mut entries: Vec<(&str, &str)> = Vec::with_capacity(signer_set.len());
+    for e in signer_set {
+        let o = e.as_object()?;
+        let role = o.get("role")?.as_str()?;
+        let pk = o.get("publicKey")?.as_str()?;
+        entries.push((role, pk));
+    }
+    entries.sort_by(|a, b| a.0.cmp(b.0).then(a.1.cmp(b.1)));
+    let arr = Value::Array(
+        entries
+            .iter()
+            .map(|(role, pk)| {
+                let mut m = Map::new();
+                m.insert("publicKey".into(), Value::String((*pk).to_string()));
+                m.insert("role".into(), Value::String((*role).to_string()));
+                Value::Object(m)
+            })
+            .collect(),
+    );
+    let canon = canonicalize_strict(&arr).ok()?;
+    let mut m = SIGNERSET_DOMAIN.to_vec();
+    m.extend_from_slice(canon.as_bytes());
+    Some(sha(&m))
+}
+
+/// Verify a single threshold share under the v2.1 agent-leaf share binding. FAIL-CLOSED: returns `false`
+/// on any malformed input (never panics). The share signature MUST verify over the bound message
+/// `"atlas-pca/share/<role>\0" || sha256(thresholdMessage) || signerSetHash || t(1 byte)` under
+/// `share.publicKey` (or `share.pq_pk` per `share.alg`, routed through the same suite seam as the leaf).
+/// Consequently the PRE-v2.1 bare agent share (a `sig` over the bare threshold message) and a cross-signer-set
+/// replay (a share bound to a DIFFERENT signer set) both fail — the clean break the v2.1 binding mandates.
+/// `entry` is a `{ role, t, signer_set, threshold_message, share{publicKey, sig, alg?, pq_pk?, pq_sig?} }`
+/// object (the `primitives.threshold_share[]` shape).
+pub fn verify_threshold_share(entry: &Value) -> bool {
+    let o = match entry.as_object() {
+        Some(o) => o,
+        None => return false,
+    };
+    let role = match o.get("role").and_then(Value::as_str) {
+        Some(r) => r,
+        None => return false,
+    };
+    let t = match o.get("t").and_then(safe_int) {
+        Some(t) if (0..=255).contains(&t) => t as u8,
+        _ => return false,
+    };
+    let signer_set = match o.get("signer_set").and_then(Value::as_array) {
+        Some(s) => s,
+        None => return false,
+    };
+    let tm = match o.get("threshold_message").and_then(Value::as_str).and_then(|s| decode_b64u_strict(s, None)) {
+        Some(b) => b,
+        None => return false,
+    };
+    let ssh = match signer_set_hash(signer_set) {
+        Some(h) => h,
+        None => return false,
+    };
+    let share = match o.get("share").and_then(Value::as_object) {
+        Some(s) => s,
+        None => return false,
+    };
+    let pk = match share.get("publicKey").and_then(Value::as_str) {
+        Some(p) => p,
+        None => return false,
+    };
+    // Bound share message: domain(role) || sha256(thresholdMessage) || signerSetHash || t.
+    let mut msg = Vec::with_capacity(SHARE_DOMAIN_PREFIX.len() + role.len() + 1 + 32 + ssh.len() + 1);
+    msg.extend_from_slice(SHARE_DOMAIN_PREFIX);
+    msg.extend_from_slice(role.as_bytes());
+    msg.push(0);
+    msg.extend_from_slice(&sha(&tm));
+    msg.extend_from_slice(&ssh);
+    msg.push(t);
+    verify_leaf_suite(share.get("alg"), pk, share.get("pq_pk"), &msg, share.get("sig"), share.get("pq_sig"))
 }
 
 /// Verify a RAW PCActn text: strict-parse it first (a parse failure is a `wire` failure), then

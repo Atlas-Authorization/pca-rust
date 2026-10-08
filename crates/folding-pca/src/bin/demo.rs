@@ -10,7 +10,7 @@ use std::time::Instant;
 
 use pca_folding_ivc::{
     compress, compress_keys, felt_to_hex, native_final_state, prove_history, verify_compressed,
-    within_budget, ActionStep, B_MAX, BUDGET_BITS, COST_BITS, MIMC_ROUNDS,
+    within_budget, ActionStep, B_MAX, BUDGET_BITS, COST_BITS,
 };
 
 /// A compliant 8-action history: Σcost = 8 · 100_000 = 800_000 ≤ B_MAX (1_000_000).
@@ -39,7 +39,7 @@ fn main() {
     println!("curve cycle        : Pallas / Vesta (cycle of curves)");
     println!("PCS / final SNARK  : IPA (transparent) + Spartan CompressedSNARK");
     println!(
-        "chain hash         : MiMC x^5, {MIMC_ROUNDS} rounds (didactic)   B_MAX = {B_MAX}"
+        "chain hash         : Poseidon (neptune, arity 2, Strength::Standard / 128-bit)   B_MAX = {B_MAX}"
     );
     println!("range gadgets      : cost {COST_BITS}-bit, budget/headroom {BUDGET_BITS}-bit");
     println!();
@@ -137,7 +137,7 @@ fn main() {
         "curve_cycle": "Pallas/Vesta",
         "pcs": "IPA (ipa_pc::EvaluationEngine) — transparent, no trusted setup",
         "step_state": "[chain_digest, budget_spent] (arity 2)",
-        "chain_hash": format!("MiMC x^5, {MIMC_ROUNDS} rounds (didactic placeholder for Poseidon)"),
+        "chain_hash": "Poseidon (neptune, arity 2, Strength::Standard, 128-bit) over the Pallas scalar field",
         "b_max": B_MAX,
         "cost_bits": COST_BITS,
         "budget_bits": BUDGET_BITS,

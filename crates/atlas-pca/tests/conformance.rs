@@ -87,24 +87,59 @@ fn b64d(s: &str) -> Vec<u8> {
     base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(s).unwrap()
 }
 
+/// The signature suites this Rust verifier implements — for the LEAF signature (`requires:"pq"`), for
+/// non-leaf capability-chain hops (`requires:"pq-nonleaf"`), and for the threshold-share binding. The three
+/// CROSS-IMPL suites every conformant impl is required to agree on (GAP 1): classical Ed25519, the pure
+/// lattice ML-DSA-65 (FIPS-204, via the `fips204` crate), and the hybrid Ed25519 + ML-DSA-65. The remaining
+/// registered suites (ml-dsa-87, slh-dsa-sha2-128f/256s, their hybrids, and the SUF-CMA nested hybrid) are
+/// NOT yet wired in Rust, so vectors that need a real signature verdict under them are skipped explicitly.
+const SUPPORTED_SUITES: &[&str] = &["ed25519", "ml-dsa-65", "hybrid-ed25519-ml-dsa-65"];
+
+/// Which concrete signature suite a vector exercises that this verifier does NOT implement, if any:
+/// the leaf `alg` for `requires:"pq"`, or any capability-hop `alg` for `requires:"pq-nonleaf"`.
+/// `None` for core vectors and for vectors that stay entirely within [`SUPPORTED_SUITES`].
+fn unsupported_suite(v: &Value) -> Option<String> {
+    let p = v.get("pcactn")?;
+    let alg = |o: &Value| o.get("alg").and_then(Value::as_str).unwrap_or("ed25519").to_string();
+    match v.get("requires").and_then(Value::as_str) {
+        Some("pq") => {
+            let a = alg(p);
+            (!SUPPORTED_SUITES.contains(&a.as_str())).then_some(a)
+        }
+        Some("pq-nonleaf") => p
+            .get("cap_chain")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .map(alg)
+            .find(|a| !SUPPORTED_SUITES.contains(&a.as_str())),
+        _ => None,
+    }
+}
+
 #[test]
 fn vectors() {
     let doc = load("vectors.json");
     assert_eq!(doc["format"].as_i64(), Some(2));
     let vs = doc["vectors"].as_array().expect("vectors");
     assert!(!vs.is_empty());
-    // This verifier implements the ed25519 signature suite AND the B4 post-quantum suites (ml-dsa-65,
-    // hybrid-ed25519-ml-dsa-65) via the fips204 crate — for the LEAF signature (requires:"pq") AND for
-    // non-leaf capability-chain hops (requires:"pq-nonleaf"). Vectors tagged with a `requires` suite we do
-    // not support are skipped explicitly, not silently.
-    const SUPPORTED_SUITES: &[&str] = &["ed25519", "pq", "pq-nonleaf"];
     let mut bad = Vec::new();
     let mut skipped = 0usize;
+    let mut skipped_suites: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
     for v in vs {
         let name = v["name"].as_str().unwrap();
-        if let Some(req) = v.get("requires").and_then(Value::as_str) {
-            if !req.is_empty() && !SUPPORTED_SUITES.contains(&req) {
+        let want = v["expect"]["checks"].as_object().unwrap();
+        // A terminal `wire` failure ({wire:false}) is suite-agnostic: this verifier rejects an unknown /
+        // unimplemented suite at the wire stage (unknown `alg`, or a `pq_sig` the suite requires but we
+        // cannot size), which IS the correct contract verdict for those negatives, so we still run them.
+        // A vector whose expected verdict needs a genuine signature outcome under an unsupported suite
+        // (every positive, and every `*-corrupt-sig`/`*-corrupt-pqsig` that expects `wire:true`) is skipped
+        // with an explicit count — never silently passed.
+        let terminal_wire_false = want.len() == 1 && want.get("wire") == Some(&Value::Bool(false));
+        if let Some(suite) = unsupported_suite(v) {
+            if !terminal_wire_false {
                 skipped += 1;
+                skipped_suites.insert(suite);
                 continue;
             }
         }
@@ -124,7 +159,6 @@ fn vectors() {
         if got.allow != exp["allow"].as_bool().unwrap() {
             bad.push(format!("{name}: allow = {}, want {} ({})", got.allow, exp["allow"], got.reason));
         }
-        let want = exp["checks"].as_object().unwrap();
         if got.checks.len() != want.len() {
             bad.push(format!("{name}: checks {:?}, want {:?}", got.checks, want));
         }
@@ -135,10 +169,47 @@ fn vectors() {
         }
     }
     assert!(bad.is_empty(), "{} of {} vectors failed:\n{}", bad.len(), vs.len() - skipped, bad.join("\n"));
-    if skipped > 0 {
-        eprintln!("skipped {skipped} vectors requiring unsupported suite: pq");
+    eprintln!(
+        "{} of {} vectors passed; {skipped} skipped (suites not yet in Rust: {})",
+        vs.len() - skipped,
+        vs.len(),
+        skipped_suites.iter().cloned().collect::<Vec<_>>().join(", ")
+    );
+}
+
+/// v2.1 agent-leaf share binding (GAP 2). Every `primitives.threshold_share[]` entry must verify over the
+/// `signerSetHash‖t`-bound share message iff `valid`; in particular the PRE-v2.1 bare agent share and a
+/// cross-signer-set replay MUST be rejected. All corpus share vectors are Ed25519, so no PQ suite is needed.
+#[test]
+fn threshold_shares() {
+    let doc = load("vectors.json");
+    let shares = doc["primitives"]["threshold_share"].as_array().expect("threshold_share");
+    assert!(!shares.is_empty());
+    let mut bad = Vec::new();
+    let (mut accepted, mut rejected) = (0usize, 0usize);
+    let (mut bare_rejected, mut wrong_set_rejected) = (false, false);
+    for s in shares {
+        let name = s.get("name").and_then(Value::as_str).unwrap_or_else(|| s["role"].as_str().unwrap());
+        let want = s.get("valid").and_then(Value::as_bool).unwrap_or(true);
+        let got = verify_threshold_share(s);
+        if got != want {
+            bad.push(format!("{name}: share verified = {got}, want valid = {want}"));
+        }
+        if want {
+            accepted += 1;
+        } else {
+            rejected += 1;
+        }
+        bare_rejected |= name == "agent-bare-rejected" && !got;
+        wrong_set_rejected |= name == "agent-bound-wrong-set" && !got;
     }
-    eprintln!("{} vectors passed ({} skipped)", vs.len() - skipped, skipped);
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+    assert!(bare_rejected, "v2.1 binding: the pre-v2.1 bare agent share MUST be rejected");
+    assert!(wrong_set_rejected, "v2.1 binding: a cross-signer-set agent share replay MUST be rejected");
+    eprintln!(
+        "threshold shares: {accepted} valid accepted, {rejected} invalid rejected \
+         (incl. v2.1 bare-agent-share + cross-signer-set replay)"
+    );
 }
 
 #[test]

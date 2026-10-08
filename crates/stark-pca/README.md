@@ -26,8 +26,10 @@ Policy-VM circuit in `packages/pca/src/zk.ts`.
 **Public inputs** (bound into the Fiat–Shamir transcript, so a proof only verifies against
 *these* values): the six risk weights `(α, β, γ, δ, ε, ζ)` at scale `S`; the tier-1
 threshold `θ₁` at scale `S`; the integer cost scale `κ`; the budget ceiling `bMax` at
-scale `S`; the scale `S`; and two opaque commitments `policy_commitment`,
-`action_commitment`.
+scale `S`; the scale `S`; two opaque commitments `policy_commitment`, `action_commitment`;
+and the `COMMIT_LIMBS = 4` limbs of `witness_commitment` — the resource server's algebraic
+commitment to the quantized action, which the AIR **constrains** (unlike the two opaque
+commitments, which it only transcript-binds). See the binding section below.
 
 **Private witnesses**: the six risk-magnitude inputs
 `(d, rev, bl, taint, conf, age)` ∈ `[0, S]`; the trust budget `B` at scale `S`; a
@@ -68,6 +70,14 @@ such that:
      with the range gadgets above, so a deny witness — `r > θ₁`, `B < κ·r`, `pm = 0`, or
      `co = 0` — makes the constraint system **unsatisfiable**. You cannot forge an `allow`.
 
+4. **Witness ↔ commitment binding**: a native in-AIR algebraic hash (a 10-lane cube-S-box
+   SPN, one round per trace row) absorbs the nine quantized witness quantities and the first
+   four squeezed state lanes are **asserted equal to the public `witness_commitment`**. The
+   same witness columns drive both the gate and the hash, so you cannot prove the gate for a
+   witness that does not match the committed (quantized) action. See the honest fidelity-gap
+   note below for exactly what this binds (the quantized struct) vs. the SHA-256 canonical
+   JSON `action_commitment` (not recomputed in-AIR).
+
 The inequalities are enforced with genuine **bit-decomposition range gadgets**: a value
 `V` is proven `0 ≤ V < 2⁶³` by exhibiting its 63 bits (each constrained boolean) summed by
 a per-step running residual that must reach exactly `0`. A "negative" (deny) difference
@@ -95,16 +105,31 @@ cannot reach `0` and no proof exists. This soundness relies on the field order l
 This STARK is scoped to the **release gate + the fixed-point risk functional**. It is
 **NOT** at parity with the full Groth16 Policy-VM circuit. The precise gaps:
 
-- **No in-AIR SHA-256 / struct commitments.** The Groth16 circuit computes the
-  action/policy/plan commitments with SHA-256 *in-circuit* over a fixed-layout quantized
-  struct, binding the private witness to the public commitment. This STARK does **not**
-  hash in-AIR. `policy_commitment` / `action_commitment` are carried in the public inputs
-  (so the proof is *bound* to them via Fiat–Shamir and cannot be replayed under different
-  commitments), but the AIR does **not prove that the private risk inputs are the
-  pre-images of those commitments**. Consequently this is a proof of *knowledge of some
-  valid fixed-point witness that passes the gate*, not a proof that *the specific committed
-  action* passes. Closing this gap requires an in-AIR hash (e.g. Rescue/Poseidon or a
-  SHA-256 AIR) binding the inputs to `action_commitment`.
+- **The witness IS now bound in-AIR — to the quantized preimage, via a native algebraic
+  hash (not SHA-256).** The AIR runs a genuine in-AIR algebraic hash and **asserts the
+  private witness hashes to a public commitment**, so a proof can no longer be produced for
+  a witness that does not match the committed action. Precisely:
+  - A `NUM_LANES = 10`-wide **cube-S-box SPN** (`aₖ = (Hₖ + 2^row + RCₖ)³`, diffusion
+    `H'ⱼ = Σₖ aₖ + aⱼ`, one round per trace row, per-row constant `2^row`, per-lane
+    constants `RCₖ`) absorbs the **nine quantized witness quantities**
+    `(d, rev, bl, taint, conf, age, B, pm, co)` on row 0 (lanes 0..8) + a capacity IV
+    (lane 9).
+  - The first `COMMIT_LIMBS = 4` state lanes at the final row are **asserted equal to a new
+    public input `witness_commitment`** (the four field-element limbs the resource server
+    publishes). The same witness columns feed both the risk gate and the hash, so the proof
+    exists *only* for a witness whose quantized form hashes to the committed value. This is
+    the `compute_witness_commitment` function; on `f128`, `gcd(3, p−1)=1`, so the cube S-box
+    is a field permutation.
+  - **What it binds, honestly:** this binds the **quantized witness struct** (the integer
+    risk/budget/boolean preimage, at scale `S`) to the committed action — it is **NOT** an
+    in-AIR recomputation of the SHA-256-of-canonical-JSON `action_commitment` (full
+    variable-length canonical-JSON SHA-256 in-field remains infeasible without a dedicated
+    SHA-256 AIR and a large blow-up — that is what the RISC Zero `zkvm-pca` guest does with
+    the accelerated sha256 precompile). The algebraic `witness_commitment` and the opaque
+    SHA-256 `action_commitment` are linked **off-circuit** by the resource server deriving
+    both from one action. Collision resistance of the binding rests on the algebraic-hash
+    (MiMC/Poseidon-family, algebraic-degree) heuristic; a SHA-256-identical binding, and a
+    larger round count / `x⁷` S-box on small fields, are documented follow-ups.
 
 - **Predicates and caveats are reduced to booleans.** The circuit encodes a
   `(verb, resource)` allow-list entry with a numeric `where` bound, and the six
