@@ -1,0 +1,39 @@
+[package]
+name = "pca-zkvm-guest"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+risc0-zkvm = { version = "^3.0.6", default-features = false, features = ["std"] }
+pca-zkvm-core = { path = "../../core" }
+# Ed25519 chain + leaf signature verification runs in-guest (via pca-zkvm-core::chain). Declared here
+# explicitly too; v2 is pure Rust and builds for the rv32im guest. See the sha256 precompile note below:
+# an accelerated ed25519 is possible via risc0's curve25519-dalek patch, but plain dalek is correct and
+# sufficient (just more cycles). If accelerating later, add the risc0 curve25519-dalek patch under
+# `[patch.crates-io]` beside the sha2 patch — e.g.:
+#   curve25519-dalek = { git = "https://github.com/risc0/curve25519-dalek", tag = "curve25519-4.1.2-risczero.0" }
+ed25519-dalek = "2"
+
+[package.metadata.risc0]
+# bincode / proving profile tuning handled by risc0-build
+
+# RISC Zero sha256 PRECOMPILE: replace the crates.io `sha2` with the accelerated fork so every
+# `sha2::Sha256` the core crate computes (the action/policy/plan commitments + Merkle hashing) runs on
+# the zkVM's native sha256 circuit instead of emulated RISC-V. This is what makes the in-circuit,
+# variable-length, canonical-JSON sha256 commitment binding tractable.
+[patch.crates-io]
+sha2 = { git = "https://github.com/risc0/RustCrypto-hashes", tag = "sha2-v0.10.8-risczero.0" }
+# RISC Zero curve25519 ACCELERATOR: the accelerated fork runs ed25519's field/scalar ops on risc0's
+# precompile instead of emulated rv32im — the in-guest Ed25519 chain + leaf verification (pca-zkvm-core
+# ::chain) proves in a fraction of the cycles. Identical verification result; far fewer cycles. Tag
+# pinned to the exact resolved version (4.1.3) so ed25519-dalek v2's requirement is satisfied.
+curve25519-dalek = { git = "https://github.com/risc0/curve25519-dalek", tag = "curve25519-4.1.3-risczero.0" }
+# the accelerated curve25519 fork's field arithmetic uses `crypto_bigint::risc0` — pull risc0's
+# crypto-bigint fork too (the accelerator is a patch SET, not a single patch).
+crypto-bigint = { git = "https://github.com/risc0/crypto-bigint", tag = "v0.5.5-risczero.0" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"

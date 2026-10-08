@@ -1,0 +1,4 @@
+/target
+Cargo.lock
+# Large proving/LDE artifacts are regenerable; keep only the small committed sample.
+*.profraw
