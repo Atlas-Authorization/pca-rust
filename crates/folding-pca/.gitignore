@@ -1,5 +1,0 @@
-# Cargo.lock IS committed for this crate (pinned, reproducible proving toolchain).
-# Regenerable proving / build artifacts.
-*.profraw
-/target
-fixtures/verifier_key.bin
