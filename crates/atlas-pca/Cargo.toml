@@ -1,10 +1,16 @@
 [package]
 name = "atlas-pca"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-description = "Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks, M0-M3)"
+description = "Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks)"
 license = "MIT"
-publish = true
+readme = "README.md"
+repository = "https://github.com/Atlas-Authorization/pca-rust"
+homepage = "https://github.com/Atlas-Authorization/pca-rust"
+documentation = "https://docs.rs/atlas-pca"
+keywords = ["authorization","agents","verifier","ed25519","pca"]
+categories = ["cryptography","authentication"]
+exclude = ["tests/","/.gitignore"]
 
 [dependencies]
 ed25519-dalek = "2"

@@ -1,9 +1,11 @@
 # pca-folding-ivc
 
+> Status: **0.2.0, unaudited.** Install: `cargo add pca-folding-ivc`
+
 **One succinct proof of an agent's entire PCA action history — via a folding scheme (Nova), not naive recursion.**
 
-This crate implements PCA roadmap item **T4.4 (recursive action-proof aggregation)** the modern
-way. Instead of proving a SNARK-of-a-SNARK-of-a-SNARK… (naive recursion, where the verifier
+This crate implements recursive action-proof aggregation for Proof-Carrying Authority (PCA) the
+modern way. Instead of proving a SNARK-of-a-SNARK-of-a-SNARK… (naive recursion, where the verifier
 circuit grows and every level re-proves the one below), it uses **Incrementally Verifiable
 Computation (IVC)** built on **Microsoft Nova's folding scheme** (`nova-snark`, pinned
 `=0.76.0`). `N` per-action steps are *folded* into a single `RecursiveSNARK`, then compressed
@@ -79,7 +81,6 @@ fixtures to `fixtures/`:
   security over GF(p)). The in-circuit and native hashes share identical, deterministically-derived
   constants, so the folded IVC output matches the native replay. This is no longer a didactic
   placeholder.
-- Nova over Pallas/Vesta with IPA is **transparent but not post-quantum**. The roadmap sense of
-  "PQ-friendly" is that folding reduces the whole history to a *single* relaxed-R1CS instance
-  that a PQ final SNARK (e.g. the STARK in `sdks/stark-pca-plonky3`) could compress instead;
+- Nova over Pallas/Vesta with IPA is **transparent but not post-quantum**. "PQ-friendly" here means that folding reduces the whole history to a *single* relaxed-R1CS instance
+  that a PQ final SNARK (e.g. a STARK) could compress instead;
   wiring that PQ wrap is future work and is not claimed here.

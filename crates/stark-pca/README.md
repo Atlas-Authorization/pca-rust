@@ -1,5 +1,7 @@
 # stark-pca — a transparent STARK of the PCA release gate
 
+Install: `cargo add stark-pca`
+
 A **genuine, verifiable zk-STARK** of the core *release decision* of Proof-Carrying
 Authority, built with the [Winterfell](https://github.com/facebook/winterfell) STARK
 library (pure Rust).
@@ -12,16 +14,15 @@ library (pure Rust).
   `src/lib.rs` plus the public parameters in `fixtures/params.json` are the *complete*
   verification artifact (this is the "vkey-equivalent").
 
-This crate was developed and verified end-to-end on a fresh Azure VM (Ubuntu 24.04,
-`Standard_D4s_v4`, 4 vCPU, region `westus3`). Winterfell version: **0.13.1**.
+Winterfell version: **0.13.1**. Status: **0.2.0, unaudited.**
 
 ---
 
 ## What the AIR proves (exactly)
 
 Field: Winterfell's 128-bit prime field (`f128`). Hash: `Blake3_256`. Fixed-point scale
-`S = 1_000_000` (parts-per-million), matching `packages/pca/src/risk.ts` and the Groth16
-Policy-VM circuit in `packages/pca/src/zk.ts`.
+`S = 1_000_000` (parts-per-million), matching the `@atlasauth/pca` reference risk model and its Groth16
+Policy-VM circuit.
 
 **Public inputs** (bound into the Fiat–Shamir transcript, so a proof only verifies against
 *these* values): the six risk weights `(α, β, γ, δ, ε, ζ)` at scale `S`; the tier-1
@@ -38,7 +39,7 @@ predicate-match bit `pm`; and a caveats-satisfied bit `co`.
 The prover demonstrates, with real in-AIR algebraic constraints, knowledge of a witness
 such that:
 
-1. **Fixed-point risk functional** (the integer image of `riskScore` in `risk.ts`,
+1. **Fixed-point risk functional** (the integer image of `riskScore` in the reference model,
    scale `S²`):
 
    ```
@@ -47,7 +48,7 @@ such that:
    ```
 
    `rev` and `conf` enter as `(S − x)` exactly as `(1 − reversibility)` and
-   `(1 − confidence)` do in `risk.ts`.
+   `(1 − confidence)` do in the reference model.
 
 2. **Input validity**: each `x ∈ {d, rev, bl, taint, conf, age}` is proven to lie in
    `[0, S]` (i.e. a well-formed `[0,1]` fixed-point magnitude), via two bit-decomposition
@@ -100,7 +101,7 @@ cannot reach `0` and no proof exists. This soundness relies on the field order l
 
 ---
 
-## Honest fidelity gaps vs the Groth16 Policy-VM circuit (`zk.ts`)
+## Honest fidelity gaps vs the Groth16 Policy-VM circuit
 
 This STARK is scoped to the **release gate + the fixed-point risk functional**. It is
 **NOT** at parity with the full Groth16 Policy-VM circuit. The precise gaps:
@@ -124,7 +125,7 @@ This STARK is scoped to the **release gate + the fixed-point risk functional**. 
     risk/budget/boolean preimage, at scale `S`) to the committed action — it is **NOT** an
     in-AIR recomputation of the SHA-256-of-canonical-JSON `action_commitment` (full
     variable-length canonical-JSON SHA-256 in-field remains infeasible without a dedicated
-    SHA-256 AIR and a large blow-up — that is what the RISC Zero `zkvm-pca` guest does with
+    SHA-256 AIR and a large blow-up — that is what the RISC Zero zkVM guest does with
     the accelerated sha256 precompile). The algebraic `witness_commitment` and the opaque
     SHA-256 `action_commitment` are linked **off-circuit** by the resource server deriving
     both from one action. Collision resistance of the binding rests on the algebraic-hash
@@ -144,7 +145,7 @@ This STARK is scoped to the **release gate + the fixed-point risk functional**. 
 - **No attenuation / delegation chain.** The circuit encodes the capability-chain
   narrowing (`budget_alloc` monotonicity, depth bound). This AIR does not.
 
-- **`κ` restricted to a non-negative integer.** `risk.ts` allows a real-valued `kappa`.
+- **`κ` restricted to a non-negative integer.** The reference model allows a real-valued `kappa`.
   Here `κ` is an integer multiplier (default `1`). The budget comparison is done by
   up-scaling (`B·S ≥ κ·r_raw`), so it is an **exact** rational comparison with no
   truncation error — but fractional `κ` is out of scope.
@@ -173,8 +174,8 @@ cargo test --release                    # faster
 cargo run --release --bin gen_fixtures  # regenerate fixtures/
 ```
 
-Sample timings on the build VM (`Standard_D4s_v4`, 4 vCPU): **prove ≈ 3.5 ms**,
-**verify ≈ 0.4 ms**, proof size **37,824 bytes** (~37 KB).
+Sample timings on a 4-vCPU machine: **prove ≈ 3.5 ms**, **verify ≈ 0.4 ms**, proof size
+**37,824 bytes** (~37 KB).
 
 ## Fixtures (committed)
 
@@ -182,4 +183,4 @@ Sample timings on the build VM (`Standard_D4s_v4`, 4 vCPU): **prove ≈ 3.5 ms**
 - `fixtures/public_inputs.json` — the public inputs (policy) for that proof.
 - `fixtures/params.json` — the STARK/verification parameters (the "vkey-equivalent").
 
-Large proving/LDE artifacts (`target/`) are git-ignored and regenerable.
+

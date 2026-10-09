@@ -18,7 +18,7 @@
 //! ```
 //!
 //! where `r = r_raw / S²` is computed by the **same fixed-point risk functional as
-//! `packages/pca/src/risk.ts`** (weights clamped `≥0`, inputs in `[0,1]` at scale `S`,
+//! the `@atlasauth/pca` reference risk model** (weights clamped `≥0`, inputs in `[0,1]` at scale `S`,
 //! reversibility and confidence entering as `1−x`), `tier==1 ⟺ r ≤ θ₁`
 //! (`requiredThreshold`'s t=1 band), and `B ≥ κ·r` is the budget-admission cost gate
 //! (`admit` / `cost`).
@@ -43,7 +43,7 @@
 //! for a witness that does not match the committed action. See `compute_witness_commitment`.
 //!
 //! See `README.md` for the precise honest gaps versus the Groth16 Policy-VM circuit
-//! (`packages/pca/src/zk.ts`). The binding above is over the **quantized preimage** via the
+//! (the `@atlasauth/pca` Groth16 circuit). The binding above is over the **quantized preimage** via the
 //! AIR's native algebraic hash — it is **not** a recomputation of the SHA-256-of-canonical-
 //! JSON `action_commitment` in-AIR (still infeasible in this field); the two are linked
 //! off-circuit by the resource server deriving both from one action. Remaining gaps:
@@ -62,7 +62,7 @@ use winterfell::{
     TransitionConstraintDegree,
 };
 
-/// Fixed-point scale (parts-per-million). Matches `risk.ts` / `zk.ts` `S = 1e6`.
+/// Fixed-point scale (parts-per-million). Matches the reference risk model and Groth16 circuit (`S = 1e6`).
 pub const S: u64 = 1_000_000;
 /// Execution-trace length (power of two; ≥ 63 so the range gadgets cover bits 0..=62).
 pub const TRACE_LEN: usize = 64;
@@ -160,7 +160,7 @@ pub struct PolicyParams {
 }
 
 impl PolicyParams {
-    /// The default risk policy of `risk.ts` (`DEFAULT_RISK_POLICY`), scaled by S. Its
+    /// The default risk policy of the reference model, scaled by S. Its
     /// `witness_commitment` is the algebraic commitment to the paired [`Witness::compliant`]
     /// quantized action (the default fixture), as a resource server would compute and publish.
     pub fn default_policy() -> Self {
@@ -290,7 +290,7 @@ impl Witness {
 // ---- fixed-point risk functional (scale S²), shared by trace-gen and tests -----------
 
 /// `r_raw = Σ wᵢ·termᵢ` where `termᵢ = xᵢ` or `(S − xᵢ)` for inverted inputs. Scale S².
-/// This is the integer image of `riskScore` in `risk.ts`; dividing by S² recovers `r∈[0,1]`.
+/// This is the integer image of `riskScore` in the reference model; dividing by S² recovers `r∈[0,1]`.
 pub fn risk_raw(inputs: &[u64; 6], weights: &[u64; 6]) -> u128 {
     let mut acc: u128 = 0;
     for i in 0..6 {

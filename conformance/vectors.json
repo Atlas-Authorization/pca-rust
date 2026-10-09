@@ -10,6 +10,7 @@
     "audience",
     "validity",
     "chain",
+    "grant_ref_bound",
     "plan_inclusion",
     "leaf_signature",
     "counter"
@@ -1396,6 +1397,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -1556,6 +1558,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -1716,6 +1719,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -1876,6 +1880,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -2028,6 +2033,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -2188,6 +2194,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -2348,6 +2355,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": false,
           "counter": true
@@ -2508,6 +2516,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -2668,6 +2677,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -2828,6 +2838,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -2988,6 +2999,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": false
@@ -3148,6 +3160,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": false,
           "counter": true
@@ -3308,6 +3321,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": false,
           "counter": true
@@ -3493,6 +3507,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -3678,6 +3693,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -3856,6 +3872,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -4041,6 +4058,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -4226,6 +4244,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -4411,6 +4430,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -4420,7 +4440,7 @@
     {
       "name": "chain-hops-reordered",
       "class": "negative",
-      "description": "The two hops are swapped: chain fails.",
+      "description": "The two hops are swapped: chain fails, and the first hop is no longer the root that grant_ref names (grant_ref_bound fails).",
       "grant": {
         "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
         "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
@@ -4596,6 +4616,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": false,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -4756,6 +4777,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -4927,6 +4949,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -5096,6 +5119,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -5176,6 +5200,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -5651,6 +5676,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -6147,6 +6173,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -6307,6 +6334,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -6467,6 +6495,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -6627,6 +6656,7 @@
           "audience": false,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -6787,6 +6817,7 @@
           "audience": true,
           "validity": false,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -6947,6 +6978,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -7107,6 +7139,7 @@
           "audience": true,
           "validity": false,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -7267,6 +7300,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -7427,6 +7461,7 @@
           "audience": true,
           "validity": false,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -7587,6 +7622,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -7747,6 +7783,7 @@
           "audience": true,
           "validity": false,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -7907,6 +7944,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -8067,6 +8105,7 @@
           "audience": false,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -8228,6 +8267,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -8374,6 +8414,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -8520,6 +8561,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -8666,6 +8708,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -9897,6 +9940,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -10057,6 +10101,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -10217,6 +10262,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -10377,6 +10423,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -10537,6 +10584,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -11155,6 +11203,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": false,
           "leaf_signature": true,
           "counter": true
@@ -15754,6 +15803,2860 @@
       }
     },
     {
+      "name": "grant-ref-bound-positive-1-hop",
+      "class": "positive",
+      "description": "grant_ref equals the id of the chain root (1-hop chain): grant_ref_bound passes.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "hs4BPlWeQSp2nHF2hKWY0l6VFaAfx3nRpk2-nawZ_RW9p9MF4QDdcUwXSup9fhgCdRX-aNv7_a331e6RlKYBAQ"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-bound-positive-2-hop",
+      "class": "positive",
+      "description": "grant_ref equals the id of the ROOT of a 2-hop chain (not the leaf hop id): grant_ref_bound passes.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          },
+          {
+            "id": "7CEo0dF89B5opLwRTTUrziU8nHUxEd1ETEeXVecYFWE",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              },
+              {
+                "prefix": "db/",
+                "type": "resource_prefix"
+              }
+            ],
+            "body_digest": "7CEo0dF89B5opLwRTTUrziU8nHUxEd1ETEeXVecYFWE",
+            "sig": "iW6RFtJb_NgWm4RkUaJMG1fc_4Ljg1p8n120hsPoLFJg-_RvEkyfmyp-YOV_MnxnSqBHq_htuBvqLMTSwBxlDA",
+            "parent": "LhWlSbsmw2DkH3icY5xD1EJLjHw4RzdAhbSNBubYEvY"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "n51v6A4P0NEbWudrXF1sKK14-kPmwu0PJkbTVPhEVxUu0HPYHyy1qo5GidaBQwx9nC7HA2XLzwKTZeCepcwCAw"
+      },
+      "expect": {
+        "allow": true,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": true,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-mismatch-resigned",
+      "class": "negative",
+      "description": "grant_ref is a fresh canonical 32-byte value that is not the root id (validly re-signed): grant_ref_bound fails; nothing else does.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "WlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "DhyjJVIaat7snW9IMdQLXtj3kJau8AHEdCtob27n6lHHIj89UlQMbZr4LfsqMe2Q5lxIPcZKBU0rl6qk4unKBg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-mismatch-not-resigned",
+      "class": "negative",
+      "description": "grant_ref swapped to a fresh value after signing: grant_ref_bound and leaf_signature fail.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "WlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlo",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "hs4BPlWeQSp2nHF2hKWY0l6VFaAfx3nRpk2-nawZ_RW9p9MF4QDdcUwXSup9fhgCdRX-aNv7_a331e6RlKYBAQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": false,
+          "plan_inclusion": true,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-equals-non-root-hop-id",
+      "class": "negative",
+      "description": "grant_ref is the id of a NON-root hop of a 2-hop chain (re-signed by the leaf holder): grant_ref_bound fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "read",
+          "resource": "db/users",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "7CEo0dF89B5opLwRTTUrziU8nHUxEd1ETEeXVecYFWE",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          },
+          {
+            "id": "7CEo0dF89B5opLwRTTUrziU8nHUxEd1ETEeXVecYFWE",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              },
+              {
+                "prefix": "db/",
+                "type": "resource_prefix"
+              }
+            ],
+            "body_digest": "7CEo0dF89B5opLwRTTUrziU8nHUxEd1ETEeXVecYFWE",
+            "sig": "iW6RFtJb_NgWm4RkUaJMG1fc_4Ljg1p8n120hsPoLFJg-_RvEkyfmyp-YOV_MnxnSqBHq_htuBvqLMTSwBxlDA",
+            "parent": "LhWlSbsmw2DkH3icY5xD1EJLjHw4RzdAhbSNBubYEvY"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 0,
+            "size": 5,
+            "path": [
+              {
+                "side": "R",
+                "hash": "eMSUm0Mc1xce91mn3HvlkxThwLsbEbq1fYHtZ2BTOtw"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n1",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 2,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "CH_gEFT9CgIqy1fqem486kZE0-uqTzjoD8RiKD6DP7NB5wJrbPNYRw2CxnvcDxE5-BrEwIuBZ6tR_TulQCQDDQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-equals-leaf-holder-key",
+      "class": "negative",
+      "description": "grant_ref is the leaf holder public key (a well-formed 32-byte value, re-signed): grant_ref_bound fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "TZ0mUFeLlIbsf_ISM-4Oz0q-no0KRjXkR0ndFQGa1UyphuiTZEgjjOrOPdgwpWpqcghQApwLLWsSJEA6IyK4CQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-equals-grant-issuer-key",
+      "class": "negative",
+      "description": "grant_ref is the grant issuer (principal) public key (re-signed): grant_ref_bound fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "brsZLcaZ040sPFlPh4O48xpWC4ROzUKIObk-fWVeu-udNrVQMdJ6RZDFDluSMmKmvVVsfet0DPxU_Lu5tNKDDQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-case-variant-of-root-id",
+      "class": "negative",
+      "description": "grant_ref is the root id with ONE letter's case flipped (still canonical base64url, a different 32-byte value; re-signed): compared byte-exactly, grant_ref_bound fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "QK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "nRE-G_qOIpPZnCIn4hicLAK3PEUpSq41cxvgDAFUUi2BZ3EaqWT_adWo4J6y5f92WE5n-LrQneEuNm40u0fxDQ"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": true,
+          "grant_ref_bound": false,
+          "plan_inclusion": true,
+          "leaf_signature": true,
+          "counter": true
+        }
+      }
+    },
+    {
+      "name": "grant-ref-empty",
+      "class": "negative",
+      "description": "grant_ref is the empty string (re-signed): wire fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "FpA2s66wvk9evzsSDS6Sb407Jo365zA66EzktfASotCQbrj96h97WqS5YM_NCeKF811aPIDb6LG8N2Anu4GACA"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-absent",
+      "class": "negative",
+      "description": "grant_ref is absent (re-signed body without it): wire fails (missing field).",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "3u78mTQvcDOjI2ll7ac0pkuVIY09J-IfYC5DcsNVR5D0RbA8aI_KEkOGOrTSwQijkMbuEkpGM858iMOvb9DhAA"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-trailing-whitespace",
+      "class": "negative",
+      "description": "grant_ref is the root id plus a trailing space (re-signed): not canonical base64url, wire fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ ",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "nXUU_eytPaK43KRbw5Pq4U-lt_GmIMpMlBvylcrtF5l-VuwNr7kM1KQ-BTDGKoy1KYMiMG36RluqATTq4Z-oBA"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-leading-whitespace",
+      "class": "negative",
+      "description": "grant_ref is the root id with a leading TAB (re-signed): wire fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "\tqK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "7zXMxuTOOIoHt_VFgF2nT4e1SxI122c45ErWYv9Gqy8bjMuvU8VBCxYBI_qdyHX_KuANGW5TLolGL06LwKWzBg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-unicode-lookalike",
+      "class": "negative",
+      "description": "grant_ref is the root id with its first character replaced by U+0430 CYRILLIC SMALL A (re-signed): wire fails; never normalised.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "аK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "W9TdTEIrDc4FBV80eG_RF5y9wLGK6iKdOsGKzlJoeYNLRFUx7ZMpc2KnYzfHcllp7f7ybIBiVAiygBSzziwHBA"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-zero-width-joiner",
+      "class": "negative",
+      "description": "grant_ref is the root id with a U+200B ZERO WIDTH SPACE appended (re-signed): wire fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ​",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "zGDLC9cK9MBQp1h29uH5O18IEx4S8Ji5haWXJ8YH7TS-J8fhfZyE7O25toBRaJsMHaD9rDh5ilFK81ak52blCA"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-very-long",
+      "class": "negative",
+      "description": "grant_ref is a 4096-char string (re-signed): wire fails (must be exactly 32 bytes).",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "nXzW2ASc85LMIJ7cMV7RAT_hI3jMe4VbxWT1OC4SKTkIyURfh2GOgCyiNU-0BbbxOktwCaEd4iCPuThw9DvOAw"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-wrong-type-number",
+      "class": "negative",
+      "description": "grant_ref is the number 7 (re-signed): wire fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": 7,
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "sSDbcs-c2OupN-vKcTN121P0eMy-VgkPP313p7cYRJHSS4vVElr9QMg0eMlpraVWujbVxdzgmO3BWv1YuUOtDg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-null",
+      "class": "negative",
+      "description": "grant_ref is null (re-signed): wire fails.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": null,
+        "cap_chain": [
+          {
+            "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "type": "max_spend",
+                "usd": 100
+              },
+              {
+                "text": "café <&> \"q\" \\ \n ",
+                "type": "note",
+                "z": 3,
+                "～": 1,
+                "😀": 2
+              }
+            ],
+            "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+            "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+          }
+        ],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "jnFeiS8G2cbELAYka6SCmsqWwlVoBcaN8h0twZKbUShcVsJSQnjWQYjs5Og8Rd-hbfWZ1ta3KH514WJ5HVPWBg"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": false
+        }
+      }
+    },
+    {
+      "name": "grant-ref-empty-chain",
+      "class": "negative",
+      "description": "cap_chain is empty (re-signed) while grant_ref is the root id: chain, grant_ref_bound (fail-closed on no root) and leaf_signature fail.",
+      "grant": {
+        "id": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "max_spend",
+            "usd": 100
+          },
+          {
+            "text": "café <&> \"q\" \\ \n ",
+            "type": "note",
+            "z": 3,
+            "～": 1,
+            "😀": 2
+          }
+        ],
+        "body_digest": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "sig": "ovhXJbjfUfmPvek3PSSMb_Ujgb2w8qZisd4iiItUKeuxWZHAP0vtdc2dCC74I7DvwBecCgtat3R0SEobUtT7AA"
+      },
+      "plan_nodes": [
+        {
+          "id": "n1",
+          "verb": "read",
+          "resource": "db/users"
+        },
+        {
+          "id": "n2",
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        {
+          "id": "n3",
+          "verb": "delete",
+          "resource": "db/orders",
+          "reversibility_class": "irreversible",
+          "pre": {
+            "exists": true
+          },
+          "post": {
+            "exists": false
+          }
+        },
+        {
+          "id": "n4",
+          "verb": "send",
+          "resource": "mail/out",
+          "params_digest": "X7rjhB-08jOjpHdaDtwiTzky3t2AHrM1ATGHlDD7wMc"
+        },
+        {
+          "id": "n5",
+          "verb": "read",
+          "resource": "db/items"
+        }
+      ],
+      "context": {
+        "now": 1800000000000,
+        "aud": "rs-conformance"
+      },
+      "pcactn": {
+        "ver": 2,
+        "action": {
+          "verb": "write",
+          "resource": "db/orders",
+          "params_digest": "1Xiqc9nUInGdxF4MuWfVSX0MicrLZpdFuvY5dHFqgiY",
+          "reversibility_class": "reversible"
+        },
+        "grant_ref": "qK9bTlJxvo3zLOQ4msAVS7_odp-g75Kfsu_Z7L47sqQ",
+        "cap_chain": [],
+        "plan": {
+          "root": "nUT-9D0cP37E_utke2iZR3FEwwKWM4oNbmGMRJwnrDY",
+          "inclusion_proof": {
+            "index": 1,
+            "size": 5,
+            "path": [
+              {
+                "side": "L",
+                "hash": "ybCDZ4xiuJDNgfRfPQN9wGo42DR_KJt1e6L6mNKb4PA"
+              },
+              {
+                "side": "R",
+                "hash": "CsndPOuaPKXVni1nkdTCk9en3sn1SmKj1yhimqFScgo"
+              },
+              {
+                "side": "R",
+                "hash": "yfDXmJBiEXfpagM7XsEzGBA6MgJGJSeV4w-yeHP_7a4"
+              }
+            ]
+          },
+          "node_id": "n2",
+          "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+        },
+        "attestation": {
+          "quote_digest": "",
+          "epoch": 0,
+          "model_id": "unattested",
+          "measurement": "",
+          "operator": "unattested"
+        },
+        "provenance": {
+          "causal_hash": "",
+          "taint_level": 0,
+          "trusted_refs": []
+        },
+        "freshness": {
+          "beacon_ref": "",
+          "epoch": 0,
+          "accumulator_witness": ""
+        },
+        "counter": 7,
+        "risk_claim": {
+          "r": 0,
+          "inputs": {}
+        },
+        "aud": "rs-conformance",
+        "iat": 1800000000000,
+        "exp": 1800000600000,
+        "sig": "l3ow6kjW9ib-M_OxcxPb479Z90RYtxQYbPVLhNOJfDEZRhrA8kOFntSkkMB3WWh8U2dZ1aq2ouR8uvEevoDZAw"
+      },
+      "expect": {
+        "allow": false,
+        "checks": {
+          "wire": true,
+          "version": true,
+          "audience": true,
+          "validity": true,
+          "chain": false,
+          "grant_ref_bound": false,
+          "plan_inclusion": true,
+          "leaf_signature": false,
+          "counter": true
+        }
+      }
+    },
+    {
       "name": "pq-leaf-ml-dsa-65-valid",
       "requires": "pq",
       "class": "positive",
@@ -15863,6 +18766,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -15979,6 +18883,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -16096,6 +19001,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -16213,6 +19119,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -16330,6 +19237,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -16556,6 +19464,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -16673,6 +19582,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -16790,6 +19700,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -17015,6 +19926,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -17131,6 +20043,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -17248,6 +20161,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -17365,6 +20279,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -17482,6 +20397,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -17707,6 +20623,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -17823,6 +20740,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -17940,6 +20858,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -18057,6 +20976,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -18174,6 +21094,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -18399,6 +21320,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -18515,6 +21437,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -18632,6 +21555,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -18749,6 +21673,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -18866,6 +21791,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": false,
           "counter": true
@@ -19436,6 +22362,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -19570,6 +22497,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -19705,6 +22633,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -19840,6 +22769,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -19972,6 +22902,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -20107,6 +23038,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -20242,6 +23174,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -20374,6 +23307,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -20508,6 +23442,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -20642,6 +23577,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -20777,6 +23713,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -20912,6 +23849,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21044,6 +23982,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21178,6 +24117,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21312,6 +24252,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21447,6 +24388,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21582,6 +24524,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21714,6 +24657,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21848,6 +24792,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -21982,6 +24927,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -22117,6 +25063,7 @@
           "audience": true,
           "validity": true,
           "chain": true,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -22252,6 +25199,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true
@@ -22384,6 +25332,7 @@
           "audience": true,
           "validity": true,
           "chain": false,
+          "grant_ref_bound": true,
           "plan_inclusion": true,
           "leaf_signature": true,
           "counter": true

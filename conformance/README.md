@@ -40,9 +40,9 @@ The language verifiers (`sdks/*-pca`) must reproduce `allow` and every listed ch
   profile below (a parse failure == `wire` failure; the verdict is `{allow:false, checks:{wire:false}}`).
 - A verifier runs `verify(pcactn, grant, now = context.now, audience = context.aud)`.
 - `expect.checks` are booleans. If `wire` is false it is the ONLY entry (a wire failure is terminal: nothing else
-  is evaluated). Otherwise all of `wire, version, audience, validity, chain, plan_inclusion, leaf_signature,
-  counter` are present. `allow` = every check true.
-- Normative check order (`check_order`): wire, version, audience, validity, chain, plan_inclusion, leaf_signature, counter.
+  is evaluated). Otherwise all of `wire, version, audience, validity, chain, grant_ref_bound, plan_inclusion,
+  leaf_signature, counter` are present. `allow` = every check true.
+- Normative check order (`check_order`): wire, version, audience, validity, chain, grant_ref_bound, plan_inclusion, leaf_signature, counter.
 
 ### `primitives`
 
@@ -108,7 +108,7 @@ present; a non-string is a `wire` failure, never a default), `rationale_commitme
 `caution` in [0,1] (MONOTONE: verifier uses `r = max(server r, caution)`).
 
 ### 7. Other checks
-`version`: `ver == 2`. `chain`: <= 16 capabilities (checked before any signature work), root == grant, strict
+`version`: `ver == 2`. `grant_ref_bound`: `grant_ref` is a non-empty string byte-equal to `cap_chain[0].id` (exact comparison, no normalization; independent of `chain`; fails closed when the chain is empty). `chain`: <= 16 capabilities (checked before any signature work), root == grant, strict
 RFC 8032 signatures (reject non-canonical S, non-canonical / small-order / mixed-order points: the identity key and the
 order-2 key with signature R=identity,S=0 MUST NOT verify), hash-linked, issuer==parent.holder, append-only caveats.
 `plan_inclusion`: index/size bound to the path shape (path length and every side recomputed from `index,size` by the
