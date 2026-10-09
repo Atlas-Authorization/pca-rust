@@ -1,0 +1,18 @@
+{
+  "b_max": 1000000,
+  "budget_bits": 40,
+  "chain_hash": "Poseidon (neptune, arity 2, Strength::Standard, 128-bit) over the Pallas scalar field",
+  "compress_prove_ms": 5128.437548,
+  "compress_verify_ms": 111.056567,
+  "compressed_proof_bytes": 10624,
+  "cost_bits": 32,
+  "crate": "nova-snark 0.76.0",
+  "curve_cycle": "Pallas/Vesta",
+  "fold_ms": 3651.380701,
+  "note": "Folding makes per-step prover work and recursive-proof size independent of history length N; compression yields one succinct proof of the entire history.",
+  "num_steps": 8,
+  "pcs": "IPA (ipa_pc::EvaluationEngine) — transparent, no trusted setup",
+  "scheme": "Nova folding scheme (IVC) + Spartan CompressedSNARK",
+  "step_state": "[chain_digest, budget_spent] (arity 2)",
+  "verifier_key_bytes": 12661584
+}

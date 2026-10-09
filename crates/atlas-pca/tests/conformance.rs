@@ -2,7 +2,7 @@ use atlas_pca::*;
 use ed25519_dalek::SigningKey;
 use serde_json::Value;
 
-const DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/conformance/");
+const DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../conformance/");
 
 /// A Rust `String` cannot hold a lone surrogate, but `vectors.json` carries one in an OBJECT-form vector
 /// (`"aud": "rs-\ud800"`), which `serde_json` refuses to load. Replace every lone surrogate escape inside a
