@@ -1,0 +1,16 @@
+[package]
+name = "pca-zkvm-verify"
+version = "0.1.0"
+edition = "2021"
+description = "Verifier-side tests for the committed PCA zkVM receipt (no guest toolchain, no proving, no GPU)"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+
+[dev-dependencies]
+risc0-zkvm = { version = "^3.0.6", default-features = false }
+pca-zkvm-core = { path = "../core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+bincode = "1"

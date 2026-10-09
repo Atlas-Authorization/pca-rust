@@ -1,85 +1,119 @@
-# pca-rust — Proof-Carrying Authority verifier for Rust
+# pca-rust
 
-An **offline verifier for Proof-Carrying Actions (PCActns)** in Rust. A PCActn is the credential an
-autonomous agent presents with *every* action it takes: a self-contained, cryptographically-checkable
-object proving the action is a faithful execution of authority its principal actually granted. Your
-resource server verifies it locally — no token introspection, no network call on the hot path.
+**The Rust implementation of Proof-Carrying Authority (PCA): the reference `authF` verifier plus the
+advanced, post-quantum and zero-knowledge crypto rungs that build on it.**
 
-This library is the Rust member of the PCA verifier family. It is a faithful port of the TypeScript
-reference implementation and passes the **same shared conformance corpus** as every other language
-verifier, so a PCActn that verifies here verifies identically everywhere.
+This is the Rust counterpart to [`Atlas-Authorization/pca`](https://github.com/Atlas-Authorization/pca)
+(the spec, docs, playground and the independent language verifiers) and
+[`Atlas-Authorization/pca-js`](https://github.com/Atlas-Authorization/pca-js) (the TypeScript
+implementation). It is a single Cargo workspace.
+
+Classic auth answers two questions:
+
+- **authN** — *who are you?* (OIDC, passkeys)
+- **authZ** — *what may you do?* (OAuth scopes, roles)
+
+Those were enough when a human was behind every action: the human *is* the policy engine, and their
+identity implies faithfulness. An autonomous agent breaks that assumption — it is a stochastic,
+externally-steerable process whose actions are unknown at grant time and manipulable (prompt injection,
+tool-poisoning) at run time. A bearer token in a hijacked agent is full impersonation.
+
+PCA adds a third question:
+
+- **authF** — *is this specific action a faithful, uncompromised execution of an authority the principal
+  actually conferred?*
+
+PCA makes `authF` cheaply verifiable by replacing the bearer token with a **Proof-Carrying Action
+(PCActn)**: with every action the agent presents a self-contained object, and the resource server
+verifies a *proof* — not the possession of a secret. The core verifier (`atlas-pca`) runs **offline**
+with a stateless set of fail-closed checks in a fixed, normative order; every higher capability
+(post-quantum signatures, transparent STARKs, in-circuit zero-knowledge, recursive folding) is an
+additive, independently-adoptable rung on top of the base wire.
+
+---
+
+## Crates
+
+| Crate | In root workspace? | What it does |
+|-------|--------------------|--------------|
+| [`atlas-pca`](crates/atlas-pca) | yes (member) | Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks) |
+| [`stark-pca`](crates/stark-pca) | yes (member) | Transparent, post-quantum STARK (Winterfell) proof of the Proof-Carrying Authority release gate |
+| [`zkvm-pca`](crates/zkvm-pca) | no (standalone) | Faithful port of the PCA Policy-VM release gate (full predicate DSL + fixed-point risk + caveats + native-sha256 commitments) for execution inside a zkVM guest |
+| [`folding-pca`](crates/folding-pca) | no (standalone) | Recursive PCA action-history aggregation via a Nova folding scheme (IVC): fold N per-action steps into ONE RecursiveSNARK, then compress to a CompressedSNARK proving an agent's WHOLE action history (unforgeable hash chain + cumulative Σcost ≤ bMax). |
+
+`atlas-pca` is the core verifier — start there. The other crates are heavy-crypto rungs that each prove
+a stronger property about a PCA decision or history; they are optional and independent.
+
+---
 
 ## Install
 
-The crate (`atlas-pca`) is not yet published to crates.io; add it from the repo:
-
 ```toml
+# Cargo.toml — the core verifier
 [dependencies]
-atlas-pca = { git = "https://github.com/Atlas-Authorization/pca-rust" }
+atlas-pca = "0.1"
 ```
 
-## Verify a PCActn
-
-A verifier is stateless. Give it the received PCActn (raw JSON via `verify_pcactn_json`, or a parsed
-`serde_json::Value` via `verify_pcactn_core`), the Root Intent Grant it claims to derive from, the
-current time (epoch **milliseconds**), and *your own* audience id. It returns an allow/deny verdict plus
-the per-check results.
-
 ```rust
-use atlas_pca::verify_pcactn_json;
+use atlas_pca::{verify_pcactn, VerifyOptions};
 
-// `raw` is the PCActn as received (strict canonical JSON, wire version 2).
-// `grant` is the Root Intent Grant the action's capability chain roots in.
-let now = std::time::SystemTime::now()
-    .duration_since(std::time::UNIX_EPOCH)
-    .unwrap()
-    .as_millis() as i64;
-
-let verdict = verify_pcactn_json(raw, &grant, now, "https://api.example.com");
-
-if verdict.allow {
-    // every core check passed — execute the action
-} else {
-    eprintln!("denied: {} {:?}", verdict.reason, verdict.checks);
+let verdict = verify_pcactn(&pcactn, &VerifyOptions {
+    audience: "https://api.example.com".into(),
+    ..Default::default()
+});
+if !verdict.ok {
+    return Err(format!("authF failed: {}", verdict.reason));
 }
 ```
 
-`verdict.checks` reports each core check (`wire`, `version`, `audience`, `validity`, `chain`,
-`plan_inclusion`, `leaf_signature`, `counter`). Every check is **fail-closed** — the action is allowed
-only if none reports failure — and a `wire` failure is terminal (nothing else is evaluated).
+The optional `axum` feature adds an ergonomic tower `Layer`/`Service` guard:
 
-## Conformance
+```toml
+atlas-pca = { version = "0.1", features = ["axum"] }
+```
 
-The repo ships a vendored copy of the shared **conformance corpus** (`conformance/vectors.json` +
-`conformance/keys.json`): over a hundred golden and adversarial PCActns with their expected verdicts,
-plus canonical-JSON, strict-base64url, and Merkle primitive vectors. `cargo test` runs the verifier
-against every vector; it must reproduce `allow` and every listed check exactly.
-
-## Supported signature suites
-
-- `ed25519` (default)
-- `ml-dsa-65` (FIPS-204, post-quantum)
-- `hybrid-ed25519-ml-dsa-65` (classical + post-quantum)
-
-ML-DSA-65 verification uses the `fips204` crate. The suite id and the post-quantum key are part of the
-signed body, so a downgrade is a signature failure; a hybrid PCActn requires **both** signatures to verify.
-
-## Capability maturity
-
-The PCActn wire format and the eight core offline checks are stable and conformance-covered. The broader
-framework surface is implemented and tested in the reference implementation: threshold/step-up co-signing
-(a real FROST threshold signature over a DKG-established group key, released only on a Policy-VM allow),
-TEE/hardware and model-weights attestation, zero-knowledge proof-of-compliance (a real Groth16 proof),
-optimistic bonds and the contestable dispute game, and the malicious-secure MPC Policy VM (SPDZ-style MACs
-with abort). A few rungs carry a remaining production requirement, stated plainly rather than hidden
-behind a label: a live TEE/hardware attestation needs real SEV-SNP/TDX silicon (the verifier is tested
-against real-crypto mock reports); unforgeable FROST guardian custody needs each share in a separate trust
-domain / HSM with a network signing protocol (the reference runs the signing round in-process); the MPC
-Policy VM's offline triple generation is trusted-dealer today (a no-dealer OT/HE phase is designed); and
-the zero-knowledge circuit proves a decision subset (plan-membership + risk ≤ budget), with fuller
-policy coverage ongoing. See the [PCA framework repo](https://github.com/Atlas-Authorization/pca) for the
+See each crate's own `README.md` and the [spec repo](https://github.com/Atlas-Authorization/pca) for the
 full model.
+
+---
+
+## Working in this workspace
+
+```sh
+# the root workspace (atlas-pca + stark-pca + folding-pca)
+cargo build --release
+cargo test
+
+# just the core verifier (loads the vendored conformance corpus in ./conformance)
+cargo test -p atlas-pca
+cargo test -p atlas-pca --features axum
+
+# a single crypto rung (note: folding-pca's package name is `pca-folding-ivc`)
+cargo test -p stark-pca
+cargo run  -p pca-folding-ivc --bin demo --release
+```
+
+### `zkvm-pca` builds on its own
+
+`zkvm-pca` is **excluded from the root workspace** and is its own Cargo workspace. It proves the PCA
+release gate — including the in-guest Ed25519 capability-chain and leaf-PCActn verification — inside a
+[RISC Zero](https://risczero.com) zkVM, which needs a `rv32im` guest target and a pinned
+`[patch.crates-io]` set (risc0 forks of `sha2` / `curve25519-dalek` / `crypto-bigint`). A workspace root
+cannot be a member of another workspace, and those guest patches must not leak into the host graph, so it
+stands alone:
+
+```sh
+cd crates/zkvm-pca
+cargo build --release          # host + methods; risc0-build compiles the guest ELF
+cargo run --release --bin host # mint + prove + verify the fixture
+```
+
+The small proving fixtures (`image_id.json`, `public_journal.json`, succinct sample receipt, …) are
+committed; the large guest ELF and full receipts are regenerated by the build.
+
+---
 
 ## License
 
-See `LICENSE`.
+MIT — see [`LICENSE`](./LICENSE). (`stark-pca`, `zkvm-pca` and `folding-pca` are additionally offered
+under Apache-2.0; see each crate's `Cargo.toml`.)
