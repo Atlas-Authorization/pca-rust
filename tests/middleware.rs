@@ -25,7 +25,7 @@ use tower_service::Service;
 
 // ---- conformance-vector loader (mirrors tests/conformance.rs) ---------------------------
 
-const DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../conformance/");
+const DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/conformance/");
 const LONE: char = '\u{10FFFF}';
 
 fn sanitize_lone_surrogates(text: &str) -> String {
