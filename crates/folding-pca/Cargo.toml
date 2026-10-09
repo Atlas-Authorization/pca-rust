@@ -1,9 +1,16 @@
 [package]
 name = "pca-folding-ivc"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Recursive PCA action-history aggregation via a Nova folding scheme (IVC): fold N per-action steps into ONE RecursiveSNARK, then compress to a CompressedSNARK proving an agent's WHOLE action history (unforgeable hash chain + cumulative Σcost ≤ bMax)."
-license = "MIT OR Apache-2.0"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/Atlas-Authorization/pca-rust"
+homepage = "https://github.com/Atlas-Authorization/pca-rust"
+documentation = "https://docs.rs/pca-folding-ivc"
+keywords = ["nova","folding","ivc","zero-knowledge","pca"]
+categories = ["cryptography"]
+exclude = ["fixtures/","/.gitignore","rust-toolchain.toml"]
 
 [dependencies]
 # Microsoft Nova (the maintained `nova-snark` line on crates.io). Folding / IVC over a

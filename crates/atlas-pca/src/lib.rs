@@ -1,6 +1,6 @@
 //! Reference verifier for the CORE PCActn checks (wire format v2): wire, version, audience, validity,
-//! capability chain, Merkle plan inclusion, strict Ed25519 leaf signature, counter. Byte-matches
-//! `@atlasauth/pca` (see `packages/pca/conformance/README.md` for the normative rules).
+//! capability chain, grant_ref binding, Merkle plan inclusion, strict Ed25519 leaf signature, counter. Byte-matches
+//! `@atlasauth/pca` (the shared conformance corpus defines the normative rules).
 
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use base64::Engine;
@@ -718,7 +718,7 @@ fn verify_ed25519_strict(pk: &[u8; 32], msg: &[u8], sg: &[u8; 64]) -> bool {
 // ---- B4 post-quantum crypto-agility (ML-DSA-65 / FIPS-204) -----------------------------
 //
 // An ADDITIVE, backward-compatible algorithm-agility slot for the PCActn leaf signature, mirroring
-// packages/pca/src/pq.ts and sdks/go-pca/pq.go. Absent `alg` (or `alg == "ed25519"`) is BYTE-IDENTICAL to
+// the `@atlasauth/pca` and Go implementations. Absent `alg` (or `alg == "ed25519"`) is BYTE-IDENTICAL to
 // the pre-B4 wire. Suites:
 //   - "ed25519"                     classical 64-byte Ed25519 `sig` (unchanged).
 //   - "ml-dsa-65"                   pure PQ: `sig` is an ML-DSA-65 (FIPS-204) signature verified under `pq_pk`.
@@ -1445,6 +1445,19 @@ pub fn verify_pcactn_core(pcactn: &Value, grant: &Value, now: i64, audience: &st
             verify_chain(chain, grant.get("issuer").and_then(Value::as_str))
         }
     });
+
+    // grant_ref_bound (normative): the signed grant_ref MUST be a non-empty string byte-equal to the id of the
+    // ROOT capability of the presented chain (cap_chain[0].id). Independent of the chain verdict; fail-closed on
+    // an empty / malformed chain. Replay state is keyed on grant_ref, so it must not be attacker-chosen.
+    let gref = p.get("grant_ref").and_then(Value::as_str);
+    let root_id = chain.first().and_then(|c| c.get("id")).and_then(Value::as_str);
+    record(
+        "grant_ref_bound",
+        match (gref, root_id) {
+            (Some(g), Some(r)) if !g.is_empty() && g == r => Ok(()),
+            _ => Err("grant_ref is not the id of the root capability in cap_chain".into()),
+        },
+    );
 
     // plan inclusion (leaf recomputed from the action itself)
     let empty_map = Map::new();

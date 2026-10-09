@@ -38,7 +38,7 @@
 //! * Nova folds over the **Pallas/Vesta** cycle with an **IPA** PCS and a Spartan
 //!   [`CompressedSNARK`]: transparent (no trusted setup) but **not** post-quantum. "PQ-friendly"
 //!   in the roadmap sense is that folding reduces the whole history to a *single* relaxed-R1CS
-//!   instance that a PQ final SNARK (e.g. a STARK, cf. `sdks/stark-pca-plonky3`) could compress
+//!   instance that a PQ final SNARK (e.g. a STARK) could compress
 //!   instead; wiring that PQ wrap is future work. We do not overstate it here.
 
 use ff::{Field, PrimeField};

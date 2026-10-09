@@ -36,8 +36,8 @@ additive, independently-adoptable rung on top of the base wire.
 
 | Crate | In root workspace? | What it does |
 |-------|--------------------|--------------|
-| [`atlas-pca`](crates/atlas-pca) | yes (member) | Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks, M0-M3) |
-| [`stark-pca`](crates/stark-pca) | yes (member) | Transparent, post-quantum STARK (Winterfell) proof of the PCA release gate |
+| [`atlas-pca`](crates/atlas-pca) | yes (member) | Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks) |
+| [`stark-pca`](crates/stark-pca) | yes (member) | Transparent, post-quantum STARK (Winterfell) proof of the Proof-Carrying Authority release gate |
 | [`zkvm-pca`](crates/zkvm-pca) | no (standalone) | Faithful port of the PCA Policy-VM release gate (full predicate DSL + fixed-point risk + caveats + native-sha256 commitments) for execution inside a zkVM guest |
 | [`folding-pca`](crates/folding-pca) | no (standalone) | Recursive PCA action-history aggregation via a Nova folding scheme (IVC): fold N per-action steps into ONE RecursiveSNARK, then compress to a CompressedSNARK proving an agent's WHOLE action history (unforgeable hash chain + cumulative Σcost ≤ bMax). |
 

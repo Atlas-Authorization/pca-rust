@@ -1,9 +1,16 @@
 [package]
 name = "stark-pca"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-description = "Transparent, post-quantum STARK (Winterfell) proof of the PCA release gate"
-license = "MIT OR Apache-2.0"
+description = "Transparent, post-quantum STARK (Winterfell) proof of the Proof-Carrying Authority release gate"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/Atlas-Authorization/pca-rust"
+homepage = "https://github.com/Atlas-Authorization/pca-rust"
+documentation = "https://docs.rs/stark-pca"
+keywords = ["stark","zero-knowledge","post-quantum","winterfell","pca"]
+categories = ["cryptography"]
+exclude = ["tests/","/.gitignore"]
 
 [dependencies]
 winterfell = "0.13.1"
