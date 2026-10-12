@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 - 2026-10-12
+
+- Security (policy layer): caveats on the root grant outside the envelope are now evaluated like delegated caveats; new policy_caveats/evaluate_caveats helpers (incl. max_spend). The core verifier still does not evaluate caveats. (`policy_caveats(&grant, &chain)` / `evaluate_caveats(&caveats, &ctx) -> (ok, failed)`, exercised by the shared `primitives.caveat_eval` vectors.)
+- Threshold shares (wire): `threshold.shares[i]` signatures are validated per suite like the leaf (`alg` absent = ed25519 with a 64-byte `sig`; `ml-dsa-65` a 3309-byte `sig`; `hybrid-ed25519-ml-dsa-65` a 64-byte `sig` plus a required 3309-byte `pq_sig`; `pq_sig` must be absent otherwise; a non-string or unknown `alg` fails). Before, every share `sig` had to be exactly 64 bytes, so a pure ML-DSA-65 share could never be carried, and a stray or missing `pq_sig` was not caught at the wire stage. A share's `pq_pk` stays an optional echo judged by the threshold check.
+- Strict `PCA-Action` header: new public `decode_pca_header` (strict unpadded base64url, no trimming, canonical trailing bits, strict UTF-8, BOM kept) used by the `axum` middleware's header path; any failure is the existing `401`. Exercised by the shared `primitives.pca_header` vectors.
+
 ## 0.4.0 - 2026-10-11 (BREAKING)
 
 - Depth / strict digests (security, parity): every protocol digest the verifiers compute (hop body digest, parent capability hash, caveat comparison, root-vs-grant, root `trusted_root` match, Merkle leaves; new public `hash_canonical_strict`) now uses the STRICT canonical form like the reference (`hashCanonical` is `canonicalizeStrict`): depth <= 32, safe integers, plain decimals. It was the lenient form, so a correctly SIGNED hop carrying a depth-33 value, `1e300` or `2^53+2` verified although the reference refuses the chain; now `hop N: malformed body`. `merkle_root` errs on an out-of-profile leaf. A caller-built hop deeper than the cap is measured iteratively BEFORE the body is cloned (a recursive clone of a 1,000,000-deep value overflowed the stack and aborted the process). `hash_canonical` / `cap_hash` / `params_digest` stay lenient (content addressing only).

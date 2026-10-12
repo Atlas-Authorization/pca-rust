@@ -1,6 +1,6 @@
 # pca-folding-ivc
 
-> Status: **0.4.0, unaudited.** Install: `cargo add pca-folding-ivc`
+> Status: **0.4.1, unaudited.** Install: `cargo add pca-folding-ivc`
 
 **One succinct proof of an agent's entire PCA action history — via a folding scheme (Nova), not naive recursion.**
 
@@ -127,8 +127,10 @@ fixtures to `fixtures/`:
 - **Long history.** `cargo run --release --bin longfold -- 1000` folds 1000 actions (cost 1000 each,
   cumulative cost exactly `B_MAX`), checks the folded output against the native replay, compresses
   and verifies the proof, and confirms a wrong step count is rejected. On an Apple-silicon Mac:
-  fold plus recursive verification 346 s, compression setup 0.27 s, compression proving 4.1 s,
-  compressed verification 0.11 s, compressed proof 10624 bytes (the same size as the 8-step proof).
+  fold plus recursive verification 90.4 s, compression setup 0.24 s, compression proving 2.75 s,
+  compressed verification 45.6 ms, compressed proof 10624 bytes (the same size as the 8-step proof).
+  These are the values recorded in the result file, measured after the RT-05 fix; an earlier version of
+  this paragraph quoted 346 s / 4.1 s / 0.11 s from a run before the fix.
   Result: `fixtures/longfold_1000.json`.
   The same run on a 40-vCPU AMD EPYC Azure VM (CPU only) gives the identical final chain digest
   (`0x176d49be...e6e9`), fold plus recursive verification 49 s, compression proving 0.49 s, 168 MB peak

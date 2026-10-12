@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 - 2026-10-12
+
+- Lockstep release with the PCA 0.4.1 security fix (root caveats enforced in the policy layer). No change in this crate.
+
 ## 0.4.0 - 2026-10-11 (BREAKING)
 
 - R3-15 fix (BREAKING API): `verify_compressed(proof, vk, num_steps)` and `verify_recursive(pp, rec, num_steps)` no longer take `z0`; they verify against the pinned `initial_state()` `[0, 0]`. A start state taken from a prover or a public-IO file was accepted as-is, so a field-negative `z0 = [0, -X]` hid `X` of early spend while the chain digest still matched the honest ledger. New `verify_compressed_claimed` / `verify_recursive_claimed` / `check_claimed_z0` compare a claimed start with the pinned one and refuse anything else; new `initial_state_commitment()`; `public_io.json` gains `z0_commitment`. Tests: `tests/z0_pinning.rs`.

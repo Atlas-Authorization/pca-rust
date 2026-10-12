@@ -304,5 +304,68 @@
   "reason": "Poisons to 64 instead of 65. evaluations is private and only read by charge() as ev = evaluations + 1, compared > 64: 65 > 64 and 66 > 64 both refuse, so every later charge in the scope is refused either way (chars/steps are not updated on refusal in both). Same verdicts.",
   "occurrence": 1,
   "lineno": 824
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with == in emit (line 438 col 19)",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS || depth > MAX_PARSE_DEPTH * 2 {",
+  "reason": "The entry size check is only an early exit: whenever prog.len() >= 4096 at any emit entry, the finished program (plus the Match compile() appends) has >= 4097 instructions and compile() returns None at line 517 (and every Rep re-checks at line 497, bounding the overshoot). Refusing only at exactly 4096 changes no compile() verdict.",
+  "occurrence": 1,
+  "lineno": 438
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with >= in emit (line 438 col 19)",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS || depth > MAX_PARSE_DEPTH * 2 {",
+  "reason": "Newly refuses when prog.len() == 4096 at an emit entry; in that case the final program plus Match is >= 4097 and compile() returns None at line 517 anyway (a 4096-instruction program including Match has at most 4095 before Match, so no emit entry ever sees 4096). Same verdict for every source.",
+  "occurrence": 1,
+  "lineno": 438
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in emit (line 455 col 49)",
+  "line": "prog.push(Inst::Split(split + 1, usize::MAX));",
+  "reason": "Placeholder Split: line 460 unconditionally overwrites prog[split] with Split(split + 1, end) after the item is emitted, and if emitting the item fails compile() returns None; the placeholder value is never executed or observed.",
+  "occurrence": 1,
+  "lineno": 455
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in emit (line 477 col 49)",
+  "line": "prog.push(Inst::Split(split + 1, usize::MAX));",
+  "reason": "Placeholder Split: line 481 overwrites prog[split] with Split(split + 1, end) once the body is emitted; on a body error compile() returns None. The placeholder is never executed or observed.",
+  "occurrence": 2,
+  "lineno": 477
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in emit (line 488 col 50)",
+  "line": "prog.push(Inst::Split(at + 1, usize::MAX));",
+  "reason": "Placeholder Split: `at` is recorded in `splits` (same prog.len()) and line 493 overwrites every prog[sp] with Split(sp + 1, end) after the loop; on a body error compile() returns None. The placeholder is never executed or observed.",
+  "occurrence": 1,
+  "lineno": 488
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with == in emit (line 497 col 27)",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS {",
+  "reason": "Post-Rep size check is an early exit: a program that ever exceeds 4096 instructions during emission ends with > 4096 after Match and compile() refuses at line 517; with == the growth is still bounded by the entry check (line 438) and the line 517 check. Same compile() verdict.",
+  "occurrence": 1,
+  "lineno": 497
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with >= in emit (line 497 col 27)",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS {",
+  "reason": "Newly refuses when a Rep ends at exactly 4096 instructions; compile() then appends Match (4097 > 4096) and returns None at line 517 anyway. Same verdict for every source.",
+  "occurrence": 1,
+  "lineno": 497
  }
 ]

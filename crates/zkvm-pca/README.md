@@ -7,6 +7,22 @@ caveats, native SHA-256 commitments and an in-guest Ed25519 capability-chain che
 RISC Zero guest. The host produces a succinct receipt whose journal is the public statement
 (`allow`, `r_scaled`, `tier`, three commitments, `chain_verified`, and the evaluated `context`, see RT-06 below).
 
+## TODO (PCA 0.4.1): root caveats and `max_spend` are not in the current guest
+
+PCA 0.4.1 fixes a security gap in the TypeScript policy layer: caveats placed on the root grant outside the `envelope` caveat
+were signed but never evaluated. They are now enforced exactly like the caveats delegation hops append, and a `max_spend`
+caveat type (`{usd}` against the action's `params.amount`, optional `currency` "usd"/"USD") was added. The guest in this
+directory (`3b1eebb5...fdad`) still mirrors the 0.4.0 decision: `core/src/lib.rs` evaluates the envelope's caveats and the
+delegated caveats (`delegated_caveats`, R3-11) but not the root's other caveats, and `core/src/caveats.rs` treats `max_spend`
+as an unknown type. A receipt from this guest therefore does NOT prove that root caveats held. To close it:
+
+1. `core/src/lib.rs`: evaluate `root_caveats(grant)` (the grant's caveats minus its FIRST `envelope` caveat) with the same
+   context and AND it into `allow`, as `policy-vm.ts` `decide()` does; `core/src/caveats.rs`: add `max_spend` as in
+   `agent-native.ts` `maxSpendSatisfied`.
+2. Add the `caveat_eval` conformance entries (packages/pca/conformance/vectors.json) to the core crate tests.
+3. Rebuild the guest, re-prove the committed receipts, update the pinned image id and the verify crate, and re-run the
+   min-image check (a full risc0 rebuild on the farm, `--need risc0`).
+
 ## Red-team round 6 (R6-ZK-01 to R6-ZK-06): current guest `3b1eebb5...fdad`
 
 BREAKING: new image id `3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad`, and the journal gains a leading `guest_version` field (7). The guest now matches the

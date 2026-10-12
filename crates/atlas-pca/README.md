@@ -4,7 +4,7 @@ Reference verifier for **Proof-Carrying Authority (PCA)**, an execution-authenti
 autonomous agents. The agent presents a self-contained proof-carrying action (PCActn) with every
 request, and the resource server verifies it offline instead of trusting a bearer token.
 
-> Status: **0.4.0, unaudited.** Not independently security-reviewed.
+> Status: **0.4.1, unaudited.** Not independently security-reviewed.
 
 ## Install
 
@@ -25,6 +25,34 @@ rejected. ML-DSA-65 (FIPS-204) leaf signatures are supported alongside Ed25519.
 
 The crate passes the shared 172-vector PCA conformance corpus that the other language verifiers
 (TypeScript, Python, Go, ...) also pass.
+
+## Caveats (policy layer)
+
+The core verifier (and the `axum` middleware) does **not** evaluate caveats: it checks that they are carried, signed and
+only ever appended along the chain, and treats their content as opaque. A resource server that enforces a grant's caveats
+calls the policy-layer helpers with its own action:
+
+```rust
+use atlas_pca::{evaluate_caveats, policy_caveats};
+use serde_json::json;
+
+let ctx = json!({
+    "now": now_ms,
+    "delegation_depth": chain.as_array().map_or(0, |c| c.len().saturating_sub(1)),
+    "action": { "verb": "pay", "resource": "invoice:42", "params": { "amount": 50, "currency": "usd" } },
+});
+let (ok, failed) = evaluate_caveats(&policy_caveats(&grant, &chain), &ctx);
+if !ok { /* deny: `failed` lists the unsatisfied caveat types */ }
+```
+
+`policy_caveats` is the ROOT grant's caveats (minus its first `envelope` caveat, the policy container) followed by the
+caveats the delegation hops appended. Since 0.4.1 the root's own caveats are included, so a `max_spend` (or any other
+caveat) placed directly on the root grant is enforced exactly like one a hop appended. Implemented types: `max_spend`,
+`expires`, `not_before`, `rate`, `max_blast_radius`, `reversibility_max`, `delegation_depth`, `budget_alloc`; any other
+type is unsatisfied (fail closed).
+
+The `PCA-Action` header is decoded strictly (`decode_pca_header`): unpadded base64url only, no whitespace, canonical
+trailing bits, valid UTF-8. Anything else is a `401`.
 
 ## Links
 

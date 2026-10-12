@@ -875,6 +875,17 @@ fn ml_dsa65_verify_b64u(pk_b64u: &str, msg: &[u8], sig_b64u: Option<&Value>) -> 
 /// Validate `alg`/`sig`/`pq_pk`/`pq_sig` per suite. `Ok(())` when well-formed, else a short reason.
 /// Strict + fail-closed: unknown alg, wrong sizes, or a field not used by the suite being present all fail.
 fn validate_signature_wire(p: &Map<String, Value>) -> Result<(), String> {
+    validate_suite_fields(p, true)
+}
+
+/// 0.4.1: a threshold share's signature fields, validated PER SUITE exactly like the leaf's (`alg` absent = ed25519 with a
+/// 64-byte `sig` and no `pq_sig`; ml-dsa-65 a 3309-byte `sig`; the hybrid a 64-byte `sig` plus a 3309-byte `pq_sig`), EXCEPT
+/// that a share's `pq_pk` is not judged here: it is an optional echo checked against the signer set by the threshold check.
+fn validate_share_signature_wire(s: &Map<String, Value>) -> Result<(), String> {
+    validate_suite_fields(s, false)
+}
+
+fn validate_suite_fields(p: &Map<String, Value>, check_pq_pk: bool) -> Result<(), String> {
     let alg = p.get("alg");
     if let Some(a) = alg {
         if !a.is_string() {
@@ -888,7 +899,9 @@ fn validate_signature_wire(p: &Map<String, Value>) -> Result<(), String> {
     if !b64_len(p.get("sig"), suite.sig_bytes) {
         return Err(format!("'sig' is not canonical base64url ({} bytes) for alg '{}'", suite.sig_bytes, suite.alg));
     }
-    if suite.needs_pq_pk {
+    if !check_pq_pk {
+        // share: `pq_pk` is an optional echo, judged by verify_threshold_share against the signer set
+    } else if suite.needs_pq_pk {
         if !b64_len(p.get("pq_pk"), ML_DSA_65_PUBLIC_KEY_BYTES) {
             return Err(format!("'pq_pk' is not canonical base64url ({ML_DSA_65_PUBLIC_KEY_BYTES} bytes)"));
         }
@@ -1306,10 +1319,6 @@ fn b32(v: Option<&Value>) -> bool {
     v.and_then(Value::as_str).is_some_and(|s| decode_b64u_strict(s, Some(32)).is_some())
 }
 
-fn b64sig(v: Option<&Value>) -> bool {
-    v.and_then(Value::as_str).is_some_and(|s| decode_b64u_strict(s, Some(64)).is_some())
-}
-
 fn is_str(v: Option<&Value>) -> bool {
     matches!(v, Some(Value::String(_)))
 }
@@ -1543,9 +1552,8 @@ pub fn validate_wire(pcactn: &Value) -> Result<(), String> {
             if !b32(s.get("publicKey")) {
                 return Err(format!("threshold.shares[{i}].publicKey is not canonical base64url (32 bytes)"));
             }
-            if !b64sig(s.get("sig")) {
-                return Err(format!("threshold.shares[{i}].sig is not canonical base64url (64 bytes)"));
-            }
+            // 0.4.1: per suite (it used to be a fixed 64 bytes, so a pure post-quantum share could never be carried).
+            validate_share_signature_wire(s).map_err(|e| format!("threshold.shares[{i}]: {e}"))?;
         }
     }
     Ok(())
@@ -1915,4 +1923,182 @@ pub fn verify_pcactn_core_policy(pcactn: &Value, grant: &Value, now: i64, audien
 
     let allow = checks.values().all(|v| *v);
     Verdict { allow, checks, reason }
+}
+
+// ---- PCA-Action header (0.4.1) -----------------------------------------------------------
+
+/// Why [`decode_pca_header`] refused a `PCA-Action` header value.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PcaHeaderError {
+    /// The value is empty.
+    Empty,
+    /// The value is not strict unpadded base64url.
+    NotBase64url,
+    /// The decoded bytes are not valid UTF-8.
+    NotUtf8,
+}
+
+impl std::fmt::Display for PcaHeaderError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            PcaHeaderError::Empty => "PCA-Action header is empty",
+            PcaHeaderError::NotBase64url => "PCA-Action header is not strict unpadded base64url",
+            PcaHeaderError::NotUtf8 => "PCA-Action header does not decode to UTF-8 text",
+        })
+    }
+}
+
+impl std::error::Error for PcaHeaderError {}
+
+/// Decode a `PCA-Action` header value to the encoded PCActn JSON text (pass it to [`strict_parse`]).
+///
+/// STRICT (0.4.1), exactly the profile's base64url rule ([`decode_b64u_strict`] with no fixed length): RFC 4648 section 5
+/// alphabet only (`A-Z a-z 0-9 - _`), no `=` padding, no whitespace anywhere (nothing is trimmed), `len % 4 != 1`, zero
+/// unused trailing bits; then strict UTF-8 (invalid, overlong, surrogate and truncated sequences are refused; a leading
+/// BOM is kept, and the strict JSON parser refuses it). Nothing is normalized, so one PCActn has one header spelling.
+pub fn decode_pca_header(value: &str) -> Result<String, PcaHeaderError> {
+    if value.is_empty() {
+        return Err(PcaHeaderError::Empty);
+    }
+    let bytes = decode_b64u_strict(value, None).ok_or(PcaHeaderError::NotBase64url)?;
+    String::from_utf8(bytes).map_err(|_| PcaHeaderError::NotUtf8)
+}
+
+// ---- policy-layer caveat helpers (0.4.1) -------------------------------------------------
+//
+// The core verifier (the nine checks above, and the axum middleware) treats caveats as OPAQUE: it checks that they are
+// carried, signed and only ever appended, but it does not evaluate them. A resource server enforcing a grant's caveats
+// calls `evaluate_caveats(&policy_caveats(&grant, &chain), &ctx)` with its own action. 0.4.1 (security, mirrors the
+// TypeScript policy layer): the caveats on the ROOT grant outside the envelope are part of that list, so they are enforced
+// exactly like the caveats delegation hops append.
+
+const ENVELOPE_CAVEAT: &str = "envelope";
+const REVERSIBILITY_ORDER: [&str; 3] = ["reversible", "rate_limited", "irreversible"];
+
+/// Every caveat the policy layer evaluates for an action under `grant` delegated along `chain` (root first): the grant's
+/// caveats with its FIRST `envelope` caveat removed (order kept; that one is the policy container read separately), then
+/// the caveats the hops appended (`leaf.caveats` beyond the grant's, leaf = the last chain element). Nothing is appended
+/// when `chain` is not a non-empty array or either caveat list is not an array. A non-array grant list is returned as is
+/// (`Null` when absent), and [`evaluate_caveats`] refuses it (fail closed). Total.
+pub fn policy_caveats(grant: &Value, chain: &Value) -> Value {
+    let cs = match grant.get("caveats").and_then(Value::as_array) {
+        Some(cs) => cs,
+        None => return grant.get("caveats").cloned().unwrap_or(Value::Null),
+    };
+    let mut out: Vec<Value> = cs.clone();
+    if let Some(i) = cs.iter().position(|c| c.get("type").and_then(Value::as_str) == Some(ENVELOPE_CAVEAT)) {
+        out.remove(i);
+    }
+    if let Some(leaf_cs) = chain.as_array().and_then(|c| c.last()).and_then(|l| l.get("caveats")).and_then(Value::as_array) {
+        out.extend(leaf_cs.get(cs.len()..).unwrap_or(&[]).iter().cloned());
+    }
+    Value::Array(out)
+}
+
+/// Evaluate a caveat list against a policy context; `(ok, failed)` where `ok` iff every caveat is satisfied and `failed`
+/// lists the unsatisfied caveats' `type` (`"<malformed>"` when it is not a string) in order. A non-array list is
+/// `(false, ["<malformed caveats>"])`. Total: never panics.
+///
+/// `ctx` is a JSON object: `now` (epoch ms), optional `delegation_depth`, `blast_radius`, `reversibility_class`,
+/// `recent_action_times` (epoch ms), and `action` `{verb, resource, reversibility_class?, params}`. A field the caveat
+/// needs that is absent (or of the wrong type) leaves it unsatisfied. Implemented types (anything else, including
+/// `envelope`, `note`, `resource_prefix`, `predicates`, `tool_schema`, is unsatisfied: fail closed):
+///   * `max_spend {usd}`: `usd` finite >= 0; `action.params` is an object with an own finite `amount`, `0 <= amount <= usd`;
+///     a `currency` in params, when present, is exactly `"usd"` or `"USD"`. Does not need `now`.
+///   * the rest need a finite `now`: `expires {at}` (now < at), `not_before {at}` (now >= at), `rate {max, per_secs}`
+///     (admitted times in `(now - per_secs*1000, now]` fewer than `max`), `max_blast_radius {max}`,
+///     `reversibility_max {class}` (reads `ctx.reversibility_class`), `delegation_depth {max}`, `budget_alloc {limit}`
+///     (limit finite >= 0; metered elsewhere).
+pub fn evaluate_caveats(caveats: &Value, ctx: &Value) -> (bool, Vec<String>) {
+    let list = match caveats.as_array() {
+        Some(l) => l,
+        None => return (false, vec!["<malformed caveats>".to_string()]),
+    };
+    let mut failed = Vec::new();
+    for cv in list {
+        if !caveat_satisfied(cv, ctx) {
+            failed.push(cv.get("type").and_then(Value::as_str).unwrap_or("<malformed>").to_string());
+        }
+    }
+    (failed.is_empty(), failed)
+}
+
+/// A finite JSON number (never a bool or a string).
+fn fin(v: Option<&Value>) -> Option<f64> {
+    match v {
+        Some(Value::Number(n)) => n.as_f64().filter(|x| x.is_finite()),
+        _ => None,
+    }
+}
+
+fn caveat_satisfied(cv: &Value, ctx: &Value) -> bool {
+    let (c, x) = match (cv.as_object(), ctx.as_object()) {
+        (Some(c), Some(x)) => (c, x),
+        _ => return false,
+    };
+    let ty = match c.get("type") {
+        Some(Value::String(t)) => t.as_str(),
+        _ => return false,
+    };
+    if ty == "max_spend" {
+        let lim = match fin(c.get("usd")) {
+            Some(l) if l >= 0.0 => l,
+            _ => return false,
+        };
+        let params = match x.get("action").and_then(Value::as_object).and_then(|a| a.get("params")).and_then(Value::as_object) {
+            Some(p) => p,
+            None => return false,
+        };
+        let amount = match fin(params.get("amount")) {
+            Some(a) if a >= 0.0 => a,
+            _ => return false,
+        };
+        if let Some(cur) = params.get("currency") {
+            if cur.as_str() != Some("usd") && cur.as_str() != Some("USD") {
+                return false;
+            }
+        }
+        return amount <= lim;
+    }
+    let now = match fin(x.get("now")) {
+        Some(n) => n,
+        None => return false,
+    };
+    match ty {
+        "expires" => fin(c.get("at")).is_some_and(|at| now < at),
+        "not_before" => fin(c.get("at")).is_some_and(|at| now >= at),
+        "rate" => {
+            let (max, per) = match (fin(c.get("max")), fin(c.get("per_secs"))) {
+                (Some(m), Some(p)) if p > 0.0 => (m, p),
+                _ => return false,
+            };
+            let times = match x.get("recent_action_times").and_then(Value::as_array) {
+                Some(t) => t,
+                None => return false,
+            };
+            let lo = now - per * 1000.0;
+            let n = times.iter().filter_map(|t| fin(Some(t))).filter(|t| *t > lo && *t <= now).count();
+            (n as f64) < max
+        }
+        "max_blast_radius" => match (fin(c.get("max")), fin(x.get("blast_radius"))) {
+            (Some(m), Some(b)) => b <= m,
+            _ => false,
+        },
+        "reversibility_max" => {
+            let (lim, cur) = match (c.get("class").and_then(Value::as_str), x.get("reversibility_class").and_then(Value::as_str)) {
+                (Some(l), Some(c)) => (l, c),
+                _ => return false,
+            };
+            match (REVERSIBILITY_ORDER.iter().position(|r| *r == lim), REVERSIBILITY_ORDER.iter().position(|r| *r == cur)) {
+                (Some(l), Some(c)) => c <= l,
+                _ => false,
+            }
+        }
+        "delegation_depth" => match (fin(c.get("max")), fin(x.get("delegation_depth"))) {
+            (Some(m), Some(d)) => d <= m,
+            _ => false,
+        },
+        "budget_alloc" => fin(c.get("limit")).is_some_and(|l| l >= 0.0),
+        _ => false,
+    }
 }

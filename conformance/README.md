@@ -8,8 +8,8 @@ coverage and the v2.1 agent-leaf share binding.
 
 | file | what | who vendors it | size |
 |---|---|---|---|
-| `vectors.json` | **Curated core**: the 172 golden vectors (ed25519 core + post-quantum + v2.1) AND a deterministic, representative sample of every adversarial family (`adv-*`: 90 vectors, 6 per family; for each family the smallest vector of every distinct outcome class, then an even stride) plus a sample of the adversarial primitives. | every language verifier's native suite and every public mirror (`pca-go`, `pca-python`, ... `pca-swift`, `pca-kotlin`) | ~1.9 MB |
-| `vectors-adversarial.json.gz` | The **full** adversarial parser-differential set: 4,209 `adv-*` PCActn vectors + 1,178 primitives (425 `json_parse`, 718 `b64u`, 35 `canonical`), same schema. `primitives` holds ONLY the adversarial entries; `sample_in_core` lists the names also present in `vectors.json`. A plain `vectors-adversarial.json` is accepted wherever the `.gz` is (write one with `gen-conformance-adv.mjs --plain`). | the flagship `pca` repo and the monorepo gate only (`scripts/pca-conformance-all.sh` via `gen-adversarial.ts`); NOT the language mirrors | ~1.1 MB gz (~15 MB expanded) |
+| `vectors.json` | **Curated core**: 394 vectors (71 positive, 323 negative): the golden vectors (ed25519 core + post-quantum + v2.1 + R6 + depth), the 78 single-rule `mut-*` vectors, the 20 `r041-share-*` vectors, AND a deterministic, representative sample of every adversarial family (`adv-*`: 96 vectors; for each family the smallest vector of every distinct outcome class, then an even stride) plus a sample of the adversarial primitives. | every language verifier's native suite and every public mirror (`pca-go`, `pca-python`, ... `pca-swift`, `pca-kotlin`) | ~3.3 MB |
+| `vectors-adversarial.json.gz` | The **full** adversarial parser-differential set: 4,358 `adv-*` PCActn vectors + 1,178 primitives (425 `json_parse`, 718 `b64u`, 35 `canonical`), same schema. `primitives` holds ONLY the adversarial entries; `sample_in_core` lists the names also present in `vectors.json`. A plain `vectors-adversarial.json` is accepted wherever the `.gz` is (write one with `gen-conformance-adv.mjs --plain`). | the flagship `pca` repo and the monorepo gate only (`scripts/pca-conformance-all.sh` via `gen-adversarial.ts`); NOT the language mirrors | ~1.1 MB gz (~15 MB expanded) |
 
 Native per-language suites assert MINIMUM counts, never exact sizes, so the core can be re-sampled safely. The full set is exercised cross-language by the gate
 (`bash scripts/pca-conformance-all.sh --fuzz 300`), which drives every verifier over the core + full set + seeded fuzz and fails on any disagreement.
@@ -24,7 +24,8 @@ the full set and splices the core sample:
       && node packages/pca/scripts/gen-conformance-adv.mjs \
       && node packages/pca/scripts/gen-conformance-r6.mjs \
       && node packages/pca/scripts/gen-conformance-depth.mjs \
-      && node packages/pca/scripts/gen-conformance-mut.mjs
+      && node packages/pca/scripts/gen-conformance-mut.mjs \
+      && node packages/pca/scripts/gen-conformance-041.mjs
     # then, to refresh the committed gate manifest + matrix:
     packages/pca/node_modules/.bin/tsx packages/pca-conformance/adversarial/gen-adversarial.ts
 
@@ -37,7 +38,7 @@ The language verifiers (`sdks/*-pca`) must reproduce `allow` and every listed ch
 
 ### Post-quantum + v2.1 coverage (`gen-conformance-pq.mjs`)
 
-- LEAF verification under ALL 10 registered suites (`requires: "pq"`): `ed25519`; the lattice `ml-dsa-65` /
+- LEAF verification under the 10 suites in the corpus (`requires: "pq"`; the registry has 14: FN-DSA-512/1024 and the two LESS suites are TypeScript-only and have no shared vectors): `ed25519`; the lattice `ml-dsa-65` /
   `ml-dsa-87` and their `hybrid-ed25519-*`; the SUF-CMA `hybrid-nested-ed25519-ml-dsa-65`; the hash-based
   `slh-dsa-sha2-128f` / `slh-dsa-sha2-256s` and their hybrids. Per suite: a positive + a corrupt-primary-sig
   negative; per HYBRID also a corrupt-`pq_sig` and a missing-`pq_sig` (wire) negative; plus the global
@@ -46,6 +47,14 @@ The language verifiers (`sdks/*-pca`) must reproduce `allow` and every listed ch
   9 non-ed25519 suites — positive + corrupt per suite, + a downgrade (strip `alg`/`pq_pk`/`pq_sig`) negative
   per hybrid (the suite fields are bound into the signed hop `body_digest`).
 - `agent_leaf_binding: "2.1"` marks the clean-break agent-leaf share binding (see `primitives.threshold_share`).
+
+### 0.4.1 coverage (`gen-conformance-041.mjs`)
+
+- `r041-share-*` (20 vectors): threshold share signatures validated per suite on the wire. Positives carry a pure
+  ML-DSA-65 share, a hybrid share, an ed25519 + ML-DSA-65 pair and a share with a `pq_pk` echo (every native), plus ML-DSA-87
+  and SLH-DSA-SHA2-128f shares (`requires: <alg>`); negatives cover wrong lengths for the declared suite, the old 64-byte
+  length on a pure share, a missing / stray `pq_sig`, unknown / number / null `alg` and a padded `sig` (all `wire`).
+- `primitives.caveat_eval` (41) and `primitives.pca_header` (27): see normative rules 10 and 11.
 
 ### Mutation-driven single-rule vectors (`mut-*`, `gen-conformance-mut.mjs`)
 
@@ -168,12 +177,13 @@ The reference rejects small-order and mixed-order keys and R, non-canonical S an
 
 ### 1. Signed body and message
 `ver = 2`. Signed message: `"atlas-pca/actn/v2\0" || sha256(canonical(body))` where `body` is the PCActn WITHOUT
-`sig` and `threshold`. Signed fields (v2): `ver, action{verb,resource,params_digest,reversibility_class}, grant_ref,
+`sig`, `pq_sig` and `threshold`. Signed fields (v2): `ver, action{verb,resource,params_digest,reversibility_class}, grant_ref,
 cap_chain, plan{root,inclusion_proof{index,size,path[{side,hash}]},node_id,conditions_digest?}, attestation{quote_digest,
 epoch,model_id,measurement,operator}, provenance{causal_hash,taint_level,trusted_refs}, freshness{beacon_ref,epoch,
 accumulator_witness}, counter, risk_claim{r,inputs}, aud, iat, exp` + optional `nonce, caution, rationale_commitment,
-progress_step, prohibition_evidence, tool_binding, zk_compliance, bond_ref`. `threshold` is the only unsigned container.
-The top-level field set is CLOSED (unknown top-level / action / plan / proof / cap_chain-hop keys => `wire` fails). A capability-chain hop is closed to exactly `{id, issuer, holder, body_digest, caveats, sig, parent?}` — any other key is unsigned malleability and fails `wire`.
+progress_step, prohibition_evidence, tool_binding, zk_compliance, bond_ref` and the suite fields `alg, pq_pk`. The
+UNSIGNED members are `sig`, `pq_sig` (the post-quantum half of a hybrid leaf) and the `threshold` container.
+The top-level field set is CLOSED (unknown top-level / action / plan / proof / cap_chain-hop keys => `wire` fails). A capability-chain hop is closed to exactly `{id, issuer, holder, body_digest, caveats, sig, parent?, holder_pq?, alg?, pq_pk?, pq_sig?}` — any other key is unsigned malleability and fails `wire`. The hop's signed body is `{issuer, holder, caveats, parent|null}` plus `holder_pq` when present plus, for a non-ed25519 suite only, `alg` and `pq_pk`.
 
 ### 2. Strict JSON profile (parsing signed bytes)
 Parse with a hand-written RFC 8259 parser, NOT a platform default, rejecting: comments; trailing commas; BOM; any
@@ -199,7 +209,9 @@ lowercase); everything else (incl. U+007F, U+2028/2029, astral) raw UTF-8. Numbe
 ### 5. Byte fields (strict base64url)
 RFC 4648 section 5, NO padding, alphabet `A-Za-z0-9-_` only, no whitespace, `len % 4 != 1`, and the unused trailing bits
 of the last character MUST be zero (re-encoding the decoded bytes must reproduce the string exactly). Fixed lengths:
-signatures 64 bytes (`sig`, every `cap_chain[i].sig`, threshold share `sig`); 32 bytes: `grant_ref`, `cap_chain[i].{id,
+signatures per suite (`sig`, every `cap_chain[i].sig`, every threshold share `sig`: 64 bytes for `ed25519` and every
+hybrid, the post-quantum length for a pure suite; `pq_sig` / `pq_pk` per suite; see the suite table in the draft or the
+wire-formats reference); 32 bytes: `grant_ref`, `cap_chain[i].{id,
 issuer,holder,body_digest,parent}`, `plan.root`, proof `hash`, `action.params_digest`, `plan.conditions_digest` (when
 present; a non-string is a `wire` failure, never a default), `rationale_commitment`, `tool_binding`, share `publicKey`.
 
@@ -214,7 +226,7 @@ RFC 8032 signatures (reject non-canonical S, non-canonical / small-order / mixed
 order-2 key with signature R=identity,S=0 MUST NOT verify), hash-linked, issuer==parent.holder, append-only caveats.
 `plan_inclusion`: index/size bound to the path shape (path length and every side recomputed from `index,size` by the
 RFC 6962 split; `size >= 1`, `0 <= index < size`), 32-byte siblings. `leaf_signature`: strict Ed25519 under the leaf
-holder over the signed message. `counter`: safe integer >= 0.
+holder over the signed message (per the leaf suite; a post-quantum leaf key must hash to the leaf hop's `holder_pq`). `counter`: safe integer >= 0.
 
 ### 8. Capability / plan / Merkle (unchanged from v1)
 Capability hop: `id = body_digest = hash({issuer, holder, caveats, parent|null})`, signature over
@@ -225,7 +237,31 @@ node = H(0x01 || L || R), split at the largest power of two < n. Plan leaf: `{no
 characters.)
 
 ### 9. Threshold shares (server side)
-Guardian / principal share message: `"atlas-pca/share/<role>\0" || sha256(thresholdMessage) || signerSetHash || t(1 byte)`
-with `signerSetHash = sha256("atlas-pca/signerset/v1\0" || canonical(sort_by(role, publicKey)[{publicKey, role}]))`.
-The agent share is the leaf `sig` over `thresholdMessage` itself. `verifyThreshold` requires t in {1,2,3}, exactly one
-key per role, no key under two roles, and counts DISTINCT KEYS.
+Share message for EVERY role (`agent` included, v2.1): `"atlas-pca/share/<role>\0" || sha256(thresholdMessage) || signerSetHash || t(1 byte)`,
+followed by `"\0atlas-pca/share-suite/v1\0" || alg` for a non-ed25519 share, with
+`signerSetHash = sha256("atlas-pca/signerset/v1\0" || canonical(sort_by(utf8 role, utf8 publicKey)[{publicKey, role, pq_pk?}]))`
+(`pq_pk` carried when it is a string). A bare agent share over `thresholdMessage` does not verify; the PCActn's leaf `sig`
+counts as the agent's baseline share only when the leaf holder is the registered agent key (and, when the set registers an
+agent `pq_pk`, the leaf suite is post-quantum or hybrid). A share is `{role, publicKey, sig, alg?, pq_sig?, pq_pk?}`; its PQ
+key is always the role's registered `pq_pk` (a share `pq_pk` is only an echo that must equal it). `verifyThreshold` requires
+t in {1,2,3}, a well-formed signer set (known roles, exactly one key per role, no key under two roles), and counts DISTINCT KEYS.
+On the wire (0.4.1) each share's `sig` / `pq_sig` is validated PER SUITE like the leaf (`alg` absent = ed25519, 64 bytes;
+`ml-dsa-65` 3309; hybrid 64 + `pq_sig` 3309; ...), so a pure post-quantum share can be carried in `threshold`; the share's
+`pq_pk` is not a wire rule.
+
+### 10. Root caveats are policy (0.4.1, `primitives.caveat_eval`)
+Core verification treats caveats as opaque (prefix + `budget_alloc` monotonicity only). The POLICY layer evaluates, conjunctively,
+`policy_caveats(grant, chain)` = the grant's caveats minus its FIRST `envelope` caveat, then the caveats the hops appended
+(`leaf.caveats[len(grant.caveats):]`), plus the envelope's own predicates and caveats. Before 0.4.1 caveats placed on the root
+outside the envelope were signed but never evaluated (security fix). Any type an evaluator does not implement is unsatisfied.
+`max_spend {usd}`: own `action.params.amount` is a number with `0 <= amount <= usd`, and an own `currency`, when present, is
+exactly `"usd"` or `"USD"`; anything else is unsatisfied. Entries: `{ name, description, grant, chain, context: { now,
+delegation_depth, blast_radius?, reversibility_class?, recent_action_times?, action: { verb, resource, reversibility_class,
+params } }, expect: { allow, failed } }`; `failed` lists the unsatisfied types in order. Only the baseline types (`expires`,
+`not_before`, `rate`, `max_blast_radius`, `reversibility_max`, `delegation_depth`, `budget_alloc`, `max_spend`, plus
+unknown types) appear; `r041-root-max-spend-exceeded` must be DENIED and `r041-root-max-spend-within` ALLOWED.
+
+### 11. PCA-Action header (0.4.1, `primitives.pca_header`)
+The header value is the strict unpadded base64url (rule 5, no fixed length, no trimming) of UTF-8 text (invalid,
+overlong, surrogate or truncated UTF-8 is refused; a leading BOM is kept for the strict JSON parser to refuse).
+Entries `{ name, description, input, valid, text? }`: `valid` iff the decoder accepts, `text` = the decoded text.

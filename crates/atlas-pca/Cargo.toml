@@ -1,6 +1,6 @@
 [package]
 name = "atlas-pca"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 description = "Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks)"
 license = "MIT"

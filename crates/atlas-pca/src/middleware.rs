@@ -21,8 +21,6 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
 
-use base64::engine::general_purpose::URL_SAFE_NO_PAD;
-use base64::Engine;
 use serde_json::Value;
 
 use crate::{strict_parse, verify_pcactn_core, Verdict};
@@ -213,7 +211,9 @@ impl GuardResult {
 pub fn verify_request(header: Option<&str>, body: Option<&[u8]>, cfg: &GuardConfig) -> GuardResult {
     // 1. Obtain the PCActn value, preferring the header.
     let pcactn: Value = match header.filter(|s| !s.is_empty()) {
-        Some(h) => match URL_SAFE_NO_PAD.decode(h.as_bytes()) {
+        // 0.4.1: STRICT unpadded base64url (`decode_b64u_strict`, the rule `decode_pca_header` applies): no padding, no
+        // standard alphabet, no whitespace (nothing is trimmed), zero trailing bits; then strict UTF-8 below.
+        Some(h) => match crate::decode_b64u_strict(h, None).ok_or(()) {
             Ok(raw) if raw.len() > crate::MAX_ARTIFACT_BYTES => {
                 return GuardResult::unauthorized(
                     "invalid_request",

@@ -268,3 +268,75 @@ fn run_step_cap_counts_subject_length_plus_one() {
     assert_eq!(run(&re, &vec![b'a' as u16; 499_999]), Some(true));
     assert_eq!(run(&re, &vec![b'a' as u16; 500_000]), None);
 }
+
+// ======== batch Z4: class range order, emit depth/size limits, compile size limit =====================================
+
+#[test]
+fn class_range_with_equal_endpoints_is_valid_and_reversed_is_refused() {
+    // line 414 (TS cls: x > y refuses): [a-a] is the single char a
+    assert_eq!(m("[a-a]", "a"), Some(true));
+    assert_eq!(m("[a-a]", "b"), Some(false));
+    assert_eq!(m("[\\x41-\\x41]", "A"), Some(true));
+    assert!(full_match("x[0-0]", "x0"));
+    assert!(!compiles("[b-a]"));
+    assert!(!compiles("[z-a]"));
+}
+
+/// `(` + 255 nested alternation groups + `)`: emit depth = 2 * 255 + 2 at the innermost leaf; `leaf` is the innermost
+/// atom. `first` puts the nesting chain through the FIRST alternative (line 456), else through the last (line 462).
+fn deep(leaf: &str, first: bool) -> String {
+    if first {
+        format!("({}{}|a{})", "(".repeat(255), leaf, "|a)".repeat(255))
+    } else {
+        format!("({}{}{})", "(a|".repeat(255), leaf, ")".repeat(255))
+    }
+}
+
+#[test]
+fn emit_depth_limit_is_exactly_twice_max_parse_depth() {
+    // line 438: depth > MAX_PARSE_DEPTH * 2 (512) refuses. The innermost leaf of deep("a") sits at depth 512 (allowed);
+    // a quantified leaf adds one Rep level, putting its body at 513 (refused, fail closed). Parse depth is 256 (allowed).
+    for first in [false, true] {
+        assert!(compiles(&deep("a", first)), "depth 512 compiles (first={first})");
+        assert_eq!(m(&deep("a", first), "a"), Some(true));
+        // body at 513 through each Rep emission path: min copies (472), unbounded (478), optional copies (489)
+        for leaf in ["a{1}", "a*", "a?", "a{0,2}", "a+"] {
+            assert!(!compiles(&deep(leaf, first)), "{leaf} at depth 513 is refused (first={first})");
+        }
+    }
+    // a bare quantified leaf one level up is fine
+    let shallow = format!("{}a?{}", "(a|".repeat(255), ")".repeat(255));
+    assert!(compiles(&shallow));
+}
+
+#[test]
+fn compile_allows_exactly_4096_instructions_including_match() {
+    // line 517: prog.len() > MAX_NFA_INSTRUCTIONS refuses. 63 x [^]{64} + [^]{63} = 4095 sets, + Match = 4096.
+    let p = format!("{}[^]{{63}}", "[^]{64}".repeat(63));
+    let re = compile(&u(&p)).expect("exactly 4096 instructions compile");
+    assert_eq!(run(&re, &[b'a' as u16; 10]), Some(false));
+    assert_eq!(run(&re, &[b'a' as u16; 400]), Some(false), "within the step cap (4096 * 401), too short to match");
+    let p2 = format!("{}[^]{{63}}a", "[^]{64}".repeat(63));
+    assert!(compile(&u(&p2)).is_none(), "4097 instructions are refused");
+}
+
+#[test]
+fn negated_class_caret_is_consumed_not_a_member() {
+    // line 381: after `[^` the `^` is the negation marker, not a class member; `[` is never a member either
+    assert_eq!(m("[^a]", "^"), Some(true));
+    assert_eq!(m("[^a]", "["), Some(true));
+    assert_eq!(m("[^a]", "a"), Some(false));
+    assert_eq!(m("[^^]", "^"), Some(false), "a second ^ is a member");
+}
+
+/// `\uXXXX` takes exactly four HEX digits: any non-hex character in the four positions refuses the pattern
+/// (the TS reference compiles with the `u` flag, where an incomplete `\u` escape is a SyntaxError). Pins the
+/// `is_hex(h)` guard in escape_inner (a `g` would otherwise decode as digit value 16).
+#[test]
+fn unicode_escape_requires_four_hex_digits() {
+    for bad in ["\\u00g0", "\\u00G0", "\\uZZZZ", "\\u12 4", "\\u123"] {
+        assert!(!compiles(bad), "{bad:?} must be refused");
+    }
+    assert_eq!(m("\\u0041", "A"), Some(true));
+    assert_eq!(m("\\u00e9", "\u{e9}"), Some(true));
+}

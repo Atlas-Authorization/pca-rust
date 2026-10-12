@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 - 2026-10-12
+
+- Lockstep release with the PCA 0.4.1 security fix (root caveats enforced in the policy layer). No change in this crate.
+
 ## 0.4.0 - 2026-10-11 (BREAKING)
 
 - **Breaking: proofs generated with 0.3.0 and earlier no longer verify.** The pinned proof options now use 37 FRI queries (was 32) at blow-up 8, so the conjectured security level is 110 bits (was 95, below the 100-bit floor): min(min(128, 3 * 37) - 1, 128). `MIN_SECURITY_BITS` is 100 (was 95), the verifier still pins the exact options, and proofs made with the old 32-query options are refused with `UnacceptableProofOptions`. Proven security rises to 54 bits (list decoding) and 30 bits (unique decoding). Cost: the sample proof grows from 43,135 to 48,894 bytes (+13 %); prove time 2.2 to 2.7 ms and verify time 0.4 to 0.8 ms on the sample witness (single timed run, release build). Fixtures regenerated. Regenerate any stored proof.

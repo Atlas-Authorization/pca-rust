@@ -227,8 +227,19 @@ fn wire_rules_for_aud_nonce_and_unsigned_members() {
     assert!(validate_wire(&th(json!({"role": 5, "publicKey": pk, "sig": sg}))).unwrap_err().contains("threshold.shares[0] is malformed"));
     assert!(validate_wire(&th(json!(5))).unwrap_err().contains("malformed"));
     assert!(validate_wire(&th(json!({"role": "r", "publicKey": "AA", "sig": sg}))).unwrap_err().contains("publicKey is not canonical"));
-    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": "AA"}))).unwrap_err().contains("sig is not canonical"));
-    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": B64.encode([2u8; 65])}))).unwrap_err().contains("sig is not canonical"));
+    // 0.4.1: the share signature is validated per suite; the reason names the suite
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": "AA"}))).unwrap_err().contains("'sig' is not canonical base64url (64 bytes) for alg 'ed25519'"));
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": B64.encode([2u8; 65])}))).unwrap_err().contains("'sig' is not canonical"));
+    let ml = B64.encode(vec![3u8; 3309]);
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": ml, "alg": "ml-dsa-65"}))).is_ok());
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": ml, "alg": "ml-dsa-65", "pq_pk": "not-judged-by-wire"}))).is_ok());
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "hybrid-ed25519-ml-dsa-65", "pq_sig": ml}))).is_ok());
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "hybrid-ed25519-ml-dsa-65"}))).unwrap_err().contains("'pq_sig' is not canonical"));
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "pq_sig": ml}))).unwrap_err().contains("'pq_sig' must be absent"));
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": ml, "alg": "ml-dsa-65", "pq_sig": ml}))).unwrap_err().contains("'pq_sig' must be absent"));
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "ml-dsa-65"}))).unwrap_err().contains("(3309 bytes) for alg 'ml-dsa-65'"));
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": null}))).unwrap_err().contains("'alg' must be a string"));
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "ml-dsa-87"}))).unwrap_err().contains("unknown signature alg"));
 }
 
 #[test]

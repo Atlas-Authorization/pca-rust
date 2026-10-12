@@ -113,7 +113,9 @@ fn unsupported_suite(v: &Value) -> Option<String> {
             .flatten()
             .map(alg)
             .find(|a| !SUPPORTED_SUITES.contains(&a.as_str())),
-        _ => None,
+        // 0.4.1: a vector may name the one suite it needs directly (e.g. a threshold share under `ml-dsa-87`).
+        Some(r) => (!SUPPORTED_SUITES.contains(&r)).then(|| r.to_string()),
+        None => None,
     }
 }
 
