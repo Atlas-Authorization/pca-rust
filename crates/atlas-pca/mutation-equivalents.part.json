@@ -1,0 +1,58 @@
+[
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace % with + in decode_b64u_strict",
+  "line": "if b.len() % 4 == 1 {",
+  "reason": "A length with len % 4 == 1 can never be valid base64url; the URL_SAFE_NO_PAD decoder that runs next rejects it, so the pre-check only short-circuits an already-failing input."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace match guard b.len() == m.div_ceil(3) with true in decode_b64u_strict",
+  "line": "Some(m) if b.len() == m.div_ceil(3) => {}",
+  "reason": "The length pre-check is redundant with the final decoded-length comparison (bytes.len() != n -> None): any input the guard would reject also fails there."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace > with >= in number_error",
+  "line": "return if u > MAX_SAFE as u64 { Some(\"integer outside the safe range\".into()) } else { None };",
+  "reason": "This branch is reached only for u64 values above i64::MAX (as_i64 handled the rest), all far above MAX_SAFE, so > and >= agree on every reachable input."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace match guard f.is_finite() with true in number_error",
+  "line": "Some(f) if f.is_finite() => f,",
+  "reason": "serde_json::Number cannot hold NaN or an infinity (its parser and from_f64 refuse them), so as_f64() is always finite and the guard is always true."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace match guard !v.is_null() with true in plan_leaf",
+  "line": "Some(v) if !v.is_null() => v.clone(),",
+  "reason": "plan_leaf is only called after validate_wire, which requires plan.node_id to be a string, so a null node_id is unreachable."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace || with && in verify_ed25519_strict",
+  "line": "if a.is_small_order() || r.is_small_order() || !a.is_torsion_free() || !r.is_torsion_free() {",
+  "reason": "Small-order A or R is rejected again by VerifyingKey::verify_strict later in the function (dalek rejects weak keys and small-order R), and every non-identity small-order point also trips the !is_torsion_free disjuncts; the && form changes no verdict."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace match guard !s.is_empty() with true in pinned::resolve_pq_key",
+  "line": "Some(Value::String(s)) if !s.is_empty() => s.as_str(),",
+  "reason": "An empty pq_pk resolved to a key still cannot verify anything (ML-DSA public key length check fails), so the verdict is the same refusal either way."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace match guard holder_pq_commitment(pk) == *c with true in pinned::resolve_pq_key",
+  "line": "Some(Value::String(c)) if holder_pq_commitment(pk) == *c => Some(PinnedPq { key: pk.to_string() }),",
+  "reason": "Both callers that pass a holder_pq (chain hops, PCActn leaf) run pq_binding_ok, the same commitment check, immediately before; the root passes holder_pq None. The guard is a defence-in-depth duplicate."
+ }
+]

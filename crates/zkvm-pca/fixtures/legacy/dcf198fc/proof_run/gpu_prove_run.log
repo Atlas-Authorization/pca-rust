@@ -1,0 +1,53 @@
+zkvm version: 3.0.6
+image id: dcf198fcfedd63182ddd8c392070d73f03c595b56e5d8649242e878fe530813a
+2026-10-09T04:40:25.986173Z  INFO risc0_zkvm::host::server::exec::executor: execution time: 208.405895ms
+succinct: 24916 ms, 223554 bytes, cycles total=11534336 user=9920981 segments=11
+NEGATIVE risk_above_theta1_and_zero_budget: no receipt (381 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE predicate_miss_verb_delete: no receipt (374 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE chain_leaf_hop_signature_tampered: no receipt (280 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE chain_root_hop_signature_tampered: no receipt (203 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE chain_misrooted_wrong_pinned_principal: no receipt (204 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE chain_leaf_hop_dropped: no receipt (311 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE leaf_pcactn_signature_tampered: no receipt (359 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE leaf_pcactn_missing: no receipt (203 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE chain_hop_alg_pq_unsupported_in_guest: no receipt (258 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE delegation_depth_exceeds_caveat: no receipt (376 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE expired_grant: no receipt (376 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE ts_variant_leaf_sig_noncanonical_S_plus_L: no receipt (300 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE ts_variant_leaf_sig_identity_R_zero_S: no receipt (299 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE ts_variant_leaf_body_digest_tampered: no receipt (258 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE ts_variant_leaf_caveats_emptied_unsigned: no receipt (257 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+NEGATIVE ts_variant_mixed_order_delegator_key_with_k_0_mod_8: no receipt (280 ms): Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy
+  left: 0
+ right: 1
+ALL DONE: 16 negative variants produced no receipt

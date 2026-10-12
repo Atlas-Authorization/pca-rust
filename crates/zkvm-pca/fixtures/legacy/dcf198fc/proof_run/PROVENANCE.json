@@ -1,0 +1,65 @@
+{
+  "status": "experimental, unaudited",
+  "date_utc": "2026-10-09",
+  "statement": "RISC Zero guest pca-zkvm-guest: PCA release gate (predicates, caveats, fixed-point risk, commitments, in-guest Ed25519 chain + leaf verification, torsion-free A/R) on fixtures/decide_input.sample.json; journal = fixtures/proof_run/journal.json",
+  "image_id_hex": "dcf198fcfedd63182ddd8c392070d73f03c595b56e5d8649242e878fe530813a",
+  "guest_elf_sha256": "748e4da6376a575f5901189ebc97c17f2fd53b37029e853dd5ee263ada58764e",
+  "guest_elf_note": "ELF not committed (gitignored); methods/guest/Cargo.lock and ../../Cargo.lock pin the dependency graph it was built from",
+  "versions": {
+    "risc0-zkvm": "3.0.6",
+    "risc0-groth16": "3.0.5",
+    "risc0-circuit-rv32im": "4.0.5",
+    "r0vm": "3.0.6",
+    "rzup rust (guest) toolchain": "1.97.0",
+    "host rustc": "1.99.0 (b940084d7 2026-09-28)",
+    "cuda toolkit (kernel build)": "12.6.85 (nvcc), NVCC_APPEND_FLAGS=-arch=sm_90",
+    "nvidia driver": "595.71.05",
+    "groth16 prover docker image": "risczero/risc0-groth16-prover@sha256:a4f80ce2e0b8e2bb7637a93c37136a6776ac00ec843a3fdf1c67b1d5ffea64ee (tag v2025-04-03.1)"
+  },
+  "host": {
+    "cloud": "Azure centralus",
+    "vm": "Standard_NCC40ads_H100_v5 (Ubuntu 24.04 confidential VM, kernel 6.17.0-1018-azure-fde)",
+    "cpu": "AMD EPYC 9V84, 40 vCPU, 313 GB RAM",
+    "gpu": "NVIDIA H100 NVL 94 GB (confidential-compute mode ON, GPU ready state set with nvidia-smi conf-compute -srs 1)"
+  },
+  "pipeline": [
+    {
+      "step": "succinct receipt",
+      "where": "H100 NVL GPU (host built with --features cuda)",
+      "wall_ms": 24916,
+      "peak_rss_kb": 662608,
+      "cycles_total": 11534336,
+      "cycles_user": 9920981,
+      "segments": 11,
+      "artifact": "receipt_succinct.bin"
+    },
+    {
+      "step": "groth16 wrap (stark-to-snark) of that succinct receipt",
+      "where": "CPU, docker image risc0-groth16-prover (x86_64), non-CUDA host build",
+      "wall_ms": 21278,
+      "peak_rss_kb": 1448692,
+      "artifact": "receipt_groth16.bin"
+    },
+    {
+      "step": "baseline: same succinct proof on CPU only",
+      "where": "40 vCPU EPYC, no GPU",
+      "wall_ms": 530840,
+      "peak_rss_kb": 9629476,
+      "note": "also wrapped to groth16 in 22898 ms; that CPU receipt pair is not committed"
+    }
+  ],
+  "gpu_groth16_wrap": "NOT achieved: the CUDA Groth16 wrap (rzup component risc0-groth16 0.1.0, ~5 GB) aborted with cudaStreamSynchronize 'an illegal memory access was encountered' (sppark-0.1.15) on this confidential-compute H100 VM; the docker CPU wrap was used instead",
+  "verified_on": "Apple-silicon macOS with only the verify crate (cargo test -p pca-zkvm-verify --test groth16_proof_run): groth16 receipt verified against image id; independent arkworks pairing check also accepts it",
+  "artifacts_sha256": {
+    "receipt_succinct.bin": "5961492266ae92902d5fa6bef8e809e110d7d25a0f98873abe31c60f91187b9c",
+    "receipt_groth16.bin": "9bfb5871ffad434a69b7fc0595226a8a200d437e873d3df83a93d3e7671a03a7",
+    "journal.json": "f12b3fdbc0c69a3241c64fe4d5598728e55f1cf06c89d8c07dd19682c736b543",
+    "image_id.json": "f8113fa70c6eb928c9f2b4705f1abbc2ef100da94d0e84848f6d0730a4c09565",
+    "negative_proving.json": "e7393083e15756fcab46a432494706297621c3c0207e5849692147e4df3fb05a",
+    "run_stats_gpu_h100.json": "734a0c8b0e78a9217c11aa7d705797efd32cd67d0ac1c3c20033f3fe7cebcfb3",
+    "run_stats_cpu_baseline.json": "9333b254a63d26f25ad349f04a7866dd789c216ef08229748045e0391da3f12c",
+    "run_stats_groth16_wrap_cpu_docker.json": "ea3fe1802fd176afbeeac65b0d5843fa06daf989acecbb6ca7ffb540a59b1fc3",
+    "gpu_prove_run.log": "379f3dbfdb9559bb1e434e7b069aa42796b8b50c6bf92318c2accc314caf01f0",
+    "groth16_wrap_run.log": "fba315d3eacd5c70dd851d198ea7335d8a6839a3c23fb12936b2d8666a8d22ae"
+  }
+}

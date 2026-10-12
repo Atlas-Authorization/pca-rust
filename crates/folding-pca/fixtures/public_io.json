@@ -1,0 +1,49 @@
+{
+  "actions": [
+    {
+      "action_digest": 3237998080,
+      "cost": 100000
+    },
+    {
+      "action_digest": 3237998081,
+      "cost": 100000
+    },
+    {
+      "action_digest": 3237998082,
+      "cost": 100000
+    },
+    {
+      "action_digest": 3237998083,
+      "cost": 100000
+    },
+    {
+      "action_digest": 3237998084,
+      "cost": 100000
+    },
+    {
+      "action_digest": 3237998085,
+      "cost": 100000
+    },
+    {
+      "action_digest": 3237998086,
+      "cost": 100000
+    },
+    {
+      "action_digest": 3237998087,
+      "cost": 100000
+    }
+  ],
+  "b_max": 1000000,
+  "curve_cycle": "Pallas/Vesta",
+  "description": "Public IO for the committed CompressedSNARK over a compliant PCA action history.",
+  "final_state": {
+    "budget_spent": "0x00000000000000000000000000000000000000000000000000000000000c3500",
+    "chain_digest": "0x13a2e4dffa8574a96a727ae0ff1a6d5716d30cc9f0c9b7ef8eb8af1ddc7f8c03"
+  },
+  "num_steps": 8,
+  "z0": [
+    "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  "z0_commitment": "0x38ec69788c896550d69fb76411058e72798b21bcaaae2ad06101e9dc558b5dbd"
+}

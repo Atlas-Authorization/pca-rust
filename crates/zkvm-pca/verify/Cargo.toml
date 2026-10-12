@@ -1,0 +1,27 @@
+[package]
+name = "pca-zkvm-verify"
+version = "0.1.0"
+edition = "2021"
+description = "Verifier-side tests for the committed PCA zkVM receipt (no guest toolchain, no proving, no GPU)"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+risc0-zkvm = { version = "^3.0.6", default-features = false }
+pca-zkvm-core = { path = "../core" }
+
+[dev-dependencies]
+# R3-14: reproduce the real-world feature unification (any consumer that also pulls the prover/host, or the
+# default features, turns the RISC0_DEV_MODE env var on in `risc0-zkvm`), so the test exercises the exposed config.
+risc0-zkvm = { version = "^3.0.6" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+bincode = "1"
+# independent (arkworks-direct) re-derivation of the on-chain Groth16 verifier equation
+risc0-groth16 = "3.0.5"
+ark-groth16 = "0.5"
+ark-bn254 = "0.5"
+ark-ec = "0.5"
+ark-ff = "0.5"
+ark-serialize = "0.5"
+sha2 = "0.10"

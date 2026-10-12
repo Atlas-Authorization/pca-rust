@@ -1,0 +1,19 @@
+{
+  "artifact": "receipt_groth16.bin",
+  "sha256": "d91c8230885893bdd8034530eb1358dcff4074efe015c6f6311c658bfe544f97",
+  "bytes": 825,
+  "produced_from": "receipt_succinct.bin (committed), via Prover::compress(ProverOpts::groth16())",
+  "image_id_hex": "ac95031feecea70e62bfb998a14acd645f400d5a33d5e1bc6200d2aa63ed96e3",
+  "produced_on": "2026-10-09, Azure Standard_D8s_v4 (8 vCPU x86_64, 32 GiB), Ubuntu 24.04, Linux 6.17 azure",
+  "versions": {
+    "risc0-zkvm": "3.0.6",
+    "risc0-groth16": "3.0.5",
+    "r0vm": "3.0.6",
+    "rzup component risc0-groth16": "0.1.0",
+    "groth16 prover docker image": "risczero/risc0-groth16-prover:v2025-04-03.1 (sha256:a4f80ce2e0b8e2bb7637a93c37136a6776ac00ec843a3fdf1c67b1d5ffea64ee)",
+    "rustc": "1.99.0"
+  },
+  "compress_wall_ms": 207684,
+  "verified_on_prover_host": true,
+  "verified_on": "Apple-silicon macOS with the verify-only crate (cargo test -p pca-zkvm-verify)"
+}

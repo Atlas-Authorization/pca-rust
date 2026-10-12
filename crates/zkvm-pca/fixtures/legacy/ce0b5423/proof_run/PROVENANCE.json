@@ -1,0 +1,53 @@
+{
+  "status": "experimental, unaudited",
+  "date_utc": "2026-10-10",
+  "statement": "RISC Zero guest pca-zkvm-guest after red-team round 3 (R3-11..R3-14): evaluates the caveats of every hop, derives delegation depth from the chain, binds the signed PCActn (grant_ref, cap_chain, action, plan root, node, tool_binding) to the evaluated inputs and commits depth/grant_ref/node_id; journal = fixtures/proof_run/journal.json",
+  "image_id_hex": "ce0b542313a11e4863661d921157f95e61df18a919c97eea92641bba8699cf1b",
+  "supersedes_image_id": "6b0ac8939ebf3f98fbaa6a63ac842e4f24e105142bd3d684f2bc11da796997cc",
+  "guest_elf_note": "ELF not committed (gitignored); Cargo.lock files pin the dependency graph. The image id above is the authoritative identity.",
+  "versions": {
+    "risc0-zkvm": "3.0.6",
+    "r0vm": "3.0.6",
+    "rzup rust (guest) toolchain": "1.97.0",
+    "host rustc": "1.99.0 (b940084d7 2026-09-28)",
+    "groth16 prover docker image": "risczero/risc0-groth16-prover (tag per risc0-zkvm 3.0.6 default, pulled by the host); docker.io 29.1.3"
+  },
+  "host": {
+    "cloud": "Azure eastus2",
+    "vm": "Standard_D8s_v6 (Ubuntu 24.04, x86_64)",
+    "cpu": "8 vCPU, 31 GB RAM, shared with an unrelated fuzz job at ~65% of one core",
+    "gpu": "none (CPU proving)"
+  },
+  "pipeline": [
+    {
+      "step": "succinct receipt",
+      "where": "CPU, 8 vCPU",
+      "wall_ms": 5386890,
+      "cycles_total": 12058624,
+      "cycles_user": 10500934,
+      "segments": 12,
+      "artifact": "receipt_succinct.bin"
+    },
+    {
+      "step": "groth16 wrap (stark-to-snark) of that succinct receipt",
+      "where": "CPU, docker risc0-groth16-prover (x86_64)",
+      "wall_ms": 264462,
+      "artifact": "receipt_groth16.bin"
+    },
+    {
+      "step": "negative proving matrix",
+      "where": "same run (execute + full proving attempt per variant)",
+      "artifact": "negative_proving.json",
+      "result": "25 of 25 variants: guest panicked, no receipt"
+    }
+  ],
+  "verified_on": "Apple-silicon macOS with the verify-only crate (cargo test -p pca-zkvm-verify)",
+  "artifacts_sha256": {
+    "receipt_succinct.bin": "a676e669fe102dbfde85a24673d645ad4d14ea2b33b6f90cbc0f620fdd793968",
+    "receipt_groth16.bin": "60c635519890bf5e961c848b7964b02ec8ffa69c2c0f347b4a383f0b0c4c9358",
+    "journal.json": "062afc2cdee6e8bdae7d88aea081117f167bbf3f1bad5b96b19818335e13b70b",
+    "image_id.json": "9f483edafae0962f24f8e795b6b843ac85a7442e7dc3f2ef9e29c291014e2978",
+    "negative_proving.json": "fc324dc483e7ba7e2c2bf26afde52017d4a2dd2c4668ebaefb152712185045be",
+    "run_stats.json": "c1a03d300787bd437ae82724fc65feb8ece7ba682793f4d4ee4e959b4d7c1029"
+  }
+}

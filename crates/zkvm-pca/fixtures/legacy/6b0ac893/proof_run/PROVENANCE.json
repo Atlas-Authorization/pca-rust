@@ -1,0 +1,54 @@
+{
+  "status": "experimental, unaudited",
+  "date_utc": "2026-10-09",
+  "statement": "RISC Zero guest pca-zkvm-guest after RT-06: the journal now commits the evaluated context (now, subject, env, rate history, delegation depth, tool binding, risk inputs, budget, floor, root principal, leaf PCActn digest) in addition to the verdict and commitments; journal = fixtures/proof_run/journal.json",
+  "image_id_hex": "6b0ac8939ebf3f98fbaa6a63ac842e4f24e105142bd3d684f2bc11da796997cc",
+  "supersedes_image_id": "dcf198fcfedd63182ddd8c392070d73f03c595b56e5d8649242e878fe530813a",
+  "guest_elf_note": "ELF not committed (gitignored); methods/guest/Cargo.lock and the workspace Cargo.lock pin the dependency graph. The ELF hash was not captured (find pattern missed it on the VM); the image id above is the authoritative identity.",
+  "versions": {
+    "risc0-zkvm": "3.0.6",
+    "r0vm": "3.0.6",
+    "rzup rust (guest) toolchain": "1.97.0",
+    "host rustc": "1.99.0 (b940084d7 2026-09-28)",
+    "groth16 prover docker image": "risczero/risc0-groth16-prover (tag per risc0-zkvm 3.0.6 default, pulled by the host)"
+  },
+  "host": {
+    "cloud": "Azure eastus",
+    "vm": "Standard_D8s_v4 (Ubuntu 24.04, x86_64)",
+    "cpu": "8 vCPU Intel, 31 GB RAM",
+    "gpu": "none (CPU proving)"
+  },
+  "pipeline": [
+    {
+      "step": "succinct receipt",
+      "where": "CPU, 8 vCPU",
+      "wall_ms": 3365015,
+      "peak_rss_kb": 9631784,
+      "cycles_total": 11534336,
+      "cycles_user": 10115463,
+      "segments": 11,
+      "artifact": "receipt_succinct.bin"
+    },
+    {
+      "step": "groth16 wrap (stark-to-snark) of that succinct receipt",
+      "where": "CPU, docker risc0-groth16-prover (x86_64)",
+      "wall_ms": 211206,
+      "artifact": "receipt_groth16.bin"
+    },
+    {
+      "step": "negative proving matrix",
+      "where": "same VM, second invocation (PCA_ONLY_NEGATIVE=1); the first invocation stopped after the Groth16 wrap because the ts_chain_variants.json fixture was not in the uploaded payload",
+      "artifact": "negative_proving.json",
+      "result": "16 of 16 variants: guest panicked, no receipt"
+    }
+  ],
+  "verified_on": "Apple-silicon macOS with the verify-only crate (cargo test -p pca-zkvm-verify)",
+  "artifacts_sha256": {
+    "receipt_succinct.bin": "2722737a4b890fda5a2b770401b0b109dae7db7e3f619c8abb608c56cc27cfc8",
+    "receipt_groth16.bin": "73b2036f5f2f306f5dba491fe2380d815ed86791a37585131fb706b1b5ec0796",
+    "journal.json": "eca958e95e49d11c1aa92d632a100aa028caf38165ce04f27acb7c9be3f2cdb3",
+    "image_id.json": "167aa22e24f4468e2525289baf6921ced573c1ac4a7087aa7c95ffb6d7b74d37",
+    "negative_proving.json": "e7393083e15756fcab46a432494706297621c3c0207e5849692147e4df3fb05a",
+    "run_stats.json": "2b8aaa957daf91795e3da4fc4155f8a896a3f6278740a35892f30de8a9561b02"
+  }
+}

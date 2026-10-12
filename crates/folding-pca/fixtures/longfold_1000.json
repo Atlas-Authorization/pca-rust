@@ -1,0 +1,15 @@
+{
+  "b_max": 1000000,
+  "compress_prove_ms": 2750.505917,
+  "compress_setup_ms": 244.66333400000002,
+  "compress_verify_ms": 45.635833,
+  "compressed_proof_bytes": 10624,
+  "cost_per_step": 1000,
+  "crate": "nova-snark 0.76.0",
+  "cumulative_cost": 1000000,
+  "final_budget_spent": "0x00000000000000000000000000000000000000000000000000000000000f4240",
+  "final_chain_digest": "0x34e14f8a4db3a49178127e4d1bc7d1971915c1474d2bd399837e89f88d57e5aa",
+  "fold_and_verify_recursive_ms": 90437.23258299999,
+  "host": "macos aarch64",
+  "num_steps": 1000
+}

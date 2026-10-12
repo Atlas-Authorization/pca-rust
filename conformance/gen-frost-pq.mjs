@@ -11,7 +11,7 @@
 // across regenerations; every emitted vector is nonetheless a VALID witness of its stated verdict, and the
 // companion test (frost-pq.test.ts) re-verifies the committed file against the live reference. The group key
 // and the guardian ML-DSA material are fixed/deterministic.
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { b64u, unb64u, utf8, frostTrustedDealerKeygen, mlDsa65Keygen } from '../dist/index.js';

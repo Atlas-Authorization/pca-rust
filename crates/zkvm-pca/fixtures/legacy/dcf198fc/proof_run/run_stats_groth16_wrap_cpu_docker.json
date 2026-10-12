@@ -1,0 +1,8 @@
+{
+  "cuda_feature": false,
+  "groth16_bytes": 825,
+  "groth16_wrap_ms": 21278,
+  "image_id_hex": "dcf198fcfedd63182ddd8c392070d73f03c595b56e5d8649242e878fe530813a",
+  "risc0_zkvm_version": "3.0.6",
+  "wrapped_from": "/opt/pca/out/gpu-wrap/input_receipt_succinct.bin"
+}

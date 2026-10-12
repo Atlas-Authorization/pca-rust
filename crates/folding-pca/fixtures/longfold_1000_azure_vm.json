@@ -1,0 +1,19 @@
+{
+  "b_max": 1000000,
+  "compress_prove_ms": 494.338705,
+  "compress_setup_ms": 96.07622,
+  "compress_verify_ms": 30.919157,
+  "compressed_proof_bytes": 10624,
+  "cost_per_step": 1000,
+  "crate": "nova-snark 0.76.0",
+  "cumulative_cost": 1000000,
+  "date_utc": "2026-10-09",
+  "final_budget_spent": "0x00000000000000000000000000000000000000000000000000000000000f4240",
+  "final_chain_digest": "0x176d49be095f6854e00756ab4b85a2241a0ae0c722b44b09e61cf5c74f68e6e9",
+  "fold_and_verify_recursive_ms": 49206.654834,
+  "host": "Azure Standard_NCC40ads_H100_v5 (centralus), AMD EPYC 9V84 40 vCPU, 313 GB RAM, Ubuntu 24.04, rustc 1.99.0, CPU only (no GPU used)",
+  "num_steps": 1000,
+  "peak_rss_kb": 168448,
+  "process_wall_clock": "0:56.69",
+  "produced_by": "cargo run --release --bin longfold -- 1000 (binary src/bin/longfold.rs), run under /usr/bin/time -v"
+}

@@ -1,0 +1,308 @@
+[
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/lib.rs",
+  "mutant": "replace || with && in scale (line 357 col 23)",
+  "line": "if !f.is_finite() || f < 0.0 {",
+  "reason": "scale() only ever receives values envelope_well_formed already proved finite and >= 0 (decide_inner returns before parse_policy when the envelope is not well formed; is_num filters non-finite, weights need >= 0, theta1>=0, theta2>=theta1, kappa>0, lambda/rho/bMax>=0), so the guard is never taken on either side. Even out of that domain the only input where `!finite && f<0` differs from `!finite || f<0` with a different RESULT is +inf (serde_json cannot produce inf from JSON text); finite negatives fall through to `(f*S).round() as u64`, which saturates to 0 exactly like the early return, and NaN casts to 0.",
+  "occurrence": 1,
+  "lineno": 357
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/lib.rs",
+  "mutant": "replace < with == in scale (line 357 col 28)",
+  "line": "if !f.is_finite() || f < 0.0 {",
+  "reason": "Inputs are finite and >= 0 (validated by envelope_well_formed before parse_policy). For any finite negative f the fall-through `(f * S as f64).round() as u64` is a saturating float->int cast that yields 0, the same value as the early return, so no input distinguishes `f < 0.0` from `f == 0.0` (f == 0 also yields 0 either way).",
+  "occurrence": 1,
+  "lineno": 357
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/lib.rs",
+  "mutant": "replace < with <= in scale (line 357 col 28)",
+  "line": "if !f.is_finite() || f < 0.0 {",
+  "reason": "Differs only at f == 0.0 (and -0.0), where the early return gives 0 and the fall-through gives (0*S).round() as u64 = 0: identical.",
+  "occurrence": 1,
+  "lineno": 357
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/canonical.rs",
+  "mutant": "replace < with <= in js_number_to_string (line 91 col 10)",
+  "line": "if f < 0.0 {",
+  "reason": "f == 0.0 (and -0.0) returned on the line above and NaN/inf are excluded there too, so on every value reaching this test `f < 0.0` and `f <= 0.0` agree.",
+  "occurrence": 1,
+  "lineno": 91
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/canonical.rs",
+  "mutant": "replace < with <= in js_number_to_string (line 107 col 29)",
+  "line": "let sign = if n - 1 < 0 { '-' } else { '+' };",
+  "reason": "The exponent branch is only reached for n >= 22 or n <= -6 (n in 1..=21 and -5..=0 are handled above), so n - 1 == 0 (n == 1) is unreachable here and `< 0` / `<= 0` agree. The killable siblings (== and > at this column, line 108, line 109) are killed by js_number_to_string_exponent_forms_match_ecmascript.",
+  "occurrence": 1,
+  "lineno": 107
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/canonical.rs",
+  "mutant": "replace - with + in js_number_to_string (line 107 col 25)",
+  "line": "let sign = if n - 1 < 0 { '-' } else { '+' };",
+  "reason": "Reachable n are n >= 22 or n <= -6. `n + 1 < 0` is true exactly for n <= -2, and `n - 1 < 0` for n <= 0; on the reachable set both are true for n <= -6 and false for n >= 22, so the sign never changes.",
+  "occurrence": 1,
+  "lineno": 107
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/canonical.rs",
+  "mutant": "replace - with / in js_number_to_string (line 107 col 25)",
+  "line": "let sign = if n - 1 < 0 { '-' } else { '+' };",
+  "reason": "`n / 1 < 0` is `n < 0`; on the reachable set (n >= 22 or n <= -6) this equals `n - 1 < 0`.",
+  "occurrence": 1,
+  "lineno": 107
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/caveats.rs",
+  "mutant": "replace > with == in check_value (line 490 col 14)",
+  "line": "if depth > MAX_SCHEMA_DEPTH + 1 {",
+  "reason": "check_value runs only after validate_arg_schema accepted the schema (evaluate_tool_schema returns early otherwise; check_object is called from nowhere else), and the value depth tracks the schema depth exactly (check_object(d)->check_value(d+1) mirrors object_schema_error(d)->spec_error(d+1); array items +1 on both sides; object spec keeps the depth on both sides). spec_error refuses any spec at depth > MAX_SCHEMA_DEPTH (8), so check_value never sees depth > 8 and the `too deep` branch is dead (as in agent-native.ts checkValue, a second line of defence). `depth == 9` is therefore never true either.",
+  "occurrence": 1,
+  "lineno": 490
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/caveats.rs",
+  "mutant": "replace > with >= in check_value (line 490 col 14)",
+  "line": "if depth > MAX_SCHEMA_DEPTH + 1 {",
+  "reason": "check_value runs only after validate_arg_schema accepted the schema (evaluate_tool_schema returns early otherwise; check_object is called from nowhere else), and the value depth tracks the schema depth exactly (check_object(d)->check_value(d+1) mirrors object_schema_error(d)->spec_error(d+1); array items +1 on both sides; object spec keeps the depth on both sides). spec_error refuses any spec at depth > MAX_SCHEMA_DEPTH (8), so check_value never sees depth > 8 and the `too deep` branch is dead (as in agent-native.ts checkValue, a second line of defence). `depth >= 9` is therefore never true either.",
+  "occurrence": 1,
+  "lineno": 490
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/caveats.rs",
+  "mutant": "replace + with * in check_value (line 490 col 33)",
+  "line": "if depth > MAX_SCHEMA_DEPTH + 1 {",
+  "reason": "check_value runs only after validate_arg_schema accepted the schema (evaluate_tool_schema returns early otherwise; check_object is called from nowhere else), and the value depth tracks the schema depth exactly (check_object(d)->check_value(d+1) mirrors object_schema_error(d)->spec_error(d+1); array items +1 on both sides; object spec keeps the depth on both sides). spec_error refuses any spec at depth > MAX_SCHEMA_DEPTH (8), so check_value never sees depth > 8 and the `too deep` branch is dead (as in agent-native.ts checkValue, a second line of defence). The mutant `depth > MAX_SCHEMA_DEPTH * 1` (= depth > 8) is therefore never true either.",
+  "occurrence": 1,
+  "lineno": 490
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/caveats.rs",
+  "mutant": "replace + with * in check_object (line 482 col 53)",
+  "line": "if let Some(e) = check_value(spec, v, depth + 1, budget) {",
+  "reason": "check_value runs only after validate_arg_schema accepted the schema (evaluate_tool_schema returns early otherwise; check_object is called from nowhere else), and the value depth tracks the schema depth exactly (check_object(d)->check_value(d+1) mirrors object_schema_error(d)->spec_error(d+1); array items +1 on both sides; object spec keeps the depth on both sides). spec_error refuses any spec at depth > MAX_SCHEMA_DEPTH (8), so check_value never sees depth > 8 and the `too deep` branch is dead (as in agent-native.ts checkValue, a second line of defence). `depth * 1` only makes the passed depth smaller (never larger), and depth is read nowhere except that dead `too deep` check, so the verdict and reason are unchanged.",
+  "occurrence": 1,
+  "lineno": 482
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/caveats.rs",
+  "mutant": "replace + with * in check_value (line 544 col 65)",
+  "line": "if let Some(e) = check_value(items, item, depth + 1, budget) {",
+  "reason": "check_value runs only after validate_arg_schema accepted the schema (evaluate_tool_schema returns early otherwise; check_object is called from nowhere else), and the value depth tracks the schema depth exactly (check_object(d)->check_value(d+1) mirrors object_schema_error(d)->spec_error(d+1); array items +1 on both sides; object spec keeps the depth on both sides). spec_error refuses any spec at depth > MAX_SCHEMA_DEPTH (8), so check_value never sees depth > 8 and the `too deep` branch is dead (as in agent-native.ts checkValue, a second line of defence). `depth * 1` only makes the passed depth smaller, and depth is read nowhere except that dead `too deep` check, so the verdict and reason are unchanged.",
+  "occurrence": 1,
+  "lineno": 544
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/chain.rs",
+  "mutant": "replace % with / in decode_b64u_strict (line 70 col 16)",
+  "line": "if s.len() % 4 == 1 {",
+  "reason": "decode_b64u_strict is private and only called with len 32 (public key) and 64 (signature); a b64u string of c chars decodes to floor(6c/8) bytes, so only c = 43 (32 bytes) and c = 86 (64 bytes) can pass the final `bytes.len() != len` check, and both have c % 4 != 1 and c / 4 != 1. Any string the early check (original or mutant) would refuse or let through differently is refused later anyway (base64 0.22 URL_SAFE_NO_PAD rejects c % 4 == 1 as InvalidLength, the canonical re-encode check, and the exact-length check), so the result is None either way. The mutant additionally refuses c in 4..=7, which decode to at most 5 bytes and fail the length check.",
+  "occurrence": 1,
+  "lineno": 70
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/chain.rs",
+  "mutant": "replace % with + in decode_b64u_strict (line 70 col 16)",
+  "line": "if s.len() % 4 == 1 {",
+  "reason": "decode_b64u_strict is private and only called with len 32 (public key) and 64 (signature); a b64u string of c chars decodes to floor(6c/8) bytes, so only c = 43 (32 bytes) and c = 86 (64 bytes) can pass the final `bytes.len() != len` check, and both have c % 4 != 1 and c / 4 != 1. Any string the early check (original or mutant) would refuse or let through differently is refused later anyway (base64 0.22 URL_SAFE_NO_PAD rejects c % 4 == 1 as InvalidLength, the canonical re-encode check, and the exact-length check), so the result is None either way. The mutant `s.len() + 4 == 1` is never true, so c % 4 == 1 strings reach the decoder, which rejects them.",
+  "occurrence": 1,
+  "lineno": 70
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/risk.rs",
+  "mutant": "replace > with >= in risk_raw (line 47 col 12)",
+  "line": "if acc > s2 {",
+  "reason": "When acc == s2 the mutant assigns acc = s2, which is the value it already has; no input distinguishes the two.",
+  "occurrence": 1,
+  "lineno": 47
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/predicates.rs",
+  "mutant": "replace && with || in ordered (line 137 col 26)",
+  "line": "if x.is_finite() && y.is_finite() {",
+  "reason": "Every serde_json::Number reachable here is finite: the crate does not enable arbitrary_precision, the parser rejects out-of-range literals (1e400 is a parse error), Number::from_f64 refuses NaN/Inf (json!/Value::from map them to Null), and as_f64 of an i64/u64 is always finite. So x.is_finite() and y.is_finite() are both always true and `&&` == `||`; no input distinguishes it.",
+  "occurrence": 1,
+  "lineno": 137
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/predicates.rs",
+  "mutant": "replace match guard !s.is_empty() with true in tri_leaf (line 369 col 39)",
+  "line": "Some(Value::String(s)) if !s.is_empty() => s.as_str(),",
+  "reason": "member_of collection guard. With the guard removed, collection \"\" reaches `ctx.resolve(\"\")`, which returns None on an empty path (first line of Ctx::resolve), so the next match returns U, the same verdict the guard returns. Nothing between the guard and the resolve has side effects (no regex budget, no state), so the result is identical for every input.",
+  "occurrence": 2,
+  "lineno": 369
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in normalize (line 92 col 41)",
+  "line": "Some(last) if r.0 <= last.1 + 1 => last.1 = last.1.max(r.1),",
+  "reason": "The guard becomes r.0 <= last.1: overlapping/touching ranges still merge, only exactly-adjacent ranges (r.0 == last.1+1) stay separate (and for last.1 == 0 the bound is 0 vs 1, again only adjacency). Input is sorted by start, so the output is still sorted and pairwise disjoint; the only consumers are CharSet::has (binary search, correct on any sorted disjoint list, adjacency irrelevant) and complement (a == next for an adjacent successor pushes nothing, same complement). Range count never reaches the NFA (a Set is one instruction), so no pattern/subject distinguishes it.",
+  "occurrence": 1,
+  "lineno": 92
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with >= in complement (line 103 col 14)",
+  "line": "if a > next {",
+  "reason": "complement is only called from cls() on a negated class escape (\\D \\W \\S), i.e. on the constants DIGIT/WORD/SPACE, whose first range starts at 0x30/0x30/0x09 (never 0 = initial next) and whose ranges are pairwise non-adjacent after normalize (every successor a >= previous b + 2 = next + 1). So a == next never occurs and > / >= take the same branch on every reachable input.",
+  "occurrence": 1,
+  "lineno": 103
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace += with *= in run (line 571 col 11)",
+  "line": "epoch += 1;",
+  "reason": "Only the first epoch changes (0 instead of 1); later epochs become 1..n instead of 2..n+1. mark[] starts at usize::MAX and is only compared for equality with the current epoch, so what matters is that the epochs of successive add() rounds are pairwise distinct and never usize::MAX; both sequences (1,2,..,n+1) and (0,1,..,n) satisfy that, so every add() visits exactly the same pcs and the match result is identical.",
+  "occurrence": 1,
+  "lineno": 571
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in is_safe_regex_source (line 615 col 37)",
+  "line": "let n = match src.get(i + 1) {",
+  "reason": "n then reads the backslash itself, so the backreference refusal (\\1-\\9, \\k) never fires and a trailing backslash no longer returns false early; but i += 2 / prev = Atom are unchanged, and the final `compile(src).is_some()` refuses every such source anyway (escape_inner refuses a trailing backslash and any alphanumeric identity escape, which covers 1-9 and k). The guard's result is the same for every input.",
+  "occurrence": 1,
+  "lineno": 615
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace || with && in is_safe_regex_source (line 619 col 43)",
+  "line": "if (0x31..=0x39).contains(&n) || n == 0x6b {",
+  "reason": "Weakens the early backreference refusal (\\1-\\9, \\k) to never-true; the scan state is unchanged (i += 2, prev = Atom) and the closing `compile(src).is_some()` refuses every source holding \\1-\\9 or \\k (escape_inner: alphanumeric identity escapes are refused; inside a class the scanner never reaches this branch). Same result for every input.",
+  "occurrence": 1,
+  "lineno": 619
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in is_safe_regex_source (line 627 col 27)",
+  "line": "let mut j = i + 1;",
+  "reason": "j starts at the `[` instead of after it. The scan loop then steps over the `[` (it is neither `]` nor `\\`), arriving at i + 1, and a leading `^` is either skipped by the optional-^ check or (since `^` is neither `]` nor `\\`) by the loop itself; the loop therefore reaches the same first unescaped `]` with the same escape pairing. Identical j, identical result.",
+  "occurrence": 1,
+  "lineno": 627
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace += with -= in is_safe_regex_source (line 629 col 19)",
+  "line": "j += 1;",
+  "reason": "Skipping the optional leading `^` is redundant: `^` is neither `]` nor `\\`, so the scan loop steps over it itself. With -= j goes back to the `[` (also neither), one extra loop step; j ends at the same first unescaped `]` with the same escape pairing (j = i is >= 0, no underflow). Identical result.",
+  "occurrence": 1,
+  "lineno": 629
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace += with *= in is_safe_regex_source (line 629 col 19)",
+  "line": "j += 1;",
+  "reason": "j stays on the leading `^`, which the scan loop then steps over itself (it is neither `]` nor `\\`); the loop reaches the same first unescaped `]` with the same escape pairing. Identical result.",
+  "occurrence": 1,
+  "lineno": 629
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in is_safe_regex_source (line 640 col 19)",
+  "line": "i = j + 1;",
+  "reason": "i lands on the closing `]` instead of after it; the next iteration processes `]` through the fall-through (not \\ [ ( ) | or a quantifier char) which does i += 1 and prev = Atom: exactly the state the original reaches (i = j + 1, prev = Atom). Identical result.",
+  "occurrence": 1,
+  "lineno": 640
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "delete match arm Prev::None in is_safe_regex_source (line 720 col 17)",
+  "line": "Prev::None => return false,",
+  "reason": "prev is None exactly at the start, after `(` / `(?:`, after `|`, and after a quantifier (with its lazy `?`); the parser in compile() reaches atom() at those same positions (it uses the same class/escape boundaries) and atom() refuses a leading * + ? {. So every source this arm rejects is also rejected by the closing `compile(src).is_some()`; continuing the scan can only add more refusals. Same result for every input.",
+  "occurrence": 1,
+  "lineno": 720
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace += with *= in is_safe_regex_source (line 725 col 27)",
+  "line": "unbounded += 1;",
+  "reason": "The unbounded-quantifier count (> 3) is dominated by the cost budget: every unbounded quantifier adds UNBOUNDED_QUANTIFIER_BITS = 8 to bits, so the 3rd one already makes bits >= 24 > MAX_REGEX_COST_BITS = 22 and returns false (the TS reference has no separate count at all). Never counting (*= keeps 0) changes no verdict.",
+  "occurrence": 1,
+  "lineno": 725
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with == in is_safe_regex_source (line 726 col 30)",
+  "line": "if unbounded > MAX_UNBOUNDED_QUANTIFIERS {",
+  "reason": "Fires at the 3rd unbounded quantifier instead of the 4th; but at the 3rd one bits reaches >= 24 > 22 in the same iteration and the function returns false anyway, and a 4th is never reached. Same verdict for every input.",
+  "occurrence": 1,
+  "lineno": 726
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with >= in is_safe_regex_source (line 726 col 30)",
+  "line": "if unbounded > MAX_UNBOUNDED_QUANTIFIERS {",
+  "reason": "Fires at the 3rd unbounded quantifier instead of the 4th; at the 3rd one bits is already >= 3 * 8 = 24 > MAX_REGEX_COST_BITS = 22 and the same iteration returns false. Same verdict for every input.",
+  "occurrence": 1,
+  "lineno": 726
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "delete ! in is_safe_regex_source (line 730 col 16)",
+  "line": "if !qunb {",
+  "reason": "With the ! removed the bounded-max check (> 64) applies only to unbounded quantifiers, whose qmax is always None, so it never fires. Every bounded quantifier with max > 64 that the scan now lets through is refused by the closing `compile(src).is_some()` (quantified(): max > MAX_REPEAT refuses; more than 4 digits is not a quantifier). Same verdict for every input.",
+  "occurrence": 1,
+  "lineno": 730
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace match guard o > 1 with true in is_safe_regex_source (line 741 col 32)",
+  "line": "Some(o) if o > 1 => 64 - (o - 1).leading_zeros(), // ceil(log2(o))",
+  "reason": "options is h - lo + 1 >= 1 (h < lo is refused earlier) or Some(2) for `?`; the only newly admitted value is o = 1, where 64 - (0u64).leading_zeros() = 64 - 64 = 0, the same 0 the default arm gives. Identical bits.",
+  "occurrence": 1,
+  "lineno": 741
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace > with >= in is_safe_regex_source (line 741 col 34)",
+  "line": "Some(o) if o > 1 => 64 - (o - 1).leading_zeros(), // ceil(log2(o))",
+  "reason": "Only o = 1 newly takes the arm, and there 64 - (0u64).leading_zeros() = 0, equal to the default arm's 0. Identical bits.",
+  "occurrence": 1,
+  "lineno": 741
+ },
+ {
+  "crate": "zkvm-pca",
+  "file": "core/src/safe_regex.rs",
+  "mutant": "replace + with * in charge (line 824 col 64)",
+  "line": "b.evaluations = MAX_REGEX_EVALUATIONS_PER_DOCUMENT + 1;",
+  "reason": "Poisons to 64 instead of 65. evaluations is private and only read by charge() as ev = evaluations + 1, compared > 64: 65 > 64 and 66 > 64 both refuse, so every later charge in the scope is refused either way (chars/steps are not updated on refusal in both). Same verdicts.",
+  "occurrence": 1,
+  "lineno": 824
+ }
+]

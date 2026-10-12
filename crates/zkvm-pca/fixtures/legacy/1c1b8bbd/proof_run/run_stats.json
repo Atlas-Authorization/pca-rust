@@ -1,0 +1,13 @@
+{
+  "cuda_feature": false,
+  "groth16_bytes": 1793,
+  "groth16_seal_bytes": 256,
+  "groth16_wrap_ms": 187795,
+  "image_id_hex": "1c1b8bbd531c5f3c93debfa41350b9a5e5c2478959ae2c0994c12de505933b95",
+  "risc0_zkvm_version": "3.0.6",
+  "segments": 11,
+  "succinct_bytes": 224522,
+  "succinct_prove_ms": 2957274,
+  "total_cycles": 11534336,
+  "user_cycles": 10375868
+}

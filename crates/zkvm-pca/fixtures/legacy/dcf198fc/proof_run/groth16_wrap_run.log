@@ -1,0 +1,3 @@
+zkvm version: 3.0.6
+image id: dcf198fcfedd63182ddd8c392070d73f03c595b56e5d8649242e878fe530813a
+groth16 wrap of /opt/pca/out/gpu-wrap/input_receipt_succinct.bin: 21278 ms, 825 bytes

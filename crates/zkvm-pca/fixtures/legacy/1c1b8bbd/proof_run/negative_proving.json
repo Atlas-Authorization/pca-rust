@@ -1,0 +1,444 @@
+[
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 900000,
+      "tier": 3
+    },
+    "receipt_produced": false,
+    "variant": "risk_above_theta1_and_zero_budget"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "predicate_miss_verb_delete"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "chain_leaf_hop_signature_tampered"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "chain_root_hop_signature_tampered"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "chain_misrooted_wrong_pinned_principal"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "chain_leaf_hop_dropped"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "leaf_pcactn_signature_tampered"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "leaf_pcactn_missing"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "chain_hop_alg_pq_unsupported_in_guest"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "expired_grant"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "ts_variant_leaf_sig_noncanonical_S_plus_L"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "ts_variant_leaf_sig_identity_R_zero_S"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "ts_variant_leaf_body_digest_tampered"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "ts_variant_leaf_caveats_emptied_unsigned"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 0,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "ts_variant_mixed_order_delegator_key_with_k_0_mod_8"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_11_delegated_expired_caveat"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_11_delegated_blast_radius_narrowing"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_12_three_hops_under_max_depth_1"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_13_pcactn_grant_ref_bogus"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_13_pcactn_plan_node_other"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_13_pcactn_plan_root_wrong"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_13_pcactn_signed_for_other_action"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_13_input_action_differs_from_signed_action"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_13_pcactn_carries_other_chain"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r3_13_tool_binding_not_signed"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_expired_grant_still_valid"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_iat_beyond_skew"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_lifetime_over_one_hour"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_exp_not_after_iat"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_wrong_version"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_aud_empty"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_counter_negative"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_04_pcactn_exp_missing"
+  },
+  {
+    "execute_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "prove_error": "Guest panicked: assertion `left == right` failed: PCA release gate DENIED (allow=0): the action is not compliant under the policy\n  left: 0\n right: 1",
+    "pure_decision": {
+      "action_commit_empty": false,
+      "allow": 0,
+      "chain_verified": 1,
+      "r_scaled": 65000,
+      "tier": 1
+    },
+    "receipt_produced": false,
+    "variant": "r4_03_delegated_malformed_tool_schema"
+  }
+]

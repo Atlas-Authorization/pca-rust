@@ -1,0 +1,122 @@
+[
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace || with && in verify_release (guard operator before info.num_aux_segments())",
+  "line": "|| info.num_aux_segments() != 0",
+  "reason": "winter-air TraceInfo::num_aux_segments() is 1 iff aux_segment_width() > 0, so the two operands are logically identical; with && binding tighter than || the mutant rewrites `a || n` as `a && n` over identical operands, which is the same predicate",
+  "occurrence": 1,
+  "lineno": 957,
+  "fn": "verify_release"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace += with -= in <impl Air for ReleaseAir>::evaluate_transition (final i += 1, line 575)",
+  "line": "i += 1;",
+  "reason": "The final `i += 1` of evaluate_transition: `i` is read afterwards only by `debug_assert_eq!(i, result.len())`, which is compiled out ([profile.test] debug-assertions = false, and in release). No constraint value changes.",
+  "occurrence": 11,
+  "lineno": 575,
+  "fn": "<impl Air for ReleaseAir>::evaluate_transition"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace += with *= in <impl Air for ReleaseAir>::evaluate_transition (final i += 1, line 575)",
+  "line": "i += 1;",
+  "reason": "The final `i += 1` of evaluate_transition: `i` is read afterwards only by `debug_assert_eq!(i, result.len())`, which is compiled out ([profile.test] debug-assertions = false, and in release). No constraint value changes.",
+  "occurrence": 11,
+  "lineno": 575,
+  "fn": "<impl Air for ReleaseAir>::evaluate_transition"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace * with / in build_trace (pm * co)",
+  "line": "let allow = pm * co * tgate * bgate;",
+  "reason": "pm and co are 0/1 field elements and tgate = bgate = ONE: x / ONE == x, and for pm / co winterfell's FieldElement::inv(ZERO) is ZERO, so pm / co == pm * co on all four (pm, co) pairs. allow is unchanged.",
+  "occurrence": 1,
+  "lineno": 639,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace * with / in build_trace (* tgate)",
+  "line": "let allow = pm * co * tgate * bgate;",
+  "reason": "pm and co are 0/1 field elements and tgate = bgate = ONE: x / ONE == x, and for pm / co winterfell's FieldElement::inv(ZERO) is ZERO, so pm / co == pm * co on all four (pm, co) pairs. allow is unchanged.",
+  "occurrence": 1,
+  "lineno": 639,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace * with / in build_trace (* bgate)",
+  "line": "let allow = pm * co * tgate * bgate;",
+  "reason": "pm and co are 0/1 field elements and tgate = bgate = ONE: x / ONE == x, and for pm / co winterfell's FieldElement::inv(ZERO) is ZERO, so pm / co == pm * co on all four (pm, co) pairs. allow is unchanged.",
+  "occurrence": 1,
+  "lineno": 639,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace < with <= in build_trace (bit row bound)",
+  "line": "let bit = if row < TRACE_LEN - 1 { ((v >> row) & 1) as u128 } else { 0 };",
+  "reason": "Only changes the bit column at the LAST row (row = TRACE_LEN-1): bit = (v >> 63) & 1 instead of 0. For every target the honest prover can prove (< 2^63) that bit is 0 anyway, and the last row is never the `cur` row of a transition constraint, so it is unconstrained; out-of-range targets fail the acc[last] == 0 assertion either way.",
+  "occurrence": 1,
+  "lineno": 664,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace - with + in build_trace (bit row bound TRACE_LEN - 1)",
+  "line": "let bit = if row < TRACE_LEN - 1 { ((v >> row) & 1) as u128 } else { 0 };",
+  "reason": "Only changes the bit column at the LAST row (row = TRACE_LEN-1): bit = (v >> 63) & 1 instead of 0. For every target the honest prover can prove (< 2^63) that bit is 0 anyway, and the last row is never the `cur` row of a transition constraint, so it is unconstrained; out-of-range targets fail the acc[last] == 0 assertion either way.",
+  "occurrence": 1,
+  "lineno": 664,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace - with / in build_trace (bit row bound TRACE_LEN - 1)",
+  "line": "let bit = if row < TRACE_LEN - 1 { ((v >> row) & 1) as u128 } else { 0 };",
+  "reason": "Only changes the bit column at the LAST row (row = TRACE_LEN-1): bit = (v >> 63) & 1 instead of 0. For every target the honest prover can prove (< 2^63) that bit is 0 anyway, and the last row is never the `cur` row of a transition constraint, so it is unconstrained; out-of-range targets fail the acc[last] == 0 assertion either way.",
+  "occurrence": 1,
+  "lineno": 664,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace < with <= in build_trace (acc update row bound)",
+  "line": "if row < TRACE_LEN - 1 {",
+  "reason": "Only affects the update of `acc` after the last row has been written (cols[acol][row] is stored before the subtraction and `acc` is not read again), i.e. a dead store; the trace is identical.",
+  "occurrence": 1,
+  "lineno": 666,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace - with + in build_trace (acc update row bound TRACE_LEN - 1)",
+  "line": "if row < TRACE_LEN - 1 {",
+  "reason": "Only affects the update of `acc` after the last row has been written (cols[acol][row] is stored before the subtraction and `acc` is not read again), i.e. a dead store; the trace is identical.",
+  "occurrence": 1,
+  "lineno": 666,
+  "fn": "build_trace"
+ },
+ {
+  "crate": "stark-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace - with / in build_trace (acc update row bound TRACE_LEN - 1)",
+  "line": "if row < TRACE_LEN - 1 {",
+  "reason": "Only affects the update of `acc` after the last row has been written (cols[acol][row] is stored before the subtraction and `acc` is not read again), i.e. a dead store; the trace is identical.",
+  "occurrence": 1,
+  "lineno": 666,
+  "fn": "build_trace"
+ }
+]

@@ -1,0 +1,53 @@
+{
+  "status": "experimental, unaudited",
+  "date_utc": "2026-10-11",
+  "statement": "RISC Zero guest pca-zkvm-guest after red-team round 4 (R4-02..R4-04): evaluates re: patterns with a port of the TS linear-time NFA matcher (same subset guard, JavaScript semantics over UTF-16, per-document regex budget), tool_schema caveats fail closed, and the PCActn's own ver/iat/exp/aud/counter are enforced in-guest and committed to the journal; journal = fixtures/proof_run/journal.json",
+  "image_id_hex": "1c1b8bbd531c5f3c93debfa41350b9a5e5c2478959ae2c0994c12de505933b95",
+  "supersedes_image_id": "ce0b542313a11e4863661d921157f95e61df18a919c97eea92641bba8699cf1b",
+  "guest_elf_note": "ELF not committed (gitignored); Cargo.lock files pin the dependency graph. The image id above is the authoritative identity.",
+  "versions": {
+    "risc0-zkvm": "3.0.6",
+    "r0vm": "3.0.6",
+    "rzup rust (guest) toolchain": "1.97.0",
+    "host rustc": "stable (rust-toolchain.toml) as installed by rustup on the box",
+    "groth16 prover docker image": "risczero/risc0-groth16-prover (tag per risc0-zkvm 3.0.6 default, pulled by the host); docker.io 29.1.3"
+  },
+  "host": {
+    "cloud": "Azure (PCA cloud farm box cloud-box-21, exclusive lease)",
+    "vm": "Standard_D8as_v6-class (Ubuntu 24.04.4, x86_64)",
+    "cpu": "8 vCPU, 31 GB RAM, exclusive (no other job on the box)",
+    "gpu": "none (CPU proving)"
+  },
+  "pipeline": [
+    {
+      "step": "succinct receipt",
+      "where": "CPU, 8 vCPU",
+      "wall_ms": 2957274,
+      "cycles_total": 11534336,
+      "cycles_user": 10375868,
+      "segments": 11,
+      "artifact": "receipt_succinct.bin"
+    },
+    {
+      "step": "groth16 wrap (stark-to-snark) of that succinct receipt",
+      "where": "CPU, docker risc0-groth16-prover (x86_64)",
+      "wall_ms": 187795,
+      "artifact": "receipt_groth16.bin"
+    },
+    {
+      "step": "negative proving matrix",
+      "where": "same run (execute + full proving attempt per variant)",
+      "artifact": "negative_proving.json",
+      "result": "34 of 34 variants: guest panicked, no receipt"
+    }
+  ],
+  "verified_on": "cargo test -p pca-zkvm-verify (see README)",
+  "artifacts_sha256": {
+    "receipt_succinct.bin": "032744177cb9cc7b95b72e47d31d2ccc65ce7e44ec20109e9474de68f8b022ff",
+    "receipt_groth16.bin": "0993610a9240016a6e3e0c14cb47165c26ec57852e9bb8eb925cdbd37193bfd0",
+    "journal.json": "bafcb5423ab3ae9ebfb1ae7f838ffd62cfdc2ae08a76e3c3926fa295df105482",
+    "image_id.json": "15092ac5fa899db61bd737c6285cf6acfde81c11907a80bc4b23a679bddffba7",
+    "negative_proving.json": "cd78e6fa58d56da88ce69a084565c98b6d1d657634494736974252192d7827c9",
+    "run_stats.json": "97a12086c7137f91e0ca95aa245a8d4f510c0ffd35a750e3ad7d21bb9256666b"
+  }
+}

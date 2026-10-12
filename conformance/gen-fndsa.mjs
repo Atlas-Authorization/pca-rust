@@ -28,6 +28,7 @@ import {
   fnDsa512Sign,
   fnDsa1024Sign,
   verifyLeafSuite,
+  resolvePqVerifyKey,
   validateSignatureWire,
   FN_DSA_512_PUBLIC_KEY_BYTES,
   FN_DSA_512_SIGNATURE_BYTES,
@@ -95,7 +96,7 @@ function add(name, cls, description, { alg, pq_pk, sig, pq_sig }, want) {
   if (pq_pk !== undefined) wireObj.pq_pk = pq_pk;
   if (pq_sig !== undefined) wireObj.pq_sig = pq_sig;
   const wire = validateSignatureWire(wireObj); // string (reason) | null
-  const verify = verifyLeafSuite({ alg, holder: 'unused-for-pure-pq', pqPublicKey: pq_pk, message: MSG, sig });
+  const verify = verifyLeafSuite({ alg, holder: 'unused-for-pure-pq', ...(typeof pq_pk === 'string' ? { pq: resolvePqVerifyKey('', undefined, { trustedPk: pq_pk }) } : {}), message: MSG, sig });
 
   const wireOk = wire === null;
   if (wireOk !== want.wireOk) throw new Error(`vector ${name}: wireOk=${wireOk} (reason='${wire ?? ''}') != intended ${want.wireOk}`);

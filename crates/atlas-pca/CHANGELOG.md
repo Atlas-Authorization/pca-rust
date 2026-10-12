@@ -1,0 +1,30 @@
+# Changelog
+
+## 0.4.0 - 2026-10-11 (BREAKING)
+
+- Depth / strict digests (security, parity): every protocol digest the verifiers compute (hop body digest, parent capability hash, caveat comparison, root-vs-grant, root `trusted_root` match, Merkle leaves; new public `hash_canonical_strict`) now uses the STRICT canonical form like the reference (`hashCanonical` is `canonicalizeStrict`): depth <= 32, safe integers, plain decimals. It was the lenient form, so a correctly SIGNED hop carrying a depth-33 value, `1e300` or `2^53+2` verified although the reference refuses the chain; now `hop N: malformed body`. `merkle_root` errs on an out-of-profile leaf. A caller-built hop deeper than the cap is measured iteratively BEFORE the body is cloned (a recursive clone of a 1,000,000-deep value overflowed the stack and aborted the process). `hash_canonical` / `cap_hash` / `params_digest` stay lenient (content addressing only).
+- R6-01 (security): the tower/axum middleware's body mode parses the `{"pcactn": ...}` envelope with the strict profile (new `strict_parse_envelope`; depth cap `MAX_JSON_DEPTH` over the whole envelope, as the reference's `defaultExtract`) instead of `serde_json::from_slice`: duplicate keys anywhere are refused, as in header mode (a lenient parse collapsed them last-wins before verification).
+- R6-03/R6-04 (parity): `verify_threshold_share` validates the WHOLE signer set like the reference (unknown or wrong-case roles, malformed keys, empty / null / short `pq_pk` anywhere, one key per role, one role per key, a duplicate (role, key) only with the same `pq_pk`); `t` must be 1, 2 or 3 (0..=255 was accepted); `share.role` is required. New `signer_set_hash_b64u`.
+- R6-05 (robustness): `verify_chain` applies the reference per-hop type check (`id`/`issuer`/`holder`/`body_digest`/`sig` strings; `alg`/`pq_pk`/`pq_sig`/`holder_pq`/`parent` absent or strings; caveats objects with a string `type`): correctly SIGNED but ill-typed hops (numeric caveat, caveat without `type`, numeric `holder_pq`/`holder`, object `caveats`) and a hop with a numeric `pq_pk` were accepted. No public verify entry point panics on the shared `malformed` vectors.
+- R6-02 (security): a signer-set role that registers a `pq_pk` now REQUIRES a PQ (pure or hybrid) threshold share; an ed25519-only share for that role is refused, so an Ed25519 break no longer forges a hybrid-registered role (parity with the TypeScript reference). Corpus: `agent-bound-signerset-with-pq-pk` is now `valid:false`; new positive `agent-hybrid-signerset-with-pq-pk`.
+- R5-A1 (security): threshold-share verification is now signer-set PINNED, no longer self-vouched. The share must be for the one key the signer set registers for its role, a PQ/hybrid share verifies only under the set's registered `pq_pk` (a differing share `pq_pk` is refused), the share-suite tag is part of the signed bytes (a classical share cannot be relabelled hybrid), and the signer-set hash now includes a registered `pq_pk` (parity with the TypeScript reference). New corpus vectors: `agent-not-in-signer-set`, `agent-bound-signerset-with-pq-pk`, `agent-hybrid-relabel-*`.
+
+- Suite policy defaults documented: no list = no restriction, an empty list refuses everything, and the hosted API defaults to ed25519 + Ed25519 hybrids (README lists the exact list to pass offline).
+
+- BREAKING (security, R4-01): the standalone chain verifier now takes a non-ed25519 root's PQ authority from the verifier, exactly like the TypeScript reference (R3-01). `verify_chain_policy` gains two trailing arguments, `pq_pins: Option<&HashMap<String, String>>` (root issuer, Ed25519 base64url, to its ML-DSA public key) and `trusted_root: Option<&Value>` (the verifier's own stored root capability). A pure `ml-dsa-65` or hybrid ROOT hop is accepted only if `trusted_root` has the same content hash as the root, or `pq_pins` has an entry for `root.issuer` equal to the root's `pq_pk` (a differing pin is a refusal). Otherwise it is refused with `hop 0: root suite '<alg>' needs a PQ key pinned for the root issuer (policy.pqPins) or the verifier's stored grant (policy.trustedRoot); the root's own pq_pk proves nothing about who issued it (R3-01)`. Before, an attacker-minted root naming a victim Ed25519 issuer, signed with the attacker's own ML-DSA key, verified. Migration: callers of `verify_chain_policy` on a root they did not load from their own store pass `Some(&pins)`, or `Some(&stored_root)`, else `None, None`; `verify_chain` (two arguments) keeps its signature but now refuses every non-ed25519 root. Ed25519 roots are unaffected. `verify_pcactn_core*` is unchanged in behaviour (it passes its grant as `trusted_root`). Internally one `pinned::resolve_pq_key` choke point mints the only key type the suite verifier accepts, so PQ verification cannot be reached with a `pq_pk` read off the artifact.
+
+- BREAKING (security, R3-03): hop and leaf signatures under `ml-dsa-65` / `hybrid-ed25519-ml-dsa-65` are now accepted only if `pq_pk` hashes to the signer's committed `holder_pq` (hop `holder_pq` is now part of the wire format and the signed hop body). Unbound or attacker-supplied PQ keys are rejected, exactly like the TypeScript reference. New `verify_pcactn_core_policy` / `verify_pcactn_json_policy` / `verify_chain_policy` take an optional allowed-suites list (`None` = none, `Some(&[])` refuses everything).
+
+## 0.3.0
+
+- Lockstep release with the `@atlasauth/pca*` family. No change to the verifier API or behaviour in this package. Aligns with the 0.3.0 conformance corpus and the fixed reference implementations; adapters now require `atlas-pca>=0.3.0,<0.4`. Upgrade together with the rest of the family.
+
+## 0.2.0 (superseded by 0.3.0)
+
+- New normative check `grant_ref_bound`: the signed `grant_ref` must equal `cap_chain[0].id` (behaviour change).
+- Aligned with the 172-vector shared conformance corpus (strings ordered by UTF-8 bytes wherever they feed a hash or commitment).
+- Added crate metadata (repository, keywords, categories), README and LICENSE.
+
+## 0.1.0
+
+- Initial release.

@@ -1,0 +1,3 @@
+# cargo-mutants scope. src/bin/gen_fixtures.rs is the developer tool that regenerates the committed fixtures
+# (sample proof, public inputs); it is not part of the verifier and no test runs it, so its mutants are out of scope.
+exclude_globs = ["src/bin/**"]

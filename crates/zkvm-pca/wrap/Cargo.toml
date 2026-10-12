@@ -1,0 +1,16 @@
+[package]
+name = "pca-zkvm-wrap"
+version = "0.1.0"
+edition = "2021"
+description = "Shrink-wraps the committed succinct PCA receipt into a Groth16 receipt (x86_64 Linux prover)"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+risc0-zkvm = { version = "^3.0.6", features = ["prove"] }
+serde_json = "1"
+bincode = "1"
+hex = "0.4"
+
+# Standalone workspace: this crate needs no guest toolchain.
+[workspace]
