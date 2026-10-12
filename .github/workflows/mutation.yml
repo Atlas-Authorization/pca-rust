@@ -1,0 +1,97 @@
+name: Mutation
+
+# Mutation testing of the atlas-pca verifier crate with cargo-mutants (--shard k/N), split into shards on separate
+# runners. The merge job checks the missed mutants against the equivalent-mutant ledger (flagship
+# tools/pca-audit/native-check-equivalents.mjs): it passes when every survivor is a ledgered equivalent and no ledger entry
+# is stale. Runs on demand and on ci/** branches (the release-candidate check), never on main pushes. The proof crates
+# (stark-pca, folding-pca, zkvm-pca) are not mutated here.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['ci/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CRATE: rust-pca
+  SHARDS: '8'
+  CARGO_TERM_COLOR: never
+  CARGO_INCREMENTAL: '0'
+
+jobs:
+  shard:
+    name: shard ${{ matrix.shard }}/8
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Mutate
+        run: |
+          rc=0
+          cargo mutants -p atlas-pca --shard "$(( ${{ matrix.shard }} - 1 ))/$SHARDS" --no-shuffle -j 2 \
+            --minimum-test-timeout 120 --timeout-multiplier 4 --output "$RUNNER_TEMP/mut" || rc=$?
+          # 0 = all caught, 2 = some missed, 3 = some timed out (both are results); anything else is a tool failure
+          case "$rc" in 0|2|3) ;; *) echo "::error::cargo-mutants exited $rc"; exit 1 ;; esac
+          tail -5 "$RUNNER_TEMP/mut/mutants.out/missed.txt" 2>/dev/null || true
+      - name: Report
+        run: |
+          node -e '
+            const fs = require("fs"), path = require("path"); const d = process.argv[1], pre = "crates/atlas-pca/";
+            const rd = (f) => fs.existsSync(path.join(d, f)) ? fs.readFileSync(path.join(d, f), "utf8").split("\n").filter(Boolean) : [];
+            const counts = { caught: rd("caught.txt").length, missed: rd("missed.txt").length, timeout: rd("timeout.txt").length, unviable: rd("unviable.txt").length };
+            const src = new Map(); const line = (f, n) => { if (!src.has(f)) src.set(f, fs.readFileSync(f, "utf8").split("\n")); return (src.get(f)[n - 1] || "").trim(); };
+            const surv = rd("missed.txt").map((l) => {
+              const m = /^(.+?):(\d+):(\d+): (.*)$/.exec(l); if (!m) throw new Error("unparsed: " + l);
+              if (!m[1].startsWith(pre)) throw new Error("mutant outside the crate: " + l);
+              return { crate: "rust-pca", file: m[1].slice(pre.length), mutant: m[4], line: line(m[1], +m[2]), lineno: +m[2] };
+            });
+            fs.writeFileSync("counts.json", JSON.stringify(counts)); fs.writeFileSync("survivors.json", JSON.stringify(surv));
+          ' "$RUNNER_TEMP/mut/mutants.out"
+          node .github/scripts/mutation-shard-report.mjs --crate="$CRATE" --shard=${{ matrix.shard }} --of="$SHARDS" --tool=cargo-mutants \
+            --counts=counts.json --survivors=survivors.json --out=shard-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ matrix.shard }}
+          path: shard-${{ matrix.shard }}.json
+
+  merge:
+    needs: shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship checker + ledger
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+      - uses: actions/download-artifact@v4
+        with:
+          path: reports
+      - name: Merge shards and check the ledger
+        run: >
+          node .github/scripts/mutation-merge.mjs --crate="$CRATE" --shards="$SHARDS" --reports=reports
+          --checker="$MONO/tools/pca-audit" --src="$GITHUB_WORKSPACE/crates/atlas-pca"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survivors-merged
+          path: reports/survivors-merged.json
+          if-no-files-found: ignore
