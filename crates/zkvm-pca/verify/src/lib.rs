@@ -14,7 +14,9 @@ use risc0_zkvm::{InnerReceipt, Receipt, VerifierContext};
 /// R6-ZK-06: image ids of SUPERSEDED guest builds, refused by [`verify_with_context`] even when the caller pins one of
 /// them (image ids are hashes, so there is no "minimum id"; this deny-list plus the journal's `guest_version`, checked
 /// against [`pca_zkvm_core::MIN_GUEST_VERSION`], is the minimum-version mechanism). Every guest before round 6 is here:
-/// a verifier that kept a pre-R5 id pinned no longer accepts its receipts.
+/// a verifier that kept a pre-R5 id pinned no longer accepts its receipts. The round-6 guest (`3b1eebb5...`, guest version 7)
+/// is superseded by guest version 8 (0.4.1: root caveats enforced, `max_spend`), and guest version 8 (`0c97a02b...`) by guest
+/// version 9 (R3-01: a PQ / hybrid session root verifies only under the verifier's `session.pq_pins`).
 pub const SUPERSEDED_IMAGE_IDS: &[&str] = &[
     "ac95031feecea70e62bfb998a14acd645f400d5a33d5e1bc6200d2aa63ed96e3", // mixed-order delegator key accepted
     "dcf198fcfedd63182ddd8c392070d73f03c595b56e5d8649242e878fe530813a", // journal without context (RT-06)
@@ -22,6 +24,8 @@ pub const SUPERSEDED_IMAGE_IDS: &[&str] = &[
     "ce0b542313a11e4863661d921157f95e61df18a919c97eea92641bba8699cf1b", // regex crate, fail-open tool_schema (R4)
     "1c1b8bbd531c5f3c93debfa41350b9a5e5c2478959ae2c0994c12de505933b95", // malformed bounds dropped, no wire limits (R5)
     "e922536c10e9a003c1c64914d9f11997dbda9e70b2d1294df358bb845f2991a8", // non-string ref, mixed groups, decoy node (R6)
+    "3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad", // root caveats outside the envelope ignored (0.4.1)
+    "0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7", // PQ session root under its own principals key (R3-01)
 ];
 
 /// Lower-case hex of an image id digest (the form used in `fixtures/image_id.json`).

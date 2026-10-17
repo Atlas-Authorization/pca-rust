@@ -1,9 +1,9 @@
 {
   "status": "experimental, unaudited",
-  "date_utc": "2026-10-11",
-  "statement": "RISC Zero guest pca-zkvm-guest after red-team round 6 (R6-ZK-01..06): three-valued conditions with the full DSL (like, is_a, member_of, all_of/any_of/not), a present non-string ref is unknown, leaf+group mixes are groups, reversibility class from the signed plan node, TS planLeaf inclusion and readEnvelope/validateRiskPolicy, String(signature_digest) tool binding, env/subject outside the wire profile, canonical Ed25519 point encodings, guest_version 7 as the first journal field; journal = fixtures/proof_run/journal.json",
-  "image_id_hex": "3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad",
-  "supersedes_image_id": "e922536c10e9a003c1c64914d9f11997dbda9e70b2d1294df358bb845f2991a8",
+  "date_utc": "2026-10-14",
+  "statement": "RISC Zero guest pca-zkvm-guest for PCA 0.4.2 (guest_version 9): root caveats outside the envelope and max_spend (0.4.1 fix), the Intent Layer M2 intent binding, Intent Layer v2 rules 13-19 (schema, intent_session with revocation and the session root verified only under the verifier pins session.pq_pins (R3-01), V5 layers, accumulators with receipt / key-set freshness and equivocation, the V15 committed-map check with the disclosure as a private input, W-B facts / provenance / classes), and every signature suite but LESS (ML-DSA, SLH-DSA, hybrids, FN-DSA); journal = fixtures/proof_run/journal.json",
+  "image_id_hex": "c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39",
+  "supersedes_image_id": "0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7",
   "guest_elf_note": "ELF not committed (gitignored); Cargo.lock files pin the dependency graph. The image id above is the authoritative identity.",
   "versions": {
     "risc0-zkvm": "3.0.6",
@@ -13,9 +13,9 @@
     "groth16 prover docker image": "risczero/risc0-groth16-prover (tag per risc0-zkvm 3.0.6 default, pulled by the host); docker.io from Ubuntu 24.04"
   },
   "host": {
-    "cloud": "Azure (PCA cloud farm box cloud-box-4, via the pcaq job queue)",
-    "vm": "Standard_D8as_v6-class (Ubuntu 24.04, x86_64)",
-    "cpu": "4 of 8 vCPU (pcaq job with 4 cores, box shared with one other 4-core job)",
+    "cloud": "GCP (temporary VM pca-zkvm-v9, us-east1-b, created for this run and deleted after it)",
+    "vm": "n2 custom 12 vCPU / 64 GB x86_64 Linux (Ubuntu 24.04)",
+    "cpu": "12 of 12 vCPU (exclusive)",
     "gpu": "none (CPU proving)"
   },
   "reproduce": "bash sdks/zkvm-pca/host/box-prove.sh <out-dir> on an x86_64 Linux box (installs rzup rust 1.97.0 + r0vm 3.0.6 and docker.io when missing)",
@@ -23,16 +23,16 @@
     {
       "step": "succinct receipt",
       "where": "CPU",
-      "wall_ms": 5424138,
+      "wall_ms": 2621116,
       "cycles_total": 12582912,
-      "cycles_user": 11146637,
+      "cycles_user": 11143341,
       "segments": 12,
       "artifact": "receipt_succinct.bin"
     },
     {
       "step": "groth16 wrap (stark-to-snark) of that succinct receipt",
       "where": "CPU, docker risc0-groth16-prover (x86_64)",
-      "wall_ms": 139393,
+      "wall_ms": 147814,
       "artifact": "receipt_groth16.bin"
     },
     {
@@ -44,11 +44,11 @@
   ],
   "verified_on": "cargo test -p pca-zkvm-verify (see README)",
   "artifacts_sha256": {
-    "receipt_succinct.bin": "d30321cb003aa5281924330d411e1b51619006a746b357ce0d4d1a8335fe19d4",
-    "receipt_groth16.bin": "00fe3d20fce6fea1de00078d4f37d748d2d3e795a0a8c0ba23f1e69cb8f4062f",
-    "journal.json": "837967871d1b3996ec6dc8a2868eb03c5f0bcc22fa606d01a2823c8a9dd116b8",
-    "image_id.json": "da3d500d7379b9b361b94ccca559ffa7f0a9db4e4a21b7a4744efe094ac62b37",
+    "receipt_succinct.bin": "b2a91f36a357149fb684d3b8c6d483ef297ad6c8394c7e59babb4cb20aa8b5f0",
+    "receipt_groth16.bin": "68eced4c6d96d130eb5b445f2eb4283a043fef43f8bde92681d2ac557e4ac75d",
+    "journal.json": "46dff9700ac41fc8cf50a7978b614f3a9c729c3f54ab912d5f3fd69bb37782b6",
+    "image_id.json": "3e4ccc90561bd4a79713404fac09332b6c9a49e71d08d61b9f530e413cb5ea9a",
     "negative_proving.json": "c768239602454283dd332919dea3ddd24cf746cf36cd82e30b3b5cfdc27b6281",
-    "run_stats.json": "d68ee4585e8eb40c2c23529380054963d7bcdeab16f5ddab63a9303bd216e588"
+    "run_stats.json": "f5c83bb2d0fbbb63c0e2dc67a427ec652b223f5a84b0a72b9f7be9c2835e8e2f"
   }
 }

@@ -17,3 +17,9 @@ ed25519-dalek = "2"
 # Direct dependency only for the torsion-freeness checks (CompressedEdwardsY / is_torsion_free); resolves to the
 # same crate ed25519-dalek uses (and to the risc0-accelerated fork under the guest's [patch.crates-io]).
 curve25519-dalek = "4"
+# PCA 0.4.2: post-quantum suites in the guest (pure Rust, no_std-capable; same FIPS 204 crate as sdks/rust-pca).
+fips204 = { version = "0.4", default-features = false, features = ["ml-dsa-65", "ml-dsa-87"] }
+fips205 = { version = "0.4", default-features = false, features = ["slh_dsa_sha2_128f", "slh_dsa_sha2_256s"] }
+# FN-DSA-512 / -1024 verification (Thomas Pornin's fn-dsa-vrfy, the crate rust-pca and the TS reference's wasm use): pure
+# integer arithmetic, no_std, builds for the rv32im guest.
+fn-dsa-vrfy = "0.4"

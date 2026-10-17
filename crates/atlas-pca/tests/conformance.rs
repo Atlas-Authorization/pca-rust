@@ -93,13 +93,16 @@ fn b64d(s: &str) -> Vec<u8> {
 /// lattice ML-DSA-65 (FIPS-204, via the `fips204` crate), and the hybrid Ed25519 + ML-DSA-65. The remaining
 /// registered suites (ml-dsa-87, slh-dsa-sha2-128f/256s, their hybrids, and the SUF-CMA nested hybrid) are
 /// NOT yet wired in Rust, so vectors that need a real signature verdict under them are skipped explicitly.
-const SUPPORTED_SUITES: &[&str] = &["ed25519", "ml-dsa-65", "hybrid-ed25519-ml-dsa-65"];
+static SUPPORTED_SUITES: std::sync::LazyLock<Vec<&'static str>> = std::sync::LazyLock::new(atlas_pca::supported_suites);
 
 /// Which concrete signature suite a vector exercises that this verifier does NOT implement, if any:
 /// the leaf `alg` for `requires:"pq"`, or any capability-hop `alg` for `requires:"pq-nonleaf"`.
 /// `None` for core vectors and for vectors that stay entirely within [`SUPPORTED_SUITES`].
 fn unsupported_suite(v: &Value) -> Option<String> {
-    let p = v.get("pcactn")?;
+    let p = match v.get("pcactn") {
+        Some(p) => p,
+        None => return unsupported_required_suite(v),
+    };
     let alg = |o: &Value| o.get("alg").and_then(Value::as_str).unwrap_or("ed25519").to_string();
     match v.get("requires").and_then(Value::as_str) {
         Some("pq") => {
@@ -116,6 +119,17 @@ fn unsupported_suite(v: &Value) -> Option<String> {
         // 0.4.1: a vector may name the one suite it needs directly (e.g. a threshold share under `ml-dsa-87`).
         Some(r) => (!SUPPORTED_SUITES.contains(&r)).then(|| r.to_string()),
         None => None,
+    }
+    .or_else(|| unsupported_required_suite(v))
+}
+
+/// Intent Layer v2: a vector whose v2 artifacts are signed under a suite names it in `requires_suite` (a string or a
+/// list); a verifier without the suite fails such a vector closed (`unsupported_suite`), so the runner skips it.
+fn unsupported_required_suite(v: &Value) -> Option<String> {
+    match v.get("requires_suite") {
+        Some(Value::String(s)) => (!SUPPORTED_SUITES.contains(&s.as_str())).then(|| s.clone()),
+        Some(Value::Array(a)) => a.iter().filter_map(Value::as_str).find(|s| !SUPPORTED_SUITES.contains(s)).map(String::from),
+        _ => None,
     }
 }
 
@@ -138,28 +152,27 @@ fn vectors() {
         // (every positive, and every `*-corrupt-sig`/`*-corrupt-pqsig` that expects `wire:true`) is skipped
         // with an explicit count — never silently passed.
         let terminal_wire_false = want.len() == 1 && want.get("wire") == Some(&Value::Bool(false));
+        // Intent Layer v2: a vector whose artifacts need a suite this build lacks must FAIL closed with unsupported_suite
+        if let Some(suite) = unsupported_required_suite(v) {
+            let got = run_vector(v);
+            if got.allow || !got.reason.contains("unsupported_suite") {
+                bad.push(format!("{name}: requires_suite {suite} not implemented, so it must fail with unsupported_suite (allow {}, {})", got.allow, got.reason));
+            }
+            continue;
+        }
         if let Some(suite) = unsupported_suite(v) {
             if !terminal_wire_false {
+                // Suite capability rule: a suite outside the manifest is refused with unsupported_suite (counted).
+                let got = run_vector(v);
+                if got.allow || !got.reason.contains(atlas_pca::UNSUPPORTED_SUITE_REASON) {
+                    bad.push(format!("{name}: suite {suite} is not implemented, so it must fail with unsupported_suite (allow {}, {})", got.allow, got.reason));
+                }
                 skipped += 1;
                 skipped_suites.insert(suite);
                 continue;
             }
         }
-        let now = v["context"]["now"].as_i64().unwrap();
-        let aud = v["context"]["aud"].as_str().unwrap();
-        let allowed: Option<Vec<String>> = v["context"]["allowed_suites"]
-            .as_array()
-            .map(|a| a.iter().map(|x| x.as_str().unwrap().to_string()).collect());
-        let got = if let Some(raw) = v.get("pcactn_json").and_then(Value::as_str) {
-            verify_pcactn_json_policy(raw, &v["grant"], now, aud, allowed.as_deref())
-        } else if has_lone(&v["pcactn"]) {
-            // not representable as a Rust String: a lone surrogate is a wire failure
-            let mut checks = std::collections::BTreeMap::new();
-            checks.insert("wire".to_string(), false);
-            Verdict { allow: false, checks, reason: "wire: lone surrogate".into() }
-        } else {
-            verify_pcactn_core_policy(&v["pcactn"], &v["grant"], now, aud, allowed.as_deref())
-        };
+        let got = run_vector(v);
         let exp = &v["expect"];
         if got.allow != exp["allow"].as_bool().unwrap() {
             bad.push(format!("{name}: allow = {}, want {} ({})", got.allow, exp["allow"], got.reason));
@@ -170,6 +183,11 @@ fn vectors() {
         for (k, w) in want {
             if got.checks.get(k) != w.as_bool().as_ref() {
                 bad.push(format!("{name}: check {k} = {:?}, want {w} ({})", got.checks.get(k), got.reason));
+            }
+        }
+        if let Some(rc) = exp.get("reason_contains").and_then(Value::as_str) {
+            if !got.reason.contains(rc) {
+                bad.push(format!("{name}: reason {:?} does not contain {rc:?}", got.reason));
             }
         }
     }
@@ -184,7 +202,7 @@ fn vectors() {
 
 /// v2.1 agent-leaf share binding (GAP 2). Every `primitives.threshold_share[]` entry must verify over the
 /// `signerSetHash‖t`-bound share message iff `valid`; in particular the PRE-v2.1 bare agent share and a
-/// cross-signer-set replay MUST be rejected. All corpus share vectors are Ed25519, so no PQ suite is needed.
+/// cross-signer-set replay MUST be rejected. An entry whose `requires` suite this build lacks must be refused.
 #[test]
 fn threshold_shares() {
     let doc = load("vectors.json");
@@ -197,6 +215,15 @@ fn threshold_shares() {
         let name = s.get("name").and_then(Value::as_str).unwrap_or_else(|| s["role"].as_str().unwrap());
         let want = s.get("valid").and_then(Value::as_bool).unwrap_or(true);
         let got = verify_threshold_share(s);
+        // Suite capability: an entry whose `requires` suite this build lacks is not compared; it must be refused.
+        if let Some(req) = s.get("requires").and_then(Value::as_str) {
+            if !SUPPORTED_SUITES.contains(&req) {
+                if got {
+                    bad.push(format!("{name}: share under unsupported suite {req} verified (want fail closed)"));
+                }
+                continue;
+            }
+        }
         if got != want {
             bad.push(format!("{name}: share verified = {got}, want valid = {want}"));
         }
@@ -344,4 +371,312 @@ fn b64u_huge_len_fails_closed() {
         assert!(decode_b64u_strict("", Some(n)).is_none());
     }
     assert!(decode_b64u_strict("AAAA", Some(3)).is_some());
+}
+
+/// Run one `vectors[]` entry through the verifier with every context member it carries.
+fn run_vector(v: &Value) -> Verdict {
+        // the Rust API clock is an i64: a vector whose clock is not an integer is reported as a failed verdict, never a panic
+        let now = match v["context"]["now"].as_i64() {
+            Some(n) => n,
+            None => return Verdict { allow: false, checks: std::collections::BTreeMap::new(), reason: "runner: context.now is not an integer".into() },
+        };
+        let aud = v["context"]["aud"].as_str().unwrap();
+        let allowed: Option<Vec<String>> = v["context"]["allowed_suites"]
+            .as_array()
+            .map(|a| a.iter().map(|x| x.as_str().unwrap().to_string()).collect());
+        // Intent Layer M2: `intent-*` vectors may carry context.intent_policy (lenient; misconfig fails closed).
+        // context.intent_policy_json (raw JSON text, keeps 950000.0 / 1e6 / -0.0) wins over context.intent_policy.
+        let intent = match v["context"].get("intent_policy_json").and_then(Value::as_str) {
+            Some(text) => Some(IntentPolicy::from_json_text(text).unwrap_or_else(|e| panic!("{}: {e}", v["name"]))),
+            None => v["context"].get("intent_policy").and_then(IntentPolicy::from_json),
+        };
+        // Intent Layer v2: `schema-*` / `session-*` / `acc-*` / `layers-*` vectors carry the verifier state in context.intent_v2.
+        let intent_v2 = v["context"].get("intent_v2").and_then(IntentV2Context::from_json);
+        let opts = VerifyOptions { allowed: allowed.as_deref(), intent: intent.as_ref(), intent_v2: intent_v2.as_ref() };
+        if let Some(raw) = v.get("pcactn_json").and_then(Value::as_str) {
+            verify_pcactn_json_with(raw, &v["grant"], now, aud, &opts)
+        } else if has_lone(&v["pcactn"]) {
+            // not representable as a Rust String: a lone surrogate is a wire failure
+            let mut checks = std::collections::BTreeMap::new();
+            checks.insert("wire".to_string(), false);
+            Verdict { allow: false, checks, reason: "wire: lone surrogate".into() }
+        } else {
+            verify_pcactn_core_with(&v["pcactn"], &v["grant"], now, aud, &opts)
+        }
+}
+
+/// A primitive's input: `input_json` (raw JSON text, for values plain JSON erases such as `-0`) parsed with the crate's
+/// lenient JSON reader (serde_json keeps `-0` as negative zero), else `input`.
+fn input_of(e: &Value) -> Value {
+    match e.get("input_json").and_then(Value::as_str) {
+        Some(text) => serde_json::from_str(text).unwrap_or_else(|err| panic!("{}: input_json: {err}", e["name"])),
+        None => e["input"].clone(),
+    }
+}
+
+/// The entries of `primitives.<name>`; empty when the corpus does not carry the table yet (the W-A tables are written by
+/// the freeze job's generator run).
+fn prim(doc: &Value, name: &str) -> Vec<Value> {
+    doc["primitives"].get(name).and_then(Value::as_array).cloned().unwrap_or_default()
+}
+
+/// Rule 14 alone (`primitives.intent_schema`): `sig` (verifyActionSchema), `digest` when the signature is valid, and
+/// `conform` (`{ok, code?, path?}`).
+#[test]
+fn intent_schema_primitives() {
+    let doc = load("vectors.json");
+    let mut bad = Vec::new();
+    for e in prim(&doc, "intent_schema") {
+        let name = e["name"].as_str().unwrap_or("?");
+        let input = input_of(&e);
+        let i = &input;
+        let sig = verify_action_schema(&i["schema"], &i["keys"]).is_ok();
+        if Some(sig) != e["expect"]["sig"].as_bool() {
+            bad.push(format!("{name}: sig = {sig}"));
+        }
+        if let Some(d) = e["expect"].get("digest").and_then(Value::as_str) {
+            if action_schema_digest(&i["schema"]).as_deref() != Some(d) {
+                bad.push(format!("{name}: digest differs"));
+            }
+        }
+        let c = conform_action(&i["schema"], i["verb"].as_str().unwrap_or(""), &i["params"]);
+        let want = &e["expect"]["conform"];
+        if Some(c.ok) != want["ok"].as_bool() || c.code.as_deref() != want.get("code").and_then(Value::as_str) || c.path.as_deref() != want.get("path").and_then(Value::as_str) {
+            bad.push(format!("{name}: conform = {c:?}, want {want}"));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// Rule 13 step 7 alone (`primitives.intent_revocation`): `checkSessionRevocation` on `{epoch, proofs}`.
+#[test]
+fn intent_revocation_primitives() {
+    let doc = load("vectors.json");
+    let mut bad = Vec::new();
+    for e in prim(&doc, "intent_revocation") {
+        let name = e["name"].as_str().unwrap_or("?");
+        let input = input_of(&e);
+        let i = &input;
+        let ok = run_intent_revocation(i);
+        if Some(ok) != e["expect"]["ok"].as_bool() {
+            bad.push(format!("{name}: ok = {ok}"));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// `primitives.intent_revocation` (rule 13 step 7 alone): `{epoch, revoked, session, authority, ids, now, max_age_ms,
+/// scope?, last?}` through `check_session_revocation` (no PQ pin; an `ids` list with a non-string is refused).
+fn run_intent_revocation(i: &Value) -> bool {
+    let ids: Option<Vec<String>> = i["ids"].as_array().and_then(|a| a.iter().map(|x| x.as_str().map(String::from)).collect());
+    let (Some(ids), Some(authority)) = (ids, i["authority"].as_str()) else { return false };
+    let ev = revocation_evidence_of(i);
+    check_session_revocation(
+        Some(&ev),
+        i["session"].as_str().unwrap_or(""),
+        authority,
+        &ids,
+        i["now"].as_f64().unwrap_or(f64::NAN),
+        i["max_age_ms"].as_f64().unwrap_or(f64::NAN),
+        i.get("scope").and_then(Value::as_str),
+        None,
+        i.get("last"),
+    )
+    .is_ok()
+}
+
+/// The evidence of an `intent_revocation` input: the input without the parameters `session`, `scope`, `authority`, `ids`,
+/// `now`, `max_age_ms`, `last` (README rule 13: it is closed, so any other member makes it malformed).
+fn revocation_evidence_of(i: &Value) -> Value {
+    let mut ev = i.as_object().cloned().unwrap_or_default();
+    for k in ["session", "scope", "authority", "ids", "now", "max_age_ms", "last"] {
+        ev.remove(k);
+    }
+    Value::Object(ev)
+}
+
+/// Rule 19 (`primitives.intent_map_commit`): the commitment of a full leaf list.
+#[test]
+fn intent_map_commit_primitives() {
+    let doc = load("vectors.json");
+    let mut bad = Vec::new();
+    for e in prim(&doc, "intent_map_commit") {
+        let got = map_commit_of_leaves(&input_of(&e)["leaves"]);
+        if got.as_deref() != e["expect"]["map_commit"].as_str() {
+            bad.push(format!("{}: map_commit {got:?}", e["name"]));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// Rule 19 (`primitives.intent_map`): the Z0 decision; `ok` and, when ok, `cell` and `p_ppm` exactly.
+#[test]
+fn intent_map_primitives() {
+    let doc = load("vectors.json");
+    let mut bad = Vec::new();
+    for e in prim(&doc, "intent_map") {
+        let input = input_of(&e);
+        let i = &input;
+        let eps = i.get("max_residual_risk_ppm").and_then(Value::as_i64);
+        let d = decide_map_disclosure(i.get("map_commit"), &i["action"], i.get("params"), i.get("disclosure"), eps);
+        let want = &e["expect"];
+        if Some(d.ok) != want["ok"].as_bool() {
+            bad.push(format!("{}: ok = {} ({})", e["name"], d.ok, d.reason));
+            continue;
+        }
+        if d.ok && (serde_json::json!(d.cell) != want["cell"] || Some(d.p_ppm) != want["p_ppm"].as_i64()) {
+            bad.push(format!("{}: cell {:?} p_ppm {}", e["name"], d.cell, d.p_ppm));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// The suite rule of the W-B primitives: an entry whose `requires_suite` this build lacks must be refused with a reason
+/// containing `unsupported_suite`; an `expect.reason_contains` must appear in the reason. `Some(Err)` = a mismatch,
+/// `Some(Ok)` = the entry is settled by this rule, `None` = compare it normally.
+fn wb_suite_rule(e: &Value, refused: bool, reason: &str) -> Option<Result<(), String>> {
+    let name = e["name"].as_str().unwrap_or("?");
+    if let Some(suite) = unsupported_required_suite(e) {
+        return Some(if refused && reason.contains("unsupported_suite") {
+            Ok(())
+        } else {
+            Err(format!("{name}: requires_suite {suite} not implemented, so it must be refused with unsupported_suite ({reason})"))
+        });
+    }
+    match e["expect"].get("reason_contains").and_then(Value::as_str) {
+        Some(rc) if !reason.contains(rc) => Some(Err(format!("{name}: reason {reason:?} does not contain {rc:?}"))),
+        _ => None,
+    }
+}
+
+/// Rule 16 (`primitives.intent_world`): `ok` and, when true, `world` and `single_source` exactly.
+#[test]
+fn intent_world_primitives() {
+    let doc = load("vectors.json");
+    let es = prim(&doc, "intent_world");
+    assert!(!es.is_empty());
+    let mut bad = Vec::new();
+    for e in es {
+        let name = e["name"].as_str().unwrap_or("?");
+        let d = decide_intent_world(&input_of(&e));
+        match wb_suite_rule(&e, !d.ok, &d.reason) {
+            Some(Err(m)) => {
+                bad.push(m);
+                continue;
+            }
+            Some(Ok(())) => continue,
+            None => {}
+        }
+        let want = &e["expect"];
+        if Some(d.ok) != want["ok"].as_bool() {
+            bad.push(format!("{name}: ok = {} ({})", d.ok, d.reason));
+            continue;
+        }
+        if d.ok {
+            let ss: Vec<Value> = d.single_source.iter().cloned().map(Value::String).collect();
+            if Value::Object(d.world.clone()) != want["world"] || Value::Array(ss) != want["single_source"] {
+                bad.push(format!("{name}: world {:?} / single_source {:?}", d.world, d.single_source));
+            }
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// Rule 17 (`primitives.intent_provenance`): `outcome` and, unless `deny`, `labels`, `classes` and (question) `friction`.
+#[test]
+fn intent_provenance_primitives() {
+    let doc = load("vectors.json");
+    let es = prim(&doc, "intent_provenance");
+    assert!(!es.is_empty());
+    let mut bad = Vec::new();
+    for e in es {
+        let name = e["name"].as_str().unwrap_or("?");
+        let d = decide_param_provenance(&input_of(&e));
+        match wb_suite_rule(&e, d.outcome == "deny", &d.reason) {
+            Some(Err(m)) => {
+                bad.push(m);
+                continue;
+            }
+            Some(Ok(())) => continue,
+            None => {}
+        }
+        let want = &e["expect"];
+        if Some(d.outcome.as_str()) != want["outcome"].as_str() {
+            bad.push(format!("{name}: outcome = {} ({})", d.outcome, d.reason));
+            continue;
+        }
+        if d.outcome != "deny" {
+            if Value::Object(d.labels.clone()) != want["labels"] || Value::Object(d.classes.clone()) != want["classes"] {
+                bad.push(format!("{name}: labels {:?} / classes {:?}", d.labels, d.classes));
+            }
+            if d.outcome == "question" && d.friction.as_deref() != want["friction"].as_str() {
+                bad.push(format!("{name}: friction {:?}", d.friction));
+            }
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// Rule 18 (`primitives.intent_classifier`): `ok` and, when true, `classes` exactly.
+#[test]
+fn intent_classifier_primitives() {
+    let doc = load("vectors.json");
+    let es = prim(&doc, "intent_classifier");
+    assert!(!es.is_empty());
+    let mut bad = Vec::new();
+    for e in es {
+        let name = e["name"].as_str().unwrap_or("?");
+        let d = decide_classifier_dimensions(&input_of(&e));
+        match wb_suite_rule(&e, !d.ok, &d.reason) {
+            Some(Err(m)) => {
+                bad.push(m);
+                continue;
+            }
+            Some(Ok(())) => continue,
+            None => {}
+        }
+        let want = &e["expect"];
+        if Some(d.ok) != want["ok"].as_bool() {
+            bad.push(format!("{name}: ok = {} ({})", d.ok, d.reason));
+            continue;
+        }
+        if d.ok && Value::Object(d.classes.clone()) != want["classes"] {
+            bad.push(format!("{name}: classes {:?}", d.classes));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// The W-B activity rule (`primitives.intent_wb_active`): which of `facts`, `provenance`, `classes` are reported.
+#[test]
+fn intent_wb_active_primitives() {
+    let doc = load("vectors.json");
+    let mut bad = Vec::new();
+    for e in prim(&doc, "intent_wb_active") {
+        let name = e["name"].as_str().unwrap_or("?");
+        let (f, p, c) = intent_wb_active(&input_of(&e));
+        let want = &e["expect"];
+        if Some(f) != want["facts"].as_bool() || Some(p) != want["provenance"].as_bool() || Some(c) != want["classes"].as_bool() {
+            bad.push(format!("{name}: ({f}, {p}, {c})"));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
+}
+
+/// Read purpose (`primitives.intent_read_purpose`, V14): `{outcome, minimise, uncovered}` exactly.
+#[test]
+fn intent_read_purpose_primitives() {
+    let doc = load("vectors.json");
+    let es = prim(&doc, "intent_read_purpose");
+    assert!(!es.is_empty());
+    let mut bad = Vec::new();
+    for e in es {
+        let name = e["name"].as_str().unwrap_or("?");
+        let d = decide_read_purpose(&input_of(&e));
+        let got = serde_json::json!({ "outcome": d.outcome, "minimise": d.minimise, "uncovered": d.uncovered });
+        if got != e["expect"] {
+            bad.push(format!("{name}: {got}"));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("\n"));
 }

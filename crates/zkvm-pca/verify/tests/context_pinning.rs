@@ -137,7 +137,7 @@ fn the_pre_r5_and_pre_r6_receipts_are_refused_even_by_a_verifier_that_pins_their
     // one of those ids pinned used to accept them; `verify_with_context` now refuses a superseded image id outright, and under
     // the current id they fail as receipts
     let cur = image_id("image_id.json");
-    for g in ["1c1b8bbd", "e922536c"] {
+    for g in ["1c1b8bbd", "e922536c", "3b1eebb5", "0c97a02b"] {
         for f in ["receipt_succinct.bin", "receipt_groth16.bin"] {
             let rel = format!("legacy/{g}/{f}");
             let r: Receipt = bincode::deserialize(&read(&rel)).unwrap();
@@ -170,8 +170,8 @@ fn r6_zk06_the_journal_carries_the_guest_version_and_an_older_one_is_refused() {
 #[test]
 fn a_legacy_receipt_does_not_verify_under_the_current_image_id() {
     let cur = image_id("image_id.json");
-    for rel in ["legacy/receipt_succinct.bin", "legacy/dcf198fc/receipt_succinct.bin", "legacy/receipt_groth16.bin", "legacy/dcf198fc/receipt_groth16.bin", "legacy/6b0ac893/receipt_succinct.bin", "legacy/6b0ac893/receipt_groth16.bin", "legacy/ce0b5423/receipt_succinct.bin", "legacy/ce0b5423/receipt_groth16.bin", "legacy/1c1b8bbd/receipt_succinct.bin", "legacy/1c1b8bbd/receipt_groth16.bin", "legacy/e922536c/receipt_succinct.bin", "legacy/e922536c/receipt_groth16.bin"] {
-        if rel.contains("1c1b8bbd") || rel.contains("e922536c") {
+    for rel in ["legacy/receipt_succinct.bin", "legacy/dcf198fc/receipt_succinct.bin", "legacy/receipt_groth16.bin", "legacy/dcf198fc/receipt_groth16.bin", "legacy/6b0ac893/receipt_succinct.bin", "legacy/6b0ac893/receipt_groth16.bin", "legacy/ce0b5423/receipt_succinct.bin", "legacy/ce0b5423/receipt_groth16.bin", "legacy/1c1b8bbd/receipt_succinct.bin", "legacy/1c1b8bbd/receipt_groth16.bin", "legacy/e922536c/receipt_succinct.bin", "legacy/e922536c/receipt_groth16.bin", "legacy/3b1eebb5/receipt_succinct.bin", "legacy/3b1eebb5/receipt_groth16.bin", "legacy/0c97a02b/receipt_succinct.bin", "legacy/0c97a02b/receipt_groth16.bin"] {
+        if rel.contains("1c1b8bbd") || rel.contains("e922536c") || rel.contains("3b1eebb5") || rel.contains("0c97a02b") {
             let r: Receipt = bincode::deserialize(&read(rel)).unwrap();
             assert!(r.verify(cur).is_err(), "{rel} must not verify under the current id");
             continue;
@@ -231,5 +231,38 @@ fn r4_04_the_journal_commits_the_pcactn_freshness_facts_and_the_verifier_must_pi
             Err(VerifyError::Context(ContextMismatch::PcactnExpired)) => {}
             other => panic!("{f}: an expired PCActn must be refused by the verifier clock, got {other:?}"),
         }
+    }
+}
+
+#[test]
+fn a_guest_version_7_receipt_is_refused() {
+    // 0.4.1: the round-6 guest (3b1eebb5, guest version 7) never evaluated the root grant's own caveats. Its id is on the
+    // deny-list; its journal predates the 0.4.2 context members (`intent`, `intent_v2`), so it either fails to decode as a
+    // current Decision or, if it did, is refused by MIN_GUEST_VERSION.
+    let old = image_id("legacy/3b1eebb5/image_id.json");
+    for f in ["receipt_succinct.bin", "receipt_groth16.bin"] {
+        let rel = format!("legacy/3b1eebb5/{f}");
+        let r: Receipt = bincode::deserialize(&read(&rel)).unwrap();
+        if let Ok(d) = r.journal.decode::<Decision>() {
+            assert!(matches!(check_context(&d, &expected(&input(), 0.0)), Err(ContextMismatch::GuestVersion { .. })), "{rel}");
+        }
+        assert!(matches!(verify_with_context(&r, old, &expected(&input(), 0.0)), Err(VerifyError::Superseded(_))), "{rel}");
+    }
+}
+
+#[test]
+fn a_guest_version_8_receipt_is_refused() {
+    // R3-01: the 0.4.2 guest (0c97a02b, guest version 8) verified a pure-PQ / hybrid session root under the PQ key named in the
+    // root's own principals[] entry, so its receipt does not prove the root was signed by the principal. Its journal has the
+    // current layout and decodes, but MIN_GUEST_VERSION (9) refuses it, and its image id is on the deny-list.
+    let old = image_id("legacy/0c97a02b/image_id.json");
+    for f in ["receipt_succinct.bin", "receipt_groth16.bin"] {
+        let rel = format!("legacy/0c97a02b/{f}");
+        let r: Receipt = bincode::deserialize(&read(&rel)).unwrap();
+        r.verify(old).unwrap_or_else(|e| panic!("{rel} verifies under its own id: {e}"));
+        let d: Decision = r.journal.decode().unwrap_or_else(|e| panic!("{rel}: a version-8 journal decodes: {e}"));
+        assert_eq!(d.guest_version, 8, "{rel}");
+        assert_eq!(check_context(&d, &expected(&input(), 0.0)), Err(ContextMismatch::GuestVersion { proven: 8, minimum: 9 }), "{rel}");
+        assert!(matches!(verify_with_context(&r, old, &expected(&input(), 0.0)), Err(VerifyError::Superseded(_))), "{rel}");
     }
 }

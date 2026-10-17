@@ -1,5 +1,67 @@
 # Changelog
 
+## PCA 0.4.2 R3-01 (BREAKING: new guest image id `c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39`, guest version 9)
+
+The guest follows the session-root PQ pin fix of the TypeScript reference and the nine native verifiers (R3-01). Image id
+`0c97a02b...53a7` to `c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39`; `GUEST_VERSION` = `MIN_GUEST_VERSION` = 9; journal layout unchanged.
+
+- **A PQ / hybrid session root verifies only under the verifier's pin (security).** `verify_session_root_pinned(S, pq_pins)`
+  (`intent_session.rs`, = TS `verifySessionRoot(S, {pqPins})`, = rust-pca): for a non-ed25519 suite the signer's PQ key comes from
+  `intent_v2.session.pq_pins[S.signer]` (an own member, a string), never from the root's own `principals[].pq_pk`. No pin, a pin
+  other than `S.pq_pk`, or a signer principals entry declaring another key fails, with the reference's reasons, before the
+  suite signature. Ed25519 roots ignore the pins. Guest version 8 verified a pure-PQ root under the key its own principals entry
+  named, so it proved roots that anyone naming a principal could sign. Rules 13 and 15 (`boundRoot`) pass the pins.
+- **Context validation.** A present `session.pq_pins` that is not an object of strings is malformed (`the session pq_pins must be
+  an object of strings`, `intent_session` fails), as `sessionCtxError`.
+- **Binding.** The pins are part of `DecideInput.intent_v2`, whose `hashCanonical` the journal commits
+  (`context.intent_v2.ctx_digest`, pinned by `ExpectedContext::intent_v2_ctx_digest`): a receipt binds the pin set it was
+  proved under, like `session.revocation_last` and the other verifier trust inputs.
+- **Tests:** `ts_v2_session.json` / `ts_v2_pipeline.json` regenerated from the reference with the verifier pins per case and the
+  R3-01 set (conformance `session-root-*-{unpinned,pin-other-signer,pin-mismatch}`, `principal-entry-mismatch`,
+  `ed25519-pq-pins-ignored`, `ctx-session-pq-pins-*`, plus malformed pin sets and the attacker-key root);
+  `core/tests/r042_session_pq_pins.rs` pins the version, reasons, rule 15 and the `ctx_digest` binding.
+- **Verifier:** `0c97a02b...53a7` joins `SUPERSEDED_IMAGE_IDS`; version-8 journals decode but are refused by
+  `MIN_GUEST_VERSION` (`a_guest_version_8_receipt_is_refused`). Its receipts moved to `fixtures/legacy/0c97a02b/`.
+- **Proving run** (one run, temporary GCP VM, 12 vCPU n2, CPU proving, RISC Zero 3.0.6, guest built in the docker guest
+  builder): succinct receipt 2,621,116 ms (12 segments, 12,582,912 cycles, 11,143,341 user), Groth16 wrap 147,814 ms (1,817
+  bytes), negative matrix 55 of 55 variants panic with no receipt. The proved journal differs from version 8's only in
+  `guest_version` (the committed sample input has no session root).
+
+## PCA 0.4.2 (BREAKING: new guest image id `0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7`, guest version 8)
+
+The guest now enforces the PCA 0.4.1 security fix (root caveats outside the envelope are policy; `max_spend`), the
+Intent Layer M2 `intent` binding and Intent Layer v2 (rules 13-19). Image id
+`3b1eebb5...fdad` to `0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7`; `GUEST_VERSION` = `MIN_GUEST_VERSION` = 8.
+
+- **Root caveats are enforced (security).** `decide` evaluates `root_caveats(grant)` (every caveat on the root grant except its
+  first `envelope` caveat, = TS `rootCaveats`) with the same caveat context and ANDs it into `allow`, exactly as `policy-vm.ts`
+  `decide()`. Unknown types, a second `envelope` caveat and non-object entries are unsatisfied (fail closed); a non-array list
+  refuses. The round-6 guest signed off on actions that a root `expires`, `delegation_depth`, `max_spend`, ... caveat forbade.
+- **`max_spend {usd}`** (`caveats.rs`): own `action.params.amount` finite and `0 <= amount <= usd`, own `currency` when present
+  exactly `"usd"`/`"USD"`; evaluated before the finite-`now` gate (agent-native). New `action_spend_usd`, `policy_caveats`.
+- **Intent binding (Intent Layer M2).** A present signed `pcactn.intent` is wire-checked and must open the root grant's goal
+  commitment (`intent::bind_intent`, = `intent-binding.ts` rule 2), else deny; the claims go to the journal as
+  `context.intent`, and `check_context` applies the relying party's `ExpectedContext::intent_policy` (rules 0, 1, 3, 4).
+  `r042_intent.rs` matches the TS reference on 35 wire slots, 3 goal commits and 360 binding x policy combinations.
+- **Intent Layer v2 (rules 13-19).** The v2 pipeline (`intent_v2.rs` `decide_intent_v2`, = TS `decideIntentV2`): schema,
+  intent_session (incl. revocation epochs), layers (closed and typed), accumulators, map, and the W-B unit (facts,
+  provenance, classes), with the strict rules (absent vs null, safe-integer numbers and clock, closed typed policies,
+  malformed top-level context fails every reportable check). Journal `context.intent_v2` = {ctx_digest, checks, env};
+  `ExpectedContext::intent_v2_ctx_digest` pins the verifier state. `decide_read_purpose` ported.
+- **Committed map (V15, rule 19, Z1).** `intent_map.rs`: per-leaf salted Merkle map commitment, cell of omega, the `map`
+  check over the agent's disclosure as a private input (`ctx_digest` excludes `map`), goal `pca-intent:v2c:`.
+- **Signature suites.** `pq_suites.rs`: ML-DSA-65/87, SLH-DSA-SHA2-128f/256s, hybrids, nested hybrid, FN-DSA-512/1024
+  (`fn-dsa-vrfy` 0.4); PQ keys only from trusted-side pins; LESS / unknown algs fail with `unsupported_suite: <alg>`.
+  Capability chains bind `alg` / `pq_pk` per hop (`chain.rs`, 153 corpus vectors).
+- **Tests:** TS-differential fixtures for every v2 rule (`ts_v2_{schema,session,acc,wb,layers,pipeline}.json`) and the
+  shared corpus families (`intent_world`, `intent_provenance`, `intent_classifier`, `intent_wb_active`,
+  `intent_read_purpose`, `intent_map_commit`, `intent_map`, `intent_schema`, `intent_revocation`).
+- **Verifier:** `3b1eebb5...fdad` joins `SUPERSEDED_IMAGE_IDS`; version-7 journals are refused by `MIN_GUEST_VERSION`. Its
+  receipts moved to `fixtures/legacy/3b1eebb5/`.
+- **Tests:** `core/tests/r042_root_caveats.rs` (every `primitives.caveat_eval` entry equals the reference; decide denies
+  unsatisfied / unknown / second-envelope / unreadable `max_spend` root caveats and still allows satisfied ones; fail-first
+  checked by removing the `root_ok` conjunct); verify tests cover the seventh legacy generation.
+
 ## Round 6, PCA 0.4.0 release (2026-10-11; BREAKING: new guest image id `3b1eebb5...fdad`, journal gains `guest_version`)
 
 Red-team round 6 (`docs/pca/security/red-team report-round6.md`, R6-ZK-01 to R6-ZK-06). Image id `e922536c...91a8` to

@@ -1,0 +1,77 @@
+name: CI
+
+# The Cargo workspace (atlas-pca verifier, stark-pca, folding-pca): build + every test, incl. the shared conformance
+# corpus (crates/atlas-pca/tests/conformance.rs over conformance/vectors.json). zkvm-pca is its own workspace: its
+# core + receipt-verifier crates are tested here against committed receipts/fixtures (proving is not run in CI).
+on:
+  push:
+    branches: [main, 'ci/**']
+    tags: ['*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: '0'
+
+jobs:
+  workspace:
+    name: workspace (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Full shared corpus from the flagship (adversarial set; tables the zkvm tests include by source path)
+        shell: bash
+        run: .github/scripts/fetch-flagship-corpus.sh --layout
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --workspace --all-targets --release --features atlas-pca/less
+      - name: Tests (all crates) + conformance corpus
+        run: cargo test --workspace --release --no-fail-fast --features atlas-pca/less
+
+  verifier:
+    name: atlas-pca (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - name: Full shared corpus from the flagship (adversarial set; tables the zkvm tests include by source path)
+        shell: bash
+        run: .github/scripts/fetch-flagship-corpus.sh --layout
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Tests + conformance corpus (LESS via the crate's copy of the reference C, not on Windows)
+        shell: bash
+        run: cargo test -p atlas-pca --no-fail-fast $([ "$RUNNER_OS" = Windows ] || echo --features less)
+
+  zkvm-verify:
+    name: zkvm-pca core + receipt verifier
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Full shared corpus from the flagship (adversarial set; tables the zkvm tests include by source path)
+        shell: bash
+        run: .github/scripts/fetch-flagship-corpus.sh --layout
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/zkvm-pca
+      - name: Tests (core + verify; no proving, the guest is not built)
+        working-directory: crates/zkvm-pca
+        env:
+          RISC0_SKIP_BUILD: '1'
+        run: cargo test --locked --release --no-fail-fast -p pca-zkvm-core -p pca-zkvm-verify

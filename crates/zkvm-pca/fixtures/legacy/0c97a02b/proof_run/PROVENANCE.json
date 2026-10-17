@@ -1,0 +1,54 @@
+{
+  "status": "experimental, unaudited",
+  "date_utc": "2026-10-13",
+  "statement": "RISC Zero guest pca-zkvm-guest for PCA 0.4.2 (guest_version 8): root caveats outside the envelope and max_spend (0.4.1 fix), the Intent Layer M2 intent binding, Intent Layer v2 rules 13-19 (schema, intent_session with revocation, V5 layers, accumulators with receipt / key-set freshness and equivocation, the V15 committed-map check with the disclosure as a private input, W-B facts / provenance / classes), and every signature suite but LESS (ML-DSA, SLH-DSA, hybrids, FN-DSA); journal = fixtures/proof_run/journal.json",
+  "image_id_hex": "0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7",
+  "supersedes_image_id": "3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad",
+  "guest_elf_note": "ELF not committed (gitignored); Cargo.lock files pin the dependency graph. The image id above is the authoritative identity.",
+  "versions": {
+    "risc0-zkvm": "3.0.6",
+    "r0vm": "3.0.6",
+    "guest build": "risczero/risc0-guest-builder:r0.1.97.0 (docker, context sdks/zkvm-pca, path-independent; methods/build.rs)",
+    "host rustc": "stable (rust-toolchain.toml) as installed by rustup on the box",
+    "groth16 prover docker image": "risczero/risc0-groth16-prover (tag per risc0-zkvm 3.0.6 default, pulled by the host); docker.io from Ubuntu 24.04"
+  },
+  "host": {
+    "cloud": "GCP (PCA cloud farm box gcp, via the pcaq job queue, exclusive)",
+    "vm": "12 vCPU / 62 GB x86_64 Linux",
+    "cpu": "12 of 12 vCPU (exclusive job)",
+    "gpu": "none (CPU proving)"
+  },
+  "reproduce": "bash sdks/zkvm-pca/host/box-prove.sh <out-dir> on an x86_64 Linux box (installs rzup rust 1.97.0 + r0vm 3.0.6 and docker.io when missing)",
+  "pipeline": [
+    {
+      "step": "succinct receipt",
+      "where": "CPU",
+      "wall_ms": 2645890,
+      "cycles_total": 12582912,
+      "cycles_user": 11143341,
+      "segments": 12,
+      "artifact": "receipt_succinct.bin"
+    },
+    {
+      "step": "groth16 wrap (stark-to-snark) of that succinct receipt",
+      "where": "CPU, docker risc0-groth16-prover (x86_64)",
+      "wall_ms": 148420,
+      "artifact": "receipt_groth16.bin"
+    },
+    {
+      "step": "negative proving matrix",
+      "where": "same run (execute + full proving attempt per variant)",
+      "artifact": "negative_proving.json",
+      "result": "55 of 55 variants: guest panicked, no receipt"
+    }
+  ],
+  "verified_on": "cargo test -p pca-zkvm-verify (see README)",
+  "artifacts_sha256": {
+    "receipt_succinct.bin": "b9c802144b67b02b1bb7fa8b97e636782046d77db95a2f0a60eafae0794aa9d0",
+    "receipt_groth16.bin": "7d243249a75bf6831e1fb80db21366ddb497882a8d600a06f5872673fb5fd19b",
+    "journal.json": "eb12c99964e9af420c3ab4cf7663c43f2d896e7609103b952eae376e37799ef6",
+    "image_id.json": "7c3c14969e106f9bc0d3a640fb1de49fb33abce5f869aef1f247198692b14de4",
+    "negative_proving.json": "c768239602454283dd332919dea3ddd24cf746cf36cd82e30b3b5cfdc27b6281",
+    "run_stats.json": "e4868c0068eac571106696404e3ae009c4083e1093bdca901b3b43f008b98653"
+  }
+}

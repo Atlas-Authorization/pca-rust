@@ -11,6 +11,7 @@ documentation = "https://docs.rs/atlas-pca"
 keywords = ["authorization","agents","verifier","ed25519","pca"]
 categories = ["cryptography","authentication"]
 exclude = ["tests/","/.gitignore"]
+build = "build.rs"
 
 [dependencies]
 ed25519-dalek = "2"
@@ -21,6 +22,11 @@ base64 = "0.22"
 # B4 post-quantum: ML-DSA-65 (FIPS-204) verification, cross-impl compatible with the
 # @noble/post-quantum (vectors) and cloudflare/circl (go-pca) signatures (empty context).
 fips204 = "0.4"
+# Suite capability (packages/pca/conformance/SUITES.md): SLH-DSA-SHA2-128f / -256s (FIPS 205, pure, empty context; same
+# IntegrityChain family as fips204 and the zkVM guest) and FN-DSA-512 / -1024 verification (Thomas Pornin's fn-dsa-vrfy,
+# the crate @atlasauth/pca-fndsa-wasm wraps for the TS reference: DOMAIN_NONE + HASH_ID_RAW).
+fips205 = { version = "0.4", default-features = false, features = ["slh_dsa_sha2_128f", "slh_dsa_sha2_256s"] }
+fn-dsa-vrfy = "0.4"
 
 # Optional tower/axum middleware (feature `axum`). Kept out of the default build so the base
 # verifier stays dependency-light.
@@ -28,6 +34,14 @@ axum = { version = "0.7", optional = true }
 tower-layer = { version = "0.3", optional = true }
 tower-service = { version = "0.3", optional = true }
 
+# Feature `less`: the LESS suites through the patched reference C in less-c/, compiled by build.rs.
+[build-dependencies]
+cc = { version = "1", optional = true }
+
 [features]
+# LESS suites (`less-cat1`, `hybrid-ed25519-less-cat1`): links the patched LESS reference C (a NIST round-2 candidate, not a
+# standard) shipped in this crate's less-c/ (or the directory in ATLAS_PCA_LESS_SRC). Off by default: without it both suites are
+# refused with `unsupported_suite`.
+less = ["dep:cc"]
 # Ergonomic tower `Layer`/`Service` + axum `from_fn` guard in `middleware`.
 axum = ["dep:axum", "dep:tower-layer", "dep:tower-service"]
