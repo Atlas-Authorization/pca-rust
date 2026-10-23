@@ -1,0 +1,2654 @@
+{
+ "about": "TS intent-binding.ts verdicts (gen_ts_intent_cases.ts)",
+ "grants": {
+  "bound": {
+   "caveats": [
+    {
+     "type": "envelope",
+     "goal_commit": "ilsVaW0lPW1K9YtPx8kH3h6zIOQpzIVq8FX7-cH8meo",
+     "predicates": [],
+     "caveats": []
+    }
+   ]
+  },
+  "bound_after_other_caveats": {
+   "caveats": [
+    {
+     "type": "expires",
+     "at": 1
+    },
+    "not-an-object",
+    {
+     "type": "envelope",
+     "goal_commit": "ilsVaW0lPW1K9YtPx8kH3h6zIOQpzIVq8FX7-cH8meo",
+     "predicates": [],
+     "caveats": []
+    }
+   ]
+  },
+  "first_envelope_wins_unbound": {
+   "caveats": [
+    {
+     "type": "envelope",
+     "goal_commit": "5qHmsoYCK779galougkgwxiHJWB4k4ho42-cUJqqc5I",
+     "predicates": [],
+     "caveats": []
+    },
+    {
+     "type": "envelope",
+     "goal_commit": "ilsVaW0lPW1K9YtPx8kH3h6zIOQpzIVq8FX7-cH8meo",
+     "predicates": [],
+     "caveats": []
+    }
+   ]
+  },
+  "first_envelope_wins_bound": {
+   "caveats": [
+    {
+     "type": "envelope",
+     "goal_commit": "ilsVaW0lPW1K9YtPx8kH3h6zIOQpzIVq8FX7-cH8meo",
+     "predicates": [],
+     "caveats": []
+    },
+    {
+     "type": "envelope",
+     "goal_commit": "5qHmsoYCK779galougkgwxiHJWB4k4ho42-cUJqqc5I",
+     "predicates": [],
+     "caveats": []
+    }
+   ]
+  },
+  "unbound": {
+   "caveats": [
+    {
+     "type": "envelope",
+     "goal_commit": "5qHmsoYCK779galougkgwxiHJWB4k4ho42-cUJqqc5I",
+     "predicates": [],
+     "caveats": []
+    }
+   ]
+  },
+  "goal_commit_not_string": {
+   "caveats": [
+    {
+     "type": "envelope",
+     "goal_commit": 7,
+     "predicates": [],
+     "caveats": []
+    }
+   ]
+  },
+  "no_envelope": {
+   "caveats": [
+    {
+     "type": "expires",
+     "at": 1
+    }
+   ]
+  },
+  "caveats_not_array": {
+   "caveats": {}
+  }
+ },
+ "slots": {
+  "valid": {
+   "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+   "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+   "goal_salt": "salt-01",
+   "fidelity_ppm": 900000,
+   "residual_risk_ppm": 2500
+  },
+  "wrong_salt": {
+   "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+   "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+   "goal_salt": "salt-02",
+   "fidelity_ppm": 900000,
+   "residual_risk_ppm": 2500
+  },
+  "wrong_ref": {
+   "ref": "6-hpf9UrkInFWsSmw1qVT9ynS1QR5aiL4tOrKcFtHkY",
+   "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+   "goal_salt": "salt-01",
+   "fidelity_ppm": 900000,
+   "residual_risk_ppm": 2500
+  },
+  "low_fidelity": {
+   "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+   "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+   "goal_salt": "salt-01",
+   "fidelity_ppm": 100,
+   "residual_risk_ppm": 2500
+  }
+ },
+ "policies": {
+  "inactive": {},
+  "require": {
+   "require": true
+  },
+  "min_fid_900000": {
+   "min_fidelity_ppm": 900000
+  },
+  "min_fid_900001": {
+   "min_fidelity_ppm": 900001
+  },
+  "max_risk_2500": {
+   "max_residual_risk_ppm": 2500
+  },
+  "max_risk_2499": {
+   "max_residual_risk_ppm": 2499
+  },
+  "both_ok": {
+   "min_fidelity_ppm": 0,
+   "max_residual_risk_ppm": 9007199254740991
+  },
+  "misconfigured": {
+   "min_fidelity_ppm": 9007199254740992
+  }
+ },
+ "wire": [
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": true
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 0,
+    "residual_risk_ppm": 0
+   },
+   "ok": true
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 1000000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": true
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 5000000
+   },
+   "ok": true
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 9007199254740991
+   },
+   "ok": true
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": true
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": true
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": 5,
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 1000001,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": -1,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 1.5,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": "1",
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": null,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": -1
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 9007199254740992
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 0.5
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "LXEWQrcmsEQBYnyp-6wy9chTD7GQPMTbAiWHF5IaSI",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVd",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": 7,
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1p",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc=",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500,
+    "extra": 1
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "fidelity_ppm": 900000,
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "residual_risk_ppm": 2500
+   },
+   "ok": false
+  },
+  {
+   "slot": {
+    "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+    "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+    "goal_salt": "salt-01",
+    "fidelity_ppm": 900000
+   },
+   "ok": false
+  },
+  {
+   "slot": [],
+   "ok": false
+  },
+  {
+   "slot": "x",
+   "ok": false
+  },
+  {
+   "slot": null,
+   "ok": false
+  },
+  {
+   "slot": 7,
+   "ok": false
+  }
+ ],
+ "commit": [
+  {
+   "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+   "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+   "goal_salt": "salt-01",
+   "commit": "ilsVaW0lPW1K9YtPx8kH3h6zIOQpzIVq8FX7-cH8meo"
+  },
+  {
+   "ref": "6-hpf9UrkInFWsSmw1qVT9ynS1QR5aiL4tOrKcFtHkY",
+   "map_digest": "nRo2MYydyzDNkrTivQ0-5cAIGypUM1LtrXBz7ZIbL1o",
+   "goal_salt": "ünïcødé ✓ salt",
+   "commit": "y5coQALWP-Ao6Y_uUYViF_9qT6yvK-yJKdtXPBA32rg"
+  },
+  {
+   "ref": "em6n_BzWhMJSFEJ5WrqtKqXuLoRMDgKeJwnAkSCxgVc",
+   "map_digest": "6-hpf9UrkInFWsSmw1qVT9ynS1QR5aiL4tOrKcFtHkY",
+   "goal_salt": "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+   "commit": "rFoH-SdoDCDkj79AYPN1qSeuH1XtLiK763vh2sPV3To"
+  }
+ ],
+ "binding": [
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "none",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "require",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "pass"
+  },
+  {
+   "grant": "bound",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "none",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "require",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "pass"
+  },
+  {
+   "grant": "bound_after_other_caveats",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_unbound",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "none",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "require",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "pass"
+  },
+  {
+   "grant": "first_envelope_wins_bound",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "unbound",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "goal_commit_not_string",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "no_envelope",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "none",
+   "status": "absent"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "inactive",
+   "status": "absent"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "absent",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "valid",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_salt",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "wrong_ref",
+   "policy": "misconfigured",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "none",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "inactive",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "require",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900000",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "min_fid_900001",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2500",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "max_risk_2499",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "both_ok",
+   "status": "fail"
+  },
+  {
+   "grant": "caveats_not_array",
+   "slot": "low_fidelity",
+   "policy": "misconfigured",
+   "status": "fail"
+  }
+ ]
+}

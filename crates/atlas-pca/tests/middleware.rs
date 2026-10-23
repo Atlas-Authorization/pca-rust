@@ -329,3 +329,17 @@ fn body_envelope_depth_budget_matches_header_mode() {
     let huge = format!("{{\"pcactn\":{}{}}}", "[".repeat(100_000), "]".repeat(100_000));
     assert!(!body_result(&huge).is_allow());
 }
+
+/// 0.4.2 audit: request-derived text (here an attacker-chosen `grant_ref`, which the unknown-grant description echoes)
+/// never reaches the WWW-Authenticate header; only the static code does. The text stays in the JSON body.
+#[test]
+fn challenge_header_carries_no_request_derived_text() {
+    let (pcactn, _grant, now, aud) = vector("valid-in-plan-action");
+    let mut p = pcactn.clone();
+    p["grant_ref"] = Value::String("x\"\r\nSet-Cookie: pwned=1".into());
+    let cfg = GuardConfig::new(aud, |_: &str| None).with_clock(move || now);
+    let result = verify_request(Some(&header_for(&p)), None, &cfg);
+    assert_eq!(result.status, 401);
+    assert_eq!(result.www_authenticate().unwrap(), "PCA realm=\"pca\", error=\"unknown_grant\"");
+    assert!(result.json_body()["error_description"].as_str().unwrap().contains("pwned"));
+}

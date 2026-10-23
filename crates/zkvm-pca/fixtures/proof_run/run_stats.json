@@ -1,13 +1,13 @@
 {
   "cuda_feature": false,
-  "groth16_bytes": 1801,
+  "groth16_bytes": 1817,
   "groth16_seal_bytes": 256,
-  "groth16_wrap_ms": 139393,
-  "image_id_hex": "3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad",
+  "groth16_wrap_ms": 106350,
+  "image_id_hex": "432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060",
   "risc0_zkvm_version": "3.0.6",
   "segments": 12,
-  "succinct_bytes": 224530,
-  "succinct_prove_ms": 5424138,
+  "succinct_bytes": 224546,
+  "succinct_prove_ms": 3426705,
   "total_cycles": 12582912,
-  "user_cycles": 11146637
+  "user_cycles": 11143341
 }

@@ -1,6 +1,6 @@
 //! Faithful port of the caveat evaluators: the built-in envelope caveats
 //! (`packages/pca/src/predicates.ts` `envelopeCaveatEvaluator`) plus the agent-native superset
-//! (`agent-native.ts` `agentNativeCaveatEvaluator`): `predicates` and `tool_schema`.
+//! (`agent-native.ts` `agentNativeCaveatEvaluator`): `predicates`, `tool_schema` and (0.4.1) `max_spend`.
 //!
 //! All caveats are CONJUNCTIVE and fail CLOSED (unknown/malformed type => unsatisfied). Numeric
 //! threshold comparisons use `f64` COMPARISONS only (never float arithmetic in the proven gate), which
@@ -48,7 +48,7 @@ pub fn evaluate_caveat(cv: &Value, ctx: &CaveatCtx) -> bool {
         // envelopeCaveatEvaluator requires a finite now for the time-based ones; the agent-native
         // `predicates`/`tool_schema` do not read `now`, so handle those before the now gate.
         match ty {
-            "predicates" | "tool_schema" => {}
+            "predicates" | "tool_schema" | "max_spend" => {}
             _ => return false,
         }
     }
@@ -91,6 +91,8 @@ pub fn evaluate_caveat(cv: &Value, ctx: &CaveatCtx) -> bool {
             _ => false,
         },
         "budget_alloc" => matches!(fin(obj.get("limit")), Some(l) if l >= 0.0),
+        // Intent Layer v2 (rule 13): the session grant caveat imposes no per-action constraint; satisfied iff well formed.
+        "intent_session" => crate::intent_session::intent_session_caveat_error(Some(cv)).is_none(),
         "predicates" => {
             let allow = match obj.get("allow").and_then(|a| a.as_array()) {
                 Some(a) => a,
@@ -100,7 +102,25 @@ pub fn evaluate_caveat(cv: &Value, ctx: &CaveatCtx) -> bool {
             allow.iter().any(|p| predicate_matches(p, &c))
         }
         "tool_schema" => evaluate_tool_schema(obj, ctx).is_ok(),
+        // 0.4.1 agent-native.ts `maxSpendSatisfied`: a finite limit and a readable spend <= limit; a negative limit admits
+        // nothing (every readable spend is >= 0). Fail closed on a malformed limit or an unreadable spend.
+        "max_spend" => matches!((fin(obj.get("usd")), action_spend_usd(ctx.action_root)), (Some(lim), Some(spend)) if spend <= lim),
         _ => false,
+    }
+}
+
+/// agent-native.ts `actionSpendUsd`: the action's spend in USD = own `action.params.amount` (a finite number >= 0) of the
+/// action root, with an own `currency`, when present, of exactly "usd" or "USD". `None` = no readable spend.
+pub fn action_spend_usd(action_root: &Value) -> Option<f64> {
+    let params = action_root.get("action")?.as_object()?.get("params")?.as_object()?;
+    let amount = fin(params.get("amount"))?;
+    if amount < 0.0 {
+        return None;
+    }
+    match params.get("currency") {
+        None => Some(amount),
+        Some(Value::String(c)) if c == "usd" || c == "USD" => Some(amount),
+        Some(_) => None,
     }
 }
 

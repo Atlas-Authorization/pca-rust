@@ -18,6 +18,40 @@ pub use serde_json;
 #[cfg(feature = "axum")]
 pub mod middleware;
 
+// Intent Layer v2 (rules 13-18 and the V5 `layers` check).
+mod action_schema;
+mod intent_acc;
+mod intent_map;
+mod intent_strict;
+mod intent_revocation;
+mod intent_session;
+mod intent_suite;
+mod intent_v2;
+mod intent_wb;
+mod predicates;
+mod safe_regex;
+#[cfg(test)]
+mod k042_support;
+
+pub use action_schema::{action_schema_digest, action_schema_shape_error, conform_action, verify_action_schema, ConformResult};
+pub use intent_acc::{
+    acc_receipt_digest, pcactn_reservation_digest, sequencer_key_set_digest, DEFAULT_MAX_KEYSET_AGE_MS, DEFAULT_MAX_RECEIPT_AGE_MS, MAX_RECEIPT_LIFETIME_MS, RECEIPT_SKEW_MS,
+};
+pub use intent_map::{decide_map_disclosure, map_commit_of_leaves, MapDecision};
+pub use intent_revocation::{
+    check_session_revocation, delta_revocation_id, map_revocation_id, profile_revocation_id, revocation_epoch_shape_error, revset_root,
+    session_revocation_id, session_revocation_scope,
+};
+pub use intent_session::{
+    intent_session_caveat_error, session_root_digest, session_root_shape_error, validate_intent_session_wire, verify_session_root, verify_session_root_pinned, MAP_FORM_COMMIT,
+    MAX_SESSION_SEQ,
+};
+pub use intent_v2::{decide_intent_v2, intent_v2_active, intent_v2_context_error, IntentV2Check, IntentV2Context, IntentV2Decision};
+pub use intent_wb::{
+    decide_classifier_dimensions, decide_intent_wb, decide_intent_world, decide_param_provenance, decide_read_purpose, intent_wb_active, ClassifierDecision, IntentWbResult,
+    IntentWorldDecision, ProvenanceDecision, WbCheck,
+};
+
 const SIG_DOMAIN: &[u8] = b"atlas-pca/actn/v2\x00";
 const CAP_DOMAIN: &[u8] = b"atlas-pca/cap/v1\x00";
 const SHARE_DOMAIN_PREFIX: &[u8] = b"atlas-pca/share/";
@@ -118,13 +152,13 @@ fn wire_fail(why: impl Into<String>) -> Verdict {
 fn number_error(n: &Number) -> Option<String> {
     if let Some(i) = n.as_i64() {
         return if i.unsigned_abs() > MAX_SAFE as u64 {
-            Some("integer outside the safe range".into())
+            Some("integer outside the safe range (|n| > 2^53-1)".into())
         } else {
             None
         };
     }
     if let Some(u) = n.as_u64() {
-        return if u > MAX_SAFE as u64 { Some("integer outside the safe range".into()) } else { None };
+        return if u > MAX_SAFE as u64 { Some("integer outside the safe range (|n| > 2^53-1)".into()) } else { None };
     }
     let f = match n.as_f64() {
         Some(f) if f.is_finite() => f,
@@ -134,16 +168,16 @@ fn number_error(n: &Number) -> Option<String> {
         return Some("negative zero".into());
     }
     if f.fract() == 0.0 {
-        return if f.abs() > MAX_SAFE as f64 { Some("integer outside the safe range".into()) } else { None };
+        return if f.abs() > MAX_SAFE as f64 { Some("integer outside the safe range (|n| > 2^53-1)".into()) } else { None };
     }
     if f.abs() < 1e-6 {
-        return Some("non-integer magnitude below 1e-6".into());
+        return Some("non-integer magnitude below 1e-6 (needs an exponent form; not representable in the canonical decimal form)".into());
     }
     // Rust's Display for f64 is the shortest round-trip decimal and never uses an exponent.
     let s = format!("{}", f.abs());
     let digits: String = s.chars().filter(|c| *c != '.').collect();
     if digits.trim_start_matches('0').len() > MAX_DECIMAL_DIGITS {
-        return Some("more than 15 significant digits".into());
+        return Some("non-integer number has more than 15 significant digits".into());
     }
     None
 }
@@ -775,55 +809,169 @@ fn verify_ed25519_strict(pk: &[u8; 32], msg: &[u8], sg: &[u8; 64]) -> bool {
     vk.verify_strict(msg, &Signature::from_bytes(sg)).is_ok()
 }
 
-// ---- B4 post-quantum crypto-agility (ML-DSA-65 / FIPS-204) -----------------------------
+// ---- B4 post-quantum crypto-agility (FIPS 204 / 205 / 206) ----------------------------
 //
 // An ADDITIVE, backward-compatible algorithm-agility slot for the PCActn leaf signature, mirroring
-// the `@atlasauth/pca` and Go implementations. Absent `alg` (or `alg == "ed25519"`) is BYTE-IDENTICAL to
-// the pre-B4 wire. Suites:
-//   - "ed25519"                     classical 64-byte Ed25519 `sig` (unchanged).
-//   - "ml-dsa-65"                   pure PQ: `sig` is an ML-DSA-65 (FIPS-204) signature verified under `pq_pk`.
-//   - "hybrid-ed25519-ml-dsa-65"    BOTH Ed25519 `sig` (under the leaf holder) AND ML-DSA-65 `pq_sig`
-//                                   (under `pq_pk`) over the same canonical message; both must verify.
+// `@atlasauth/pca` (packages/pca/src/pq.ts). Absent `alg` (or `alg == "ed25519"`) is BYTE-IDENTICAL to the pre-B4 wire.
+// Suite capability (packages/pca/conformance/SUITES.md): this crate implements every registered suite Rust has a vetted,
+// pure-Rust primitive for (pure mode, EMPTY context, = @noble/post-quantum):
+//   - ML-DSA-65 / ML-DSA-87 (FIPS 204, `fips204`), SLH-DSA-SHA2-128f / -256s (FIPS 205, `fips205`): pure suites
+//     (`sig` = the PQ signature under the resolved `pq_pk`) and `hybrid-ed25519-*` (Ed25519 `sig` under the holder,
+//     checked FIRST, AND the PQ `pq_sig`, same message); `hybrid-nested-ed25519-ml-dsa-65` (SUF-CMA: the PQ half signs
+//     msg || the 64 Ed25519 signature bytes).
+//   - FN-DSA-512 / -1024 (FIPS 206, `fn-dsa-vrfy`, the crate the TS reference wraps; DOMAIN_NONE + HASH_ID_RAW): pure.
+//   - LESS (`less-cat1`, `hybrid-ed25519-less-cat1`; a NIST round-2 candidate, not a standard) only with the cargo feature
+//     `less`: the patched reference C (sdks/pca-less-c, less-252-45) through FFI; the signature is variable-length
+//     (1,153..1,329 bytes in steps of 16). Without the feature both fail closed with `unsupported_suite: <alg>`.
+// An unregistered alg keeps `unknown signature alg`.
 // `alg` and `pq_pk` are SIGNED; `sig` and `pq_sig` are the signatures, stripped from the signed body.
-// The ML-DSA primitive is `fips204` (FIPS-204, category 3), empty context — matching @noble/post-quantum
-// (vectors) and cloudflare/circl (go-pca): public key 1952 bytes, signature 3309 bytes.
 
 /// ML-DSA-65 (FIPS-204, category 3) encoded sizes, in bytes.
 pub const ML_DSA_65_PUBLIC_KEY_BYTES: usize = 1952;
 pub const ML_DSA_65_SIGNATURE_BYTES: usize = 3309;
 
+/// The reason token of a REGISTERED suite this verifier does not implement (the full reason is `unsupported_suite: <alg>`).
+pub const UNSUPPORTED_SUITE_REASON: &str = "unsupported_suite";
+
+/// The closed TS suite registry (`SIG_SUITES` in packages/pca/src/pq.ts), in registry order.
+pub const REGISTERED_SUITES: &[&str] = &[
+    "ed25519",
+    "ml-dsa-65",
+    "hybrid-ed25519-ml-dsa-65",
+    "hybrid-nested-ed25519-ml-dsa-65",
+    "slh-dsa-sha2-128f",
+    "hybrid-ed25519-slh-dsa-sha2-128f",
+    "ml-dsa-87",
+    "hybrid-ed25519-ml-dsa-87",
+    "slh-dsa-sha2-256s",
+    "hybrid-ed25519-slh-dsa-sha2-256s",
+    "fn-dsa-512",
+    "fn-dsa-1024",
+    "less-cat1",
+    "hybrid-ed25519-less-cat1",
+];
+
+/// The capability manifest: the registered suites this crate implements, in registry order.
+pub fn supported_suites() -> Vec<&'static str> {
+    REGISTERED_SUITES.iter().copied().filter(|a| sig_suite(a).is_some()).collect()
+}
+
+/// `unsupported_suite: <alg>` for a registered suite this crate does not implement, else `unknown signature alg`.
+fn suite_refusal(alg: Option<&Value>) -> String {
+    match alg {
+        Some(Value::String(s)) if REGISTERED_SUITES.contains(&s.as_str()) => format!("{UNSUPPORTED_SUITE_REASON}: {s}"),
+        _ => format!("unknown signature alg '{}'", alg.map(Value::to_string).unwrap_or_default()),
+    }
+}
+
+/// The post-quantum primitive of a suite.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Pq {
+    MlDsa65,
+    MlDsa87,
+    Slh128f,
+    Slh256s,
+    FnDsa512,
+    FnDsa1024,
+    #[cfg(feature = "less")]
+    LessCat1,
+}
+
+impl Pq {
+    /// (public key bytes, signature bytes).
+    fn lens(self) -> (usize, usize) {
+        match self {
+            Pq::MlDsa65 => (ML_DSA_65_PUBLIC_KEY_BYTES, ML_DSA_65_SIGNATURE_BYTES),
+            Pq::MlDsa87 => (fips204::ml_dsa_87::PK_LEN, fips204::ml_dsa_87::SIG_LEN),
+            Pq::Slh128f => (fips205::slh_dsa_sha2_128f::PK_LEN, fips205::slh_dsa_sha2_128f::SIG_LEN),
+            Pq::Slh256s => (fips205::slh_dsa_sha2_256s::PK_LEN, fips205::slh_dsa_sha2_256s::SIG_LEN),
+            Pq::FnDsa512 => (897, 666),
+            Pq::FnDsa1024 => (1793, 1280),
+            #[cfg(feature = "less")]
+            Pq::LessCat1 => (less::PUBLIC_KEY_BYTES, less::SIGNATURE_MAX_BYTES),
+        }
+    }
+
+    /// Whether `n` is a signature length of this primitive: exactly the fixed length, or (LESS) any length the parameter
+    /// set produces (1,153..1,329 in steps of 16).
+    fn sig_len_ok(self, n: usize) -> bool {
+        match self {
+            #[cfg(feature = "less")]
+            Pq::LessCat1 => less::sig_len_ok(n),
+            _ => n == self.lens().1,
+        }
+    }
+}
+
+/// LESS (less-252-45) through the patched reference C in sdks/pca-less-c (feature `less`, compiled by build.rs).
+#[cfg(feature = "less")]
+mod less {
+    pub(super) const PUBLIC_KEY_BYTES: usize = 97484;
+    pub(super) const SIGNATURE_MIN_BYTES: usize = 1153;
+    pub(super) const SIGNATURE_MAX_BYTES: usize = 1329;
+    const SIGNATURE_STEP_BYTES: usize = 16;
+
+    extern "C" {
+        fn atlas_less_cat1_verify(pk: *const u8, pk_len: usize, msg: *const u8, msg_len: usize, sig: *const u8, sig_len: usize) -> core::ffi::c_int;
+    }
+
+    pub(super) fn sig_len_ok(n: usize) -> bool {
+        (SIGNATURE_MIN_BYTES..=SIGNATURE_MAX_BYTES).contains(&n) && (SIGNATURE_MAX_BYTES - n).is_multiple_of(SIGNATURE_STEP_BYTES)
+    }
+
+    /// The detached signature opens under `pk` and yields exactly `msg`. Total.
+    pub(super) fn verify(pk: &[u8], msg: &[u8], sig: &[u8]) -> bool {
+        if pk.len() != PUBLIC_KEY_BYTES || !sig_len_ok(sig.len()) {
+            return false;
+        }
+        // SAFETY: every pointer is valid for the length passed with it for the whole call; the C side reads only within
+        // those lengths (it verifies on its own thread with its own stack and joins it before returning) and writes none.
+        unsafe { atlas_less_cat1_verify(pk.as_ptr(), pk.len(), msg.as_ptr(), msg.len(), sig.as_ptr(), sig.len()) == 1 }
+    }
+}
+
 struct SigSuite {
     alg: &'static str,
     /// Decoded byte length REQUIRED in the primary `sig` field for this suite.
     sig_bytes: usize,
-    /// A `pq_pk` (ML-DSA-65 public key) field is REQUIRED (and forbidden otherwise).
+    /// A `pq_pk` (the PQ public key of `pq`) field is REQUIRED (and forbidden otherwise).
     needs_pq_pk: bool,
-    /// A `pq_sig` field is REQUIRED — ML-DSA sig separate from `sig` (hybrid). Forbidden otherwise.
+    /// A `pq_sig` field is REQUIRED — the PQ sig separate from `sig` (hybrid). Forbidden otherwise.
     needs_pq_sig: bool,
+    /// The PQ primitive (None for ed25519).
+    pq: Option<Pq>,
+    /// SUF-CMA nested hybrid: the PQ half signs msg || the Ed25519 signature bytes.
+    nested: bool,
 }
 
-/// The closed algorithm registry.
+/// The suites this crate implements (a subset of [`REGISTERED_SUITES`]).
 fn sig_suite(name: &str) -> Option<SigSuite> {
-    match name {
-        "ed25519" => Some(SigSuite { alg: "ed25519", sig_bytes: 64, needs_pq_pk: false, needs_pq_sig: false }),
-        "ml-dsa-65" => Some(SigSuite {
-            alg: "ml-dsa-65",
-            sig_bytes: ML_DSA_65_SIGNATURE_BYTES,
-            needs_pq_pk: true,
-            needs_pq_sig: false,
-        }),
-        "hybrid-ed25519-ml-dsa-65" => Some(SigSuite {
-            alg: "hybrid-ed25519-ml-dsa-65",
-            sig_bytes: 64,
-            needs_pq_pk: true,
-            needs_pq_sig: true,
-        }),
-        _ => None,
-    }
+    let pure = |alg, p: Pq| SigSuite { alg, sig_bytes: p.lens().1, needs_pq_pk: true, needs_pq_sig: false, pq: Some(p), nested: false };
+    let hybrid = |alg, p, nested| SigSuite { alg, sig_bytes: 64, needs_pq_pk: true, needs_pq_sig: true, pq: Some(p), nested };
+    Some(match name {
+        "ed25519" => SigSuite { alg: "ed25519", sig_bytes: 64, needs_pq_pk: false, needs_pq_sig: false, pq: None, nested: false },
+        "ml-dsa-65" => pure("ml-dsa-65", Pq::MlDsa65),
+        "hybrid-ed25519-ml-dsa-65" => hybrid("hybrid-ed25519-ml-dsa-65", Pq::MlDsa65, false),
+        "hybrid-nested-ed25519-ml-dsa-65" => hybrid("hybrid-nested-ed25519-ml-dsa-65", Pq::MlDsa65, true),
+        "slh-dsa-sha2-128f" => pure("slh-dsa-sha2-128f", Pq::Slh128f),
+        "hybrid-ed25519-slh-dsa-sha2-128f" => hybrid("hybrid-ed25519-slh-dsa-sha2-128f", Pq::Slh128f, false),
+        "ml-dsa-87" => pure("ml-dsa-87", Pq::MlDsa87),
+        "hybrid-ed25519-ml-dsa-87" => hybrid("hybrid-ed25519-ml-dsa-87", Pq::MlDsa87, false),
+        "slh-dsa-sha2-256s" => pure("slh-dsa-sha2-256s", Pq::Slh256s),
+        "hybrid-ed25519-slh-dsa-sha2-256s" => hybrid("hybrid-ed25519-slh-dsa-sha2-256s", Pq::Slh256s, false),
+        "fn-dsa-512" => pure("fn-dsa-512", Pq::FnDsa512),
+        "fn-dsa-1024" => pure("fn-dsa-1024", Pq::FnDsa1024),
+        #[cfg(feature = "less")]
+        "less-cat1" => pure("less-cat1", Pq::LessCat1),
+        #[cfg(feature = "less")]
+        "hybrid-ed25519-less-cat1" => hybrid("hybrid-ed25519-less-cat1", Pq::LessCat1, false),
+        _ => return None,
+    })
 }
 
-/// Resolve the suite for a PCActn `alg`: absent => ed25519; a known name => that suite; anything else
-/// (unknown name, non-string, null) => `None` (FAIL-CLOSED: the caller rejects it).
+/// Resolve the suite for a PCActn `alg`: absent => ed25519; an implemented name => that suite; anything else
+/// (unregistered or unimplemented name, non-string, null) => `None` (FAIL-CLOSED: the caller rejects it, reporting
+/// [`suite_refusal`]).
 fn resolve_sig_alg(alg: Option<&Value>) -> Option<SigSuite> {
     match alg {
         None => sig_suite("ed25519"),
@@ -836,40 +984,73 @@ fn b64_len(v: Option<&Value>, n: usize) -> bool {
     v.and_then(Value::as_str).is_some_and(|s| decode_b64u_strict(s, Some(n)).is_some())
 }
 
-/// ML-DSA-65 verify over raw bytes (empty context). A wrong length or malformed input returns false.
-fn ml_dsa65_verify(pk: &[u8], msg: &[u8], sig: &[u8]) -> bool {
-    use fips204::ml_dsa_65;
-    use fips204::traits::{SerDes, Verifier};
-    let pk_arr: [u8; ML_DSA_65_PUBLIC_KEY_BYTES] = match pk.try_into() {
-        Ok(a) => a,
-        Err(_) => return false,
-    };
-    let sig_arr: [u8; ML_DSA_65_SIGNATURE_BYTES] = match sig.try_into() {
-        Ok(a) => a,
-        Err(_) => return false,
-    };
-    let vk = match ml_dsa_65::PublicKey::try_from_bytes(pk_arr) {
-        Ok(v) => v,
-        Err(_) => return false,
-    };
-    vk.verify(msg, &sig_arr, &[]) // empty context, matching @noble/post-quantum and cloudflare/circl
+/// Canonical base64url whose decoded length is a signature length of `pq` (fixed, or LESS's variable range).
+fn b64_sig_len(v: Option<&Value>, pq: Pq) -> bool {
+    v.and_then(Value::as_str).and_then(|s| decode_b64u_strict(s, None)).is_some_and(|b| pq.sig_len_ok(b.len()))
 }
 
-/// `ml_dsa65_verify` over base64url key and signature; false on any decoding error.
-/// Private on purpose: the only caller is [`ml_dsa65_verify_pinned`], which takes a [`pinned::PinnedPq`].
-fn ml_dsa65_verify_b64u(pk_b64u: &str, msg: &[u8], sig_b64u: Option<&Value>) -> bool {
-    let pk = match decode_b64u_strict(pk_b64u, Some(ML_DSA_65_PUBLIC_KEY_BYTES)) {
+/// Exact-length PQ verification over raw bytes (pure, empty context / FN-DSA DOMAIN_NONE + HASH_ID_RAW). Total.
+fn pq_verify(pq: Pq, pk: &[u8], msg: &[u8], sig: &[u8]) -> bool {
+    let (pk_len, _) = pq.lens();
+    if pk.len() != pk_len || !pq.sig_len_ok(sig.len()) {
+        return false;
+    }
+    // fips204 takes the key array by value, fips205 by reference (`$($r)?` = `&`).
+    macro_rules! fips {
+        ($m:path $(, $r:tt)?) => {{
+            use $m as m;
+            let (Ok(pk), Ok(sig)) = (<[u8; m::PK_LEN]>::try_from(pk), <[u8; m::SIG_LEN]>::try_from(sig)) else { return false };
+            match m::PublicKey::try_from_bytes($($r)? pk) {
+                Ok(vk) => vk.verify(msg, &sig, &[]),
+                Err(_) => false,
+            }
+        }};
+    }
+    match pq {
+        Pq::MlDsa65 => {
+            use fips204::traits::{SerDes, Verifier};
+            fips!(fips204::ml_dsa_65)
+        }
+        Pq::MlDsa87 => {
+            use fips204::traits::{SerDes, Verifier};
+            fips!(fips204::ml_dsa_87)
+        }
+        Pq::Slh128f => {
+            use fips205::traits::{SerDes, Verifier};
+            fips!(fips205::slh_dsa_sha2_128f, &)
+        }
+        Pq::Slh256s => {
+            use fips205::traits::{SerDes, Verifier};
+            fips!(fips205::slh_dsa_sha2_256s, &)
+        }
+        Pq::FnDsa512 => {
+            use fn_dsa_vrfy::VerifyingKey;
+            fn_dsa_vrfy::VerifyingKey512::decode(pk)
+                .is_some_and(|vk| vk.verify(sig, &fn_dsa_vrfy::DOMAIN_NONE, &fn_dsa_vrfy::HASH_ID_RAW, msg))
+        }
+        Pq::FnDsa1024 => {
+            use fn_dsa_vrfy::VerifyingKey;
+            fn_dsa_vrfy::VerifyingKey1024::decode(pk)
+                .is_some_and(|vk| vk.verify(sig, &fn_dsa_vrfy::DOMAIN_NONE, &fn_dsa_vrfy::HASH_ID_RAW, msg))
+        }
+        #[cfg(feature = "less")]
+        Pq::LessCat1 => less::verify(pk, msg, sig),
+    }
+}
+
+/// `pq_verify` over a base64url key and signature; false on any decoding error.
+/// Private on purpose: the only callers take a [`pinned::PinnedPq`].
+fn pq_verify_b64u(pq: Pq, pk_b64u: &str, msg: &[u8], sig_b64u: Option<&Value>) -> bool {
+    let (pk_len, _) = pq.lens();
+    let pk = match decode_b64u_strict(pk_b64u, Some(pk_len)) {
         Some(b) => b,
         None => return false,
     };
-    let sg = match sig_b64u
-        .and_then(Value::as_str)
-        .and_then(|s| decode_b64u_strict(s, Some(ML_DSA_65_SIGNATURE_BYTES)))
-    {
-        Some(b) => b,
-        None => return false,
+    let sg = match sig_b64u.and_then(Value::as_str).and_then(|s| decode_b64u_strict(s, None)) {
+        Some(b) if pq.sig_len_ok(b.len()) => b,
+        _ => return false,
     };
-    ml_dsa65_verify(&pk, msg, &sg)
+    pq_verify(pq, &pk, msg, &sg)
 }
 
 /// Validate `alg`/`sig`/`pq_pk`/`pq_sig` per suite. `Ok(())` when well-formed, else a short reason.
@@ -894,23 +1075,29 @@ fn validate_suite_fields(p: &Map<String, Value>, check_pq_pk: bool) -> Result<()
     }
     let suite = match resolve_sig_alg(alg) {
         Some(s) => s,
-        None => return Err(format!("unknown signature alg '{}'", alg.map(Value::to_string).unwrap_or_default())),
+        None => return Err(suite_refusal(alg)),
     };
-    if !b64_len(p.get("sig"), suite.sig_bytes) {
+    let (pk_len, pq_sig_len) = suite.pq.map_or((0, 0), Pq::lens);
+    // the PQ signature is `sig` for a pure suite and `pq_sig` for a hybrid; its length rule is the primitive's
+    let sig_ok = match suite.pq {
+        Some(pq) if !suite.needs_pq_sig => b64_sig_len(p.get("sig"), pq),
+        _ => b64_len(p.get("sig"), suite.sig_bytes),
+    };
+    if !sig_ok {
         return Err(format!("'sig' is not canonical base64url ({} bytes) for alg '{}'", suite.sig_bytes, suite.alg));
     }
     if !check_pq_pk {
         // share: `pq_pk` is an optional echo, judged by verify_threshold_share against the signer set
     } else if suite.needs_pq_pk {
-        if !b64_len(p.get("pq_pk"), ML_DSA_65_PUBLIC_KEY_BYTES) {
-            return Err(format!("'pq_pk' is not canonical base64url ({ML_DSA_65_PUBLIC_KEY_BYTES} bytes)"));
+        if !b64_len(p.get("pq_pk"), pk_len) {
+            return Err(format!("'pq_pk' is not canonical base64url ({pk_len} bytes)"));
         }
     } else if p.get("pq_pk").is_some() {
         return Err(format!("'pq_pk' must be absent for alg '{}'", suite.alg));
     }
     if suite.needs_pq_sig {
-        if !b64_len(p.get("pq_sig"), ML_DSA_65_SIGNATURE_BYTES) {
-            return Err(format!("'pq_sig' is not canonical base64url ({ML_DSA_65_SIGNATURE_BYTES} bytes)"));
+        if !suite.pq.is_some_and(|pq| b64_sig_len(p.get("pq_sig"), pq)) {
+            return Err(format!("'pq_sig' is not canonical base64url ({pq_sig_len} bytes)"));
         }
     } else if p.get("pq_sig").is_some() {
         return Err(format!("'pq_sig' must be absent for alg '{}'", suite.alg));
@@ -942,21 +1129,44 @@ fn verify_suite(
         Some(s) => s,
         None => return false,
     };
-    match suite.alg {
-        "ed25519" => verify_b64u(holder, msg, sig_str),
-        "ml-dsa-65" => ml_dsa65_verify_pinned(pq, msg, sig),
-        "hybrid-ed25519-ml-dsa-65" => {
-            verify_b64u(holder, msg, sig_str) && ml_dsa65_verify_pinned(pq, msg, pq_sig)
-        }
-        _ => false,
+    let prim = match suite.pq {
+        None => return verify_b64u(holder, msg, sig_str),
+        Some(p) => p,
+    };
+    let key = match pq {
+        Some(k) => k.key(),
+        None => return false,
+    };
+    if !suite.needs_pq_sig {
+        return pq_verify_b64u(prim, key, msg, sig); // pure PQ: `sig` is the PQ signature
     }
+    // hybrid: the cheap Ed25519 half first (R6-API-04), then the PQ `pq_sig` (nested: over msg || Ed25519 sig bytes)
+    if !verify_b64u(holder, msg, sig_str) {
+        return false;
+    }
+    if suite.nested {
+        let ed_sig = match decode_b64u_strict(sig_str, Some(64)) {
+            Some(b) => b,
+            None => return false,
+        };
+        let mut nested = msg.to_vec();
+        nested.extend_from_slice(&ed_sig);
+        return pq_verify_b64u(prim, key, &nested, pq_sig);
+    }
+    pq_verify_b64u(prim, key, msg, pq_sig)
 }
 
-fn ml_dsa65_verify_pinned(pq: Option<&pinned::PinnedPq>, msg: &[u8], sig_b64u: Option<&Value>) -> bool {
-    match pq {
-        Some(k) => ml_dsa65_verify_b64u(k.key(), msg, sig_b64u),
-        None => false,
+/// Verify a signed artifact (`alg` / `sig` / `pq_pk` / `pq_sig`, `alg` absent = ed25519) over `msg` under its suite: the
+/// wire shape per suite, then the ONE suite dispatch with the Ed25519 half under `ed_pub` and the PQ half under the
+/// artifact's OWN `pq_pk` (CALLER-VOUCHED: only for keys the caller authorised elsewhere, e.g. the `pq_artifact`
+/// conformance primitives). False for an unsupported / unknown suite or any failure. Total.
+pub fn verify_artifact_suite(artifact: &Value, ed_pub: &str, msg: &[u8]) -> bool {
+    let Some(a) = artifact.as_object() else { return false };
+    if validate_signature_wire(a).is_err() {
+        return false;
     }
+    let pq = a.get("pq_pk").and_then(Value::as_str).and_then(pinned::PinnedPq::caller_vouched);
+    verify_suite(a.get("alg"), ed_pub, pq.as_ref(), msg, a.get("sig"), a.get("pq_sig"))
 }
 
 /// The single key-resolution choke point (R3-01 / R4-01). `PinnedPq` has a private field and no public constructor,
@@ -1117,9 +1327,7 @@ fn str_of<'a>(c: &'a Map<String, Value>, k: &str) -> &'a str {
 fn signable_hop_body(c: &Map<String, Value>) -> Result<Value, String> {
     let suite = match resolve_sig_alg(c.get("alg")) {
         Some(s) => s,
-        None => {
-            return Err(format!("unknown signature alg '{}'", c.get("alg").map(Value::to_string).unwrap_or_default()));
-        }
+        None => return Err(suite_refusal(c.get("alg"))),
     };
     let mut body = body_of(c);
     if suite.alg != "ed25519" {
@@ -1191,6 +1399,11 @@ pub fn verify_chain(chain: &[Value], expected_root_issuer: Option<&str>) -> Resu
     verify_chain_policy(chain, expected_root_issuer, None, None, None)
 }
 
+/// Reason a stored-grant root is refused because a supplied pin for its issuer disagrees (0.4.2, fail closed).
+fn root_pq_pin_mismatch_reason(alg: &str) -> String {
+    format!("hop 0: root suite '{alg}': the server-side PQ pin for the root issuer (policy.pqPins) does not match the stored grant's pq_pk (fail closed)")
+}
+
 /// Reason a non-ed25519 root is refused without verifier-side PQ authority (R4-01); exact text is conformance-checked.
 fn root_pq_pin_reason(alg: &str) -> String {
     format!("hop 0: root suite '{alg}' needs a PQ key pinned for the root issuer (policy.pqPins) or the verifier's stored grant (policy.trustedRoot); the root's own pq_pk proves nothing about who issued it (R3-01)")
@@ -1217,6 +1430,14 @@ fn resolve_root_pq(
         (Some(t), Some(Value::String(s))) if same_strict_hash(t, root_val) => Some(s.as_str()),
         _ => None,
     };
+    // 0.4.2 fail closed: with the stored grant AND a pin for the issuer, both must agree (the grant never overrides a pin).
+    if let (Some(t), Some(pins), Some(iss)) = (trusted, pq_pins, root.get("issuer").and_then(Value::as_str)) {
+        if let Some(pin) = pins.get(iss) {
+            if pin != t {
+                return Err(root_pq_pin_mismatch_reason(suite.alg));
+            }
+        }
+    }
     match pinned::resolve_pq_key(root.get("issuer").and_then(Value::as_str), pk, None, pq_pins, trusted) {
         Some(k) => Ok(Some(k)),
         None => Err(root_pq_pin_reason(suite.alg)),
@@ -1308,11 +1529,15 @@ const REQUIRED_FIELDS: [&str; 14] = [
     "ver", "action", "grant_ref", "cap_chain", "plan", "attestation", "provenance", "freshness", "counter",
     "risk_claim", "aud", "iat", "exp", "sig",
 ];
-const OPTIONAL_FIELDS: [&str; 12] = [
+const OPTIONAL_FIELDS: [&str; 14] = [
     "nonce", "caution", "rationale_commitment", "progress_step", "prohibition_evidence", "tool_binding",
     "threshold", "zk_compliance", "bond_ref",
     // B4 crypto-agility (additive): absent `alg` == "ed25519" and validates exactly as pre-B4.
     "alg", "pq_pk", "pq_sig",
+    // Intent Layer M2 (additive, SIGNED): the `envelope.intent` binding (see [`IntentPolicy`]).
+    "intent",
+    // Intent Layer v2 (additive, SIGNED): the session member (rule 13; see [`validate_intent_session_wire`]).
+    "intent_session",
 ];
 
 fn b32(v: Option<&Value>) -> bool {
@@ -1532,6 +1757,12 @@ pub fn validate_wire(pcactn: &Value) -> Result<(), String> {
         if !v.is_object() {
             return Err("'progress_step' must be an object".into());
         }
+    }
+    if let Some(v) = p.get("intent") {
+        validate_intent_wire(v)?;
+    }
+    if let Some(v) = p.get("intent_session") {
+        validate_intent_session_wire(v)?;
     }
     if let Some(v) = p.get("prohibition_evidence") {
         if !v.is_object() && !v.is_array() {
@@ -1762,18 +1993,23 @@ pub fn verify_pcactn_json(text: &str, grant: &Value, now: i64, audience: &str) -
 
 /// [`verify_pcactn_json`] with an optional allowed-suites policy.
 pub fn verify_pcactn_json_policy(text: &str, grant: &Value, now: i64, audience: &str, allowed: Option<&[String]>) -> Verdict {
+    verify_pcactn_json_with(text, grant, now, audience, &VerifyOptions { allowed, ..VerifyOptions::default() })
+}
+
+/// [`verify_pcactn_json`] with explicit [`VerifyOptions`].
+pub fn verify_pcactn_json_with(text: &str, grant: &Value, now: i64, audience: &str, opts: &VerifyOptions<'_>) -> Verdict {
     if text.len() > MAX_ARTIFACT_BYTES {
         // FIRST: before any parsing (str::len is UTF-8 bytes)
         return wire_fail(ARTIFACT_SIZE_REASON.to_string());
     }
     match strict_parse(text) {
-        Ok(v) => verify_pcactn_core_policy(&v, grant, now, audience, allowed),
+        Ok(v) => verify_pcactn_core_with(&v, grant, now, audience, opts),
         Err(e) => wire_fail(e),
     }
 }
 
 /// Checks, in the normative order: wire (terminal), version, audience, validity, chain, plan_inclusion,
-/// leaf_signature, counter. `now` is epoch milliseconds; `audience` is this verifier's own audience id.
+/// leaf_signature, counter (then `intent` when the PCActn carries it). `now` is epoch milliseconds; `audience` is this verifier's own audience id.
 /// Later-milestone checks (attestation, threshold, revocation, ...) are out of scope.
 pub fn verify_pcactn_core(pcactn: &Value, grant: &Value, now: i64, audience: &str) -> Verdict {
     verify_pcactn_core_policy(pcactn, grant, now, audience, None)
@@ -1783,6 +2019,24 @@ pub fn verify_pcactn_core(pcactn: &Value, grant: &Value, now: i64, audience: &st
 /// hop and leaf suite; absent `alg` == "ed25519"). Hybrid / pure-PQ keys are always required to be bound
 /// to the signer's `holder_pq` (no unbound escape hatch).
 pub fn verify_pcactn_core_policy(pcactn: &Value, grant: &Value, now: i64, audience: &str, allowed: Option<&[String]>) -> Verdict {
+    verify_pcactn_core_with(pcactn, grant, now, audience, &VerifyOptions { allowed, ..VerifyOptions::default() })
+}
+
+/// Optional verifier policies of [`verify_pcactn_core_with`] (`VerifyOptions::default()` == [`verify_pcactn_core`]).
+#[derive(Debug, Clone, Copy, Default)]
+pub struct VerifyOptions<'a> {
+    /// Allowed signature suites (`None` = no restriction; `Some(&[])` refuses every hop and leaf suite).
+    pub allowed: Option<&'a [String]>,
+    /// Intent Layer M2 policy (`None` = none). See [`IntentPolicy`].
+    pub intent: Option<&'a IntentPolicy>,
+    /// Intent Layer v2 verifier state + policy (`None` = none). See [`IntentV2Context`].
+    pub intent_v2: Option<&'a IntentV2Context>,
+}
+
+/// [`verify_pcactn_core`] with explicit [`VerifyOptions`]. The `intent` check runs after `counter` and is reported
+/// iff the PCActn carries `intent` or `opts.intent` is active; otherwise the verdict is the pre-M2 one.
+pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience: &str, opts: &VerifyOptions<'_>) -> Verdict {
+    let allowed = opts.allowed;
     if let Err(why) = validate_wire(pcactn) {
         return wire_fail(why);
     }
@@ -1921,8 +2175,200 @@ pub fn verify_pcactn_core_policy(pcactn: &Value, grant: &Value, now: i64, audien
         },
     );
 
+    // Intent Layer M2: `intent` (reported iff the PCActn carries `intent` or the policy is active). Rule 13 amends the
+    // goal: with a (wire-valid) `intent_session` it is "pca-intent:v2:" + session + ":" + map_digest, and rule 19 makes
+    // it "pca-intent:v2c:" + session + ":" + map_commit when `intent_session.map_form` is "commit".
+    let session = p.get("intent_session").and_then(|is| {
+        let sess = is.get("session").and_then(Value::as_str)?;
+        Some((sess, is.get("map_form").is_some()))
+    });
+    if let Some(res) = decide_intent(p.get("intent"), grant, opts.intent, session) {
+        record("intent", res);
+    }
+    // Intent Layer v2: schema, intent_session, layers, accumulators, facts, provenance, classes (each reported only
+    // when the PCActn carries `intent_session` or a v2 policy is active; see [`decide_intent_v2`]).
+    for c in decide_intent_v2(pcactn, grant, opts.intent_v2, now).checks {
+        record(c.name, if c.ok { Ok(()) } else { Err(c.reason) });
+    }
+
     let allow = checks.values().all(|v| *v);
     Verdict { allow, checks, reason }
+}
+
+// ---- Intent Layer M2: envelope.intent -----------------------------------------------------
+// Normative rules: packages/pca/src/intent-binding.ts and conformance/README.md "12. Intent binding".
+
+const INTENT_GOAL_PREFIX: &str = "pca-intent:v1:";
+const INTENT_GOAL_V2_PREFIX: &str = "pca-intent:v2:";
+const INTENT_GOAL_V2C_PREFIX: &str = "pca-intent:v2c:";
+const INTENT_GOAL_COMMIT_DOMAIN: &str = "atlas-pca/goal/v1\0";
+const PPM_ONE: i64 = 1_000_000;
+/// UTF-8 byte cap of `intent.goal_salt`.
+pub const MAX_INTENT_GOAL_SALT_LEN: usize = 128;
+const ENVELOPE_INTENT_FIELDS: [&str; 5] = ["ref", "map_digest", "goal_salt", "fidelity_ppm", "residual_risk_ppm"];
+
+/// Verifier-side intent policy (Intent Layer M2). ACTIVE iff `require` is true or either threshold is `Some` (even
+/// an invalid one); an active policy runs the `intent` check even for a PCActn without the slot and fails it closed.
+/// A set threshold that is not a non-negative safe integer is a misconfiguration and fails the check.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct IntentPolicy {
+    /// Require every PCActn to carry a bound `intent`.
+    pub require: bool,
+    /// Deny when the claimed `fidelity_ppm` is below this. Setting it implies `require`.
+    pub min_fidelity_ppm: Option<f64>,
+    /// Deny when the claimed `residual_risk_ppm` is above this. Setting it implies `require`.
+    pub max_residual_risk_ppm: Option<f64>,
+}
+
+impl IntentPolicy {
+    /// True iff the policy is active.
+    pub fn is_active(&self) -> bool {
+        self.require || self.min_fidelity_ppm.is_some() || self.max_residual_risk_ppm.is_some()
+    }
+
+    /// Lenient construction from a JSON object `{require?, min_fidelity_ppm?, max_residual_risk_ppm?}`: a threshold
+    /// keeps its NUMERIC VALUE whatever its lexical form (`950000.0`, `1e6` are valid integers; `-0` is -0.0), so the
+    /// check accepts exactly the non-negative safe integers and fails closed on anything else (negative, fractional,
+    /// -0, > 2^53-1). A present non-numeric threshold (null, bool, string, ...) becomes NaN (misconfigured). `None`
+    /// when `v` is not an object.
+    pub fn from_json(v: &Value) -> Option<IntentPolicy> {
+        let o = v.as_object()?;
+        let num = |k: &str| o.get(k).map(|x| x.as_f64().unwrap_or(f64::NAN));
+        Some(IntentPolicy {
+            require: o.get("require").and_then(Value::as_bool) == Some(true),
+            min_fidelity_ppm: num("min_fidelity_ppm"),
+            max_residual_risk_ppm: num("max_residual_risk_ppm"),
+        })
+    }
+
+    /// Parse raw policy JSON text (any JSON number form) and apply [`IntentPolicy::from_json`]. An unparseable text or
+    /// a non-object is an error.
+    pub fn from_json_text(text: &str) -> Result<IntentPolicy, String> {
+        let v: Value = serde_json::from_str(text).map_err(|e| format!("intent policy: {e}"))?;
+        IntentPolicy::from_json(&v).ok_or_else(|| "intent policy: not a JSON object".to_string())
+    }
+}
+
+/// The goal commitment a root grant minted for this IntentStatement and Intent Map carries:
+/// `hash_canonical_strict({d: "atlas-pca/goal/v1\0", goal: "pca-intent:v1:" + ref + ":" + map_digest, salt})`.
+pub fn intent_goal_commit(r#ref: &str, map_digest: &str, goal_salt: &str) -> Option<String> {
+    hash_canonical_strict(&serde_json::json!({
+        "d": INTENT_GOAL_COMMIT_DOMAIN,
+        "goal": format!("{INTENT_GOAL_PREFIX}{}:{}", r#ref, map_digest),
+        "salt": goal_salt,
+    }))
+}
+
+/// The goal commitment of an Intent Layer v2 session grant (rule 13 amends rule 12 step 2):
+/// `hash_canonical_strict({d: "atlas-pca/goal/v1\0", goal: "pca-intent:v2:" + session + ":" + map_digest, salt})`.
+pub fn intent_goal_commit_v2(session: &str, map_digest: &str, goal_salt: &str) -> Option<String> {
+    hash_canonical_strict(&serde_json::json!({
+        "d": INTENT_GOAL_COMMIT_DOMAIN,
+        "goal": format!("{INTENT_GOAL_V2_PREFIX}{}:{}", session, map_digest),
+        "salt": goal_salt,
+    }))
+}
+
+/// The goal commitment of a session grant over a COMMITTED map (rule 19 amends rule 12 step 2):
+/// `hash_canonical_strict({d: "atlas-pca/goal/v1\0", goal: "pca-intent:v2c:" + session + ":" + map_commit, salt})`.
+pub fn intent_goal_commit_v2c(session: &str, map_commit: &str, goal_salt: &str) -> Option<String> {
+    hash_canonical_strict(&serde_json::json!({
+        "d": INTENT_GOAL_COMMIT_DOMAIN,
+        "goal": format!("{INTENT_GOAL_V2C_PREFIX}{}:{}", session, map_commit),
+        "salt": goal_salt,
+    }))
+}
+
+fn validate_intent_wire(v: &Value) -> Result<(), String> {
+    let o = v.as_object().ok_or("'intent' must be an object")?;
+    closed(o, &ENVELOPE_INTENT_FIELDS, "intent.")?;
+    for k in ENVELOPE_INTENT_FIELDS {
+        if !o.contains_key(k) {
+            return Err(format!("missing field 'intent.{k}'"));
+        }
+    }
+    if !b32(o.get("ref")) {
+        return Err("'intent.ref' is not canonical base64url (32 bytes)".into());
+    }
+    if !b32(o.get("map_digest")) {
+        return Err("'intent.map_digest' is not canonical base64url (32 bytes)".into());
+    }
+    match o.get("goal_salt").and_then(Value::as_str) {
+        Some(s) if !s.is_empty() && s.len() <= MAX_INTENT_GOAL_SALT_LEN => {}
+        _ => return Err("'intent.goal_salt' must be a non-empty string (<= 128 UTF-8 bytes)".into()),
+    }
+    match o.get("fidelity_ppm").and_then(safe_int) {
+        Some(f) if (0..=PPM_ONE).contains(&f) => {}
+        _ => return Err("'intent.fidelity_ppm' must be a safe integer in [0, 1000000]".into()),
+    }
+    match o.get("residual_risk_ppm").and_then(safe_int) {
+        Some(r) if r >= 0 => {}
+        _ => return Err("'intent.residual_risk_ppm' must be a non-negative safe integer".into()),
+    }
+    Ok(())
+}
+
+/// The FIRST `envelope` caveat of the verifier's root grant: its string `goal_commit`.
+fn root_goal_commit(grant: &Value) -> Option<&str> {
+    let env = grant
+        .get("caveats")?
+        .as_array()?
+        .iter()
+        .find(|c| c.get("type").and_then(Value::as_str) == Some("envelope"))?; // non-objects have no `type`
+    env.get("goal_commit").and_then(Value::as_str)
+}
+
+fn ok_threshold(x: Option<f64>) -> bool {
+    match x {
+        None => true,
+        // NaN and +/-Inf have a NaN fract(), so no separate finiteness test is needed
+        Some(f) => f.fract() == 0.0 && !f.is_sign_negative() && f <= MAX_SAFE as f64,
+    }
+}
+
+/// The `intent` check on a wire-valid PCActn (rules 0-4). `None` = not reported. `session` is the wire-valid
+/// `intent_session.session` with whether it carries `map_form` (the v2 / v2c goal), else `None` (the v1 goal). Never panics.
+fn decide_intent(intent: Option<&Value>, grant: &Value, policy: Option<&IntentPolicy>, session: Option<(&str, bool)>) -> Option<Result<(), String>> {
+    let active = policy.is_some_and(IntentPolicy::is_active);
+    if intent.is_none() && !active {
+        return None;
+    }
+    if let Some(pol) = policy {
+        // an inactive policy has no thresholds, so this only bites when active
+        if !ok_threshold(pol.min_fidelity_ppm) || !ok_threshold(pol.max_residual_risk_ppm) {
+            return Some(Err("intent policy misconfigured: thresholds must be non-negative safe integers (fail closed)".into()));
+        }
+    }
+    let Some(i) = intent else {
+        return Some(Err("this verifier requires an intent binding but the PCActn carries none".into()));
+    };
+    let Some(commit) = root_goal_commit(grant) else {
+        return Some(Err("the root grant carries no envelope goal commitment to bind the intent to".into()));
+    };
+    let r = i.get("ref").and_then(Value::as_str).unwrap_or("");
+    let md = i.get("map_digest").and_then(Value::as_str).unwrap_or("");
+    let salt = i.get("goal_salt").and_then(Value::as_str).unwrap_or("");
+    let opened = match session {
+        Some((sess, false)) => intent_goal_commit_v2(sess, md, salt),
+        Some((sess, true)) => intent_goal_commit_v2c(sess, md, salt),
+        None => intent_goal_commit(r, md, salt),
+    };
+    if opened.as_deref() != Some(commit) {
+        return Some(Err("intent ref / map_digest / goal_salt do not open the root grant's goal commitment".into()));
+    }
+    let fid = i.get("fidelity_ppm").and_then(safe_int).unwrap_or(-1);
+    let res = i.get("residual_risk_ppm").and_then(safe_int).unwrap_or(i64::MAX);
+    if let Some(min) = policy.and_then(|p| p.min_fidelity_ppm) {
+        if (fid as f64) < min {
+            return Some(Err(format!("intent fidelity {fid} ppm is below the policy minimum {min}")));
+        }
+    }
+    if let Some(max) = policy.and_then(|p| p.max_residual_risk_ppm) {
+        if (res as f64) > max {
+            return Some(Err(format!("intent residual risk {res} ppm exceeds the policy maximum {max}")));
+        }
+    }
+    Some(Ok(()))
 }
 
 // ---- PCA-Action header (0.4.1) -----------------------------------------------------------
@@ -2099,6 +2545,12 @@ fn caveat_satisfied(cv: &Value, ctx: &Value) -> bool {
             _ => false,
         },
         "budget_alloc" => fin(c.get("limit")).is_some_and(|l| l >= 0.0),
+        // Intent Layer v2 session binding (rule 13): no per-action constraint; satisfied iff well-formed.
+        "intent_session" => intent_session_caveat_error(Some(cv)).is_none(),
         _ => false,
     }
 }
+
+#[cfg(test)]
+#[path = "k042_lib_test.rs"]
+mod k042_test;

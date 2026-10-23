@@ -11,6 +11,20 @@ pub mod caveats;
 pub mod chain;
 pub mod commit;
 pub mod context;
+pub mod intent;
+pub mod jsnum;
+pub mod pq_suites;
+pub mod action_schema;
+pub mod intent_session;
+pub mod intent_acc;
+pub mod oracle_facts;
+pub mod offer_set;
+pub mod param_provenance;
+pub mod label_receipts;
+pub mod intent_classifier;
+pub mod intent_layers;
+pub mod intent_map;
+pub mod intent_v2;
 pub mod predicates;
 pub mod risk;
 pub mod safe_regex;
@@ -65,6 +79,11 @@ pub struct DecideInput {
     /// (`verifyChain`'s `expectedRootIssuer`). Absent => chain verification fails closed.
     #[serde(default)]
     pub expected_root_principal: Option<String>,
+    /// PCA 0.4.2 Intent Layer v2: the verifier state the v2 checks read (TS `IntentV2Context`: policy, params, schema docs +
+    /// keys, session root + grants + revocation evidence + the verifier's session-root PQ pins (`session.pq_pins`), layers, accumulator state / monitors / receipts / last_seq, W-B
+    /// artifacts + policy). Its `hashCanonical` is committed to the journal (`context.intent_v2.ctx_digest`).
+    #[serde(default)]
+    pub intent_v2: Option<Value>,
     /// The full signed PCActn wire object (the leaf holder's signed intent). Its `sig`/`alg`/`pq_pk`/
     /// `pq_sig` and the canonical body (minus `sig`/`threshold`/`pq_sig`) give the leaf-holder signature
     /// `verifyLeafSuite` checks. Absent => chain verification fails closed.
@@ -78,10 +97,17 @@ fn present<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<Value>, D::E
 }
 
 /// Version of the guest program's semantics, committed as the FIRST journal field. A verifier refuses any journal below
-/// [`MIN_GUEST_VERSION`] (and journals of guests older than this field do not decode at all). 7 = red-team round 6.
-pub const GUEST_VERSION: u32 = 7;
-/// The oldest guest semantics a verifier accepts.
-pub const MIN_GUEST_VERSION: u32 = 7;
+/// [`MIN_GUEST_VERSION`] (and journals of guests older than this field do not decode at all). 7 = red-team round 6;
+/// 8 = PCA 0.4.1/0.4.2: root caveats outside the envelope are enforced and `max_spend` is implemented; 9 = PCA 0.4.2 R3-01:
+/// a PQ / hybrid session root verifies only under the verifier's pin (`intent_v2.session.pq_pins`); 10 = PCA 0.4.2 re-pin:
+/// `intent_v2_active` is also true for a present malformed v2 context (fail closed, as the reference), a guest rebuild with
+/// the same decision semantics.
+pub const GUEST_VERSION: u32 = 10;
+/// The oldest guest semantics a verifier accepts. 9: a version-8 receipt may have admitted a pure-PQ / hybrid session root
+/// under the PQ key named in the root's own `principals[]` (anyone naming a principal could sign it), so it is refused; a
+/// version-7 receipt does not prove that the root grant's own caveats held (the 0.4.1 security fix). 10: the guest rebuilt at
+/// the 0.4.2 re-pin (`intent_v2_active` fail-closed); the version-9 image (`c5107456...`) is on the deny-list.
+pub const MIN_GUEST_VERSION: u32 = 10;
 
 /// The public statement the guest commits to the receipt journal.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -134,7 +160,7 @@ pub fn decide_from_str(json: &str) -> Decision {
 /// is `thresholdMessage(pcactn)` = `SIG_DOMAIN ‖ sha256(canonical(body))` where `body` is the PCActn with
 /// its UNSIGNED containers `sig`/`threshold`/`pq_sig` removed (faithful to `pcactn.ts` `thresholdMessage`
 /// and `wire.ts`). Returns `None` if the PCActn is not a JSON object.
-fn leaf_sig_from_pcactn(pcactn: &Value) -> Option<chain::LeafSig> {
+pub fn leaf_sig_from_pcactn(pcactn: &Value) -> Option<chain::LeafSig> {
     let obj = pcactn.as_object()?;
     let mut body = pcactn.clone();
     if let Some(m) = body.as_object_mut() {
@@ -181,7 +207,8 @@ fn verify_full_chain(input: &DecideInput) -> bool {
         },
         None => return false,
     };
-    chain::verify_chain(&input.chain, root_pk, &leaf).ok
+    // the root IS the verifier's grant (checked above): a PQ root verifies under it (`trustedRoot: grant`, R3-01)
+    chain::verify_chain_with(&input.chain, root_pk, Some(&input.grant), &leaf).ok
 }
 
 /// R3-12: the delegation depth is derived from the verified chain, never supplied by the prover.
@@ -210,6 +237,27 @@ fn delegated_caveats(input: &DecideInput) -> Vec<Value> {
         .unwrap_or_default()
 }
 
+/// 0.4.1 policy-vm.ts `rootCaveats`: the caveats on the ROOT grant that the policy layer evaluates as caveats = every entry
+/// of `grant.caveats` except the FIRST `envelope` caveat (the one [`get_envelope`] reads; its predicates and inner caveats are
+/// evaluated separately). `None` when `grant.caveats` is not an array (TS returns it as is and `evaluateCaveats` refuses
+/// it: fail closed). A second `envelope` caveat stays in the list and is unsatisfied (unknown to the evaluator).
+pub fn root_caveats(grant: &Value) -> Option<Vec<Value>> {
+    let cs = grant.get("caveats")?.as_array()?;
+    let first_env = cs.iter().position(|c| c.get("type").and_then(|t| t.as_str()) == Some("envelope"));
+    Some(cs.iter().enumerate().filter(|(i, _)| Some(*i) != first_env).map(|(_, c)| c.clone()).collect())
+}
+
+/// 0.4.1 policy-vm.ts `policyCaveats`: [`root_caveats`] of the grant, then the caveats the hops appended
+/// (`leaf.caveats[len(grant.caveats)..]`); the list the conformance `caveat_eval` vectors evaluate. `None` = not an array.
+pub fn policy_caveats(grant: &Value, chain: &[Value]) -> Option<Vec<Value>> {
+    let mut root = root_caveats(grant)?;
+    let glen = grant.get("caveats").and_then(|c| c.as_array()).map_or(0, |a| a.len());
+    if let Some(leaf) = chain.last().and_then(|c| c.get("caveats")).and_then(|c| c.as_array()) {
+        root.extend(leaf.iter().skip(glen).cloned());
+    }
+    Some(root)
+}
+
 /// R3-13: what [`bind_pcactn`] proved and the journal commits.
 pub struct Binding {
     pub grant_ref: String,
@@ -231,6 +279,7 @@ fn str_of<'a>(v: &'a Value, k: &str) -> Option<&'a str> {
 ///     fields match the action (verb, resource, reversibility class, params digest when present) and the signed
 ///     `conditions_digest` (absent == the empty conditions digest, as the TS verifier);
 ///   * `pcactn.tool_binding` equals the `tool_binding` the `tool_schema` caveat compared against;
+///   * 0.4.2: a present `pcactn.intent` is well formed and opens the root grant's goal commitment ([`intent::bind_intent`]);
 ///   * R4-04: `ver == 2`, `aud` a non-empty string, `counter >= 0`, and `iat < exp <= iat + 1h`, `iat <= now + 60s`,
 ///     `now <= exp` (all strictly typed safe integers, none optional).
 /// Fails CLOSED (`None`) on any absence or mismatch.
@@ -289,6 +338,14 @@ pub fn bind_pcactn(input: &DecideInput) -> Option<Binding> {
     if signed_tb != input.tool_binding.as_deref() {
         return None;
     }
+    // PCA 0.4.2 Intent Layer M2: a present signed `intent` slot must be well formed and open the root grant's goal
+    // commitment (intent-binding.ts rule 2); the claims are committed to the journal (`Context::intent`), and the relying
+    // party's fidelity / residual-risk policy is applied by the verifier (`check_context`).
+    // Intent Layer v2 (rule 13 wire): a present `intent_session` member must be well formed (closed set, digests, bounds).
+    if let Some(is) = pc.get("intent_session") {
+        intent_session::validate_intent_session_wire(is).ok()?;
+    }
+    intent::bind_intent(pc, &input.grant).ok()?;
     Some(Binding { grant_ref: grant_ref.to_string(), node_id: node_id.to_string() })
 }
 
@@ -385,7 +442,10 @@ fn parse_policy(env: &Value) -> Option<RiskPolicyScaled> {
 /// `ActionContext.action` = `{verb, resource, params, reversibility_class}` of the signed action (other keys of the
 /// signed action, e.g. `params_digest`, are not visible to conditions). A key the action lacks is a TS `undefined`
 /// member (see [`predicates::Ctx::action_has_undefined`]).
-fn action_root(input: &DecideInput) -> Value {
+///
+/// The predicate env is given explicitly (Intent Layer v2: the verifier-computed members replace the host's, see
+/// [`intent_v2::v2_env`]).
+fn action_root_with_env(input: &DecideInput, env: Option<&Value>) -> Value {
     let mut a = serde_json::Map::new();
     for k in ["verb", "resource", "params", "reversibility_class"] {
         if let Some(v) = input.action.get(k) {
@@ -397,7 +457,7 @@ fn action_root(input: &DecideInput) -> Value {
     if let Some(s) = &input.subject {
         m.insert("subject".to_string(), s.clone());
     }
-    if let Some(e) = &input.env {
+    if let Some(e) = env {
         m.insert("env".to_string(), e.clone());
     }
     Value::Object(m)
@@ -491,7 +551,19 @@ fn decide_inner(input: &DecideInput) -> Decision {
         }
     };
 
-    let root = action_root(input);
+    // 0.4.2 Intent Layer v2: the v2 checks (rules 13-18 + V5 layers), reported only when the PCActn carries `intent_session`
+    // or a v2 policy is active; with `intent_session` the verifier-computed env members replace the host's.
+    let v2 = input
+        .pcactn
+        .as_ref()
+        .map(|pc| intent_v2::decide_intent_v2(pc, &input.grant, input.intent_v2.as_ref(), input.now))
+        .unwrap_or_default();
+    let v2_ok = v2.all_ok();
+    let eff_env = match input.pcactn.as_ref() {
+        Some(pc) => intent_v2::v2_env(input.env.as_ref(), pc, &v2),
+        None => input.env.clone(),
+    };
+    let root = action_root_with_env(input, eff_env.as_ref());
 
     // 1. predicates (full DSL, default deny)
     let predicates = envelope
@@ -533,6 +605,10 @@ fn decide_inner(input: &DecideInput) -> Decision {
         tool_signature_digest: input.tool_binding.clone(),
     };
     let caveats_ok = evaluate_caveats(&env_caveats, &cctx).ok;
+    // 0.4.1 (security): caveats placed directly on the ROOT grant, outside the envelope, are signed authority too and are
+    // enforced exactly like the caveats delegation hops append (policy-vm.ts `decide`: `rootCaveats(grant)`); unknown types,
+    // including a second `envelope` caveat, are unsatisfied (fail closed), and a non-array caveat list refuses.
+    let root_ok = root_caveats(&input.grant).is_some_and(|rc| evaluate_caveats(&rc, &cctx).ok);
     // R3-11: caveats appended by delegation hops must ALSO hold (attenuation = every hop's caveats hold).
     let delegated_ok = evaluate_caveats(&delegated_caveats(input), &cctx).ok;
 
@@ -552,7 +628,7 @@ fn decide_inner(input: &DecideInput) -> Decision {
     // R3-13: the signed PCActn is bound to the chain, action, plan and node that were evaluated.
     let bound_ok = bind_pcactn(input).is_some();
 
-    let allow = predicates_ok && caveats_ok && delegated_ok && admit && chain_ok && bound_ok;
+    let allow = predicates_ok && caveats_ok && root_ok && delegated_ok && admit && chain_ok && bound_ok && v2_ok;
     // r at scale S (r_raw is at scale S²): divide to report the proven risk.
     let r_scaled = (r_raw / (S as u128)) as u64;
 
@@ -565,6 +641,6 @@ fn decide_inner(input: &DecideInput) -> Decision {
         policy_commit,
         plan_commit,
         chain_verified: if chain_ok { 1 } else { 0 },
-        context: context::Context::from_input(input),
+        context: context::Context::from_input(input).with_intent_v2(input, &v2, eff_env.as_ref()),
     }
 }

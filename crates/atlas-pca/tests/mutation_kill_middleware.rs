@@ -161,7 +161,7 @@ fn json_body_and_challenge_shapes() {
     let un = verify_request(None, None, &cfg);
     let b = un.json_body();
     assert_eq!(b, json!({"error": "invalid_request", "error_description": "no PCA-Action header or body supplied"}));
-    assert_eq!(un.www_authenticate().unwrap(), "PCA realm=\"pca\", error=\"invalid_request\", error_description=\"no PCA-Action header or body supplied\"");
+    assert_eq!(un.www_authenticate().unwrap(), "PCA realm=\"pca\", error=\"invalid_request\"");
     let q = verify_request(Some("!!"), None, &cfg_for(&grant, "a\"b\\c"));
     assert!(q.www_authenticate().is_some());
 }
@@ -183,7 +183,7 @@ fn layer_service_responses_are_real() {
     assert_eq!(ok.status(), StatusCode::IM_A_TEAPOT);
     let deny = block_on(svc.call(req(None, vec![]))).unwrap();
     assert_eq!(deny.status(), StatusCode::UNAUTHORIZED);
-    assert_eq!(deny.headers()[header::WWW_AUTHENTICATE], "PCA realm=\"pca\", error=\"invalid_request\", error_description=\"no PCA-Action header and the body is not JSON\"");
+    assert_eq!(deny.headers()[header::WWW_AUTHENTICATE], "PCA realm=\"pca\", error=\"invalid_request\"");
     assert_eq!(deny.headers()[header::CONTENT_TYPE], "application/json");
     let body = block_on(axum::body::to_bytes(deny.into_body(), 1 << 20)).unwrap();
     let v: Value = serde_json::from_slice(&body).unwrap();

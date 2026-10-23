@@ -1,0 +1,223 @@
+name: Mutation
+
+# Mutation testing of the atlas-pca verifier crate with cargo-mutants (--shard k/N), split into 63 shards on separate
+# runners (14 shards ran 3.5-5.5 h each on the 0.4.2 crate and 8 of them hit the 6 h limit; 42 shards then ran 0.9-4.8 h with
+# two still cut at the 300 min cap, so 63 shards keep each near 1-3 h and the cap is 345 min). The merge job checks the missed mutants against the equivalent-mutant ledger (flagship
+# tools/pca-audit/native-check-equivalents.mjs): it passes when every survivor is a ledgered equivalent and no ledger entry
+# is stale. --all-features: the middleware (axum) and its tests are feature-gated. Runs on demand and on ci/** branches
+# (the release-candidate check), never on main pushes. The proof crates
+# (stark-pca, folding-pca, zkvm-pca) are not mutated here.
+#
+# TARGETED mode (the default whenever a usable baseline exists; the pca-ruby scheme, tools/pca-audit/mut-carry +
+# rust-mutate/carry.mjs): every shard uploads mut-results-<k> (each mutant's result, carried ones included) and the run uploads
+# mut-snapshot (the tests + shared corpus it ran against). The next run pools the results of the newest earlier runs of this
+# branch (the input `baseline_run` pins one) and runs cargo-mutants on ONLY: mutants the pool never saw, its missed / timed-out
+# ones, and every mutant whose function (cargo-mutants' span) or the file's code outside every mutated function changed (plain
+# comments and blank lines do not count; doc comments do). An `unviable` result is carried only when the whole production source
+# is unchanged. A run is used as a baseline only when its cargo-mutants version + flags are identical and the tests and corpus it
+# ran against only GREW since (new files, pure line insertions, JSON that gained data): any edited or removed test line, binary
+# change or changed vector makes that run unusable and the shard runs in full. The pool is keyed by mutant identity (file,
+# function, genre, description, occurrence), not by shard, so a different shard layout needs no special case. Each shard still
+# reports its COMPLETE slice (carried results included), so the merge checks the ledger over the full picture. No usable
+# baseline (or `full: true`) = a full run, which seeds the next one.
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_run:
+        description: 'run id whose mut-results-<k> + mut-snapshot artifacts seed a targeted run (default: newest earlier runs on this branch)'
+        required: false
+        default: ''
+      full:
+        description: 'ignore any baseline results: mutate everything'
+        type: boolean
+        default: false
+  push:
+    branches: ['ci/**']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  # a push supersedes an earlier push run; a dispatched (queue) run is never killed by a later push to the branch
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+env:
+  CRATE: rust-pca
+  SHARDS: '63'
+  # part of the baseline identity (with the cargo-mutants version): a run with other flags is no baseline
+  MUT_CFG: 'cargo-mutants -j2 min-timeout60 x3 all-features'
+  CARGO_TERM_COLOR: never
+  CARGO_INCREMENTAL: '0'
+
+jobs:
+  # the tests + corpus this run mutates against (the next run's baseline check); small, runs alongside the shards
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants@27.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship tooling
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - name: Snapshot
+        run: |
+          node "$MONO/tools/pca-audit/rust-mutate/carry.mjs" files --pkg=atlas-pca > "$RUNNER_TEMP/src.txt"
+          node "$MONO/tools/pca-audit/mut-carry/snapshot.mjs" make --root="$GITHUB_WORKSPACE" --exclude-list="$RUNNER_TEMP/src.txt" \
+            --corpus-root="$MONO" --out=mut-snapshot --cfg="$MUT_CFG $(cargo mutants --version)" \
+            --tool-files="$MONO/tools/pca-audit/rust-mutate/carry.mjs,$MONO/tools/pca-audit/mut-carry/lib.mjs"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mut-snapshot
+          path: mut-snapshot/
+          retention-days: 30
+
+  # splits the shard list between the GitHub-hosted runners and the self-hosted GCP box (3 runners labelled pca-box, 12 vCPU):
+  # every BOX_EVERY-th shard goes to the box (63 shards -> 9 = 3 waves of 3), the rest (54) to hosted runners, which run
+  # ~17-20 at a time under the org cap (~3 waves), so both halves finish about together. Only this workflow (push to ci/** or
+  # workflow_dispatch, never pull_request) requests the pca-box label.
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - id: m
+        env:
+          BOX_EVERY: '7'
+        run: |
+          node -e '
+            const n = +process.env.SHARDS, every = +process.env.BOX_EVERY;
+            const include = Array.from({ length: n }, (_, i) => i + 1).map((shard) =>
+              ({ shard, runner: JSON.stringify(shard % every === 0 ? ["self-hosted", "pca-box"] : "ubuntu-latest") }));
+            console.log("matrix=" + JSON.stringify({ include }));
+          ' >> "$GITHUB_OUTPUT"
+
+  shard:
+    name: shard ${{ matrix.shard }}/63
+    needs: plan
+    runs-on: ${{ fromJSON(matrix.runner) }}
+    timeout-minutes: 345
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      # cargo-mutants' scratch copies (each with its own target dir) live under this runner's own temp, never in a shared /tmp
+      # (runner.* is not available in job-level env, so it is exported here)
+      - name: Per-runner TMPDIR
+        run: echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Clean the self-hosted workspace (non-ephemeral runner)
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: |
+          find "$RUNNER_TEMP" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+          find "$GITHUB_WORKSPACE" -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # the box runners share one CARGO_HOME: concurrent installs there corrupt each other's download (checksum
+      # mismatch), so cargo-mutants is preinstalled on the box at the same pinned version and only hosted runners install it
+      - uses: taiki-e/install-action@v2
+        if: ${{ runner.environment != 'self-hosted' }}
+        with:
+          tool: cargo-mutants@27.1.0
+      - name: cargo-mutants on the box is the pinned version
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: cargo mutants --version | grep -qx 'cargo-mutants 27.1.0'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Full shared corpus from the flagship
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - name: Baseline results (targeted mode)
+        if: ${{ !inputs.full }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASELINE: ${{ inputs.baseline_run }}
+        run: |
+          node "$MONO/tools/pca-audit/rust-mutate/carry.mjs" files --pkg=atlas-pca > "$RUNNER_TEMP/src.txt"
+          node "$MONO/tools/pca-audit/mut-carry/snapshot.mjs" make --root="$GITHUB_WORKSPACE" --exclude-list="$RUNNER_TEMP/src.txt" \
+            --corpus-root="$MONO" --out="$RUNNER_TEMP/snap" --cfg="$MUT_CFG $(cargo mutants --version)" \
+            --tool-files="$MONO/tools/pca-audit/rust-mutate/carry.mjs,$MONO/tools/pca-audit/mut-carry/lib.mjs"
+          node "$MONO/tools/pca-audit/mut-carry/baseline.mjs" --repo="$GITHUB_REPOSITORY" --branch="$GITHUB_REF_NAME" \
+            --exclude-run="$GITHUB_RUN_ID" --explicit="$BASELINE" --snapshot="$RUNNER_TEMP/snap" --out="$RUNNER_TEMP/base" >> "$GITHUB_ENV"
+      - name: Mutate
+        run: |
+          # a mutant that allocates without bound must die alone (caught), not exhaust the runner: 6 GiB address space per
+          # process (applied to the mutants' processes by carry.mjs, not to node), 2 mutants at a time. carry.mjs runs
+          # cargo-mutants (exit 0 / 2 missed / 3 timeouts are results, anything else fails) on this shard's mutants that no
+          # earlier result vouches for and writes the COMPLETE shard (carried results included) to $RUNNER_TEMP/mut/mutants.out.
+          carry=()
+          [ -z "${BASE_POOL:-}" ] || carry=(--carry="$BASE_POOL")
+          CARRY_ULIMIT_KB=6291456 node "$MONO/tools/pca-audit/rust-mutate/carry.mjs" run --pkg=atlas-pca \
+            --shard="$(( ${{ matrix.shard }} - 1 ))" --of="$SHARDS" --out="$RUNNER_TEMP/mut" "${carry[@]}" -- \
+            -j 2 --minimum-test-timeout 60 --timeout-multiplier 3
+          tail -5 "$RUNNER_TEMP/mut/mutants.out/missed.txt" 2>/dev/null || true
+          # the next run's baseline: this slice's results (carried ones included)
+          mkdir -p "$RUNNER_TEMP/mut-results"; cp "$RUNNER_TEMP/mut/results.json" "$RUNNER_TEMP/mut-results/results.json"
+      - name: Report
+        run: |
+          node -e '
+            const fs = require("fs"), path = require("path"); const d = process.argv[1], pre = "crates/atlas-pca/";
+            const rd = (f) => fs.existsSync(path.join(d, f)) ? fs.readFileSync(path.join(d, f), "utf8").split("\n").filter(Boolean) : [];
+            const counts = { caught: rd("caught.txt").length, missed: rd("missed.txt").length, timeout: rd("timeout.txt").length, unviable: rd("unviable.txt").length };
+            const src = new Map(); const line = (f, n) => { if (!src.has(f)) src.set(f, fs.readFileSync(f, "utf8").split("\n")); return (src.get(f)[n - 1] || "").trim(); };
+            const surv = rd("missed.txt").map((l) => {
+              const m = /^(.+?):(\d+):(\d+): (.*)$/.exec(l); if (!m) throw new Error("unparsed: " + l);
+              if (!m[1].startsWith(pre)) throw new Error("mutant outside the crate: " + l);
+              return { crate: "rust-pca", file: m[1].slice(pre.length), mutant: m[4], line: line(m[1], +m[2]), lineno: +m[2] };
+            });
+            fs.writeFileSync("counts.json", JSON.stringify(counts)); fs.writeFileSync("survivors.json", JSON.stringify(surv));
+          ' "$RUNNER_TEMP/mut/mutants.out"
+          node .github/scripts/mutation-shard-report.mjs --crate="$CRATE" --shard=${{ matrix.shard }} --of="$SHARDS" --tool=cargo-mutants \
+            --counts=counts.json --survivors=survivors.json --out=shard-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ matrix.shard }}
+          path: shard-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mut-results-${{ matrix.shard }}
+          path: ${{ runner.temp }}/mut-results/
+          retention-days: 30
+      - name: Clean up (self-hosted)
+        if: ${{ always() && runner.environment == 'self-hosted' }}
+        run: |
+          find "$RUNNER_TEMP" -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
+          find "$GITHUB_WORKSPACE" -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
+
+  merge:
+    needs: shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship checker + ledger
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+      - uses: actions/download-artifact@v4
+        with:
+          path: reports
+          pattern: shard-*
+      - name: Merge shards and check the ledger
+        run: >
+          node .github/scripts/mutation-merge.mjs --crate="$CRATE" --shards="$SHARDS" --reports=reports
+          --checker="$MONO/tools/pca-audit" --src="$GITHUB_WORKSPACE/crates/atlas-pca"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survivors-merged
+          path: reports/survivors-merged.json
+          if-no-files-found: ignore

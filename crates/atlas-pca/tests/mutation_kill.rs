@@ -55,8 +55,8 @@ fn number_profile_boundaries() {
     assert!(ok(json!(123456.789012345f64)).is_ok());
     // each error carries its own text
     assert!(ok(json!(-0.0f64)).unwrap_err().ends_with("negative zero"));
-    assert!(ok(json!(1e-7f64)).unwrap_err().ends_with("non-integer magnitude below 1e-6"));
-    assert!(ok(json!(18446744073709551615u64)).unwrap_err().ends_with("integer outside the safe range"));
+    assert!(ok(json!(1e-7f64)).unwrap_err().ends_with("non-integer magnitude below 1e-6 (needs an exponent form; not representable in the canonical decimal form)"));
+    assert!(ok(json!(18446744073709551615u64)).unwrap_err().ends_with("integer outside the safe range (|n| > 2^53-1)"));
 }
 
 #[test]
