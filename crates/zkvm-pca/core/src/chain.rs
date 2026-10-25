@@ -15,11 +15,11 @@
 //! the decision folds into `allow = 0`, making the guest `assert_eq!(allow, 1)` panic — so a forged or
 //! broken chain is UNPROVABLE.
 //!
-//! SCOPE (deliberate, documented boundary — NOT a soundness hole): only the `ed25519` suite is verified
-//! in-circuit (absent `alg`, or `alg == "ed25519"` — byte-identical bodies). Any post-quantum / hybrid
-//! suite (`ml-dsa-*`, `slh-dsa-*`, `hybrid-*`) FAILS CLOSED here, because verifying ML-DSA / SLH-DSA in
-//! the guest is a separate milestone. verifyChain ACCEPTS those suites off-circuit; the guest simply
-//! cannot yet PROVE them. ed25519 is the overwhelming default and the only suite the fixtures use.
+//! SUITES (PCA 0.4.2): every suite the guest implements ([`crate::pq_suites`]: ed25519, ML-DSA-65/87, SLH-DSA-SHA2-128f/256s
+//! and their hybrids, incl. the nested one) is verified in-circuit with the TS PQ-key authority rules (R3-01, F-2): a PQ ROOT
+//! verifies only under the verifier's stored grant (`trusted_root`, byte-identical), a PQ HOP only under a `pq_pk` that hashes
+//! to its parent's `holder_pq` commitment, and the signed hop body binds `holder_pq` and (for a PQ suite) `alg` + `pq_pk`. FN-DSA,
+//! LESS and unknown suites FAIL CLOSED (`unsupported_suite`).
 
 use crate::canonical::canonical_bytes;
 use crate::commit::{b64u, hash_canonical, sha256};
@@ -66,7 +66,7 @@ pub struct LeafSig {
 /// STRICT base64url (RFC 4648 §5, no padding) — a faithful port of `hash.ts` `decodeB64uStrict`:
 /// only `[A-Za-z0-9_-]`, length `mod 4 != 1`, canonical trailing bits (`b64u(decode(s)) == s`), and the
 /// decoded length MUST equal `len`. Returns `None` for ANY deviation (never panics).
-fn decode_b64u_strict(s: &str, len: usize) -> Option<Vec<u8>> {
+pub fn decode_b64u_strict(s: &str, len: usize) -> Option<Vec<u8>> {
     if s.len() % 4 == 1 {
         return None;
     }
@@ -135,24 +135,61 @@ pub fn ed25519_verify_b64u(public_key_b64u: &str, msg: &[u8], sig_b64u: &str) ->
     vk.verify_strict(msg, &sig).is_ok()
 }
 
-/// True iff the hop's `alg` selects the ed25519 suite we support in-circuit (absent, or the explicit
-/// `"ed25519"`). A known-but-PQ suite, or an unknown value, is NOT ed25519 (caller fails closed).
-fn is_ed25519_alg(c: &Value) -> bool {
-    match c.get("alg") {
-        None => true,
-        Some(Value::String(s)) => s == "ed25519",
-        _ => false,
+/// Every suite name the TS registry knows (`SIG_SUITES`): a name outside it is UNKNOWN (TS `resolveSigAlg` null).
+const KNOWN_SUITES: [&str; 14] = [
+    "ed25519", "ml-dsa-65", "hybrid-ed25519-ml-dsa-65", "hybrid-nested-ed25519-ml-dsa-65", "slh-dsa-sha2-128f",
+    "hybrid-ed25519-slh-dsa-sha2-128f", "ml-dsa-87", "hybrid-ed25519-ml-dsa-87", "slh-dsa-sha2-256s",
+    "hybrid-ed25519-slh-dsa-sha2-256s", "fn-dsa-512", "less-cat1", "hybrid-ed25519-less-cat1", "fn-dsa-1024",
+];
+
+/// `resolveSigAlg(alg)?.alg`: absent = ed25519; a non-string or unregistered name = `None` (unknown).
+fn resolve_alg(alg: Option<&Value>) -> Option<&'static str> {
+    match alg {
+        None => Some("ed25519"),
+        Some(Value::String(s)) => KNOWN_SUITES.iter().copied().find(|k| k == s),
+        _ => None,
     }
 }
 
-/// The canonical signed body of an ed25519 hop (`capability.ts` `bodyOf` → `signableBody`, ed25519
-/// leaves it unchanged): `{issuer, holder, caveats, parent: parent ?? null}`.
-fn signable_body_ed25519(c: &Value) -> Value {
-    let mut m = serde_json::Map::with_capacity(4);
+/// `holderPqCommitment(pq_pk)` = b64u(sha256("atlas-pca/holder-pq/v1\0" ‖ utf8(pq_pk))).
+pub fn holder_pq_commitment(pq_pk: &str) -> String {
+    let mut m = b"atlas-pca/holder-pq/v1\0".to_vec();
+    m.extend_from_slice(pq_pk.as_bytes());
+    b64u(&sha256(&m))
+}
+
+/// `pqBindingError(alg, pq_pk, committed)` (F-2, `allowUnboundPq` false): a suite that carries a PQ key needs the signer's
+/// holder to have committed (`holder_pq`) to exactly that key. `Some(reason)` = refused.
+pub fn pq_binding_error(alg: Option<&str>, pq_pk: Option<&str>, committed: Option<&str>, label: &str) -> Option<String> {
+    let needs = alg.is_some_and(|a| a != "ed25519");
+    if !needs {
+        return None;
+    }
+    let alg = alg.unwrap_or("ed25519");
+    match committed {
+        None => Some(format!(
+            "{label}: suite '{alg}' needs a PQ key bound to the signer, but the signer's holder carries no holder_pq commitment (unbound PQ keys are rejected; F-2)"
+        )),
+        Some(c) if pq_pk.map(holder_pq_commitment).as_deref() == Some(c) => None,
+        Some(_) => Some(format!("{label}: pq_pk does not match the signer's committed holder_pq (F-2)")),
+    }
+}
+
+/// The canonical signed body of a hop (`capability.ts` `signableBody` = `bindSuiteFields(bodyOf(c), alg, pq_pk)`):
+/// `{issuer, holder, caveats, parent: parent ?? null, holder_pq?}`, plus `alg` and `pq_pk` for a non-ed25519 suite.
+fn signable_body(c: &Value, alg: &str) -> Value {
+    let mut m = serde_json::Map::with_capacity(7);
     m.insert("issuer".to_string(), c.get("issuer").cloned().unwrap_or(Value::Null));
     m.insert("holder".to_string(), c.get("holder").cloned().unwrap_or(Value::Null));
     m.insert("caveats".to_string(), c.get("caveats").cloned().unwrap_or(Value::Array(Vec::new())));
     m.insert("parent".to_string(), c.get("parent").cloned().unwrap_or(Value::Null));
+    if let Some(hp) = c.get("holder_pq") {
+        m.insert("holder_pq".to_string(), hp.clone());
+    }
+    if alg != "ed25519" {
+        m.insert("alg".to_string(), Value::String(alg.to_string()));
+        m.insert("pq_pk".to_string(), c.get("pq_pk").cloned().unwrap_or(Value::Null));
+    }
     Value::Object(m)
 }
 
@@ -167,7 +204,7 @@ fn well_typed(c: &Value) -> bool {
     if !is_str("id") || !is_str("issuer") || !is_str("holder") || !is_str("body_digest") || !is_str("sig") {
         return false;
     }
-    for k in ["alg", "pq_pk", "pq_sig", "parent"] {
+    for k in ["alg", "pq_pk", "pq_sig", "holder_pq", "parent"] {
         if let Some(v) = o.get(k) {
             if !v.is_string() {
                 return false;
@@ -182,15 +219,18 @@ fn well_typed(c: &Value) -> bool {
     }
 }
 
-/// `capability.ts` `checkSig` (ed25519 suite). Verifies the hop body digest / id binding and the Ed25519
-/// signature by `signer` over `CAP_DOMAIN ‖ sha256(canonical(body))`. Returns `Ok(())` or an error label.
-fn check_sig(c: &Value, signer: &str, label: &str) -> Result<(), String> {
-    // Unknown / unsupported suite => fail closed before any hashing (matches `resolveSigAlg(...) === null`
-    // for unknown, and extends fail-closed to PQ suites the guest does not verify in-circuit).
-    if !is_ed25519_alg(c) {
-        return Err(format!("{label}: unsupported/unknown signature alg for in-circuit verification"));
+/// `capability.ts` `checkSig`: the hop body digest / id binding, then the suite signature by `signer` (Ed25519 identity) over
+/// `CAP_DOMAIN ‖ sha256(canonical(body))`, the PQ half under `pq` (the verifier-authorised key; `None` for a PQ suite =
+/// refused). Unknown suite: refused before any hashing; a suite the guest lacks: `unsupported_suite`.
+fn check_sig(c: &Value, signer: &str, label: &str, pq: Option<&str>) -> Result<(), String> {
+    let alg = match resolve_alg(c.get("alg")) {
+        Some(a) => a,
+        None => return Err(format!("{label}: unknown signature alg")),
+    };
+    if !crate::pq_suites::suite_supported(Some(alg)) {
+        return Err(format!("{label}: unsupported_suite: {alg}"));
     }
-    let body = signable_body_ed25519(c);
+    let body = signable_body(c, alg);
     let cb = canonical_bytes(&body);
     let digest_raw = sha256(&cb);
     let digest_b64 = b64u(&digest_raw);
@@ -203,8 +243,11 @@ fn check_sig(c: &Value, signer: &str, label: &str) -> Result<(), String> {
     let mut msg = Vec::with_capacity(CAP_DOMAIN.len() + 32);
     msg.extend_from_slice(CAP_DOMAIN);
     msg.extend_from_slice(&digest_raw);
-    let sig = c.get("sig").and_then(|v| v.as_str()).unwrap_or("");
-    if !ed25519_verify_b64u(signer, &msg, sig) {
+    if alg != "ed25519" && pq.is_none() {
+        return Err(format!("{label}: no verifier-authorised PQ key for suite '{alg}' (refused)"));
+    }
+    let s = |k: &str| c.get(k).and_then(|v| v.as_str());
+    if crate::pq_suites::verify_with_suite(Some(alg), &msg, Some(signer), s("sig"), pq, s("pq_sig")).is_err() {
         return Err(format!("{label}: bad signature (not signed by expected key)"));
     }
     Ok(())
@@ -239,31 +282,42 @@ fn allocations_monotone_err(leaf: &Value) -> Option<String> {
     None
 }
 
-/// The leaf PCActn signature (`pcactn.ts` `verifyLeafSuite`, ed25519 path): Ed25519 `sig` by the leaf
-/// `holder` over the canonical PCActn message. PQ/unknown suites fail closed (module scope note).
-fn verify_leaf_suite(leaf: &LeafSig, holder: &str) -> bool {
-    match leaf.alg.as_deref() {
-        None | Some("ed25519") => {}
-        _ => return false,
-    }
-    let sig = match &leaf.sig {
-        Some(s) => s,
-        None => return false,
+/// The leaf PCActn signature (`pcactn.ts` step 3): F-2 binding of the leaf's `pq_pk` to the leaf capability's `holder_pq`
+/// (`pqBindingError`), then `verifyLeafSuite` under the leaf `holder` with the bound PQ key (`holderPqKey`). Unknown and
+/// guest-unsupported suites fail closed.
+fn verify_leaf_suite(leaf: &LeafSig, holder: &str, holder_pq: Option<&str>) -> bool {
+    let alg = match leaf.alg.as_deref() {
+        None => "ed25519",
+        Some(a) => match KNOWN_SUITES.iter().copied().find(|k| *k == a) {
+            Some(k) => k,
+            None => return false,
+        },
     };
-    ed25519_verify_b64u(holder, &leaf.message, sig)
+    if pq_binding_error(Some(alg), leaf.pq_pk.as_deref(), holder_pq, "leaf").is_some() {
+        return false;
+    }
+    let pq = if alg == "ed25519" { None } else { leaf.pq_pk.as_deref() };
+    crate::pq_suites::verify_with_suite(Some(alg), &leaf.message, Some(holder), leaf.sig.as_deref(), pq, leaf.pq_sig.as_deref()).is_ok()
 }
 
 /// Verify the FULL signed capability chain AND the leaf PCActn signature — the faithful port of
 /// `capability.ts` `verifyChain(chain, expectedRootIssuer)` followed by the leaf-holder signature check of
 /// `verifyPCActnCore` step 3. `expected_root_principal` is the pinned root issuer (== `grant.issuer`).
 pub fn verify_chain(chain: &[Value], expected_root_principal: &str, leaf: &LeafSig) -> ChainVerdict {
-    let hops = verify_hops(chain, expected_root_principal);
+    verify_chain_with(chain, expected_root_principal, None, leaf)
+}
+
+/// [`verify_chain`] with the verifier's stored grant as `trusted_root` (the PCActn path: the root is the grant, so a PQ root
+/// verifies under its own `pq_pk` exactly when it IS the stored grant, `verifyChain(..., {trustedRoot: grant})`).
+pub fn verify_chain_with(chain: &[Value], expected_root_principal: &str, trusted_root: Option<&Value>, leaf: &LeafSig) -> ChainVerdict {
+    let hops = verify_hops_with(chain, expected_root_principal, trusted_root);
     if !hops.ok {
         return hops;
     }
     // ---- leaf PCActn signature under the leaf capability holder -----------------------------------
-    let leaf_holder = chain[chain.len() - 1].get("holder").and_then(|v| v.as_str()).unwrap_or("");
-    if !verify_leaf_suite(leaf, leaf_holder) {
+    let leaf_cap = &chain[chain.len() - 1];
+    let leaf_holder = leaf_cap.get("holder").and_then(|v| v.as_str()).unwrap_or("");
+    if !verify_leaf_suite(leaf, leaf_holder, leaf_cap.get("holder_pq").and_then(|v| v.as_str())) {
         return ChainVerdict::deny("leaf signature does not verify under the leaf holder key");
     }
     ChainVerdict::ok()
@@ -273,6 +327,11 @@ pub fn verify_chain(chain: &[Value], expected_root_principal: &str, leaf: &LeafS
 /// leaf PCActn signature). Exposed so the verdict AND reason can be compared 1:1 with the TypeScript
 /// reference in the cross-implementation tests.
 pub fn verify_hops(chain: &[Value], expected_root_principal: &str) -> ChainVerdict {
+    verify_hops_with(chain, expected_root_principal, None)
+}
+
+/// [`verify_hops`] with an optional `trusted_root` (the verifier's stored grant; R3-01).
+pub fn verify_hops_with(chain: &[Value], expected_root_principal: &str, trusted_root: Option<&Value>) -> ChainVerdict {
     if chain.is_empty() {
         return ChainVerdict::deny("empty chain");
     }
@@ -294,7 +353,23 @@ pub fn verify_hops(chain: &[Value], expected_root_principal: &str) -> ChainVerdi
     if root_issuer != expected_root_principal {
         return ChainVerdict::deny("hop 0: root issuer is not the expected principal");
     }
-    if let Err(e) = check_sig(root, root_issuer, "hop 0") {
+    // R3-01: a PQ ROOT's key must come from verifier-side authority: here, the verifier's stored copy of this very grant.
+    let root_alg = resolve_alg(root.get("alg"));
+    let root_pq = match root_alg {
+        Some(a) if a != "ed25519" => {
+            let trusted = trusted_root.is_some_and(|t| hash_canonical(t) == hash_canonical(root));
+            match root.get("pq_pk").and_then(|v| v.as_str()) {
+                Some(pk) if trusted => Some(pk),
+                _ => {
+                    return ChainVerdict::deny(format!(
+                        "hop 0: root suite '{a}' needs a PQ key pinned for the root issuer (policy.pqPins) or the verifier's stored grant (policy.trustedRoot); the root's own pq_pk proves nothing about who issued it (R3-01)"
+                    ))
+                }
+            }
+        }
+        _ => None,
+    };
+    if let Err(e) = check_sig(root, root_issuer, "hop 0", root_pq) {
         return ChainVerdict::deny(e);
     }
 
@@ -313,7 +388,14 @@ pub fn verify_hops(chain: &[Value], expected_root_principal: &str) -> ChainVerdi
         if c.get("issuer").and_then(|v| v.as_str()).unwrap_or("") != parent_holder {
             return ChainVerdict::deny(format!("{label}: issuer is not the parent's bound holder"));
         }
-        if let Err(e) = check_sig(c, parent_holder, &label) {
+        // F-2: a PQ hop's key must be the one the parent's holder committed to (`holder_pq`).
+        let hop_alg = resolve_alg(c.get("alg"));
+        let hop_pq_pk = c.get("pq_pk").and_then(|v| v.as_str());
+        if let Some(e) = pq_binding_error(hop_alg, hop_pq_pk, parent.get("holder_pq").and_then(|v| v.as_str()), &label) {
+            return ChainVerdict::deny(e);
+        }
+        let hop_pq = if hop_alg.is_some_and(|a| a != "ed25519") { hop_pq_pk } else { None };
+        if let Err(e) = check_sig(c, parent_holder, &label, hop_pq) {
             return ChainVerdict::deny(e);
         }
         // Attenuation-only: parent caveats must be an exact prefix (no drop, reorder or edit).

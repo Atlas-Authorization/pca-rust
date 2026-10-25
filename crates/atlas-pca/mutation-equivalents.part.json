@@ -17,7 +17,7 @@
   "crate": "rust-pca",
   "file": "src/lib.rs",
   "mutant": "replace > with >= in number_error",
-  "line": "return if u > MAX_SAFE as u64 { Some(\"integer outside the safe range\".into()) } else { None };",
+  "line": "return if u > MAX_SAFE as u64 { Some(\"integer outside the safe range (|n| > 2^53-1)\".into()) } else { None };",
   "reason": "This branch is reached only for u64 values above i64::MAX (as_i64 handled the rest), all far above MAX_SAFE, so > and >= agree on every reachable input."
  },
  {
@@ -54,5 +54,274 @@
   "mutant": "replace match guard holder_pq_commitment(pk) == *c with true in pinned::resolve_pq_key",
   "line": "Some(Value::String(c)) if holder_pq_commitment(pk) == *c => Some(PinnedPq { key: pk.to_string() }),",
   "reason": "Both callers that pass a holder_pq (chain hops, PCActn leaf) run pq_binding_ok, the same commitment check, immediately before; the root passes holder_pq None. The guard is a defence-in-depth duplicate."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_map.rs",
+  "mutant": "replace match guard k == \"log2_vs_mbits\" with true in metrics_error",
+  "line": "None if k == \"log2_vs_mbits\" => {}",
+  "reason": "The required metric fields are checked present before this loop, so the missing-member arm is only reachable for log2_vs_mbits."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_map.rs",
+  "mutant": "replace > with >= in cell_of",
+  "line": "if kind == \"prefix\" && xs.starts_with(v.as_str()) && best.is_none_or(|(_, l)| v.len() > l) {",
+  "reason": "Two distinct prefix values of the same length cannot both prefix one string (values are checked distinct), so > and >= pick the same cell."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_revocation.rs",
+  "mutant": "delete - in check_session_revocation",
+  "line": "let (e_now, e_last) = (nonneg(o.get(\"epoch\")).unwrap_or(-1), nonneg(le.get(\"epoch\")).unwrap_or(-1));",
+  "reason": "Both unwrap_or(-1) fallbacks (current and last epoch) are dead: both epochs were validated as non-negative safe integers by the shape checks above, so neither -1 is ever read.",
+  "multiplicity": 2
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_suite.rs",
+  "mutant": "replace match guard !p.is_empty() with true in verify_pinned_suite",
+  "line": "Some(Value::String(p)) if !p.is_empty() => p.as_str(),",
+  "reason": "An empty artifact pq_pk fails closed anyway: PinnedPq::caller_vouched of an empty key is None, so the guard is redundant."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_v2.rs",
+  "mutant": "replace < with <= in js_number_string",
+  "line": "return if f < 0.0 { \"-Infinity\".into() } else { \"Infinity\".into() };",
+  "reason": "Infinity is never negative-zero: the f == 0.0 case returned earlier, so f < 0.0 and f <= 0.0 agree on infinite values."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_v2.rs",
+  "mutant": "replace < with <= in js_number_string",
+  "line": "if f < 0.0 {",
+  "reason": "f == 0.0 returned earlier, so f < 0.0 and f <= 0.0 agree."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_v2.rs",
+  "mutant": "replace < with <= in js_number_string",
+  "line": "let sign = if e < 0 { '-' } else { '+' };",
+  "reason": "The exponent branch is only taken for e >= 21 or e <= -7, so e == 0 (where < and <= differ) is unreachable."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_v2.rs",
+  "mutant": "replace - with / in session_step",
+  "line": "if i > 0 && !(b32(prior[i - 1].get(\"id\")) && same(c.and_then(|c| c.get(\"prev\")), prior[i - 1].get(\"id\"))) {",
+  "reason": "A held grant's prev must be a 32-byte digest (the caveat shape check) and equal the previous id, so b32 of the previous id is implied by the second conjunct."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_wb.rs",
+  "mutant": "replace match guard safe_integer_f64(skew) with true in decide_offer_set",
+  "line": "Some(n) if safe_integer_f64(skew) => n as f64,",
+  "reason": "skew is the world policy skew_ms, validated as a non-negative safe integer by validate_world_policy before the offer step runs."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_wb.rs",
+  "mutant": "replace < with <= in decide_offer_set",
+  "line": "if offer_matches(x, &fo) && price(x) < min {",
+  "reason": "Equal prices yield the same minimum, so < and <= select the same value."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_wb.rs",
+  "mutant": "replace > with >= in flow_rule_for",
+  "line": "if p.ends_with(\".*\") && cls.starts_with(prefix) && best.is_none_or(|b| p.encode_utf16().count() > b.encode_utf16().count()) {",
+  "reason": "Policy keys are distinct, so two different .* prefixes of equal length cannot both prefix one class."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_wb.rs",
+  "mutant": "replace != with == in prov_inner",
+  "line": "if a != b && b.starts_with(&format!(\"{a}.\")) {",
+  "reason": "prov keys are exactly action.params.<name> with no dot in the name, so one key can never be a dotted extension of another."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/intent_wb.rs",
+  "mutant": "replace match guard is_taint_level(Some(l)) with true in prov_inner",
+  "line": "Some(l) if is_taint_level(Some(l)) => s(Some(l)).unwrap_or(\"agent\"),",
+  "reason": "A non-taint registry value ranks 4 (unwrap_or(4)), which is the rank of 'agent', so the fallback level is indistinguishable."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace match guard pq.sig_len_ok(b.len()) with true in pq_verify_b64u",
+  "line": "Some(b) if pq.sig_len_ok(b.len()) => b,",
+  "reason": "pq_verify re-checks the signature length immediately after, so the guard is redundant."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace || with && in pq_verify",
+  "line": "if pk.len() != pk_len || !pq.sig_len_ok(sig.len()) {",
+  "reason": "Every suite's decoder / fixed-size conversion (and the LESS C side) rejects a wrong key or signature length itself."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace || with && in less::verify",
+  "line": "if pk.len() != PUBLIC_KEY_BYTES || !sig_len_ok(sig.len()) {",
+  "reason": "The LESS C verifier checks pk_len and sig_len itself and returns 0, so the Rust pre-check is redundant."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/lib.rs",
+  "mutant": "replace match guard l >= 0.0 with true in caveat_satisfied",
+  "line": "Some(l) if l >= 0.0 => l,",
+  "reason": "A negative limit makes amount <= lim false for every amount >= 0, which is also what the guard's refusal returns."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/predicates.rs",
+  "mutant": "replace && with || in ordered",
+  "line": "if x.is_finite() && y.is_finite() {",
+  "reason": "serde_json numbers are always finite (it cannot hold NaN or Infinity), so is_finite is always true."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/predicates.rs",
+  "mutant": "replace match guard !s.is_empty() with true in tri_leaf",
+  "line": "Some(Value::String(s)) if !s.is_empty() => s.as_str(),",
+  "reason": "An empty collection path resolves to nothing, which returns the same unknown as the guard's fallthrough.",
+  "occurrence": 2
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace > with == in emit",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS || depth > MAX_PARSE_DEPTH * 2 {",
+  "reason": "The size half of the check is redundant with the top-of-emit check on the next call and compile's final length check, since the program only grows."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace > with >= in emit",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS || depth > MAX_PARSE_DEPTH * 2 {",
+  "reason": "The size half of the check is redundant with the top-of-emit check on the next call and compile's final length check, since the program only grows."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace > with == in emit",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS {",
+  "reason": "Rep-tail size check: redundant with the entry check of the next emit call and compile's final length check (the program only grows and Match is always appended; at exactly the cap the appended Match overflows it anyway). The depth half of the cap is a separate site, killed by emit_depth_cap_is_exactly_twice_the_parse_depth.",
+  "occurrence": 1
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace > with >= in emit",
+  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS {",
+  "reason": "Rep-tail size check: redundant with the entry check of the next emit call and compile's final length check (the program only grows and Match is always appended; at exactly the cap the appended Match overflows it anyway). The depth half of the cap is a separate site, killed by emit_depth_cap_is_exactly_twice_the_parse_depth.",
+  "occurrence": 1
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace += with *= in run",
+  "line": "epoch += 1;",
+  "reason": "The first epoch only has to differ from the marks' initial usize::MAX and from later epochs; 0 does.",
+  "occurrence": 1
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace + with * in is_safe_regex_source",
+  "line": "let n = match src.get(i + 1) {",
+  "reason": "A backreference escape is also refused by the parser (compile is required by the guard), so the verdict is unchanged."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace || with && in is_safe_regex_source",
+  "line": "if (0x31..=0x39).contains(&n) || n == 0x6b {",
+  "reason": "A backreference escape is also refused by the parser (compile is required by the guard), so the verdict is unchanged."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace + with * in is_safe_regex_source",
+  "line": "let mut j = i + 1;",
+  "reason": "Starting the class scan one code unit earlier at '[' reaches the same closing bracket."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace += with -= in is_safe_regex_source",
+  "line": "j += 1;",
+  "reason": "This is the skip of an optional '^' right after '['. The unskipped start (the '^' itself, or the '[' for -=) is neither ']' nor '\\\\', so the class scan advances and ends at the same closing bracket either way.",
+  "occurrence": 1
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace += with *= in is_safe_regex_source",
+  "line": "j += 1;",
+  "reason": "This is the skip of an optional '^' right after '['. The unskipped start (the '^' itself, or the '[' for -=) is neither ']' nor '\\\\', so the class scan advances and ends at the same closing bracket either way.",
+  "occurrence": 1
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace + with * in is_safe_regex_source",
+  "line": "i = j + 1;",
+  "reason": "Resuming at the closing ']' treats it as one plain atom, with the same prev state and cost as resuming after it."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "delete match arm Prev::None in is_safe_regex_source",
+  "line": "Prev::None => return false,",
+  "reason": "A quantifier with nothing to repeat is also refused by the parser (compile is required by the guard)."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "delete ! in is_safe_regex_source",
+  "line": "if !qunb {",
+  "reason": "A bounded repeat above 64 is also refused by the parser (compile is required by the guard)."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace match guard o > 1 with true in is_safe_regex_source",
+  "line": "Some(o) if o > 1 => 64 - (o - 1).leading_zeros(), // ceil(log2(o))",
+  "reason": "ceil(log2(o)) is 0 for o == 1 and o >= 1 always, so o > 1, o >= 1 and true give the same cost."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace > with >= in is_safe_regex_source",
+  "line": "Some(o) if o > 1 => 64 - (o - 1).leading_zeros(), // ceil(log2(o))",
+  "reason": "ceil(log2(o)) is 0 for o == 1 and o >= 1 always, so o > 1, o >= 1 and true give the same cost."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace + with * in emit",
+  "line": "prog.push(Inst::Split(split + 1, usize::MAX));",
+  "occurrence": 1,
+  "reason": "The Split target is a placeholder: every Split pushed here is overwritten with its real targets (split+1, end) before emit returns, nothing executes the program in between, and an error path drops the whole program, so split*1 vs split+1 never reaches the matcher or the size count."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace + with * in emit",
+  "line": "prog.push(Inst::Split(split + 1, usize::MAX));",
+  "occurrence": 2,
+  "reason": "The Split target is a placeholder: every Split pushed here is overwritten with its real targets (split+1, end) before emit returns, nothing executes the program in between, and an error path drops the whole program, so split*1 vs split+1 never reaches the matcher or the size count."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/safe_regex.rs",
+  "mutant": "replace + with * in emit",
+  "line": "prog.push(Inst::Split(at + 1, usize::MAX));",
+  "occurrence": 1,
+  "reason": "The Split target is a placeholder: every Split pushed here is overwritten with its real targets (sp+1, end) before emit returns, nothing executes the program in between, and an error path drops the whole program, so split*1 vs split+1 never reaches the matcher or the size count."
  }
 ]

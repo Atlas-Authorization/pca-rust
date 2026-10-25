@@ -52,6 +52,23 @@ pub struct Context {
     /// R4-04: the signed PCActn's `counter` (a non-negative safe integer; monotonicity against stored state is the
     /// resource server's job, the journal only carries the value so it can be checked there).
     pub pcactn_counter: u64,
+    /// PCA 0.4.2: the signed `intent` claims (`ref`, `map_digest`, `fidelity_ppm`, `residual_risk_ppm`), present iff the
+    /// PCActn carries an `intent` slot, which the guest proved well formed and bound to the root grant's goal commitment.
+    pub intent: Option<crate::intent::IntentClaim>,
+    /// PCA 0.4.2 Intent Layer v2: present iff the input carried a v2 verifier state or the PCActn carries `intent_session`.
+    pub intent_v2: Option<IntentV2Journal>,
+}
+
+/// What a proved decision says about the Intent Layer v2 checks.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct IntentV2Journal {
+    /// `hashCanonical(intent_v2)` of the verifier state the checks ran under (the empty string when none was supplied).
+    pub ctx_digest: String,
+    /// The reported v2 checks in order, `(name, ok)` (a proved allow means all ok).
+    pub checks: Vec<(String, bool)>,
+    /// The admitting root's predicate env AFTER the v2 replacement, as strict canonical JSON (`""` when absent): the
+    /// verifier-computed `canon` / `acc` / `mon` / `world` / `prov` / `class` values the grant predicates read.
+    pub env: String,
 }
 
 /// `PCACTN_VERSION` (pcactn.ts): the only wire version the guest and the verifier accept.
@@ -179,7 +196,22 @@ impl Context {
             pcactn_exp: facts.as_ref().map_or(0, |f| f.exp),
             pcactn_aud: facts.as_ref().map_or_else(String::new, |f| f.aud.clone()),
             pcactn_counter: facts.as_ref().map_or(0, |f| f.counter),
+            intent: i.pcactn.as_ref().and_then(|p| crate::intent::bind_intent(p, &i.grant).ok().flatten()),
+            intent_v2: None,
         }
+    }
+
+    /// Record the Intent Layer v2 outcome (called by `decide` with the decision it computed once).
+    pub fn with_intent_v2(mut self, i: &DecideInput, d: &crate::intent_v2::V2Decision, eff_env: Option<&Value>) -> Self {
+        let has_session = i.pcactn.as_ref().is_some_and(|p| p.get("intent_session").is_some());
+        if i.intent_v2.is_some() || has_session || !d.checks.is_empty() {
+            self.intent_v2 = Some(IntentV2Journal {
+                ctx_digest: i.intent_v2.as_ref().map_or_else(String::new, crate::intent_v2::ctx_digest),
+                checks: d.checks.iter().map(|c| (c.name.to_string(), c.ok)).collect(),
+                env: if has_session { eff_env.map_or_else(String::new, crate::canonical::canonicalize) } else { String::new() },
+            });
+        }
+        self
     }
 }
 
@@ -220,6 +252,11 @@ pub struct ExpectedContext {
     pub action_commit: String,
     pub policy_commit: String,
     pub plan_commit: String,
+    /// PCA 0.4.2: the relying party's intent policy (`IntentPolicy`); the default is inactive (any or no intent).
+    pub intent_policy: crate::intent::IntentPolicy,
+    /// PCA 0.4.2 Intent Layer v2: `hashCanonical` of the verifier's OWN v2 state + policy (`None`: the verifier runs no v2
+    /// checks, and the journal must carry no v2 state). Pinning it pins every pin, key, policy and store value the checks read.
+    pub intent_v2_ctx_digest: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -256,6 +293,10 @@ pub enum ContextMismatch {
     ActionCommit,
     PolicyCommit,
     PlanCommit,
+    /// PCA 0.4.2: the proved intent claim does not satisfy the relying party's intent policy.
+    Intent(crate::intent::IntentPolicyFailure),
+    /// PCA 0.4.2: the proved Intent Layer v2 state is not the verifier's (or one side has none).
+    IntentV2Context,
 }
 
 impl ExpectedContext {
@@ -287,6 +328,8 @@ impl ExpectedContext {
             action_commit: crate::commit::action_commitment(&i.action),
             policy_commit: crate::commit::policy_commitment(&i.grant),
             plan_commit: crate::commit::plan_commitment(&i.plan).unwrap_or_default(),
+            intent_policy: crate::intent::IntentPolicy::default(),
+            intent_v2_ctx_digest: i.intent_v2.as_ref().map(crate::intent_v2::ctx_digest),
         })
     }
 }
@@ -370,6 +413,13 @@ pub fn check_context(j: &crate::Decision, e: &ExpectedContext) -> Result<(), Con
         Err(Freshness::Lifetime) => return Err(M::PcactnLifetime),
         Err(Freshness::NotYetValid) => return Err(M::PcactnNotYetValid),
         Err(Freshness::Expired) => return Err(M::PcactnExpired),
+    }
+    // PCA 0.4.2 (intent-binding.ts rules 0, 1, 3, 4; rule 2 was proved in the guest): the relying party's policy.
+    crate::intent::check_intent_policy(c.intent.as_ref(), &e.intent_policy).map_err(M::Intent)?;
+    // Intent Layer v2: the proved checks ran under exactly the verifier's state and policy
+    let proven_v2 = c.intent_v2.as_ref().map(|j| j.ctx_digest.as_str()).filter(|d| !d.is_empty());
+    if proven_v2 != e.intent_v2_ctx_digest.as_deref() {
+        return Err(M::IntentV2Context);
     }
     if j.action_commit != e.action_commit {
         return Err(M::ActionCommit);

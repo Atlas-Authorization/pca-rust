@@ -239,7 +239,9 @@ fn wire_rules_for_aud_nonce_and_unsigned_members() {
     assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": ml, "alg": "ml-dsa-65", "pq_sig": ml}))).unwrap_err().contains("'pq_sig' must be absent"));
     assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "ml-dsa-65"}))).unwrap_err().contains("(3309 bytes) for alg 'ml-dsa-65'"));
     assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": null}))).unwrap_err().contains("'alg' must be a string"));
-    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "ml-dsa-87"}))).unwrap_err().contains("unknown signature alg"));
+    // ml-dsa-87 is implemented (0.4.2): judged by its own lengths; an unregistered alg is unknown
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "ml-dsa-87"}))).unwrap_err().contains("(4627 bytes) for alg 'ml-dsa-87'"));
+    assert!(validate_wire(&th(json!({"role": "r", "publicKey": pk, "sig": sg, "alg": "ml-dsa-44"}))).unwrap_err().contains("unknown signature alg"));
 }
 
 #[test]

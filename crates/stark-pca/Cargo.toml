@@ -1,6 +1,6 @@
 [package]
 name = "stark-pca"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "Transparent, post-quantum STARK (Winterfell) proof of the Proof-Carrying Authority release gate"
 license = "MIT"

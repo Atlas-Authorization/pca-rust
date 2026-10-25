@@ -92,13 +92,10 @@ pub fn b64d(s: &str) -> Vec<u8> {
     base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(s).unwrap()
 }
 
-/// The signature suites this Rust verifier implements — for the LEAF signature (`requires:"pq"`), for
-/// non-leaf capability-chain hops (`requires:"pq-nonleaf"`), and for the threshold-share binding. The three
-/// CROSS-IMPL suites every conformant impl is required to agree on (GAP 1): classical Ed25519, the pure
-/// lattice ML-DSA-65 (FIPS-204, via the `fips204` crate), and the hybrid Ed25519 + ML-DSA-65. The remaining
-/// registered suites (ml-dsa-87, slh-dsa-sha2-128f/256s, their hybrids, and the SUF-CMA nested hybrid) are
-/// NOT yet wired in Rust, so vectors that need a real signature verdict under them are skipped explicitly.
-pub const SUPPORTED_SUITES: &[&str] = &["ed25519", "ml-dsa-65", "hybrid-ed25519-ml-dsa-65"];
+/// The signature suites this Rust verifier implements: its capability manifest ([`atlas_pca::supported_suites`]; every
+/// registered suite but the LESS pair, packages/pca/conformance/SUITES.md). A vector needing a suite outside it must be
+/// refused with the distinct reason `unsupported_suite`.
+pub static SUPPORTED_SUITES: std::sync::LazyLock<Vec<&'static str>> = std::sync::LazyLock::new(atlas_pca::supported_suites);
 
 /// Which concrete signature suite a vector exercises that this verifier does NOT implement, if any:
 /// the leaf `alg` for `requires:"pq"`, or any capability-hop `alg` for `requires:"pq-nonleaf"`.

@@ -25,11 +25,31 @@ the full set and splices the core sample:
       && node packages/pca/scripts/gen-conformance-r6.mjs \
       && node packages/pca/scripts/gen-conformance-depth.mjs \
       && node packages/pca/scripts/gen-conformance-mut.mjs \
-      && node packages/pca/scripts/gen-conformance-041.mjs
+      && node packages/pca/scripts/gen-conformance-041.mjs \
+      && node packages/pca/scripts/gen-conformance-intent.mjs \
+      && node packages/pca/scripts/gen-conformance-intent-wb.mjs
     # then, to refresh the committed gate manifest + matrix:
     packages/pca/node_modules/.bin/tsx packages/pca-conformance/adversarial/gen-adversarial.ts
 
 Files are written one vector per line (valid JSON; shared writer `scripts/conformance-io.mjs`).
+(On Node 24 with the default V8 stack, `gen-conformance-adv.mjs` overflows while stringifying its 5000-deep nesting
+vectors: run the stages with `node --stack-size=4000`.)
+
+### Raw JSON text members (`*_json`)
+Some inputs cannot survive an ordinary JSON round trip: `-0` is written as `0`, and an integral float (`1.0`), an
+exponent form (`1e6`), an integer beyond 2^53 or a duplicate key cannot be expressed as a parsed value at all. Where a
+vector's meaning depends on such a lexeme it carries the input as RAW JSON TEXT in a string member whose name ends in
+`_json`. A runner parses that string with ITS OWN JSON parser and uses the result INSTEAD of the sibling member (the
+raw form takes precedence; the sibling, when present, is only a lossy convenience copy). The members are:
+- `pcactn_json` (a vector): the PCActn document (adversarial families);
+- `context.intent_policy_json` (a vector): the rule-12 intent policy (see rule 12);
+- `input_json` (any `primitives.*` entry): the WHOLE `input` object. Today it carries `-0` (e.g.
+  `schema14-int-neg-zero`, where `"total":-0` must reach the verifier as negative zero and fail `bad_type`); the writer
+  emits it automatically whenever an `input` holds a value plain JSON would erase.
+A parser that cannot represent `-0` must still report it as negative zero (it is not a non-negative safe integer). The
+shared writer (`conformance-io.mjs`, used by every generator) refuses to write any other JSON-erasable value (NaN,
+Infinity, array holes, non-plain objects) and asserts that each written entry re-parses to exactly the value its
+expectation was computed from, so a lossy vector cannot be written again.
 
 Each generator asserts every vector's / primitive's stated intent against the TypeScript reference before it
 is written (`verifyPCActnCore` for PCActns; `verifyThreshold` / `verifyWithSuite` for the threshold + artifact
@@ -51,10 +71,82 @@ The language verifiers (`sdks/*-pca`) must reproduce `allow` and every listed ch
 ### 0.4.1 coverage (`gen-conformance-041.mjs`)
 
 - `r041-share-*` (20 vectors): threshold share signatures validated per suite on the wire. Positives carry a pure
-  ML-DSA-65 share, a hybrid share, an ed25519 + ML-DSA-65 pair and a share with a `pq_pk` echo (every native), plus ML-DSA-87
-  and SLH-DSA-SHA2-128f shares (`requires: <alg>`); negatives cover wrong lengths for the declared suite, the old 64-byte
+  ML-DSA-65 share, a hybrid share, an ed25519 + ML-DSA-65 pair and a share with a `pq_pk` echo, plus ML-DSA-87
+  and SLH-DSA-SHA2-128f shares; every positive names its first non-ed25519 share suite (`requires: <alg>`), so a runtime
+  without that backend asserts the `unsupported_suite` refusal instead; negatives cover wrong lengths for the declared suite, the old 64-byte
   length on a pure share, a missing / stray `pq_sig`, unknown / number / null `alg` and a padded `sig` (all `wire`).
 - `primitives.caveat_eval` (41) and `primitives.pca_header` (27): see normative rules 10 and 11.
+
+### Intent binding (`intent-*`, `gen-conformance-intent.mjs`, Intent Layer M2)
+
+The signed `envelope.intent` slot and the `intent` check (normative rule 12). Vectors may carry
+`context.intent_policy` (`{require?, min_fidelity_ppm?, max_residual_risk_ppm?}`), which a runner passes to its verifier,
+or `context.intent_policy_json` (the same policy as raw JSON text: parse it, then pass it; see rule 12).
+`expect.checks.intent` is present iff the check was evaluated; it then follows `counter`. Coverage: bound positives (no
+policy, `require`, inclusive thresholds, ppm range edges, `residual_risk_ppm` up to 2^53-1, envelope as the second caveat,
+a 128-byte salt), back-compat (no field and no / inactive policy: no `intent` key), every `intent` failure (absent under
+`require` or a threshold, `ref` / `map_digest` / `goal_salt` mismatch, grant without an envelope, plain-text goal, goal
+without a map, first envelope wins, non-string `goal_commit`, fidelity below the floor, residual risk above the ceiling,
+misconfigured negative / fractional thresholds), tampering without re-signing (`leaf_signature`), and every wire refusal.
+
+### Intent Layer v2 wire batch W-B (`primitives.intent_world` / `intent_provenance` / `intent_classifier`, `gen-conformance-intent-wb.mjs`)
+
+Function-level vectors for normative rules 16-18 (world facts and offer sets, per-parameter provenance with label receipts and
+flow rules, classifier verdicts). They are primitives, not PCActn vectors: each entry is `{ name, description, input, expect }`
+and a runner calls the rule's function on `input` (a JSON object, self-contained: every pinned key is in it). Compared:
+rule 16 `expect.ok` and, when true, `expect.world` and `expect.single_source` exactly; rule 17 `expect.outcome` and, unless
+it is `"deny"`, `expect.labels`, `expect.classes` and (for `"question"`) `expect.friction` exactly; rule 18 `expect.ok` and,
+when true, `expect.classes` exactly; `primitives.intent_wb_active` (which checks are reported, see "Activity" under rule 16)
+`expect.facts`, `expect.provenance`, `expect.classes` exactly. Reason strings are never compared. Vectors named `*-proto-*`
+use world, relational, parameter, field, class, classifier and label names spelled like `Object.prototype` members
+(`constructor`, `__proto__`, `toString`, `valueOf`, `hasOwnProperty`): every keyed lookup and tally must treat them as
+ordinary keys (prototype-free maps; a JSON `"__proto__"` key is an ordinary own member). Vectors `*-now-*` pass a `now`
+that is not a safe integer. The PCActn member that carries the commitments
+(`intent_session.facts` / `offer_set` / `prov` / `classes` / `labels`) is wire-checked by rule 13; these vectors take the
+member values as `input.committed` / `input.prov` / `input.committed_labels`. Coverage: `wb16-*` lower median (odd, even,
+liar), single source, string agreement, inclusive freshness and skew bounds, stale and future facts not counted, uncommitted
+facts ignored, relational `sub` / `ratio_ppm` (negative, chained, zero divisor, overflow), every fact refusal (unpinned kid,
+wrong key, subject, duplicate oracle, undeclared world, missing / duplicate / malformed commitments, tampering, mixed or
+disagreeing values, malformed facts, misconfigured policies), and the offer set (excess, coverage: extra key / other value /
+typed equality / broader and empty queries, completeness, pins, audience, session, age, chosen offer missing / filtered /
+not a string, commitment and wire refusals); `wb17-*` registry classification and joins, prototype-named refs, undeclared
+and free parameters, every tainted mode and `critical_max`, label refs (first party, value mismatch, foreign with and
+without flow rules, `public`, `*`, joined with registry refs) and every label / prov / policy refusal; `wb18-*` k-of-n,
+measurement pins, structured content, and every verdict / commitment / policy refusal; `*-proto-*` prototype-named keys in
+all three rules; `*-now-*` non-integer clocks; `wbact-*` the activity rule, including objects with their own `length` and
+null members; `*-null-*` / `*-absent-*` absent vs null for every optional member; `*-unknown-member`, `*-string`, `*-fraction`,
+`*-number`, `*-boolean` closed and typed policies; `*-alg-*` and `requires_suite` vectors the
+suite rule (ML-DSA-65 and its hybrid under pinned and unpinned PQ keys, `no-such-suite`, non-string `alg`, an ed25519
+artifact with `pq_sig`); `wbread-*` read purpose, including a UTF-8-versus-UTF-16 ordering case with ASCII, BMP and
+non-BMP paths.
+
+### Intent Layer v2 W-A (`schema-*`, `session-*`, `acc-*`, `layers-*`, `gen-conformance-intent-v2.mjs`)
+
+Full PCActn vectors for rules 13–15 and the V5 `layers` slot, with the verifier state in `context.intent_v2` (see "Intent
+Layer v2: the verification pipeline"): G_0 and a chained delta D_1, back-compat, the session-require and closed-world
+policies, an agent-signed delta, a broken `prev`, a seq mismatch, a missing / expired root, the statement bound through S,
+every revocation outcome (fresh, absent, stale, revoked session / map / delta, a foreign or PRINCIPAL signer instead of
+the dedicated authority, a revoked list that is missing / short / swapped / unsorted / repeating / null, `epoch !=
+set_size`, the append-only checks against a tracked last epoch: extension, re-presentation, the DROP attempts (same size
+and larger), the rollback, a malformed tracked epoch; the stricter max age, a misconfigured policy, a policy age with no
+authority in S, a keyless S.revocation and one whose key is a principal), every closed-world refusal, every claim and
+state failure, distinct / max / keyed-count arithmetic, the domain bound (inclusive), monitors, every sequencer-receipt
+refusal (incl. a LEAKED RETIRED key back-dating into its window, the receipt-age policy at and over its bound, a key set
+too old / from the future / superseded by or equivocating under the tracked {version, digest}, and the typed `policy.acc` and `acc.keyset_versions`), the
+org ceiling, and every `intent_session` wire refusal. `primitives.intent_schema` (rule 14 alone) and `primitives.intent_revocation` (rule 13 step 7 alone).
+
+### Intent Layer v2 committed map (`primitives.intent_map_commit` / `intent_map`, `map-*`, `gen-conformance-intent-map.mjs`)
+
+Rule 19 (V15, committed map and Z0 disclosure). `primitives.intent_map_commit`: `{ name, input: {leaves: [{kind, salt,
+leaf}]}, expect: {map_commit} }`: recompute the commitment of a full leaf list (every tree size from tiny maps to a 3-verb
+map, resalting, metrics with and without `log2_vs_mbits`). `primitives.intent_map`: `{ name, input: {map_commit, action:
+{verb, resource, params_digest}, params?, disclosure, max_residual_risk_ppm?}, expect: {ok, cell?, p_ppm?} }`: the Z0
+decision (`params` absent = `{}`; reason strings not compared): granted cells (numeric cut cells, exact beats the longer
+prefix beats the shorter prefix beats other, a zero-dimension verb), ε at and over the bound, every value outside its
+dimension (numeric string, fraction, null, absent, out of range, non-string category, own `__proto__`), a params digest
+mismatch, a foreign commitment, altered salts / paths / leaves / size, a swapped cell, kind confusion between leaf
+kinds, the metrics position, and closed / typed shapes (unknown members, null, strings for numbers). Full PCActn
+vectors `map-*` (`gen-conformance-intent-v2.mjs`) carry the v2c goal and the `map` check in the pipeline.
 
 ### Mutation-driven single-rule vectors (`mut-*`, `gen-conformance-mut.mjs`)
 
@@ -86,7 +178,7 @@ The PCActn path pins hop 0 by `chain[0] == grant`. The exported standalone chain
 - order of checks at hop 0: root-has-parent, expected root issuer, `allowed_suites`, then PQ authority, then the signature.
 - ONE function resolves the verification key (`resolve*PqKey`); the low-level PQ verify accepts only its result, never `pq_pk` read from the artifact.
 
-`primitives.chain_pin[]` entries: `{ name, class, description, chain, expected_root_issuer, pq_pins?, trusted_root?, allowed_suites?, expect: { ok, reason? } }`. A runner calls the chain API with those arguments and requires `ok`; when `expect.reason` starts with `hop 0: root suite` it must match exactly. 28 vectors: attacker-own-key pure-PQ and hybrid roots naming the victim issuer, wrong / foreign / absent pins, `trusted_root` equal and unequal, pinned and trusted positives, corrupt signatures under a right pin, mixed chains (ed25519 root + bound PQ hop, pinned PQ root + ed25519 / PQ / hybrid hops, attacker PQ hop), suite-policy ordering. The gate feeds them as `kind: "chain"` items (`raw` = JSON of the whole input; verdict `{allow, checks: {chain}}`, category `chain-pin`).
+`primitives.chain_pin[]` entries: `{ name, requires?, class, description, chain, expected_root_issuer, pq_pins?, trusted_root?, allowed_suites?, expect: { ok, reason? } }`. A runner calls the chain API with those arguments and requires `ok`; when `expect.reason` starts with `hop 0: root suite` it must match exactly. `requires` is the first non-ed25519 suite of the chain: the root PQ authority is decided on the REGISTERED suite, so a pin refusal is compared exactly on every runtime; any other entry whose `requires` is outside the runtime's manifest is not compared (the runner asserts `ok: false`, with `unsupported_suite` in the reason when the reference accepts, and counts it). 31 vectors: attacker-own-key pure-PQ and hybrid roots naming the victim issuer, wrong / foreign / absent pins, `trusted_root` equal and unequal, pinned and trusted positives, `trusted_root` together with an agreeing pin (accepted) or a disagreeing pin (refused: both must agree, the stored grant never overrides a pin; exact reason `hop 0: root suite '<alg>': the server-side PQ pin for the root issuer (policy.pqPins) does not match the stored grant's pq_pk (fail closed)`), corrupt signatures under a right pin, mixed chains (ed25519 root + bound PQ hop, pinned PQ root + ed25519 / PQ / hybrid hops, attacker PQ hop), suite-policy ordering. The gate feeds them as `kind: "chain"` items (`raw` = JSON of the whole input; verdict `{allow, checks: {chain}}`, category `chain-pin`).
 
 ## Files
 
@@ -130,9 +222,10 @@ The reference rejects small-order and mixed-order keys and R, non-canonical S an
 - `b64u[]`: `{ input, valid, len? }` - strict base64url; `len` = required decoded byte length.
 - `merkle[]`, `params_digest_empty` - unchanged.
 - `threshold_share[]`: role/signerSetHash/t-bound share vectors. Each `{ role, t, signer_set, threshold_message,
-  signer_set_hash, share_message, share, valid? }`. A verifier that checks threshold shares MUST confirm
+  signer_set_hash, share_message, share, valid?, requires? }`. A verifier that checks threshold shares MUST confirm
   `share` verifies over `share_message` (under `share.publicKey` / `share.pq_pk` per `share.alg`) iff
-  `valid` (default `true`). v2.1 AGENT-LEAF BINDING: the `role:"agent"` entries sign the SAME
+  `valid` (default `true`). `requires` names a non-ed25519 share suite: a runtime without it must refuse the entry
+  (fail closed, never verified) and count it instead of comparing `valid`. v2.1 AGENT-LEAF BINDING: the `role:"agent"` entries sign the SAME
   `"atlas-pca/share/agent\0" || sha256(thresholdMessage) || signerSetHash || t` bytes as guardian/principal
   (positive); the OLD bare-threshold-message agent share (`agent-bare-rejected`) and a cross-signer-set replay
   (`agent-bound-wrong-set`) are `valid:false`. Guardian/principal share bytes are UNCHANGED by v2.1.
@@ -140,7 +233,7 @@ The reference rejects small-order and mixed-order keys and R, non-canonical S an
   hybrid) suite verified under that registered key; an ed25519-only share for such a role is `valid:false`
   (`agent-bound-signerset-with-pq-pk`), a hybrid one verifies (`agent-hybrid-signerset-with-pq-pk`).
 - `threshold_set[]` (round 6, `gen-conformance-r6.mjs`): WHOLE signer-set validation for one share, same schema as
-  `threshold_share` plus optional `requires` (a suite the runner must implement, else it skips the entry). `valid` is
+  `threshold_share` plus optional `requires` (a suite the runner must implement, else it must refuse the entry with `unsupported_suite`; see "Suite capability"). `valid` is
   true iff the reference `verifyThreshold({shares:[share]}, threshold_message, signer_set, t)` counts the share for
   `role`. Every native must validate the ENTIRE set exactly like the reference before looking at the share: every
   entry is an object with a known role (`agent`/`guardian`/`principal`, case-sensitive) and a canonical 32-byte
@@ -265,3 +358,608 @@ unknown types) appear; `r041-root-max-spend-exceeded` must be DENIED and `r041-r
 The header value is the strict unpadded base64url (rule 5, no fixed length, no trimming) of UTF-8 text (invalid,
 overlong, surrogate or truncated UTF-8 is refused; a leading BOM is kept for the strict JSON parser to refuse).
 Entries `{ name, description, input, valid, text? }`: `valid` iff the decoder accepts, `text` = the decoded text.
+
+### 12. Intent binding (Intent Layer M2, `intent-*`)
+Optional SIGNED top-level slot `intent`. When present it is an object with exactly the members `ref`, `map_digest`
+(canonical base64url, 32 bytes each), `goal_salt` (non-empty string, at most 128 UTF-8 bytes), `fidelity_ppm` (safe
+integer in [0, 1000000]) and `residual_risk_ppm` (safe integer >= 0); anything else (not an object, null, an array, an
+unknown or missing member, a wrong type or range) fails `wire`.
+
+The `intent` check runs after `counter` and is reported iff the PCActn carries `intent` OR the verifier's intent policy
+is ACTIVE (`require: true`, or `min_fidelity_ppm` / `max_residual_risk_ppm` set; a threshold implies `require`). Absent
+both, the verdict is exactly the pre-M2 one. First failure wins:
+0. a set threshold that is not a safe integer >= 0 fails (misconfigured, fail closed);
+1. no `intent` under an active policy fails;
+2. let `E` be the FIRST element of the verifier grant's `caveats` that is an object with `type == "envelope"`; `E` must
+   exist with a string `goal_commit` equal to
+   `base64url(sha256(strictCanonical({"d":"atlas-pca/goal/v1\u0000","goal":"pca-intent:v1:"+ref+":"+map_digest,"salt":goal_salt})))`;
+3. `fidelity_ppm >= min_fidelity_ppm` when set;
+4. `residual_risk_ppm <= max_residual_risk_ppm` when set.
+`allow` requires `intent` to pass when reported. The reference is `packages/pca/src/intent-binding.ts`.
+A threshold is judged by its NUMERIC VALUE only (for a JSON number: the nearest IEEE-754 binary64, ties to even, i.e. what `JSON.parse` yields), whatever its lexical or runtime form: `950000`, `950000.0`, `1e6` and
+`4.31e6` are valid (integral, non-negative, at most 2^53-1); `950000.5`, any negative value, negative zero (`-0.0`),
+NaN / infinities, values above 2^53-1, and `null` / booleans / strings are misconfigured (step 0). Every verifier must
+agree on this exactly (JSON does not distinguish `950000.0` from `950000` in every language). Vectors that exercise
+lexical forms carry the policy as RAW JSON TEXT in `context.intent_policy_json` (a string, so the lexeme survives every
+JSON round trip); a runner parses it with its platform JSON parser and uses the result as the policy. When both are
+present `intent_policy_json` wins.
+
+
+### Suite capability (every implementation, every signed surface)
+
+The signature-suite registry is the TypeScript reference's `SIG_SUITES` (packages/pca/src/pq.ts; 14 suites). Every
+verifier implements EVERY registered suite its ecosystem has a trustworthy implementation of: there is no lowest common
+denominator, and the per-language matrix with the library behind each suite is [SUITES.md](./SUITES.md). Each verifier
+exports its capability manifest (the registered suites it can verify in its current runtime; e.g. Go `SupportedSuites()`,
+Rust `supported_suites()`, Python `supported_suites()`, Swift `PCASuites.supported`) and the reason token
+`unsupported_suite`. The rules:
+
+- Every primitive is the standard's PURE mode with an EMPTY context (ML-DSA FIPS 204, SLH-DSA FIPS 205), FN-DSA as the
+  `fn-dsa` crate with `DOMAIN_NONE` and `HASH_ID_RAW`; every byte field is strict base64url of the suite's exact length;
+  a hybrid checks its Ed25519 half first and needs both halves; the nested hybrid's PQ half signs `message ‖ sig_ed25519`.
+- A REGISTERED suite a verifier does not implement, or cannot run in its current runtime (a missing optional backend, an
+  OS without the platform primitive), is refused FAIL-CLOSED with a reason that carries `unsupported_suite: <alg>`, at the
+  point where an unknown `alg` is refused (the signature wire check of the leaf, a capability hop, a threshold share, a
+  chain-pin hop; the suite dispatch of any other signed artifact). In the core verdict that is the terminal
+  `{allow: false, checks: {wire: false}}` with reason `wire: unsupported_suite: <alg>` (Go / Ruby / PHP / Python spelling;
+  every language's reason contains the token). It is never a silent bad signature and never an accept.
+- An `alg` that is not registered (`ml-dsa-999`, `none`, a non-string) keeps its ordinary refusal (`unknown signature alg`
+  / `'alg' must be a string`); it is never `unsupported_suite`.
+- Native runners take the suite set from the manifest. A vector that needs a suite outside it (`requires: "pq"` leaf `alg`,
+  `requires: "pq-nonleaf"` hop `alg`, `requires: "<alg>"`, `requires_suite`) is not compared: the runner asserts
+  `allow: false` with `unsupported_suite` in the reason, and counts it. A terminal `{wire: false}` expectation is compared
+  exactly as usual. A `requires_suite` vector that names its refusal (`expect.reason_contains`, e.g. the session-root pin
+  checks) reaches it before any suite work, so on such a host the runner asserts `allow: false` with THAT reason instead: a
+  verifier keeps the reference's order and checks a suite's availability only where it would verify the signature.
+- The cross-language gate (`scripts/pca-conformance-all.mjs` with the `tools/pca-diff-fuzz` drivers) asks every driver for
+  its manifest (protocol line `{"id": "__suites__", "kind": "suites"}`, answer `{"id": ..., "suites": [...]}`; drivers tag a
+  verdict whose reason carries the token with an `unsupported_suite` field). A vector carrying (anywhere in the artifact) a
+  registered suite outside a language's manifest is compared ONLY against the languages that declare it; every other
+  language must answer `allow: false` and either tag `unsupported_suite` or, when the reference itself rejects the vector
+  with a terminal `{wire: false}`, that same terminal verdict. A language that tags `unsupported_suite` on a vector whose
+  suites it all declares, or answers anything else for an undeclared suite, is a `SUITE-CAPABILITY` finding.
+
+### Host-language strictness (every implementation, every PCA decision surface)
+These rules hold wherever a PCA component decides on signed or untrusted data, including the surfaces that have no
+cross-language vectors (server policy layer, AP2 / A2A / payments adapters, objective risk, the intent learner). They
+exist so that no implementation has to emulate a host-language quirk:
+- Names are ordinary keys. Every keyed lookup, tally or copy uses OWN members only (a prototype-free map); a name spelled
+  like an `Object.prototype` member (`__proto__`, `constructor`, `toString`, `valueOf`, `hasOwnProperty`) is an ordinary
+  key, and a JSON `"__proto__"` member is an ordinary own member that survives every copy (SD-JWT claims and disclosures
+  included).
+- Absent is not null. Only an ABSENT member takes a documented default; JSON `null` is a value like any other and fails
+  whatever type check the member has (an AP2 / payments charge `currency: null` is not "the mandate currency").
+- Text from signed or untrusted bytes is decoded as UTF-8 FATALLY: an invalid, overlong or truncated sequence is a refusal,
+  never U+FFFD; a leading BOM is kept (the JSON parser refuses it).
+- An instant written as text (AP2 `execution_date`, `not_before`, `not_after`) is RFC 3339: `YYYY-MM-DD` (UTC midnight) or
+  `YYYY-MM-DDTHH:MM:SS[.fraction](Z|+HH:MM|-HH:MM)` with an explicit offset, every component in range (a real calendar
+  day, hour <= 23, no leap second), the fraction truncated to milliseconds. Anything else, including a date-time without
+  an offset, is invalid: an instant never depends on the verifier's time zone or on a lenient platform date parser.
+- Reversibility classes rank `reversible` < `rate_limited` = `costly` < `irreversible`; any other string ranks as the most
+  restrictive. A declared class replaces the resource server's authoritative class only when it ranks strictly higher.
+- Proof shapes are strict even where a deviation could not forge anything: Merkle (revocation) proofs take safe-integer
+  `index` / `size` and canonical 32-byte base64url siblings; signed epoch-ms instants (`issued_at`, `not_after`) are safe
+  integers; a replay / storage key is built from well-formed strings only (a lone surrogate has no UTF-8 encoding).
+- An unsigned document that refers to a PCActn (an A2A / AP2 Payment Mandate) is bound field by field to what the PCActn
+  authorized (its params opened against `params_digest`): amount, currency, payee, instrument, human-present modality.
+- A verification entry point is total: a hostile shape is a refusal with a reason, never an exception.
+
+### Intent Layer v2: the verification pipeline (W-A rules 13–15 with V5 layers, W-B rules 16–18)
+After `counter` and `intent` (rule 12) a v2 verifier evaluates, IN THIS ORDER, each check reported only under the
+condition shown (absent all of them the verdict is byte-identical to a pre-v2 verifier):
+
+| # | check | reported iff | rule |
+|---|---|---|---|
+| 1 | `schema` | the PCActn carries `intent_session`, or the policy sets `schema.closed_world: true` | 14 |
+| 2 | `intent_session` | the PCActn carries `intent_session`, or the policy sets `session.require: true` | 13 |
+| 3 | `layers` | the PCActn carries `intent_session` and the verifier configured `layers` (`{org?, site?, std?}`, each absent or `{predicates}`; a `null` ceiling or `layers: null` is a MALFORMED context, see "Absent vs null") | V5 |
+| 4 | `accumulators` | the PCActn carries `intent_session` | 15 |
+| 4a | `map` | the PCActn's `intent_session.map_form` is `"commit"`, or the policy sets `map.require: true` | 19 |
+| 5 | `facts` | the PCActn carries `intent_session` and rule 16 is active (member present or policy active) | 16 |
+| 6 | `provenance` | as above, rule 17 | 17 |
+| 7 | `classes` | as above, rule 18 | 18 |
+
+Checks 1–4a are independent (each runs even when an earlier one failed; `allow` needs all of them; `map` is reported
+also for a PCActn without `intent_session` when the policy requires it, and then fails). Checks 5–7 are one
+unit (`decideIntentWB`): the first failing one ends the unit and later ones are not reported; a rule-17 `question`
+outcome reports `provenance` as FAILED in the core verdict (the site then answers with a signed `intent_required`).
+`layers` evaluates each configured ceiling in the order org, site, std with the ordinary predicate evaluator against
+`{action: {verb, resource, params}, env: {canon}}` (`canon` from rule 14 when it passed, else empty); a ceiling admits
+iff some predicate matches; a ceiling object without a predicate list admits nothing. The verifier-computed predicate
+environment of the admitting root is `env.canon` (rule 14 passed), `env.acc` / `env.mon` (rule 15 passed) and
+`env.world` / `env.prov` / `env.class` (rules 16–18 passed); a verifier REPLACES any host-supplied member of those names.
+A vector carries the verifier state in `context.intent_v2` = `{policy?, params?, schema?: {docs, keys}, session?: {root,
+grants, revocation?: {epoch, revoked}, revocation_last?: {epoch, revoked}, pq_pins?: {<key>: <pq_pk>}}, layers?, acc?: {state?, monitors?, receipts?,
+last_seq?, sequencer_keys?, keyset_versions?}, map?: {disclosure?}}`;
+`expect.checks` lists the
+v2 checks exactly when reported. References: `src/intent-v2.ts` (`decideIntentV2`), `src/intent-session.ts`,
+`src/action-schema.ts`, `src/intent-acc.ts`, `src/intent-revocation.ts`, `src/intent-layers.ts`, `src/intent-env.ts`.
+
+### Intent Layer v2: strict values, absent vs null, suite capability (apply to rules 13–18)
+**Strict values.** No verifier may depend on its language's coercions:
+- every numeric field (times, windows, sequence numbers, ages, sizes, indices, amounts, pre-states, epochs) must be a JSON
+  number that is a SAFE INTEGER (|n| <= 2^53-1, not -0) where the rule says integer; `null`, a numeric string (`"60"`), a
+  fraction, NaN or an infinity fails the check closed. The verifier clock `now` must itself be a safe integer, else every
+  v2 check fails;
+- every list (artifact lists, `docs`, `keys`, `grants`, `receipts`, `sequencer_keys`, `principals`, `accumulators`,
+  `monitors`, `acc`, `facts`, ...) must be a JSON ARRAY; a string, an object or `null` in its place fails closed (a string is
+  never iterated);
+- every keyed lookup (`acc.state[id]`, `acc.monitors[id]`, `acc.last_seq[id]`, `acc.keyset_versions[root]`, `params[name]`,
+  `reversibility_by.map[value]`, schema `params[path]`) reads an OWN member of a JSON object: an inherited name (`toString`,
+  `constructor`) is absent, and an own `__proto__` key is ordinary data (never the prototype). Verifier outputs (`env.acc`,
+  `env.mon`, `env.canon`) are prototype-free;
+- the names `__proto__`, `constructor` and `prototype` are refused as accumulator ids, monitor ids and schema parameter
+  names (the predicate DSL cannot address them, so a grant could not constrain them).
+
+**Absent vs null.** An optional member that is ABSENT means empty / default. An optional member PRESENT with JSON `null`
+(or of the wrong JSON type) is MALFORMED and fails closed; it is never read as empty. This holds for every optional member
+of the verifier context `intent_v2` (`policy`, `policy.session`, `policy.schema`, `policy.map`, `params`, `schema`, `session`,
+`session.grants`, `session.revocation`, `session.revocation_last`, `session.pq_pins` (an object whose every value is a
+string), `policy.acc`, `acc` and its `state`, `monitors`,
+`receipts`, `last_seq`, `sequencer_keys`, `keyset_versions`,
+`layers` and each ceiling, `wb`, `wb.artifacts` and its `facts`, `labels`, `verdicts`, `offer_set`, `wb.policy` and its
+`world`, `provenance`, `classifiers`, `map` and its `disclosure`) and of every v2 artifact (`intent_session` members, session root members including
+`layers.org`, `layers.std`, `revocation`, `flows`, principal `alg` / `pq_pk`, schema optional members including a parameter
+`default`, receipt and key-set optional members, profile members). A malformed TOP-LEVEL context member (`policy` and its
+members, `params`, `schema`, `session`, `acc`, `layers`, `wb`, `map`) makes every v2 check that could be reported fail:
+`schema`, `intent_session`, `accumulators` when the PCActn carries `intent_session`, and `map` when its
+`intent_session.map_form` is `"commit"` (also for a PCActn without `intent_session`: `schema` and `intent_session` are then
+reported and fail).
+
+**The v2 policy is closed and typed.** `policy` has only the members `session`, `schema`, `acc` and `map`; `policy.session` only
+`require` (JSON boolean) and `max_revocation_age_s` (non-negative safe integer); `policy.schema` only `closed_world` (JSON
+boolean); `policy.map` only `require` (JSON boolean) and `max_residual_risk_ppm` (non-negative safe integer). The context
+member `map` has only `disclosure`. `policy.acc` has only
+`max_receipt_age_s` and `max_keyset_age_s` (non-negative safe integers; rule 15). Absent = default (`false`, no age bound;
+`policy.acc`: 900 and 3600). A flag present as `null`, a string, a number or anything but `true` /
+`false`, an age that is not a non-negative safe integer, or an unknown member makes the context malformed (above), whether
+or not the policy would otherwise activate a check. The one member whose `null` carries a
+meaning is an accumulator's required `key` (`null` = ungrouped).
+
+**Suite capability.** v2 artifacts may use every suite of the registry (`ed25519`; `ml-dsa-65`, `ml-dsa-87`, their hybrids,
+the nested hybrid; `slh-dsa-sha2-128f`, `slh-dsa-sha2-256s` and hybrids; `fn-dsa-*`, `less-cat1` where the language has them).
+A verifier that does not implement the suite an artifact names (session root, principal entry, schema signature or key,
+`intent_required`, receipt, sequencer key set or key entry, `holder.root_alg`, revocation epoch, held session grant,
+profile) MUST fail the check closed with a reason containing the token `unsupported_suite`: never accept, never another
+reason. A non-string `alg` is malformed. A post-quantum signature verifies only under a PQ key PINNED by the trusted side:
+a principal's `pq_pk` in S, `S.revocation.pq_pk` for the revocation key, the discovery key entry for a schema or an
+`intent_required`, the key-set entry for a receipt, `holder.root_pq_pk` for a key set; an artifact's own `pq_pk` alone
+never authorises it. Vectors that need a suite carry `requires_suite: "<alg>"`: a runner that implements it compares the
+verdict exactly; one that does not must fail the vector's checks with `unsupported_suite`. Vectors with
+`expect.reason_contains: "unsupported_suite"` name an alg no verifier implements and every runner must give that reason.
+
+### 13. Intent session (Intent Layer v2 W-A, `session-*`, `primitives.intent_revocation`)
+**Wire** (part of the terminal `wire` check). Optional SIGNED top-level slot `intent_session`: an object with the CLOSED
+member set `session, root, seq, schema, acc, facts, offer_set, prov, classes, labels, map_form`. Required: `session`, `root`,
+`schema` (canonical base64url, 32 bytes each) and `seq` (safe integer in [0, 2^31-1]). Optional: `acc`, an array of at
+most 16 objects with exactly `id` (`^[A-Za-z0-9_]{1,64}$`, distinct across entries), `post` (safe integer >= 0) and an
+optional `receipt` (32-byte digest); `facts` (<= 16), `classes` (<= 8), `labels` (<= 16): arrays of DISTINCT 32-byte
+digests; `offer_set`: a 32-byte digest; `prov`: an object of at most 32 entries whose keys match
+`^action\.params\.[A-Za-z0-9_]{1,64}$` and whose values are arrays of 1..8 non-empty strings of at most 256 UTF-8 bytes
+(no lone surrogates); `map_form`: the string `"commit"` (rule 19: `intent.map_digest` is the map commitment and the
+goal is `pca-intent:v2c:`). Anything else fails `wire`.
+
+**Session root** S (`pca-intent-session` v1, closed): `v` (1), `kind`, `session`, `principals` (1..16 distinct `{key,
+alg?, pq_pk?}`), `intent_ref`, `schema: {aud, digest}`, `layers: {org?, std?, task: {map_digest}}` (`std`: null or exactly
+`{profile, version >= 1, digest}`; `org` / `std` absent = no such layer, `null` is malformed), `accumulators` (<= 16, rule 15),
+`monitors` (<= 16, rule 15), `question_uri`, `revocation?: {epoch_uri, max_age_s, key, pq_pk?}` (`key` REQUIRED: the
+DEDICATED revocation authority, canonical base64url of 32 bytes, and NOT one of `principals[].key`; `pq_pk`: the pinned PQ
+key of that authority), `flows?`, `expires_at`, `signer`, `alg?`, `pq_pk?`, `sig`, `pq_sig?`. It is
+signed by `signer` (which must be one of `principals`) over
+`"atlas-pca/intent-session/v1\0" || strictCanonical(body + signer + bound suite fields)`, exactly like the other intent
+artifacts. `digest(S) = base64url(sha256(strictCanonical({"d":"atlas-pca/intent-session-ref/v1","s":S})))`.
+
+**Session-root PQ keys come from the verifier's pin, never from S.** `principals[].pq_pk` is part of the presented root, so
+it proves nothing about who signed it (a pure-PQ signature uses no Ed25519 secret: anyone could name an enrolled principal
+and sign under a key of their choosing). For a non-ed25519 suite, after the shape checks, in this order (first failure
+wins): the verifier must hold a pin for `signer`, an OWN member of `context.intent_v2.session.pq_pins` whose value is a
+string, else fail with a reason containing `needs the signer's PQ key pinned by the verifier`; the pin must equal S's
+`pq_pk`, else fail with a reason containing `does not match the verifier's pin`; when the signer's own principals entry
+carries a `pq_pk` it must equal S's `pq_pk`, else fail with a reason containing `does not match the signer's principals
+entry`; then the suite signature verifies under that key. An ed25519 root never consults the pins.
+
+**Session grant caveat.** G_0 and every delta D_k are ROOT capabilities whose caveats contain (as the first caveat of
+that type) `{type: "intent_session", session, seq, root, prev?}`, closed, `prev` present exactly when `seq > 0`. Their
+envelope goal is `"pca-intent:v2:" + session + ":" + map_digest_k`. This AMENDS rule 12 step 2: when the PCActn carries a
+wire-valid `intent_session`, the goal there is `"pca-intent:v2:" + intent_session.session + ":" + intent.map_digest`.
+In the policy layer (rule 10) a well-formed `intent_session` caveat is SATISFIED (it constrains nothing per action), a
+malformed one is unsatisfied.
+
+**Check `intent_session`** (verifier state: S, the grants G_0..D_{k-1} the verifier holds, a revocation epoch with its
+full revoked list, optionally the last epoch it accepted for the session). First
+failure wins:
+0. policy `max_revocation_age_s`, when set, must be a safe integer >= 0 (else the context is malformed: see "The v2 policy is closed and typed");
+1. no `intent_session` under `session.require` fails;
+2. the PCActn must carry `intent` (rule 12);
+3. S is supplied and verifies; `digest(S) == root`; `S.session == session`; `now < S.expires_at`; `S.intent_ref ==
+   intent.ref`; `S.schema.digest == intent_session.schema`; `S.schema.aud == aud`; when `seq == 0`, `intent.map_digest ==
+   S.layers.task.map_digest`;
+4. the verifier's grant carries a well-formed session caveat with `session`, `root` and `seq` equal to the PCActn's;
+5. the grant's `issuer` is one of `S.principals[].key` (an agent can never mint a grant: T15);
+6. for every i < seq the verifier holds grant i (an object with string `id` and `issuer`, its `alg` a suite this verifier
+   implements, else `unsupported_suite`): its session caveat names this session and root with seq i, its issuer is a
+   principal, and for i > 0 its `prev` is the id of grant i-1; and when seq > 0 the grant's `prev` is the id of grant seq-1;
+7. REVOCATION (T22), when `S.revocation` is present or the policy sets `max_revocation_age_s`: `S.revocation` must be
+   present (a policy age with no authority in S fails); `M` = the smaller of `S.revocation.max_age_s` and the policy
+   value, in milliseconds; `ids` = `"pca-intent:session:"+session`, `"pca-intent:map:"+intent.map_digest`,
+   `"pca-intent:delta:"+id` for every held grant and the admitting grant, and `"pca-intent:profile:"+std.profile+"@"+
+   std.version` when `S.layers.std` is set. The evidence `context.intent_v2.session.revocation` is CLOSED, exactly
+   `{epoch, revoked}` (any other member, e.g. a leftover `proofs`, is malformed); the optional TRACKED state
+   `session.revocation_last` (same closed shape) is the last evidence this verifier accepted for the session.
+   `checkSessionRevocation`, first failure wins:
+   a. `M` a safe integer >= 0, `now` a safe integer, `ids` an array, the authority a string;
+   b. the evidence is an object with exactly the members `epoch` and `revoked`; `epoch` is strictly typed (the revocation-epoch format of `pq_artifact` "revocation": `instance_id`, `grant_ref`,
+      `root`, `guardian`, `sig` strings, `epoch`, `set_size`, `issued_at`, `not_after` (and `guardian_epoch` when present)
+      non-negative safe integers, `alg` a suite this verifier implements, `pq_pk` / `pq_sig` strings when present) and
+      `epoch.guardian == S.revocation.key` (ONLY the dedicated authority; a principal's epoch is refused);
+   c. it verifies under the authority (a PQ epoch only under `S.revocation.pq_pk`), `grant_ref == "pca-intent-session:" +
+      session`, `now <= not_after`, `issued_at <= now + 60000`;
+   d. `now - issued_at <= M`;
+   e. `revoked` is the FULL signed set: a JSON array of strings, strictly ascending in UTF-8 byte order (so distinct),
+      `revoked.length == set_size == epoch` (epochs are numbered by their set size) and `revset_root(revoked) == root`,
+      where `revset_root(L) = base64url(SHA-256("pca-revset/v1\0" || canonical({size: |L|, tree})))`, `tree` the
+      RFC-6962-shaped Merkle root (leaf `SHA-256(0x00 || canonical(id))`, node `SHA-256(0x01 || l || r)`) over `L` in
+      order, `tree = base64url(SHA-256(""))` for the empty list (the same root as the revocation-set proofs);
+   f. APPEND-ONLY, when `revocation_last` is present (itself closed and well-formed per b's shape and e, else fail
+      closed): `epoch >= last.epoch` (no rollback), every id of `last.revoked` is in `revoked` (no DROP), and `epoch ==
+      last.epoch` implies `root == last.root` (no equivocation). The equivocation branch is SUBSUMED: once both lists
+      pass e, equal epochs mean equal sizes, so a different root means a different list of the same length, which
+      misses some id of `last.revoked` and has already failed the drop check. Keep it as defence in depth; it is not a
+      separate path and no vector can reach it;
+   g. no id of `ids` is in `revoked`.
+   Why: with a dedicated authority a co-principal cannot publish an epoch that leaves a revocation out; with the full
+   list and the tracked last epoch even the authority cannot un-revoke an id once a verifier has seen it revoked (an
+   epoch that drops it is shorter, rolled back, or equivocates). A verifier that does not track `last` still gets
+   T22's freshness bound `M`. A profile's epochs (rule 13 for V10) follow the same steps with `grant_ref ==
+   "pca-intent-profile:" + profile_id`, ids `["pca-intent:profile:"+id+"@"+version]` and the authority
+   `profile.revocation.key` (absent: the profile owner, its single signer).
+`primitives.intent_revocation[]` pins step 7 alone: `{input: {epoch, revoked, session, authority, ids, now, max_age_ms,
+last?: {epoch, revoked}}, expect: {ok}}` (`ok` iff steps a–g pass with the scope `"pca-intent-session:" + session`). The
+EVIDENCE is the input without the parameters `session`, `scope`, `authority`, `ids`, `now`, `max_age_ms`, `last`; it is
+closed, so an input member outside those parameters and `epoch` / `revoked` (e.g. `rev13-evidence-extra-member`'s
+`proofs`) makes it malformed.
+
+### 14. Action schema, closed world (Intent Layer v2 W-A, `schema-*`, `primitives.intent_schema`)
+Schema `pca-action-schema` v1 (closed): `v, kind, site, aud, version, units?, state?, verbs, sig`. A verb entry is closed
+to `verb, kind (read|write), params, reversibility?, reversibility_by?, mcp?, openapi?, harm?, world?, effects?, returns?,
+description?` (`harm`/`effects`/`returns` objects and `world` an array, owned by later rules). A parameter is keyed by
+`action.params.<name>` (`^[A-Za-z0-9_]{1,64}$`, top-level names only) and closed to `type (string|integer|boolean|date|
+set|array), semantic, sensitivity (free|material|critical), required? (default true), values?, min?, max?, unit?, max_len?,
+items?, min_items?, max_items?, default?, principal_neutral_default?, accumulates_into?, issued_by_site?, description?`.
+A parameter name `__proto__`, `constructor` or `prototype` is refused; a `default` of `null` is malformed.
+`sig = {alg, kid, value, pq_value?}`; the signature is over `"atlas-pca/action-schema/v1\0" || strictCanonical(schema
+without sig)` under the discovery key whose `kid` matches, and `sig.alg` must equal THAT KEY's `alg` (the suite is pinned by
+the key entry). Digest: `base64url(sha256(strictCanonical({"d":"atlas-pca/action-schema-ref/v1","s":<signed schema>})))`.
+
+**Check `schema`.** First failure wins:
+1. the verifier has accepted schemas; the one used is the accepted schema whose digest equals `intent_session.schema`
+   (none: fail), or the FIRST accepted schema when the PCActn has no `intent_session` (closed-world policy);
+2. its signature verifies under the discovery keys (as above);
+3. `schema.aud == aud`;
+4. the plaintext params are supplied and `paramsDigest(params) == action.params_digest`;
+5. CONFORMANCE (⊠, a terminal deny, never a question), first failure wins: params not a JSON object; no verb entry
+   named `action.verb`; a key of params (in UTF-8 byte order) whose path is not declared (`undeclared_param`); then for
+   every declared path in UTF-8 byte order: absent and required (`missing_param`), else the value check:
+   `string` a string without lone surrogates of at most `max_len` (default 1024) UTF-8 bytes, in `values` when set;
+   `integer` a safe integer (not -0) within `min`/`max` (inclusive); `boolean`; `date` `YYYY-MM-DD` and a Gregorian
+   calendar date (years 0001–9999, leap rule /4 except /100 unless /400); `set` an array of distinct strings, each in
+   `values`, with `min_items` (default 0) <= length <= `max_items` (default |values|); `array` an array of strings of at
+   most `max_len` bytes (or safe integers within `min`/`max` when `items == "integer"`) with `min_items` (default 0) <=
+   length <= `max_items` (default 64). A wrong JSON type is `bad_type`, a domain miss `out_of_domain`.
+`primitives.intent_schema[]` pins the signature (`sig`), the digest and conformance (`{ok, code?, path?}`) on their own.
+The canonical projection `env.canon.<name>` exists for every PRESENT boolean (`"true"`/`"false"`), set (strict canonical
+JSON of its members sorted by UTF-8 bytes) and array (strict canonical JSON as sent) parameter.
+
+### 15. Accumulators and monitors (Intent Layer v2 W-A, `acc-*`)
+Accumulator declaration (in S, closed): `id` (`^[A-Za-z0-9_]{1,64}$`), `agg` (sum|count|distinct|max), `val?`
+(`action.params.<name>`), `unit?`, `sel` (exactly one kind: `{verbs?, accumulates_into?}` for actions, or `{event}` for a
+wallet counter), `win` (`{kind:"task"}`, `{kind:"sliding", ms>0}`, `{kind:"period", ms>0, t0>=0}`), `key` (null or
+`action.params.<name>`), `domain_max?`, `cap?`, `holder` (`{kind:"site_local"}`, `{kind:"sequenced", uri, root, root_alg?,
+root_pq_pk?, keys_uri?}` or `{kind:"wallet"}`; wallet-held exactly for event selectors). A sequenced holder is named by its
+long-lived ROOT key, never by a signing key: the sequencer publishes a root-signed key set `pca-sequencer-keys` v1 (closed:
+`v, kind, sequencer` (= the root), `version` (safe integer >= 1, MONOTONE: each new set of a root has a higher
+version), `issued_at, keys, alg?, pq_pk?, sig, pq_sig?`; `keys`: 1..256 entries closed to `kid`
+(`^[A-Za-z0-9_.:-]{1,64}$`, distinct), `pk` (32 bytes), `alg?`, `pq_pk?`, `not_before`, `not_after?` with
+`not_before <= not_after`), signed by the root over `"atlas-pca/sequencer-keys/v1\0" || strictCanonical(body + bound suite
+fields)`. Rotating a signing key publishes a new set (the old key gets a `not_after`); session roots never change. Monitor declaration (closed): `id`, `kind`
+(requires_prior|precedes|never|always|responds_within), `p`, `q` (exactly for requires_prior / precedes /
+responds_within), `status?` (admitted|committed), `within` (1..64, exactly for responds_within); its state set Q is
+`unmet,met` / `clean,seen` / `ok,broken` / `idle,pending:1..pending:W,missed`.
+
+Accumulator and monitor ids `__proto__`, `constructor`, `prototype` are refused. The verifier context `acc` is an object
+whose `state`, `monitors`, `last_seq` are objects (own members; `last_seq` values non-negative safe integers) and whose
+`receipts`, `sequencer_keys` are arrays; `keyset_versions` (optional, tracked state) is an object mapping a sequencer root
+to the newest key set this verifier has accepted for it, each value CLOSED and typed: exactly `{version, digest}` with
+`version` a safe integer >= 1 and `digest` canonical base64url of 32 bytes, where the key-set digest is
+`base64url(sha256(strictCanonical({"d":"atlas-pca/sequencer-keys-ref/v1","k":<the key set, signature fields included>})))`.
+Anything else (a bare number, `null`, a missing or short digest, an unknown member) fails `accumulators`.
+The HOST applies window and key and injects, per site-local accumulator, the PRE-STATE of the action's group: `{sum}`,
+`{count}`, `{max}` (safe integers >= 0) or `{values}` (distinct strings: the strict canonical JSON text of each counted
+value). ω ∈ sel iff the verb is in `sel.verbs`, or the schema's verb entry has an integer parameter listing
+`sel.accumulates_into`. val(ω): count 1; distinct: params[val] (string or safe integer) as its canonical text; sum/max with
+`val`: params[val], a safe integer >= 0; sum without `val`: the sum of every PRESENT integer parameter of the verb listing the
+unit (each a safe integer >= 0). post: sum `pre.sum + val`; count `pre.count + 1`; max `max(pre.max, val)`; distinct
+`|pre.values|` plus 1 iff the value's text is not in `pre.values`. Receipt `pca-acc-receipt` v1 (closed: `v, kind, session,
+acc, seq >= 1, pre, delta, post, pcactn_digest, aud, issued_at, expires_at, kid, ledger {index, head}, signer, alg?, pq_pk?,
+sig, pq_sig?`; `issued_at <= expires_at <= issued_at + 900000`: a receipt lives at most 15 min),
+signed over `"atlas-pca/acc-receipt/v1\0" || strictCanonical(body + bound suite fields)`, digest
+`base64url(sha256(strictCanonical({"d":"atlas-pca/acc-receipt-ref/v1","r":receipt})))`; `pcactn_digest` is
+`base64url(sha256(strictCanonical({"d":"atlas-pca/acc-reserve/v1","b":<PCActn without sig, pq_sig, threshold,
+intent_session>})))`.
+
+**Check `accumulators`.** First failure wins:
+1. S is supplied, verifies, `digest(S) == root`, `S.session == session`, `now < S.expires_at`;
+2. every claim names an accumulator of S that is not wallet-held;
+3. for each non-wallet accumulator of S in declaration order: if it selects by `accumulates_into` the verifier must hold
+   the schema whose digest is `intent_session.schema`; if the action is NOT selected, a claim for it fails; otherwise a
+   claim must exist; when `key` is set the key parameter must be present and declared for the verb with a semantic type
+   not starting with `text.`; val(ω) must be readable; then
+   - site-local: no `receipt` on the claim; the pre-state is injected and well-formed; post as above (a safe integer);
+   - sequenced: the claim has a `receipt` whose digest matches a presented receipt; with `A_r` = `policy.acc.
+     max_receipt_age_s` * 1000 (default 900000) and `A_k` = `policy.acc.max_keyset_age_s` * 1000 (default 3600000):
+     `receipt.issued_at <= now + 60000` and `now - receipt.issued_at <= A_r`; SOME presented key set
+     (`context.intent_v2.acc.sequencer_keys`) verifies under `holder.root` (PQ: pinned by `holder.root_pq_pk`), has
+     when the own member `T = acc.keyset_versions[holder.root]` is present, `version >= T.version` (no rollback) and, if
+     `version == T.version`, `digest(set) == T.digest` (another set under the same version is an EQUIVOCATION and is
+     skipped; unlike revocation epochs a key set carries no full history, so this check is reachable and real),
+     `issued_at <= now + 60000` and
+     `now - issued_at <= A_k`, and lists `receipt.kid` with `pk == receipt.signer`, `not_before <= receipt.issued_at` and,
+     when `not_after` is set, `receipt.issued_at <= not_after` AND `not_after >= now - 60000` (a RETIRED key stops
+     verifying once retired: a leaked retired key cannot back-date receipts into its window), the entry's suite equals the
+     receipt's, and the receipt verifies under that entry (PQ: pinned by the entry's `pq_pk`); `receipt.session == session`, `receipt.acc == id`, `receipt.aud == aud`, `receipt.pcactn_digest` ==
+     the reservation digest above, `now <= expires_at`, `seq` above the last accepted seq for the id when one is given,
+     and the arithmetic holds (sum: `delta == val`, `post == pre + delta`; count: `delta == 1`, `post == pre + 1`; max:
+     `delta == val`, `post == max(pre, delta)`; distinct: `delta` in {0,1}, `post == pre + delta`); post = `receipt.post`;
+   - `post <= domain_max` when declared (else the action is outside Ω̃);
+   - the claim's `post` equals the verifier's post;
+4. every monitor of S has an injected state that is a member of its Q.
+The grant predicates then read `env.acc.<id>.post` and `env.mon.<id>.state` (T11: a cap on the post-action value cannot be
+split around; the verifier's pre-state must come from a linearizable store: a row lock or a sequencer).
+
+### 16. Intent world facts, relational dimensions and offer sets (Intent Layer v2 W-B, `primitives.intent_world`)
+Reference: `packages/pca/src/oracle-facts.ts` (`decideIntentWorld`), `packages/pca/src/offer-set.ts`. Shared artifact
+conventions (also rules 17 and 18): every artifact is a closed-member JSON object; besides its listed members it MAY carry
+the suite members `alg` (absent = `ed25519`), `pq_pk` and `pq_sig` (strings). It is signed under the suite `alg` names over
+`utf8(domain) || strictCanonical(artifact without "sig" and "pq_sig")` (rule 4; so `alg` and `pq_pk` are signed), with the
+Ed25519 identity taken from the VERIFIER's pin entry, never from the artifact. SUITE (README "suite capability"): a
+non-string `alg`, `pq_pk` or `pq_sig` is malformed; an `alg` the verifier does not implement fails with a reason containing
+`unsupported_suite` (checked before anything else about that artifact); an ed25519 artifact must carry neither `pq_pk` nor
+`pq_sig`; a post-quantum or hybrid signature verifies only when the artifact's `pq_pk` equals the `pq_pk` of the pin entry
+(oracle `{kid, pk, pq_pk?}`, site key `{kid, pk, pq_pk?}`, label key `{site, kid, pk, pq_pk?}`, classifier
+`pq_keys {judge: pq_pk}`); a pin without one never authorises a PQ signature. A malformed or failing signature is a failed
+signature. Vectors with `requires_suite` use a post-quantum suite (a runner without it must fail them with
+`unsupported_suite`); vectors with `expect.reason_contains: "unsupported_suite"` name the suite `no-such-suite`. The
+ML-DSA-65 signatures in these vectors use the FIPS 204 DETERMINISTIC variant (rnd = 0^32, empty context), so the corpus
+regenerates byte-identically; a verifier needs nothing special (a deterministic signature is an ordinary one).
+ABSENT VS NULL (README "absent vs null"): in every rule-16-18 input, an ABSENT optional member is empty / default and a
+member PRESENT with `null` or of the wrong JSON type is malformed and fails (rule 17: `deny`); it is never read as empty:
+`policy` (absent = `{}`), `committed`, `committed.facts`, `committed.offer_set`, `facts`, `offer_set` (must be an object even
+without an offers policy), `action.params`, `prov`, `committed_labels`, `labels`, `verdicts`, `committed` (rule 18), every
+optional policy member (`worlds`, `relational`, `offers`, `skew_ms`, `registry`, `label_keys`, `critical_max`,
+`material_tainted`, `critical_tainted`, `flows`, `measurements`, `pq_keys`) and every pin's `pq_pk`. Lists are JSON arrays
+(a string is never iterated).
+CLOSED AND TYPED POLICIES (as the v2 policy, README "closed and typed"): every rule-16-18 policy object has a CLOSED
+member set and an unknown member is malformed (fails closed): the world policy `{skew_ms?, worlds?, relational?,
+offers?}`; a world `{name, subject_path, oracles, freshness_ms, min_oracles, max_faulty}`; an oracle pin `{kid, pk,
+pq_pk?}`; a relational entry `{name, fn, a, b}`; the offers policy `{name, site_keys, max_age_ms, offer_param, filter}`;
+a site key `{kid, pk, pq_pk?}`; the filter `{query, offer}`; the provenance policy `{params, registry?, label_keys?,
+critical_max?, material_tainted?, critical_tainted?, flows?}`; a label key `{site, kid, pk, pq_pk?}`; the classifier policy
+`{classifiers}` and a classifier `{id, param, labels, keys, k, measurements?, pq_keys?}`; the W-B context `artifacts
+{facts?, labels?, verdicts?, offer_set?}` and `policy {world?, provenance?, classifiers?}`; the layers object `{org?, site?,
+std?}`, a layer `{predicates}` and a layered grant `{org?, site?, std?, task, denied?}`. Every number in them
+(`skew_ms`, `freshness_ms`, `min_oracles`, `max_faulty`, `max_age_ms`, `k`) is a safe integer (a numeric string, a fraction or
+`null` is malformed); every enum (`fn`, `critical_max`, `material_tainted`, `critical_tainted`) is one of its strings, never
+a number or a boolean; the only boolean (`optional` of a read field) must be a JSON boolean. Its reference (what the PCActn
+commits) is `base64url(sha256(strictCanonical({"d": <ref domain>, <slot>: <artifact including sig>})))`. A "digest" below is
+canonical base64url of 32 bytes (rule 5); a "name" matches `^[a-z][a-z0-9_]{0,63}$`; a "safe integer" is rule 3's; scalar
+equality is same JSON type and value (`2 != "2"`, `true != 1`). Byte limits are UTF-8 bytes. KEYS (rules 16-18): every
+lookup by name, path, field, class, classifier id or label, and every vote tally, is over OWN members only and must not
+consult any inherited or built-in member: `constructor`, `toString`, `valueOf`, `hasOwnProperty` and `__proto__` are
+ordinary keys (a JSON `"__proto__"` member is an ordinary own member). CLOCK: `now` must be a safe integer; any other
+value (a string such as `"1800000000000"`, a fraction, `null`) is never coerced: it makes every fact and every offer set
+stale (a world then has no fresh fact and fails; an offers policy fails), while dimensions that need no clock (relational)
+are still computed.
+
+ACTIVITY (`primitives.intent_wb_active`, reference `intentWBActive`): with input `{intent_session, policy: {world?,
+provenance?, classifiers?}}` a verifier REPORTS `facts` iff `intent_session.facts` is a non-empty ARRAY, or
+`intent_session.offer_set` is a STRING, or `policy.world.worlds` / `policy.world.relational` is a non-empty ARRAY, or
+`policy.world.offers` is a plain OBJECT (not an array); a container that is absent or not a plain object (`null` included)
+has no members here; `provenance` iff `intent_session.prov` is present (any value,
+`null` included: rule 17 then judges it), or `intent_session.labels` is a non-empty ARRAY, or `policy.provenance` is a plain
+OBJECT; `classes` iff `intent_session.classes` or `policy.classifiers` is a non-empty ARRAY. Typing is strict: an object
+with its own `length` member is not an array and never makes a check active. An inactive check is not evaluated and
+not reported (the verdict is the pre-v2 one).
+
+Fact `pca-fact` (domain `atlas-pca/fact/v1\0`, ref domain `atlas-pca/fact-ref/v1`, slot `f`): exactly `v` (1), `kind`
+(`"pca-fact"`), `name` (a name), `subject` (string, 1..256 B), `value` (safe integer, or string 1..256 B), `t_obs` (safe
+integer >= 0, epoch ms), `oracle` (string 1..64 B: the kid), `sig`, plus the optional suite members.
+
+Offer set `pca-offer-set` (domain `atlas-pca/offer-set/v1\0`, ref domain `atlas-pca/offer-set-ref/v1`, slot `o`): exactly `v`
+(1), `kind`, `site` (1..256 B), `session` (digest), `query` (object of at most 32 keys of 1..64 B, scalar values), `rank`
+(`"price_asc"`), `complete` (boolean), `offers` (1..256 objects, each with `offer_id` (1..128 B, unique in the set), `price`
+(safe integer >= 0) and at most 32 further attributes (keys 1..64 B, scalar values)), `issued_at` (safe integer >= 0), `kid`
+(1..64 B), `sig`, plus the optional suite members.
+
+Input: `now`, `aud`, `session`, `action {verb, resource, params}`, `committed {facts?, offer_set?}` (the signed
+`intent_session.facts` / `.offer_set`), `facts[]` and `offer_set` (delivered alongside), `policy {skew_ms?, worlds?,
+relational?, offers?}`. A path `action.params.a.b` resolves own members of `params` segment by segment (segments
+`[A-Za-z0-9_-]{1,64}`, never `__proto__` / `constructor` / `prototype`). First failure wins; any failure is `ok: false`:
+0. POLICY: `skew_ms` (default 60000) safe integer >= 0; at most 16 `worlds` and 16 `relational`; every world, relational and
+   offers name is a name and all are distinct; a world has `subject_path` starting `action.`, `freshness_ms` and `max_faulty`
+   safe integers >= 0, `min_oracles` a safe integer >= 2*max_faulty+1, at least `min_oracles` pinned `oracles` `{kid (1..64 B,
+   distinct), pk (digest)}`; a relational entry has `fn` `sub` or `ratio_ppm` and operands `a`, `b` that are each an
+   `action.params.*` path or `env.world.<n>` of a world or relational dimension listed EARLIER (worlds precede relational);
+   `offers` has a name, at least one `site_keys` `{kid (distinct), pk}`, `max_age_ms` safe integer >= 0, `offer_param` an
+   `action.params.*` path, `filter {query: {k: scalar}, offer: {k: scalar}}`.
+1. `committed.facts` (absent = `[]`) is an array of at most 16 distinct digests; `committed.offer_set`, when present, a digest.
+2. Supplied facts are indexed by reference; a supplied fact that is malformed has no reference. Every committed fact digest
+   must be the reference of a supplied well-formed fact. Uncommitted supplied facts are ignored.
+3. In committed order, each fact: its suite members (above); its `name` is a declared world; its `oracle` kid is pinned for that world; its signature
+   verifies under the pinned `pk`; its `subject` equals the action's string at the world's `subject_path` (`action.resource`
+   and `action.verb` are also accepted paths); no two facts share (name, oracle).
+4. In policy order, each world: FRESH facts are those with `t_obs <= now + skew_ms` and `now - t_obs <= freshness_ms` (stale
+   or future facts are NOT counted, never an error; with a `now` that is not a safe integer no fact is fresh); at least
+   `min_oracles` must be fresh. All integers: the value is the LOWER
+   MEDIAN (sort ascending, index `floor((n-1)/2)`). All strings: they must all be equal (that value). A mix fails.
+   `single_source` lists, in policy order, the worlds with `min_oracles == 1`.
+5. In policy order, each relational dimension: both operands resolve to safe integers; `sub` = a - b; `ratio_ppm` =
+   `floor(a * 1000000 / b)` in exact integer arithmetic, requiring b > 0 and a >= 0; the result must be a safe integer.
+6. When `policy.offers` is present: `committed.offer_set` present; the offer set supplied; well-formed; its reference equals
+   the commitment; its suite members; its `kid` pinned in `site_keys` and the signature valid; `site == aud`; `session == session`; `now` a
+   safe integer (else the set is stale); `issued_at <= now + skew_ms` and `now - issued_at <= max_age_ms`; `complete == true`; COVERAGE (the search was not
+   narrowed): every key of `query` is a key of `filter.query` with a scalar-equal value; the action's value at `offer_param`
+   is a string equal to some `offer_id`; that offer satisfies `filter.offer` (every key present and scalar-equal);
+   `excess` = its `price` minus the minimum `price` over the offers satisfying `filter.offer` (so excess >= 0).
+On success `world` maps the world names (step 4), then the relational names (step 5), then the offers name (step 6) to their
+values (keys compared as a set), and the verifier exposes it as `env.world`.
+
+### 17. Per-parameter provenance, label receipts and flow rules (Intent Layer v2 W-B, `primitives.intent_provenance`)
+Reference: `packages/pca/src/param-provenance.ts` (`decideParamProvenance`), `packages/pca/src/label-receipts.ts`, the label
+lattice of `taint.ts`: `trusted` (rank 0) < `first_party` (1) < `tool` (2) < `web` (3) < `agent` (4); the JOIN of labels is the
+highest rank; TAINTED means rank >= 2.
+
+Label receipt `pca-labels` (domain `atlas-pca/labels/v1\0`, ref domain `atlas-pca/labels-ref/v1`, slot `l`): exactly `v` (1),
+`kind`, `site` (1..256 B), `session` (digest), `response_digest` (digest), `fields` (1..64 entries: key 1..256 B, value exactly
+`{class, value_digest}` with `class` matching `^[a-z][a-z0-9_]*(\.[a-z0-9_]+)*$` (at most 128 B) and `value_digest` a digest),
+`issued_at` (safe integer >= 0), `kid` (1..64 B), `sig`, plus the optional suite members; verified (suite first) under the
+pinned signer with the same (`site`, `kid`).
+`value_digest` = `base64url(sha256(strictCanonical(value)))`.
+
+Input: `aud`, `session`, `action {params}`, `prov` (the signed `intent_session.prov`; absent = `{}`), `committed_labels`
+(`intent_session.labels`; absent = `[]`), `labels[]` (receipts delivered alongside), `policy {params, registry?,
+label_keys?, critical_max?, material_tainted?, critical_tainted?, flows?}`. Outcome `pass`, `question` or `deny`; every
+failure below is `deny`. First failure wins:
+0. POLICY: `params` maps `action.params.*` paths to `material` or `critical`; `registry` maps refs (1..256 B) to a level;
+   `label_keys` entries `{site, kid, pk (digest)}`; `critical_max` a level (default `agent`); `material_tainted` one of
+   `allow`, `question` (default), `question_typed`, `deny`; `critical_tainted` one of `question`, `question_typed`
+   (default), `deny`; `flows` maps patterns (a class, `<class>.*`, or `*`) to arrays of audiences (1..256 B).
+1. `prov` is an object of at most 32 keys; each key is `action.params.<name>` with `<name>` in `[A-Za-z0-9_]{1,64}` and not
+   `__proto__`, `constructor` or `prototype`; each value 1..8 strings of 1..256 B. `committed_labels` is an array of at most 16
+   distinct digests.
+2. Every `prov` key names an own member of `params`.
+3. For each `prov` key in ascending order and each of its refs in order: a ref starting `pca-labels:` must have the form
+   `pca-labels:<receipt digest>#<field>` (non-empty field; split at the FIRST `#`); the digest must be in
+   `committed_labels`; a supplied well-formed receipt must have that reference; it must verify; its `session` must equal
+   `session`; `<field>` must be a key of its `fields`. The ref's label is then `first_party` when the receipt's `site == aud`
+   and `tool` otherwise, PROVIDED `value_digest` equals the digest of the parameter's value, else `agent`; and the field's
+   `(class, receipt site)` attaches to the parameter either way. Any other ref gets the registry level when the registry has
+   that ref as an OWN key, else `agent` (`"__proto__"`, `"constructor"`, `"toString"` are ordinary unknown refs). The
+   parameter's label is the join of its refs' labels.
+4. Every `policy.params` path that `prov` does not declare and the action carries gets `agent`.
+5. FLOW: for each classified parameter in ascending order, each attached `(class, origin)` must be allowed at `aud`: allowed
+   when `aud == origin` or `class == "public"`; otherwise take the MOST SPECIFIC flow pattern matching the class (the class
+   itself; else the longest `p.*` with the class starting `p.`; else `*`) and require `aud` in its list; no matching
+   pattern is a denial.
+6. Every CRITICAL parameter with a label: rank(label) <= rank(`critical_max`).
+7. Every tainted material parameter applies `material_tainted`, every tainted critical one `critical_tainted`: `deny` denies;
+   any `question` / `question_typed` makes the outcome `question`, with `friction` `typed` if some applied mode is
+   `question_typed`, else `tap`. Otherwise `pass`.
+8. `env.prov` nests the labels by path (`env.prov.action.params.offer_id`); a classified path that is a prefix of another
+   (only possible through `policy.params`) denies.
+`labels` maps every classified path to its level; `classes` maps each parameter with attached classes to the
+de-duplicated class list sorted in UTF-8 BYTE order (`{}` when none). Every sort in rules 16-18 and below is UTF-8 byte
+order (rule 4's key order), never UTF-16 code-unit order.
+
+READ PURPOSE (V14, `primitives.intent_read_purpose`, reference `decideReadPurpose` in `label-receipts.ts`). Input
+`{fields: [{path, class, optional?}], purpose, coverage: {purpose: [pattern]}, on_uncovered?}`; patterns as for flows
+(a class, `p.*`, `*`). Malformed input (fields not an array of objects with string `path` and `class` and an absent or
+boolean `optional`; a non-string `purpose`; `coverage` not an object of string arrays; `on_uncovered` present and not
+`"question"` / `"deny"`; JSON `null` anywhere) gives `{outcome: "deny", minimise: [], uncovered: []}`. Otherwise
+`coverage[purpose]` is read as an OWN member (an unknown or prototype-named purpose covers nothing); a field is covered
+when its class is `public` or matches a pattern; an uncovered field with `optional: true` goes to `minimise`, any other
+uncovered field to `uncovered`; both lists are de-duplicated and sorted in UTF-8 BYTE order (`U+FFFD` sorts before
+`U+1F600`, unlike UTF-16 order); `outcome` is `allow` when `uncovered` is empty, else `on_uncovered` (default
+`"question"`). Compare `expect` exactly.
+
+### 18. Classifier verdicts (Intent Layer v2 W-B, `primitives.intent_classifier`)
+Reference: `packages/pca/src/intent-classifier.ts` (`decideClassifierDimensions`). Verdict `pca-intent-classification`
+(domain `atlas-pca/intent-classifier/v1\0`, ref domain `atlas-pca/intent-classifier-ref/v1`, slot `c`): exactly `v` (1),
+`kind`, `classifier` (a name), `session` (digest), `content_digest` (digest), `label` (1..64 B), `measurement` (1..256 B),
+`judge` (digest: the Ed25519 key), `sig`, plus the optional suite members; verified under `judge`, which must be on the
+classifier's allowlist (a PQ suite only under `pq_keys[judge]`).
+`content_digest` = `base64url(sha256(strictCanonical(value)))` of the classified parameter's value (any JSON value).
+
+Input: `session`, `action {params}`, `committed` (`intent_session.classes`; absent = `[]`), `verdicts[]`, `policy
+{classifiers: [{id, param, labels, keys, k, measurements?}]}`. First failure wins (`ok: false`):
+0. POLICY: ids are distinct names; `param` an `action.params.*` path; `labels` 1..32 distinct strings of 1..64 B; `keys`
+   1+ distinct digests; `k` a safe integer in [1, |keys|]; `measurements`, when present, an array of strings;
+   `pq_keys`, when present, an object mapping allowlisted keys to non-empty strings.
+1. `committed` is an array of at most 8 distinct digests.
+2. Every committed digest is the reference of a supplied well-formed verdict (uncommitted verdicts are ignored).
+3. In committed order, each verdict: its suite members (above); its classifier is declared; `judge` is in that classifier's `keys`; the signature
+   verifies; `session` equals `session`; the action carries `param` and `content_digest` equals its digest; `label` is in
+   `labels`; `measurement` is in `measurements` when that is present; no two verdicts share (classifier, judge).
+4. In policy order, each classifier: count verdicts per label in a prototype-free tally (a label or id named
+   `constructor`, `__proto__`, `toString`, ... is an ordinary key); the labels with at least `k` verdicts (distinct
+   judges, by step 3) must be exactly one
+   (none: no quorum; two or more: ambiguous). `classes[id]` = that label, exposed as `env.class.<id>`.
+
+### 19. Committed map and Z0 disclosure (Intent Layer v2 V15, `primitives.intent_map_commit`, `primitives.intent_map`, `map-*`)
+Reference: `packages/pca/src/intent-map-commit.ts` (`commitMap`, `decideMapDisclosure`), wallet side
+`@atlasauth/pca-intent` `map-commit.ts` (`commitIntentMap`). The committed form hides the map from a relying party: it sees
+the header of the action's verb, the action's cell and the metrics, nothing else, and two sessions over the same map are
+not linkable by it. The zkVM guest (Z1) proves the same decision without revealing even those leaves.
+
+WIRE (amends rules 12 and 13). `intent_session` gains the optional member `map_form`; when present it must be the string
+`"commit"` (any other value, including `null`, fails `wire`). Then `intent.map_digest` carries `map_commit` (below) and the
+goal of rule 12 step 2 is `"pca-intent:v2c:" || intent_session.session || ":" || intent.map_digest` instead of the `v2`
+goal (so a grant minted over the plain map digest never opens under the commit form, and vice versa). The session root's
+`layers.task.map_digest` is then the commitment as well (rule 13 seq-0 check unchanged).
+
+TAGS (ASCII, each ending in one NUL byte): `TAG_HEADER = "atlas-pca/intent-map/header/v1\0"`, `TAG_CELL =
+"atlas-pca/intent-map/cell/v1\0"`, `TAG_METRICS = "atlas-pca/intent-map/metrics/v1\0"`, `TAG_LEARNER =
+"atlas-pca/intent-map/learner/v1\0"`, `TAG_NODE = "atlas-pca/intent-map/node/v1\0"`, `TAG_COMMIT =
+"atlas-pca/intent-map/commit/v1\0"`.
+
+COMMITMENT. Every leaf has its own 32-byte salt `r` (informative wallet derivation: `r_i = SHA-256("atlas-pca/intent-map/
+salt/v1\0" || secret || u64be(i))`).
+- `leaf_hash = SHA-256(TAG_kind || r || strictCanonical(leaf))` (rule 4 canonical bytes);
+- `node_hash = SHA-256(TAG_NODE || left || right)`;
+- the tree over the n leaf hashes has the RFC 6962 / RFC 9162 shape (split at the largest power of two < n; no
+  duplication); `map_commit = base64url(SHA-256(TAG_COMMIT || u64be(n) || root))` (u64be: 8-byte big-endian).
+LEAF ORDER: (1) one header per verb, verbs sorted by UTF-8 bytes; (2) for each verb in that order, its cell leaves in flat
+order 0 .. cells-1; (3) the metrics leaf (index n-2); (4) the learner leaf (index n-1). LEAVES (closed member sets, every
+member required unless marked `?`; absent vs null and the strict values of the v2 rules apply):
+- header `{verb, first, cells, dims}`: `verb` 1..128 UTF-8 bytes; `first` the index of its flat cell 0 (safe integer,
+  < 2^24); `cells` the product of the dimensions' cell counts, in [1, 2^20]; `dims` an array of at most 16 with distinct
+  paths, each `{kind: "num", path, lo, hi, cuts}` (`path` = `action.params.<name>`, `<name>` matching
+  `[A-Za-z0-9_]{1,64}`; `lo <= hi` safe integers; `cuts` at most 256 STRICTLY increasing safe integers in [lo, hi]) or
+  `{kind: "cat", path, values}` (`path` = `action.resource` or `action.params.<name>`; `values` 1..256 distinct `{kind,
+  value}` with `kind` one of `exact`, `prefix`, `other`, `value` a string of at most 256 UTF-8 bytes, a prefix non-empty, and
+  exactly one `other`, whose value is `"⊥"` (U+22A5) and which is LAST);
+- cell `{verb, cell, p_ppm, in_grant}`: `cell` an array of non-negative safe integers (one per dimension), `p_ppm` a safe
+  integer in [0, 1000000], `in_grant` a JSON boolean;
+- metrics `{residual_risk_ppm, burden_ppm, uncertainty_ppm, disagreement_ppm, mean_harm_ppm, fidelity_est_ppm,
+  entropy_mbits, questions, conflicts, log2_vs_mbits?}`: non-negative safe integers (`log2_vs_mbits` absent = not computed;
+  `null` is malformed);
+- learner `{learner_digest}`: canonical base64url of 32 bytes.
+Numeric cells: `[lo, c_1 - 1], {c_1}, [c_1 + 1, c_2 - 1], ..., {c_k}, [c_k + 1, hi]`, empty ranges dropped.
+
+CELL OF ω. For each header dimension in order, read the action's value: `action.resource` (from the PCActn), or the OWN
+member `<name>` of the verifier's plaintext params for `action.params.<name>`. `num`: the value must be a safe integer and
+its index is the numeric cell containing it. `cat`: the value must be a string; the index is the `exact` value equal to
+it, else the LONGEST `prefix` value it starts with, else the `other` value. Anything else (absent, wrong type, outside
+[lo, hi]) fails. `flat = sum_j i_j * prod_{l > j} n_l` (row-major, last dimension fastest).
+
+DISCLOSURE (the verifier context member `intent_v2.map.disclosure`; a primitive's `input.disclosure`): exactly `{size,
+header, cell, metrics}`, `size` a safe integer in [4, 2^24], each entry exactly `{index, salt, leaf, path}` with `index` a
+non-negative safe integer, `salt` canonical base64url of 32 bytes, `path` an array of at most 64 canonical 32-byte
+base64url hashes (the RFC 9162 audit path, bottom-up; sides follow from index and size), and each `leaf` well-formed for
+its kind.
+
+CHECK `map` (reported as in the pipeline table: `intent_session.map_form` is `"commit"` or `policy.map.require` is true).
+First failure wins: 0. the PCActn's `intent_session.map_form` is `"commit"` (else: a required committed map is missing),
+`intent` is present and a disclosure is present; 1. the disclosure is well-formed; 2. `intent.map_digest` is canonical
+base64url of 32 bytes; 3. params (absent = `{}`) hash to `action.params_digest`; 4. `header.leaf.verb == action.verb`,
+`header.index < header.leaf.first` and `header.leaf.first + header.leaf.cells <= size - 2`; 5. the header, cell and
+metrics leaves each open `map_commit`: hash the leaf with ITS kind's tag and its salt, fold the audit path (RFC 9162
+§2.1.3.2 with `node_hash`; the path length must match (index, size)), and `SHA-256(TAG_COMMIT || u64be(size) || root)`
+must equal `intent.map_digest`; 6. compute the cell of ω under the header: `cell.index == header.leaf.first + flat`,
+`cell.leaf.verb == header.leaf.verb` and `cell.leaf.cell` equals the computed indices; 7. `cell.leaf.in_grant` is true;
+8. `metrics.index == size - 2` and, when `policy.map.max_residual_risk_ppm` (ε) is set, `metrics.leaf.residual_risk_ppm <=
+ε`. The primitive vectors report, when ok, the cell indices and `p_ppm`.
+
+ZK (Z1, the zkVM guest; informative for the other verifiers). The guest takes the disclosure as a PRIVATE input, runs the
+same check and journals only `(map_commit, ε, ok)`; the verifier-context digest it journals excludes `map.disclosure`. A
+relying party then learns that the action's cell is in the committed grant and that the committed residual risk is at
+most ε, and nothing else about the map (T28: zkVM soundness, collision resistance of SHA-256, hiding of the salted leaves).

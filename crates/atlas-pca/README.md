@@ -4,7 +4,7 @@ Reference verifier for **Proof-Carrying Authority (PCA)**, an execution-authenti
 autonomous agents. The agent presents a self-contained proof-carrying action (PCActn) with every
 request, and the resource server verifies it offline instead of trusting a bearer token.
 
-> Status: **0.4.1, unaudited.** Not independently security-reviewed.
+> Status: **0.4.2, unaudited.** Not independently security-reviewed.
 
 ## Install
 

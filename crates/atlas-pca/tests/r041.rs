@@ -96,7 +96,7 @@ fn share_wire_vectors() {
         }
     }
     assert!(bad.is_empty(), "{} of {ran} share vectors failed:\n{}", bad.len(), bad.join("\n"));
-    assert_eq!(skipped, 2, "only the ml-dsa-87 and slh-dsa-sha2-128f share vectors are skipped");
+    assert_eq!(skipped, 0, "every r041 share suite (incl. ml-dsa-87 and slh-dsa-sha2-128f) is implemented in Rust");
     eprintln!("[r041-share] {ran} checked, {skipped} skipped (suites not in Rust; supported: {SUPPORTED_SUITES:?})");
 }
 

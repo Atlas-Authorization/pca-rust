@@ -7,23 +7,88 @@ caveats, native SHA-256 commitments and an in-guest Ed25519 capability-chain che
 RISC Zero guest. The host produces a succinct receipt whose journal is the public statement
 (`allow`, `r_scaled`, `tier`, three commitments, `chain_verified`, and the evaluated `context`, see RT-06 below).
 
-## TODO (PCA 0.4.1): root caveats and `max_spend` are not in the current guest
+## PCA 0.4.2 re-pin: `intentV2Active` fails closed (guest version 10, image id `432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060`)
 
-PCA 0.4.1 fixes a security gap in the TypeScript policy layer: caveats placed on the root grant outside the `envelope` caveat
-were signed but never evaluated. They are now enforced exactly like the caveats delegation hops append, and a `max_spend`
-caveat type (`{usd}` against the action's `params.amount`, optional `currency` "usd"/"USD") was added. The guest in this
-directory (`3b1eebb5...fdad`) still mirrors the 0.4.0 decision: `core/src/lib.rs` evaluates the envelope's caveats and the
-delegated caveats (`delegated_caveats`, R3-11) but not the root's other caveats, and `core/src/caveats.rs` treats `max_spend`
-as an unknown type. A receipt from this guest therefore does NOT prove that root caveats held. To close it:
+BREAKING: new image id `432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060`; `GUEST_VERSION` and `MIN_GUEST_VERSION` are 10; the journal layout is unchanged. `intent_v2_active`
+is also true for a present but malformed v2 verifier context (as the TypeScript reference and the native verifiers), so a host
+gating v2 enforcement on it does not skip the checks that fail closed. The function has no caller in the guest, but the change alters the
+compiled guest, so it is rebuilt and re-proved. The guest-version-9 receipts are under `fixtures/legacy/c5107456/`, that id is on
+`SUPERSEDED_IMAGE_IDS`, and version-9 journals are refused by `MIN_GUEST_VERSION`.
 
-1. `core/src/lib.rs`: evaluate `root_caveats(grant)` (the grant's caveats minus its FIRST `envelope` caveat) with the same
-   context and AND it into `allow`, as `policy-vm.ts` `decide()` does; `core/src/caveats.rs`: add `max_spend` as in
-   `agent-native.ts` `maxSpendSatisfied`.
-2. Add the `caveat_eval` conformance entries (packages/pca/conformance/vectors.json) to the core crate tests.
-3. Rebuild the guest, re-prove the committed receipts, update the pinned image id and the verify crate, and re-run the
-   min-image check (a full risc0 rebuild on the farm, `--need risc0`).
+## PCA 0.4.2 R3-01: session-root PQ keys come from the verifier's pin (guest version 9, image id `c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39`)
 
-## Red-team round 6 (R6-ZK-01 to R6-ZK-06): current guest `3b1eebb5...fdad`
+BREAKING: new image id `c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39`; `GUEST_VERSION` and `MIN_GUEST_VERSION` are 9; the journal layout is unchanged. The guest's
+`verifySessionRoot` (`intent_session.rs` `verify_session_root_pinned`, rules 13 and 15) now follows the TypeScript reference and
+the nine native verifiers: a pure-PQ or hybrid session root verifies only under the VERIFIER's pin for its signer,
+`DecideInput.intent_v2.session.pq_pins` (`{<ed25519 b64u>: <pq_pk b64u>}`, the relying party's own enrolled-key registry),
+never under the PQ key named in the root's own `principals[]` entry, which is part of the presented artifact (a pure ML-DSA
+signature uses no Ed25519 secret, so anyone naming a principal could sign a root under a key of their choosing, and guest
+version 8 proved such a root). In order: no pin for `S.signer` (an own member whose value is a string) fails with `session root
+suite '<alg>' needs the signer's PQ key pinned by the verifier (pq_pins); ...`; a pin other than `S.pq_pk` fails (`does not match
+the verifier's pin for the signer`); a signer principals entry declaring another `pq_pk` fails (`does not match the signer's
+principals entry`); then the suite signature verifies under the pin. Ed25519 roots never consult the pins. A present
+`session.pq_pins` that is not an object of strings is a malformed session context (`intent_session` fails).
+
+The pins are a verifier trust input like `session.revocation_last`: they are part of the verifier state whose `hashCanonical`
+the journal commits (`context.intent_v2.ctx_digest`, pinned by `ExpectedContext::intent_v2_ctx_digest`), so a receipt binds the
+pin set it was proved under. The guest-version-8 receipts are under `fixtures/legacy/0c97a02b/`, that id is on
+`SUPERSEDED_IMAGE_IDS`, and version-8 journals are refused by `MIN_GUEST_VERSION`.
+
+## PCA 0.4.2: root caveats, `max_spend`, the intent binding and Intent Layer v2 in the guest (guest version 8, image id `0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7`, superseded by guest version 9)
+
+BREAKING: new image id `0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7`; `GUEST_VERSION` and `MIN_GUEST_VERSION` are 8; the journal's `context` gains
+`intent`. The guest now enforces the PCA 0.4.1 security fix exactly as `policy-vm.ts` `decide()` does:
+
+- every caveat on the root grant except its FIRST `envelope` caveat (`root_caveats`, = TS `rootCaveats`) is evaluated with the
+  same context as the envelope's and the delegated caveats and ANDed into `allow`; an unknown type, a second `envelope` caveat
+  or a non-object entry is unsatisfied (fail closed), and a non-array caveat list refuses;
+- `max_spend {usd}` is implemented (`caveats.rs`, = `agent-native.ts` `maxSpendSatisfied` / `actionSpendUsd`): the action's own
+  `params.amount` must be a finite number with `0 <= amount <= usd` and an own `currency`, when present, exactly `"usd"` or
+  `"USD"`; it is evaluated before the finite-`now` gate, like the other agent-native types;
+- `policy_caveats(grant, chain)` (= TS `policyCaveats`) is exported; `core/tests/r042_root_caveats.rs` runs every
+  `primitives.caveat_eval` entry of the shared conformance corpus (41, all equal to the reference) and checks that a validly
+  signed chain whose root carries an unsatisfied, unknown or second-envelope caveat is denied (the round-6 guest allowed them).
+
+Intent Layer M2 (`packages/pca/src/intent-binding.ts`, conformance rule 12): a present signed `pcactn.intent` must pass the
+wire rules (exactly `ref`, `map_digest`, `goal_salt`, `fidelity_ppm`, `residual_risk_ppm`; `ref`/`map_digest` canonical
+base64url of 32 bytes; `goal_salt` 1 to 128 UTF-8 bytes; `fidelity_ppm` a safe integer in [0, 1000000]; `residual_risk_ppm` a
+non-negative safe integer) and open the root grant's goal commitment (the first object `envelope` caveat's string
+`goal_commit` must equal `hashCanonical({d: "atlas-pca/goal/v1\0", goal: "pca-intent:v1:" ref ":" map_digest, salt})`),
+else the action is denied. The claims (`ref`, `map_digest`, `fidelity_ppm`, `residual_risk_ppm`) are committed to the journal
+(`context.intent`), and the relying party's policy (`require`, `min_fidelity_ppm`, `max_residual_risk_ppm`: rules 0, 1, 3, 4)
+is applied by `check_context` (`ExpectedContext::intent_policy`; an active policy refuses a journal without an intent).
+`core/tests/r042_intent.rs` reproduces the TypeScript reference verdicts (`fixtures/ts_intent_cases.json`).
+
+Intent Layer v2 (conformance rules 13-19, `packages/pca/src/intent-v2.ts` `decideIntentV2`): when the PCActn carries the
+signed `intent_session` member or the verifier's v2 policy is active, the guest runs the v2 pipeline on the verifier state
+supplied as `DecideInput.intent_v2` and ANDs it into `allow`: `schema` (rule 14, `action_schema.rs`), `intent_session`
+(rule 13, `intent_session.rs`: session root, principal-signed delta chain, revocation epochs), `layers` (V5,
+`intent_layers.rs`: closed and typed ceilings), `accumulators` (rule 15, `intent_acc.rs`: claims, monitors, sequencer
+receipts), `map` (rule 19, `intent_map.rs`, below), and the W-B unit `facts` / `provenance` / `classes` (rules 16-18,
+`oracle_facts.rs`, `offer_set.rs`, `param_provenance.rs`, `label_receipts.rs`, `intent_classifier.rs`). The strict rules
+apply throughout: absent optional members are empty / default, a member present with `null` or of the wrong type is
+malformed and fails closed, numbers are safe integers, the verifier clock must be a safe integer, policies are closed and
+typed. The journal's `context.intent_v2` carries the digest of the verifier state the checks ran under (`ctx_digest`,
+pinned by `ExpectedContext::intent_v2_ctx_digest`), the reported checks and the verifier-computed predicate env. The
+read-purpose primitive (`decide_read_purpose`) is ported too.
+
+Committed map (V15, rule 19, Z1): with `intent_session.map_form: "commit"` the session grant's goal is
+`pca-intent:v2c:<session>:<map_commit>` and the `map` check proves, from the agent's disclosure (header, the action's cell,
+metrics; per-leaf salted Merkle leaves), that the action's cell is inside the committed grant and the committed residual
+risk is at most the policy's ε. The disclosure is a PRIVATE guest input: `ctx_digest` is computed over the verifier state
+WITHOUT its `map` member, so the receipt reveals the verdict, the commitment and ε, not the map (T28,
+`docs/specs/pca-intent-layer-v2.md` §3.10a).
+
+Signature suites (`pq_suites.rs`; matrix in `packages/pca/conformance/SUITES.md`): Ed25519, ML-DSA-65/87 (`fips204`),
+SLH-DSA-SHA2-128f/256s (`fips205`), their Ed25519 hybrids and the nested ML-DSA-65 hybrid, and FN-DSA-512/1024
+(`fn-dsa-vrfy`), everywhere a v2 artifact or a capability hop is signed; a PQ signature verifies only under the key the
+trusted side pins. LESS (and any unknown alg) fails closed with `unsupported_suite: <alg>`.
+
+The round-6 guest (`3b1eebb5...fdad`, guest version 7) is superseded: its receipts are under `fixtures/legacy/3b1eebb5/`, its
+id is on `SUPERSEDED_IMAGE_IDS`, and its journals are refused by `MIN_GUEST_VERSION`, because such a receipt does not prove that
+the root grant's own caveats held.
+
+## Red-team round 6 (R6-ZK-01 to R6-ZK-06): guest `3b1eebb5...fdad` (superseded by guest version 8)
 
 BREAKING: new image id `3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad`, and the journal gains a leading `guest_version` field (7). The guest now matches the
 TypeScript reference (`verifyPCActnCore` plan inclusion + `policy-vm.ts` `decide`) field by field:

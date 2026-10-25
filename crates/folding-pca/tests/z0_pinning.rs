@@ -1,5 +1,5 @@
 //! R3-15: the verifier pins the initial state z0 = [0, 0]; it is not taken from the caller or a public-IO file.
-//! PoC: redteam/round3/zk/src/folding_z0.rs. The step circuit only constrains `budget_spent' in
+//! Regression test for an internal red-team finding (z0 not pinned). The step circuit only constrains `budget_spent' in
 //! [0, B_MAX]; a prover that starts from the field-negative z0 = [0, -X] folds a history whose real total
 //! exceeds B_MAX by X, and Nova accepts it *under that z0*. Before the fix `verify_compressed(.., z0)` took
 //! z0 from the caller, so a verifier that read z0 from the prover's public IO (fixtures/public_io.json carries

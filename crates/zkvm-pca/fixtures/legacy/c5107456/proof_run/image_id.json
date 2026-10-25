@@ -1,0 +1,16 @@
+{
+  "guest": "pca-zkvm-guest",
+  "image_id_hex": "c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39",
+  "image_id_words": [
+    1450447045,
+    4267477235,
+    1658515591,
+    1940015826,
+    3381984993,
+    1943400066,
+    3461166884,
+    967606522
+  ],
+  "risc0_zkvm_version": "3.0.6",
+  "zkvm": "risc0"
+}

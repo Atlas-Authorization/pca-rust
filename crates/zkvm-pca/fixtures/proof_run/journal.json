@@ -1,5 +1,5 @@
 {
-  "guest_version": 7,
+  "guest_version": 10,
   "allow": 1,
   "r_scaled": 65000,
   "tier": 1,
@@ -32,6 +32,8 @@
     "pcactn_iat": 1760000000000,
     "pcactn_exp": 1760001200000,
     "pcactn_aud": "atlas-instance-1",
-    "pcactn_counter": 0
+    "pcactn_counter": 0,
+    "intent": null,
+    "intent_v2": null
   }
 }

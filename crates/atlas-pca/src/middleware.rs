@@ -5,7 +5,7 @@
 //! The pipeline reads a PCActn from the `PCA-Action` request header (base64url -> JSON -> strict
 //! parse) or, absent that, from a JSON body `{"pcactn": ...}`; resolves the referenced grant
 //! (capability root) via a caller-supplied resolver; and runs the existing offline verifier
-//! ([`verify_pcactn_core`]). On success the [`Verdict`] and the PCActn are inserted into the request
+//! ([`verify_pcactn_core_with`]). On success the [`Verdict`] and the PCActn are inserted into the request
 //! extensions and the inner service is called. On failure the request is short-circuited with a
 //! `401` (the proof is absent / undecodable / its grant is unknown) or `403` (a denying verdict),
 //! carrying a `WWW-Authenticate: PCA realm="pca", ...` header and a small JSON body.
@@ -23,7 +23,7 @@ use std::task::{Context, Poll};
 
 use serde_json::Value;
 
-use crate::{strict_parse, verify_pcactn_core, Verdict};
+use crate::{strict_parse, verify_pcactn_core_with, IntentPolicy, IntentV2Context, Verdict, VerifyOptions};
 
 use axum::body::{to_bytes, Body};
 use axum::extract::{Request, State};
@@ -63,7 +63,13 @@ pub struct GuardConfig {
     resolver: GrantResolver,
     clock: Clock,
     body_limit: usize,
+    intent: Option<IntentPolicy>,
+    intent_v2: Option<IntentV2Resolver>,
 }
+
+/// Per-request Intent Layer v2 verifier state: given the parsed PCActn, the host returns its [`IntentV2Context`]
+/// (plaintext params, accepted schemas, session root and grants, accumulator pre-state, receipts, key sets, ...).
+type IntentV2Resolver = Arc<dyn Fn(&Value) -> Option<IntentV2Context> + Send + Sync>;
 
 impl GuardConfig {
     /// Build a config from this verifier's `audience` and a grant resolver. The resolver maps a
@@ -77,7 +83,22 @@ impl GuardConfig {
             resolver: Arc::new(resolver),
             clock: Arc::new(system_clock),
             body_limit: DEFAULT_BODY_LIMIT,
+            intent: None,
+            intent_v2: None,
         }
+    }
+
+    /// Set the Intent Layer M2 policy (default: none). See [`IntentPolicy`].
+    pub fn with_intent_policy(mut self, policy: IntentPolicy) -> Self {
+        self.intent = Some(policy);
+        self
+    }
+
+    /// Set the Intent Layer v2 state resolver (default: none, so only a v2 member on the PCActn reports the v2 checks,
+    /// against an empty context). The resolver builds the per-request [`IntentV2Context`] from the parsed PCActn.
+    pub fn with_intent_v2(mut self, resolver: impl Fn(&Value) -> Option<IntentV2Context> + Send + Sync + 'static) -> Self {
+        self.intent_v2 = Some(Arc::new(resolver));
+        self
     }
 
     /// Override the clock (epoch milliseconds). Useful for tests and for a monotonic trusted source.
@@ -171,15 +192,16 @@ impl GuardResult {
         self.allow
     }
 
-    /// The `WWW-Authenticate` header value for a denial (`None` when allowed). The scheme is `PCA`
-    /// with `realm`, `error` and `error_description` (RFC 6750-shaped).
+    /// The `WWW-Authenticate` header value for a denial (`None` when allowed): `PCA realm="pca", error="<code>"`.
+    /// Only the static error code is emitted. The description is NOT: it can carry request-derived text (the verdict
+    /// reason, the presented `grant_ref`, a parse error) and so must never reach a header (CR/LF header injection);
+    /// TS `requirePCA` puts no reason in its challenge either. The description stays in [`GuardResult::json_body`].
     pub fn www_authenticate(&self) -> Option<String> {
         if self.allow {
             return None;
         }
         let code = self.error.unwrap_or("invalid_request");
-        let desc = self.description.replace('\\', "\\\\").replace('"', "\\\"");
-        Some(format!("PCA realm=\"pca\", error=\"{code}\", error_description=\"{desc}\""))
+        Some(format!("PCA realm=\"pca\", error=\"{code}\""))
     }
 
     /// The JSON body for a response (allow or deny), including the per-check verdict when present.
@@ -206,7 +228,7 @@ impl GuardResult {
 /// `header` is the raw `PCA-Action` header value (base64url of the PCActn JSON), if present;
 /// `body` is the raw request body, used only when no header is present and parsed as a
 /// `{"pcactn": ...}` envelope. The header path strict-parses (RFC 8259 strict profile) the decoded
-/// JSON; both paths then run [`verify_pcactn_core`] against the resolved grant and `cfg.audience`
+/// JSON; both paths then run [`verify_pcactn_core_with`] against the resolved grant and `cfg.audience`
 /// at `cfg`'s clock.
 pub fn verify_request(header: Option<&str>, body: Option<&[u8]>, cfg: &GuardConfig) -> GuardResult {
     // 1. Obtain the PCActn value, preferring the header.
@@ -289,7 +311,9 @@ pub fn verify_request(header: Option<&str>, body: Option<&[u8]>, cfg: &GuardConf
 
     // 4. Run the existing offline verifier (8 checks; aud vs signed aud; chain rooted at the grant).
     let now = (cfg.clock)();
-    let verdict = verify_pcactn_core(&pcactn, &grant, now, &cfg.audience);
+    let v2 = cfg.intent_v2.as_ref().and_then(|r| r(&pcactn));
+    let opts = VerifyOptions { allowed: None, intent: cfg.intent.as_ref(), intent_v2: v2.as_ref() };
+    let verdict = verify_pcactn_core_with(&pcactn, &grant, now, &cfg.audience, &opts);
     if verdict.allow {
         GuardResult::allow(pcactn, verdict)
     } else {
