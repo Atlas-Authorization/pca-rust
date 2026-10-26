@@ -1,6 +1,8 @@
 # pca-folding-ivc
 
-> Status: **0.4.2, unaudited.** Install: `cargo add pca-folding-ivc`
+> Maturity: **experimental**. Its API may change or be removed in any release, and it is outside the stable and production tiers. See [maturity tiers](https://github.com/Atlas-Authorization/pca/blob/main/docs/maturity.md).
+
+> Status: **0.4.1, unaudited.** Install: `cargo add pca-folding-ivc`
 
 **One succinct proof of an agent's entire PCA action history — via a folding scheme (Nova), not naive recursion.**
 

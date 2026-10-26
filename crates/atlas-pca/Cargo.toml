@@ -1,6 +1,6 @@
 [package]
 name = "atlas-pca"
-version = "0.4.2"
+version = "0.4.1"
 edition = "2021"
 description = "Reference verifier for Atlas Proof-Carrying Authority (core PCActn checks)"
 license = "MIT"
@@ -28,11 +28,22 @@ fips204 = "0.4"
 fips205 = { version = "0.4", default-features = false, features = ["slh_dsa_sha2_128f", "slh_dsa_sha2_256s"] }
 fn-dsa-vrfy = "0.4"
 
+# Vendor hardware-attestation verifiers (AMD SEV-SNP, Intel TDX DCAP, Azure MAA, GCP Confidential Space, NVIDIA GPU):
+# ECDSA P-256 / P-384 verification, RSA (PKCS#1 v1.5 and PSS) verification and SHA-1 (OCSP key hashes). The X.509 / DER readers
+# are in the crate itself.
+p256 = { version = "0.13", features = ["ecdsa"] }
+p384 = { version = "0.13", features = ["ecdsa"] }
+rsa = "0.9"
+sha1 = "0.10"
+
 # Optional tower/axum middleware (feature `axum`). Kept out of the default build so the base
 # verifier stays dependency-light.
 axum = { version = "0.7", optional = true }
 tower-layer = { version = "0.3", optional = true }
 tower-service = { version = "0.3", optional = true }
+
+# Optional durable replay store for `authorize` (feature `sqlite`): SQLite compiled in (no system library needed).
+rusqlite = { version = "0.41", optional = true, features = ["bundled"] }
 
 # Feature `less`: the LESS suites through the patched reference C in less-c/, compiled by build.rs.
 [build-dependencies]
@@ -45,8 +56,14 @@ cc = { version = "1", optional = true }
 less = ["dep:cc"]
 # Ergonomic tower `Layer`/`Service` + axum `from_fn` guard in `middleware`.
 axum = ["dep:axum", "dep:tower-layer", "dep:tower-service"]
+# `SqliteStateStore`: a durable `authorize` replay store on SQLite (rusqlite, bundled).
+sqlite = ["dep:rusqlite"]
 
 # The k042 differential unit tests parse oracle corpora nested thousands of levels deep (serde_json stops at 128).
 [dev-dependencies]
 serde = "1"
 serde_json = { version = "1", features = ["float_roundtrip", "unbounded_depth"] }
+
+[package.metadata.pca]
+# Maturity tier: stable | production | experimental (the PCA maturity tiers page defines them)
+maturity = "stable"

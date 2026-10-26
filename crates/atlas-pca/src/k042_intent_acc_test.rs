@@ -8,8 +8,15 @@ use serde_json::json;
 
 fn cases() -> Vec<Value> {
     let doc = parse(&read("k042-intentacc.json")).expect("corpus");
-    let v = doc.as_array().expect("array").clone();
+    let mut v = doc.as_array().expect("array").clone();
     assert!(v.len() > 1500, "corpus loaded");
+    // the conformance corpus file (intent-state-vectors.json): the same accumulator / receipt cases plus the session-history cases
+    let text = std::fs::read_to_string(format!("{}/../../conformance/intent-state-vectors.json", env!("CARGO_MANIFEST_DIR"))).expect("read the corpus file");
+    let corpus = parse(&text).expect("corpus file");
+    assert_eq!(corpus["format"], "pca-intent-state-vectors");
+    let cs = corpus["cases"].as_array().expect("cases").clone();
+    assert!(cs.len() > 3000, "corpus file loaded");
+    v.extend(cs);
     v
 }
 
@@ -150,4 +157,57 @@ fn t_receipt_against_holder() {
         let f = ReceiptFreshness { max_receipt_age_ms: a[4].as_f64().unwrap(), max_keyset_age_ms: a[5].as_f64().unwrap(), tracked };
         json!(verify_receipt_against_holder(&a[0], m(&a[1]), opt(&a[2]), a[3].as_f64().unwrap(), &f).is_ok())
     });
+}
+
+// ---- the session-history cases (intent_history.rs; conformance/intent-state-vectors.json) -------------------------------
+
+use crate::intent_history::{acc_key_of, acc_post, acc_pre_state, in_window, monitor_state, monitor_step};
+
+fn throws() -> Value {
+    json!({"throws": true})
+}
+
+fn history(v: &Value) -> Vec<Value> {
+    v.as_array().expect("history").clone()
+}
+
+#[test]
+fn t_history_window_and_key() {
+    run("inWindow", |a| json!(in_window(m(&a[0]), Some(&a[1]), Some(&a[2]))));
+    run("accKeyOf", |a| ostr(acc_key_of(m(&a[0]), m(&a[1]))));
+}
+
+#[test]
+fn t_history_pre_state_and_post() {
+    run("accPreState", |a| {
+        let cand = m(&a[2]);
+        acc_pre_state(m(&a[0]), &history(&a[1]), m(&cand["params"]), cand.get("t"), opt(&a[3])).unwrap_or_else(|_| throws())
+    });
+    run("accPost", |a| {
+        let cand = m(&a[2]);
+        acc_post(m(&a[0]), &history(&a[1]), st(&cand["verb"]), m(&cand["params"]), cand.get("t"), opt(&a[3])).map_or_else(|_| throws(), |n| json!(n))
+    });
+}
+
+#[test]
+fn t_history_monitors() {
+    run("monitorStep", |a| json!(monitor_step(m(&a[0]), st(&a[1]), &a[2])));
+    run("monitorState", |a| json!(monitor_state(m(&a[0]), &history(&a[1]))));
+}
+
+/// Every function of the corpus file has a runner above (a new function without one fails).
+#[test]
+fn t_corpus_is_fully_run() {
+    let known = [
+        "accumulatorDeclError", "monitorDeclError", "monitorStates", "trackedKeySetError", "preStateError", "preValue", "combineAcc", "accSelects",
+        "accValueOf", "receiptArithmeticOk", "pcactnReservationDigest", "receiptShapeError", "keySetShapeError", "verifyKeySet", "verifyReceiptSignature",
+        "verifyReceiptAgainstHolder", "inWindow", "accKeyOf", "accPreState", "accPost", "monitorStep", "monitorState",
+    ];
+    let all = cases();
+    for c in &all {
+        assert!(known.contains(&st(&c["fn"])), "no runner for corpus function {}", c["fn"]);
+    }
+    for f in known {
+        assert!(all.iter().any(|c| c["fn"] == f), "corpus has no case for {f}");
+    }
 }

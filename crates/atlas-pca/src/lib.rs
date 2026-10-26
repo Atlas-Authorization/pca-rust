@@ -1,5 +1,5 @@
 //! Reference verifier for the CORE PCActn checks (wire format v2): wire, version, audience, validity,
-//! capability chain, grant_ref binding, Merkle plan inclusion, strict Ed25519 leaf signature, counter. Byte-matches
+//! capability chain, grant_ref binding, Merkle plan inclusion, strict Ed25519 leaf signature, counter format. Byte-matches
 //! `@atlasauth/pca` (the shared conformance corpus defines the normative rules).
 
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
@@ -21,6 +21,7 @@ pub mod middleware;
 // Intent Layer v2 (rules 13-18 and the V5 `layers` check).
 mod action_schema;
 mod intent_acc;
+mod intent_history;
 mod intent_map;
 mod intent_strict;
 mod intent_revocation;
@@ -28,11 +29,34 @@ mod intent_session;
 mod intent_suite;
 mod intent_v2;
 mod intent_wb;
+mod mesh;
 mod predicates;
 mod safe_regex;
+// 0.5: wire-level verification of transparency-anchored allowlist evidence.
+mod allowlist_anchor;
+pub mod attest;
+mod passport;
+pub use passport::{verify_passport, AttestFn, PassportAttestation, PassportBinding, PassportOptions};
+pub use allowlist_anchor::{verify_allowlist_anchored, AnchorEntry, AnchorOptions, AnchorResult};
+// 0.5: extension-member verifiers (transparency ledger, optimistic path); see the module docs.
+pub mod ledger;
+pub mod optimistic;
+// 0.5: the full authorization pipeline (`authorize`) and its replay stores.
+mod authorize;
+#[cfg(feature = "sqlite")]
+mod sqlite_store;
 #[cfg(test)]
 mod k042_support;
 
+pub use authorize::{
+    authorize, authorize_json, evaluate_agent_caveats, evaluate_tool_schema, is_authorized_for, missing_authorize_components, read_envelope,
+    root_caveats, state_key, validate_arg_schema, AuthorizeInput, AuthorizeOptions, AuthorizeResult, AuthorizedOperation, CheckStatus,
+    ClaimResult, ContextProvider, GrantResolver, IntentV2Provider, MemoryStateStore, Operation, RevocationCheck, StateStore, StoreError,
+    DEFAULT_REQUIRED_CHECKS, SINGLE_STEP,
+};
+#[cfg(feature = "sqlite")]
+pub use sqlite_store::SqliteStateStore;
+pub use mesh::{verify_mesh_proof, MeshVerdict};
 pub use action_schema::{action_schema_digest, action_schema_shape_error, conform_action, verify_action_schema, ConformResult};
 pub use intent_acc::{
     acc_receipt_digest, pcactn_reservation_digest, sequencer_key_set_digest, DEFAULT_MAX_KEYSET_AGE_MS, DEFAULT_MAX_RECEIPT_AGE_MS, MAX_RECEIPT_LIFETIME_MS, RECEIPT_SKEW_MS,
@@ -132,7 +156,7 @@ pub fn decode_b64u_strict(s: &str, len: Option<usize>) -> Option<Vec<u8>> {
 
 /// Verdict for the core checks. `checks[name]` is true when it passed. A wire failure is terminal and is
 /// the ONLY entry (`{wire: false}`); otherwise all of wire, version, audience, validity, chain,
-/// plan_inclusion, leaf_signature, counter are present.
+/// plan_inclusion, leaf_signature, counter_format are present.
 #[derive(Debug, Clone)]
 pub struct Verdict {
     pub allow: bool,
@@ -2009,7 +2033,7 @@ pub fn verify_pcactn_json_with(text: &str, grant: &Value, now: i64, audience: &s
 }
 
 /// Checks, in the normative order: wire (terminal), version, audience, validity, chain, plan_inclusion,
-/// leaf_signature, counter (then `intent` when the PCActn carries it). `now` is epoch milliseconds; `audience` is this verifier's own audience id.
+/// leaf_signature, counter_format (then `intent` when the PCActn carries it). `now` is epoch milliseconds; `audience` is this verifier's own audience id.
 /// Later-milestone checks (attestation, threshold, revocation, ...) are out of scope.
 pub fn verify_pcactn_core(pcactn: &Value, grant: &Value, now: i64, audience: &str) -> Verdict {
     verify_pcactn_core_policy(pcactn, grant, now, audience, None)
@@ -2033,7 +2057,7 @@ pub struct VerifyOptions<'a> {
     pub intent_v2: Option<&'a IntentV2Context>,
 }
 
-/// [`verify_pcactn_core`] with explicit [`VerifyOptions`]. The `intent` check runs after `counter` and is reported
+/// [`verify_pcactn_core`] with explicit [`VerifyOptions`]. The `intent` check runs after `counter_format` and is reported
 /// iff the PCActn carries `intent` or `opts.intent` is active; otherwise the verdict is the pre-M2 one.
 pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience: &str, opts: &VerifyOptions<'_>) -> Verdict {
     let allowed = opts.allowed;
@@ -2166,9 +2190,9 @@ pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience
     });
     record("leaf_signature", if sig_ok { Ok(()) } else { Err(leaf_msg.into()) });
 
-    // counter: safe integer >= 0 (monotonicity vs. stored state is the resource server's job)
+    // counter_format: safe integer >= 0 (monotonicity vs. stored state is `replay`, the resource server's job)
     record(
-        "counter",
+        "counter_format",
         match p.get("counter").and_then(safe_int) {
             Some(i) if i >= 0 => Ok(()),
             _ => Err("missing or not a non-negative safe integer".into()),
