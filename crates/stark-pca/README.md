@@ -26,7 +26,7 @@ Security level (pinned options: 37 queries, blow-up 8, no extension): 110 bits c
 (list decoding), 30 bits proven (unique decoding). The conjectured figure rests on a proximity-gap conjecture; the
 proven figures are the honest lower bound.
 
-Winterfell version: **0.13.1**. Status: **0.4.2, unaudited.**
+Winterfell version: **0.13.1**. Status: **0.4.3, unaudited.**
 
 ---
 

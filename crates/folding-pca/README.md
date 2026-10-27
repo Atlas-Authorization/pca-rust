@@ -1,6 +1,6 @@
 # pca-folding-ivc
 
-> Status: **0.4.2, unaudited.** Install: `cargo add pca-folding-ivc`
+> Status: **0.4.3, unaudited.** Install: `cargo add pca-folding-ivc`
 
 **One succinct proof of an agent's entire PCA action history — via a folding scheme (Nova), not naive recursion.**
 
