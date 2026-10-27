@@ -38,6 +38,13 @@ pub const DEFAULT_MAX_ITEMS: i64 = 64;
 const SENSITIVITIES: [&str; 3] = ["free", "material", "critical"];
 const REVERSIBILITY: [&str; 3] = ["reversible", "rate_limited", "irreversible"];
 const PARAM_TYPES: [&str; 6] = ["string", "integer", "boolean", "date", "set", "array"];
+const DOC_KEYS_V2_EXTRA: [&str; 3] = ["traits_digest", "trait_defs", "pack"];
+const VERB_KEYS_V2_EXTRA: [&str; 4] = ["traits", "def", "floors", "confirmation"];
+const PARAM_KEYS_V2_EXTRA: [&str; 4] = ["role", "format", "tags", "provenance_min"];
+const PARAM_TYPES_V2_EXTRA: [&str; 3] = ["datetime", "duration", "object_ref"];
+const V2_EFFECTS: [&str; 12] = ["read", "create", "update", "delete", "send", "pay", "exec", "privilege", "export", "publish", "provision", "sign"];
+const V2_TAGS: [&str; 9] = ["pii", "phi", "pci", "secret", "credential", "free_text_outbound", "code", "path", "sql"];
+const V2_PROVENANCE: [&str; 3] = ["first_party", "tool", "agent"];
 const DOC_KEYS: [&str; 9] = ["v", "kind", "site", "aud", "version", "units", "state", "verbs", "sig"];
 const VERB_KEYS: [&str; 12] =
     ["verb", "kind", "params", "reversibility", "reversibility_by", "mcp", "openapi", "harm", "world", "effects", "returns", "description"];
@@ -137,25 +144,39 @@ fn resolve_sig_alg(v: Option<&Value>) -> Option<&str> {
 fn js_str(v: Option<&Value>) -> String {
     crate::canonical::js_string(v)
 }
+/// `^[a-z][a-z0-9_]{0,31}\.[a-z][a-z0-9_]{0,63}$`.
+fn trait_id_shape(s: &str) -> bool {
+    let Some((a, b)) = s.split_once('.') else { return false };
+    let part = |p: &str, max: usize| !p.is_empty() && p.len() <= max && p.as_bytes()[0].is_ascii_lowercase() && p.bytes().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'_');
+    part(a, 32) && part(b, 64)
+}
 
 // ---- shape -----------------------------------------------------------------------------------------------------------
 
-fn param_decl_error(path: &str, d: &Value, units: Option<&Value>) -> Option<String> {
-    if !param_path_ok(path) {
+/// `PARAM_PATH_RE_V2`: `action.params.` then 1..3 dot-separated names of `[A-Za-z0-9_]{1,64}`.
+fn param_path_ok_v2(p: &str) -> bool {
+    p.strip_prefix(PARAMS_PREFIX).is_some_and(|rest| {
+        let segs: Vec<&str> = rest.split('.').collect();
+        (1..=3).contains(&segs.len()) && segs.iter().all(|s| name_ok(s))
+    })
+}
+
+fn param_decl_error(path: &str, d: &Value, units: Option<&Value>, v2: bool) -> Option<String> {
+    if !(if v2 { param_path_ok_v2(path) } else { param_path_ok(path) }) {
         return Some(format!("parameter path '{path}' is not action.params.<name>"));
     }
-    if RESERVED_NAMES.contains(&path.strip_prefix(PARAMS_PREFIX).unwrap_or(path)) {
+    if path.strip_prefix(PARAMS_PREFIX).unwrap_or(path).split('.').any(|seg| RESERVED_NAMES.contains(&seg)) {
         return Some(format!("parameter name '{path}' is reserved (__proto__ / constructor / prototype)"));
     }
     let d = match d.as_object() {
         Some(o) => o,
         None => return Some(format!("{path}: declaration must be an object")),
     };
-    if let Some(k) = d.keys().find(|k| !PARAM_KEYS.contains(&k.as_str())) {
+    if let Some(k) = d.keys().find(|k| !PARAM_KEYS.contains(&k.as_str()) && !(v2 && PARAM_KEYS_V2_EXTRA.contains(&k.as_str()))) {
         return Some(format!("{path}: unknown member '{k}'"));
     }
     let ty = d.get("type");
-    if !str_in(ty, &PARAM_TYPES) {
+    if !(str_in(ty, &PARAM_TYPES) || (v2 && str_in(ty, &PARAM_TYPES_V2_EXTRA))) {
         return Some(format!("{path}: unknown type"));
     }
     let ty = ty.and_then(Value::as_str).unwrap_or("");
@@ -188,7 +209,7 @@ fn param_decl_error(path: &str, d: &Value, units: Option<&Value>) -> Option<Stri
     }
     let int_items = ty == "array" && d.get("items").and_then(Value::as_str) == Some("integer");
     for k in ["min", "max"] {
-        if d.get(k).is_some() && (!is_int(d.get(k)) || (ty != "integer" && !int_items)) {
+        if d.get(k).is_some() && (!is_int(d.get(k)) || (ty != "integer" && !(v2 && ty == "duration") && !int_items)) {
             return Some(format!("{path}: {k} must be a safe integer on an integer parameter"));
         }
     }
@@ -252,15 +273,116 @@ fn param_decl_error(path: &str, d: &Value, units: Option<&Value>) -> Option<Stri
     if d.get("description").is_some() && !is_str(d.get("description"), 1024) {
         return Some(format!("{path}: description must be a string"));
     }
+    if v2 {
+        if d.get("role").is_some() && !is_str(d.get("role"), 128) {
+            return Some(format!("{path}: role must be a non-empty string"));
+        }
+        if let Some(f) = d.get("format") {
+            if !f.as_str().is_some_and(format_known) || (ty != "string" && ty != "object_ref") {
+                return Some(format!("{path}: format must be a known format on a string parameter"));
+            }
+        }
+        if let Some(t) = d.get("tags") {
+            let ok = t.as_array().is_some_and(|a| a.len() <= V2_TAGS.len() && distinct_strs(a) && a.iter().all(|x| x.as_str().is_some_and(|s| V2_TAGS.contains(&s))));
+            if !ok {
+                return Some(format!("{path}: tags must be distinct known tags"));
+            }
+        }
+        if d.get("provenance_min").is_some() && !str_in(d.get("provenance_min"), &V2_PROVENANCE) {
+            return Some(format!("{path}: unknown provenance_min"));
+        }
+    }
     None
 }
 
-fn verb_decl_error(v: &Value, units: Option<&Value>) -> Option<String> {
+/// `schemaFloorsError(f)`: a well-formed materialized profile (shape only; the semantic check is rule 22).
+fn floors_shape_error(f: Option<&Value>) -> Option<String> {
+    let f = match f.and_then(Value::as_object) {
+        Some(f) => f,
+        None => return Some("floors must be an object".into()),
+    };
+    if let Some(k) = f.keys().find(|k| !["risk", "rev", "blast_ppm", "esc", "caveats", "context", "prules"].contains(&k.as_str())) {
+        return Some(format!("floors: unknown member '{k}'"));
+    }
+    let rng = |k: &str, lo: i64, hi: i64| f.get(k).and_then(safe_int).is_some_and(|x| x >= lo && x <= hi);
+    if !rng("risk", 0, 3) || !rng("esc", 0, 3) {
+        return Some("floors.risk and floors.esc must be integers in 0..3".into());
+    }
+    if !str_in(f.get("rev"), &REVERSIBILITY) {
+        return Some("floors.rev is not a reversibility class".into());
+    }
+    if !rng("blast_ppm", 0, 1_000_000) {
+        return Some("floors.blast_ppm must be an integer in 0..1000000".into());
+    }
+    let sets: [(&str, &dyn Fn(&str) -> bool); 3] = [
+        ("caveats", &|x| crate::rule22::CAVEAT_KINDS.contains(&x)),
+        ("context", &crate::rule22::is_context_key),
+        ("prules", &|x| crate::rule22::PARAM_RULE_IDS.contains(&x)),
+    ];
+    for (name, ok) in sets {
+        let a = match f.get(name).and_then(Value::as_array) {
+            Some(a) if a.len() <= 64 && a.iter().all(|x| x.as_str().is_some_and(ok)) => a,
+            _ => return Some(format!("floors.{name} must be an array of known entries")),
+        };
+        for i in 1..a.len() {
+            if a[i - 1].as_str() >= a[i].as_str() {
+                return Some(format!("floors.{name} must be sorted and distinct"));
+            }
+        }
+    }
+    None
+}
+
+/// `confirmationShapeError(c)`: a well-formed `confirmation` (shape only; the signature check is rule 22).
+fn confirmation_shape_error(c: &Value) -> Option<String> {
+    let c = match c.as_object() {
+        Some(c) => c,
+        None => return Some("confirmation must be an object".into()),
+    };
+    if let Some(k) = c.keys().find(|k| !["def_digest", "traits_digest", "facts_digest", "final_traits", "dismissed", "reviewer_kid", "ts", "sig"].contains(&k.as_str())) {
+        return Some(format!("confirmation: unknown member '{k}'"));
+    }
+    let b64 = |k: &str, len: usize| c.get(k).and_then(Value::as_str).is_some_and(|s| decode_b64u_strict(s, len).is_some());
+    if !b64("def_digest", 32) || !b64("traits_digest", 32) || !b64("facts_digest", 32) {
+        return Some("confirmation: def_digest, traits_digest and facts_digest must be canonical base64url SHA-256 digests".into());
+    }
+    if !b64("sig", 64) {
+        return Some("confirmation: sig must be a canonical base64url 64-byte signature".into());
+    }
+    let ft = match c.get("final_traits").and_then(Value::as_array) {
+        Some(a) if a.len() <= 64 && a.iter().all(|x| x.as_str().is_some_and(trait_id_shape)) => a,
+        _ => return Some("confirmation: final_traits must be trait ids".into()),
+    };
+    if ft.windows(2).any(|w| w[0].as_str() >= w[1].as_str()) {
+        return Some("confirmation: final_traits must be sorted and distinct".into());
+    }
+    let dm = match c.get("dismissed").and_then(Value::as_array) {
+        Some(a) if a.len() <= 64 => a,
+        _ => return Some("confirmation: dismissed must be an array".into()),
+    };
+    for d in dm {
+        let ok = d.as_object().is_some_and(|d| {
+            d.keys().all(|k| k == "trait" || k == "reason") && d.get("trait").and_then(Value::as_str).is_some_and(trait_id_shape) && is_str(d.get("reason"), 256)
+        });
+        if !ok {
+            return Some("confirmation: dismissed entries must be {trait, reason}".into());
+        }
+    }
+    if !is_str(c.get("reviewer_kid"), 128) {
+        return Some("confirmation: reviewer_kid must be a non-empty string".into());
+    }
+    if !is_non_neg(c.get("ts")) {
+        return Some("confirmation: ts must be a non-negative safe integer".into());
+    }
+    None
+}
+
+fn verb_decl_error(v: &Value, units: Option<&Value>, v2: bool) -> Option<String> {
     let v = match v.as_object() {
         Some(o) => o,
         None => return Some("verb entry must be an object".into()),
     };
-    if let Some(k) = v.keys().find(|k| !VERB_KEYS.contains(&k.as_str())) {
+    if let Some(k) = v.keys().find(|k| !VERB_KEYS.contains(&k.as_str()) && !(v2 && VERB_KEYS_V2_EXTRA.contains(&k.as_str()))) {
         return Some(format!("verb entry: unknown member '{k}'"));
     }
     if !is_str(v.get("verb"), 128) {
@@ -278,8 +400,15 @@ fn verb_decl_error(v: &Value, units: Option<&Value>) -> Option<String> {
         return Some(format!("{at}: more than {MAX_SCHEMA_PARAMS} parameters"));
     }
     for (p, d) in params {
-        if let Some(e) = param_decl_error(p, d, units) {
+        if let Some(e) = param_decl_error(p, d, units, v2) {
             return Some(format!("{at}: {e}"));
+        }
+    }
+    if v2 {
+        for p in params.keys() {
+            if let Some(q) = params.keys().find(|q| *q != p && q.starts_with(&format!("{p}."))) {
+                return Some(format!("{at}: parameter '{p}' is both a value and the parent of '{q}'"));
+            }
         }
     }
     if v.get("reversibility").is_some() && !str_in(v.get("reversibility"), &REVERSIBILITY) {
@@ -318,8 +447,45 @@ fn verb_decl_error(v: &Value, units: Option<&Value>) -> Option<String> {
         return Some(format!("{at}: openapi must be {{operationId}}"));
     }
     for k in ["harm", "effects", "returns"] {
+        if v2 && k == "effects" {
+            continue;
+        }
         if v.get(k).is_some_and(|x| !x.is_object()) {
             return Some(format!("{at}: {k} must be an object"));
+        }
+    }
+    if v2 {
+        let ef = match v.get("effects").and_then(Value::as_array) {
+            Some(a) if !a.is_empty() && a.len() <= V2_EFFECTS.len() && a.iter().all(|x| x.as_str().is_some_and(|s| V2_EFFECTS.contains(&s))) => a,
+            _ => return Some(format!("{at}: effects must be 1..{} known effects", V2_EFFECTS.len())),
+        };
+        for i in 1..ef.len() {
+            if ef[i - 1].as_str() >= ef[i].as_str() {
+                return Some(format!("{at}: effects must be sorted and distinct"));
+            }
+        }
+        if (v.get("kind").and_then(Value::as_str) == Some("read")) != ef.iter().all(|x| x.as_str() == Some("read")) {
+            return Some(format!("{at}: kind read must hold exactly when every effect is read"));
+        }
+        let tr = match v.get("traits").and_then(Value::as_array) {
+            Some(a) if a.len() <= 64 && a.iter().all(|x| x.as_str().is_some_and(trait_id_shape)) => a,
+            _ => return Some(format!("{at}: traits must be trait ids")),
+        };
+        for i in 1..tr.len() {
+            if tr[i - 1].as_str() >= tr[i].as_str() {
+                return Some(format!("{at}: traits must be sorted and distinct"));
+            }
+        }
+        if !v.get("def").and_then(Value::as_str).is_some_and(|d| decode_b64u_strict(d, 32).is_some()) {
+            return Some(format!("{at}: def must be a canonical base64url SHA-256 digest"));
+        }
+        if let Some(fe) = floors_shape_error(v.get("floors")) {
+            return Some(format!("{at}: {fe}"));
+        }
+        if let Some(c) = v.get("confirmation") {
+            if let Some(ce) = confirmation_shape_error(c) {
+                return Some(format!("{at}: {ce}"));
+            }
         }
     }
     if v.get("world").is_some_and(|x| !x.is_array()) {
@@ -337,10 +503,11 @@ pub fn action_schema_shape_error(doc: &Value, signed: bool) -> Option<String> {
         Some(o) => o,
         None => return Some("schema is not an object".into()),
     };
-    if let Some(k) = o.keys().find(|k| !DOC_KEYS.contains(&k.as_str())) {
+    let v2 = o.get("v").and_then(safe_int) == Some(2);
+    if let Some(k) = o.keys().find(|k| !DOC_KEYS.contains(&k.as_str()) && !(v2 && DOC_KEYS_V2_EXTRA.contains(&k.as_str()))) {
         return Some(format!("unknown member '{k}'"));
     }
-    if o.get("v").and_then(safe_int) != Some(1) {
+    if !matches!(o.get("v").and_then(safe_int), Some(1) | Some(2)) {
         return Some("unsupported schema version".into());
     }
     if o.get("kind").and_then(Value::as_str) != Some(ACTION_SCHEMA_KIND) {
@@ -376,13 +543,29 @@ pub fn action_schema_shape_error(doc: &Value, signed: bool) -> Option<String> {
     if o.get("state").is_some_and(|s| !s.is_array()) {
         return Some("state must be an array".into());
     }
+    if v2 {
+        if o.get("traits_digest").is_some() && !o.get("traits_digest").and_then(Value::as_str).is_some_and(|d| decode_b64u_strict(d, 32).is_some()) {
+            return Some("traits_digest must be a canonical base64url SHA-256 digest".into());
+        }
+        if o.get("trait_defs").is_some_and(|t| !t.as_array().is_some_and(|a| a.len() <= 64 && a.iter().all(Value::is_object))) {
+            return Some("trait_defs must be an array of up to 64 objects".into());
+        }
+        if let Some(pk) = o.get("pack") {
+            let ok = pk.as_object().is_some_and(|p| {
+                p.len() == 3 && is_str(p.get("ns"), 64) && is_str(p.get("version"), 128) && p.get("root").and_then(Value::as_str).is_some_and(|r| decode_b64u_strict(r, 32).is_some())
+            });
+            if !ok {
+                return Some("pack must be {ns, version, root}".into());
+            }
+        }
+    }
     let verbs = match o.get("verbs").and_then(Value::as_array) {
         Some(a) if !a.is_empty() && a.len() <= MAX_SCHEMA_VERBS => a,
         _ => return Some(format!("verbs must be 1..{MAX_SCHEMA_VERBS} entries")),
     };
     let mut seen: Vec<&str> = Vec::new();
     for v in verbs {
-        if let Some(e) = verb_decl_error(v, o.get("units")) {
+        if let Some(e) = verb_decl_error(v, o.get("units"), v2) {
             return Some(e);
         }
         let name = v.get("verb").and_then(Value::as_str).unwrap_or("");
@@ -533,6 +716,147 @@ fn is_calendar_date(s: &str) -> bool {
     d <= dim
 }
 
+
+// ---- v2 string formats (syntactic; identical in every language) -----------------------------------------------------------
+
+/// JS `\s`.
+pub(crate) fn js_space(c: char) -> bool {
+    matches!(c, '\u{9}'..='\u{d}' | ' ' | '\u{a0}' | '\u{1680}' | '\u{2000}'..='\u{200a}' | '\u{2028}' | '\u{2029}' | '\u{202f}' | '\u{205f}' | '\u{3000}' | '\u{feff}')
+}
+fn all_digits(s: &str) -> bool {
+    !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit())
+}
+/// `/^[A-Za-z][A-Za-z0-9+.\-]{0,31}:\/\/[^\s/?#]+[^\s]*$/` (scheme None) or `https` fixed.
+fn url_ok(s: &str, scheme: Option<&str>) -> bool {
+    let Some((sch, rest)) = s.split_once("://") else { return false };
+    let scheme_ok = match scheme {
+        Some(x) => sch == x,
+        None => !sch.is_empty() && sch.len() <= 32 && sch.as_bytes()[0].is_ascii_alphabetic() && sch.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'+' || b == b'.' || b == b'-'),
+    };
+    let mut cs = rest.chars();
+    let first_ok = cs.next().is_some_and(|c| !js_space(c) && c != '/' && c != '?' && c != '#');
+    scheme_ok && first_ok && !rest.chars().any(js_space)
+}
+fn email_ok(s: &str) -> bool {
+    if s.encode_utf16().count() > 254 || !s.is_ascii() {
+        return false;
+    }
+    let Some((local, dom)) = s.split_once('@') else { return false };
+    let lc = |b: u8| b.is_ascii_alphanumeric() || b".%_+-".contains(&b);
+    if local.is_empty() || local.len() > 64 || !local.bytes().all(lc) {
+        return false;
+    }
+    let labels: Vec<&str> = dom.split('.').collect();
+    labels.len() >= 2 && labels.iter().all(|l| !l.is_empty() && l.len() <= 63 && l.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-'))
+}
+fn iban_ok(s: &str) -> bool {
+    let b = s.as_bytes();
+    if b.len() < 15 || b.len() > 34 || !b[0].is_ascii_uppercase() || !b[1].is_ascii_uppercase() || !b[2].is_ascii_digit() || !b[3].is_ascii_digit() {
+        return false;
+    }
+    if !b[4..].iter().all(|c| c.is_ascii_uppercase() || c.is_ascii_digit()) {
+        return false;
+    }
+    let mut rem: u64 = 0;
+    for &c in b[4..].iter().chain(b[..4].iter()) {
+        let v = if c >= b'A' { u64::from(c) - 55 } else { u64::from(c) - 48 };
+        rem = (if v > 9 { rem * 100 + v } else { rem * 10 + v }) % 97;
+    }
+    rem == 1
+}
+fn canonical_num(s: &str, max: u32) -> bool {
+    all_digits(s) && s.parse::<u32>().is_ok_and(|n| n <= max && n.to_string() == s)
+}
+fn cidr_ok(s: &str) -> bool {
+    let Some((addr, pre)) = s.split_once('/') else { return false };
+    let o: Vec<&str> = addr.split('.').collect();
+    if o.len() == 4 && o.iter().all(|x| (1..=3).contains(&x.len()) && all_digits(x)) && pre.len() <= 2 && all_digits(pre) {
+        return o.iter().all(|x| canonical_num(x, 255)) && canonical_num(pre, 32);
+    }
+    (2..=39).contains(&addr.len())
+        && addr.bytes().all(|b| b.is_ascii_hexdigit() || b == b':')
+        && addr.matches(':').count() >= 2
+        && !addr.contains(":::")
+        && pre.len() <= 3
+        && canonical_num(pre, 128)
+}
+fn semver_ok(s: &str) -> bool {
+    let ident = |x: &str| !x.is_empty() && x.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-');
+    let idents = |x: &str| x.split('.').all(ident);
+    let (rest, build) = match s.split_once('+') {
+        Some((r, b)) => (r, Some(b)),
+        None => (s, None),
+    };
+    if build.is_some_and(|b| !idents(b)) {
+        return false;
+    }
+    let (core, pre) = match rest.split_once('-') {
+        Some((c, p)) => (c, Some(p)),
+        None => (rest, None),
+    };
+    if pre.is_some_and(|p| !idents(p)) {
+        return false;
+    }
+    let parts: Vec<&str> = core.split('.').collect();
+    parts.len() == 3 && parts.iter().all(|p| all_digits(p) && (*p == "0" || !p.starts_with('0')))
+}
+fn id_format(f: &str) -> bool {
+    // ^id:[a-z0-9_]+(?:\.[a-z0-9_]+){0,3}$
+    f.strip_prefix("id:").is_some_and(|r| {
+        let segs: Vec<&str> = r.split('.').collect();
+        (1..=4).contains(&segs.len()) && segs.iter().all(|g| !g.is_empty() && g.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_'))
+    })
+}
+const FORMATS: [&str; 11] = ["email", "url", "uri_https", "uuid", "iban", "phone_e164", "cidr", "iso_country", "iso_currency", "semver", "sha256"];
+fn format_known(f: &str) -> bool {
+    FORMATS.contains(&f) || id_format(f)
+}
+/// `formatCheck(f)(s)`; `None` when the format is unknown.
+fn format_ok(f: &str, s: &str) -> Option<bool> {
+    let up = |n: usize| s.len() == n && s.bytes().all(|b| b.is_ascii_uppercase());
+    Some(match f {
+        "email" => email_ok(s),
+        "url" => url_ok(s, None),
+        "uri_https" => url_ok(s, Some("https")),
+        "uuid" => {
+            let b = s.as_bytes();
+            b.len() == 36 && b.iter().enumerate().all(|(i, c)| if [8, 13, 18, 23].contains(&i) { *c == b'-' } else { c.is_ascii_digit() || (b'a'..=b'f').contains(c) })
+        }
+        "iban" => iban_ok(s),
+        "phone_e164" => s.strip_prefix('+').is_some_and(|d| (7..=15).contains(&d.len()) && all_digits(d) && !d.starts_with('0')),
+        "cidr" => cidr_ok(s),
+        "iso_country" => up(2),
+        "iso_currency" => up(3),
+        "semver" => semver_ok(s),
+        "sha256" => s.len() == 64 && s.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+        _ if id_format(f) => (1..=128).contains(&s.len()) && s.bytes().all(|b| b.is_ascii_alphanumeric() || b".:_-".contains(&b)),
+        _ => return None,
+    })
+}
+fn format_violation(d: &Value, x: &str) -> Option<(&'static str, String)> {
+    let f = d.get("format")?.as_str()?;
+    match format_ok(f, x) {
+        Some(true) => None,
+        _ => Some(("out_of_domain", format!("not a valid {f}"))),
+    }
+}
+/// `DATETIME_RE` + calendar date: `YYYY-MM-DDTHH:MM:SS[.fff]Z` (UTC).
+fn datetime_ok(s: &str) -> bool {
+    let b = s.as_bytes();
+    if b.len() < 20 || b[10] != b'T' || b[13] != b':' || b[16] != b':' || *b.last().unwrap() != b'Z' || !is_calendar_date(&s[..10]) {
+        return false;
+    }
+    let d2 = |i: usize| b[i].is_ascii_digit() && b[i + 1].is_ascii_digit();
+    let n = |i: usize| u32::from(b[i] - b'0') * 10 + u32::from(b[i + 1] - b'0');
+    if !(d2(11) && d2(14) && d2(17)) || n(11) > 23 || n(14) > 59 || n(17) > 59 {
+        return false;
+    }
+    match &s[19..s.len() - 1] {
+        "" => true,
+        frac => frac.strip_prefix('.').is_some_and(|f| (1..=3).contains(&f.len()) && all_digits(f)),
+    }
+}
+
 /// JS `x < m` / `x > m` for a safe integer `x` against a declared bound (a number; anything else: no bound).
 fn num(v: Option<&Value>) -> Option<f64> {
     v.and_then(Value::as_f64)
@@ -565,6 +889,37 @@ pub fn param_value_violation(d: &Value, x: &Value) -> Option<(&'static str, Stri
             }
             if has_values && !values.contains(&s) {
                 return Some(("out_of_domain", "not one of the declared values".into()));
+            }
+            format_violation(d, s)
+        }
+        "object_ref" => {
+            let s = match x.as_str() {
+                Some(s) if !s.is_empty() => s,
+                _ => return Some(("bad_type", "expected a non-empty id string".into())),
+            };
+            if s.len() as i64 > max_len {
+                return Some(("out_of_domain", format!("longer than {max_len} UTF-8 bytes")));
+            }
+            format_violation(d, s)
+        }
+        "datetime" => match x.as_str() {
+            None => Some(("bad_type", "expected an RFC 3339 UTC string".into())),
+            Some(s) if datetime_ok(s) => None,
+            Some(_) => Some(("out_of_domain", "not an RFC 3339 UTC datetime YYYY-MM-DDTHH:MM:SS[.fff]Z".into())),
+        },
+        "duration" => {
+            let i = match safe_int(x) {
+                Some(i) => i,
+                None => return Some(("bad_type", "expected a safe integer (milliseconds)".into())),
+            };
+            if i < 0 {
+                return Some(("out_of_domain", "a duration is not negative".into()));
+            }
+            if lo.is_some_and(|m| (i as f64) < m) {
+                return Some(("out_of_domain", format!("below min {}", js_str(d.get("min")))));
+            }
+            if hi.is_some_and(|m| (i as f64) > m) {
+                return Some(("out_of_domain", format!("above max {}", js_str(d.get("max")))));
             }
             None
         }

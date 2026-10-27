@@ -1,0 +1,372 @@
+name: Release
+
+# Publishes atlas-pca, stark-pca and pca-folding-ivc (crates/folding-pca) to crates.io, in that order, and creates the
+# GitHub Release for the tag with the exact .crate files, a build-provenance attestation for each, SHA256SUMS and the
+# changelog section. crates.io has no provenance of its own: the attested .crate files on the Release are the record.
+# The publish job uploads only after re-packaging each crate to the same bytes the build attested, and afterwards checks
+# that the checksum crates.io serves for each version is the attested one (no Release is created otherwise).
+# Credentials: crates.io trusted publishing (OIDC) when it is configured for the crate; otherwise CARGO_REGISTRY_TOKEN.
+# zkvm-pca is not published (its guest build patches crates.io dependencies with git forks, which crates.io refuses).
+# Release gates before anything is published: a CycloneDX SBOM per crate (cargo-cyclonedx, merged into one, attested and
+# bound to every .crate), `cargo audit` of the release lockfile (a high, critical or unrated finding fails unless
+# .github/vuln-allowlist.json has a reviewed, unexpired entry for it), and the security evidence report (CI, mutation,
+# cross-language and Kani runs with run ids, SBOM, audit, exceptions).
+#
+#   tag push v*                  the real release (the tag must match every crate version)
+#   tag push v*dry-run*          a dry run (e.g. v0.4.3-dry-run.1): everything except the crates.io upload
+#                                (`cargo publish --dry-run`); the Release is a draft
+#   workflow_dispatch            tag + dry_run (default true), to (re-)run for an existing tag
+#
+# Re-runs are idempotent: a crate version already on crates.io is skipped.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to release, e.g. v0.4.3'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run: no crates.io upload; the GitHub Release is a draft'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: '0'
+  # publish order (a crate's dependencies first); folding-pca's package name is pca-folding-ivc
+  CRATES: atlas-pca stark-pca pca-folding-ivc
+  CARGO_AUDIT: '0.22.2'      # pinned audit / SBOM tools
+  CARGO_CYCLONEDX: '0.5.9'
+
+jobs:
+  build:
+    name: package (with verify build), attest
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      version: ${{ steps.meta.outputs.version }}
+      dry_run: ${{ steps.meta.outputs.dry_run }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
+    steps:
+      - name: Release metadata
+        id: meta
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+          DISPATCH_DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "::error::tag '$TAG' is not vX.Y.Z[-pre]"; exit 1; }
+          DRY=false
+          if [ "$DISPATCH_DRY" = true ] || [[ "$TAG" == *dry-run* ]]; then DRY=true; fi
+          VERSION="${TAG#v}"
+          PRE=false; [[ "$VERSION" == *-* ]] && PRE=true
+          { echo "tag=$TAG"; echo "version=$VERSION"; echo "dry_run=$DRY"; echo "prerelease=$PRE"; } >> "$GITHUB_OUTPUT"
+          echo "### Release $TAG (dry run: $DRY)" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ steps.meta.outputs.tag }}
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Every package declares its maturity tier (manifest + README header)
+        run: node .github/scripts/maturity-check.mjs
+      - name: Every crate is at the tag's version (lockstep)
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          WARN: ${{ steps.meta.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          bad=0
+          for c in $CRATES; do
+            v="$(cargo metadata --no-deps --format-version 1 | jq -r --arg c "$c" '.packages[] | select(.name == $c) | .version')"
+            [ -n "$v" ] || { echo "::error::crate $c is not in the workspace"; exit 1; }
+            if [ "$v" != "$VERSION" ]; then
+              if [ "$WARN" = true ]; then echo "::warning::$c is $v, not $VERSION"; else echo "::error::$c is $v, not $VERSION"; bad=1; fi
+            fi
+          done
+          exit $bad
+      - name: Resolve the dependency graph once (the publish job packages against this same lockfile)
+        run: |
+          if [ -f Cargo.lock ]; then cargo metadata --locked --format-version 1 >/dev/null; else cargo generate-lockfile; fi
+      - name: Package each crate (cargo verifies that it builds from the packaged sources alone)
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/release"
+          for c in $CRATES; do
+            cargo package -p "$c" --locked
+            cp "target/package/$c-$(cargo metadata --no-deps --format-version 1 | jq -r --arg c "$c" '.packages[] | select(.name == $c) | .version').crate" "$RUNNER_TEMP/release/"
+          done
+          cp Cargo.lock "$RUNNER_TEMP/release/Cargo.lock.release"
+          ls -l "$RUNNER_TEMP/release"
+      - name: Leak scan (secrets, private keys, build-machine paths)
+        run: node .github/scripts/release-scan.mjs "$RUNNER_TEMP"/release/*.crate
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit@${{ env.CARGO_AUDIT }},cargo-cyclonedx@${{ env.CARGO_CYCLONEDX }}
+      - name: SBOM (CycloneDX JSON per crate from the release lockfile, merged)
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          export SOURCE_DATE_EPOCH
+          mkdir -p "$RUNNER_TEMP/gates/sbom"
+          cargo cyclonedx --format json --spec-version 1.5 --target all
+          parts=()
+          for c in $CRATES; do
+            dir="$(dirname "$(cargo metadata --no-deps --format-version 1 | jq -r --arg c "$c" '.packages[] | select(.name == $c) | .manifest_path')")"
+            cp "$dir/$c.cdx.json" "$RUNNER_TEMP/gates/sbom/$c.cdx.json"
+            parts+=(--part "$RUNNER_TEMP/gates/sbom/$c.cdx.json")
+          done
+          node .github/scripts/sbom-merge.mjs --name "pca-rust (crates.io)" --version "${{ steps.meta.outputs.version }}" \
+            --out "$RUNNER_TEMP/release/sbom-crates.cdx.json" "${parts[@]}"
+          { echo "rustc=$(rustc --version)"; echo "cargo=$(cargo --version)"; echo "cargo-audit=$CARGO_AUDIT"; echo "cargo-cyclonedx=$CARGO_CYCLONEDX"; } > "$RUNNER_TEMP/gates/toolchain.txt"
+      - name: Dependency vulnerability gate (cargo audit of the release lockfile; high / critical / unrated fail unless allowlisted)
+        run: |
+          set -uo pipefail
+          cargo audit --json --file Cargo.lock > "$RUNNER_TEMP/gates/cargo-audit.json"
+          echo "cargo audit exited $? (1 = it found something; the gate below decides)"
+          node .github/scripts/vuln-gate.mjs --ecosystem crates --report "$RUNNER_TEMP/gates/cargo-audit.json" --osv \
+            --allowlist .github/vuln-allowlist.json --out "$RUNNER_TEMP/gates/vuln-crates.json"
+      - name: SHA256SUMS
+        working-directory: ${{ runner.temp }}/release
+        run: sha256sum -- *.crate *.cdx.json > SHA256SUMS && cat SHA256SUMS
+      - name: Build-provenance attestation for every .crate and the SBOM
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            ${{ runner.temp }}/release/*.crate
+            ${{ runner.temp }}/release/*.cdx.json
+      - name: SBOM attestation (binds the SBOM to every .crate)
+        uses: actions/attest-sbom@v2
+        with:
+          subject-path: ${{ runner.temp }}/release/*.crate
+          sbom-path: ${{ runner.temp }}/release/sbom-crates.cdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rust-release
+          path: ${{ runner.temp }}/release/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-gates
+          path: ${{ runner.temp }}/gates/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  evidence:
+    name: security evidence report
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read        # the gate runs and their artifacts
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ needs.build.outputs.tag }}
+          persist-credentials: false
+          sparse-checkout: .github
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: rust-release
+          path: ${{ runner.temp }}/release
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-gates
+          path: ${{ runner.temp }}/gates
+      # A real release waits up to 40 min for gate runs still in progress at the release commit (CI also runs on the tag);
+      # after that it records them as running and uses the release-candidate branch run. A real release stops here if a
+      # required gate has no passing run, the audit failed or the SBOM is missing (--strict).
+      - name: Report (markdown + JSON)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.tag }}
+          VERSION: ${{ needs.build.outputs.version }}
+          DRY: ${{ needs.build.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          strict=(); [ "$DRY" = true ] || strict=(--strict)   # a real release fails here on a missing / failed gate
+          for c in $CRATES; do printf '%s\n' "$c"; done | awk -v v="$VERSION" \
+            '{ printf "%s{\"name\":\"%s\",\"version\":\"%s\",\"file\":\"%s-%s.crate\"}", (NR > 1 ? "," : "["), $1, v, $1, v } END { print "]" }' \
+            > "$RUNNER_TEMP/packages.json"
+          node .github/scripts/release-evidence.mjs --config .github/evidence-gates.json --repo "$GITHUB_REPOSITORY" --tag "$TAG" \
+            --version "$VERSION" --commit "$(git rev-parse HEAD)" --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT" --dry-run "$DRY" \
+            --packages "$RUNNER_TEMP/packages.json" --sums "$RUNNER_TEMP/release/SHA256SUMS" --sbom "$RUNNER_TEMP/release/sbom-crates.cdx.json" \
+            --vuln "$RUNNER_TEMP/gates/vuln-crates.json" --toolchain "$RUNNER_TEMP/gates/toolchain.txt" --wait-minutes "$([ "$DRY" = true ] && echo 0 || echo 40)" \
+            --out-dir "$RUNNER_TEMP/evidence" "${strict[@]}"
+          cd "$RUNNER_TEMP/evidence" && sha256sum -- security-evidence-* > SHA256SUMS.evidence
+      - name: Build-provenance attestation for the report
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ runner.temp }}/evidence/security-evidence-*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: security-evidence
+          path: ${{ runner.temp }}/evidence/
+          if-no-files-found: error
+          retention-days: 90
+
+  publish-crates:
+    name: publish to crates.io${{ needs.build.outputs.dry_run == 'true' && ' (dry run)' || '' }}
+    needs: [build, evidence]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # The `release` environment holds CARGO_REGISTRY_TOKEN and requires a reviewer; a dry run skips it.
+    environment: ${{ needs.build.outputs.dry_run != 'true' && 'release' || '' }}
+    permissions:
+      contents: read
+      id-token: write  # crates.io trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ needs.build.outputs.tag }}
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/download-artifact@v4
+        with:
+          name: rust-release
+          path: ${{ runner.temp }}/release
+      # Fails when no trusted publisher is configured for these crates; CARGO_REGISTRY_TOKEN is then used instead.
+      - name: crates.io trusted publishing token (OIDC)
+        id: auth
+        if: needs.build.outputs.dry_run != 'true'
+        continue-on-error: true
+        uses: rust-lang/crates-io-auth-action@v1
+      - name: Publish in order (each upload only if it re-packages to the attested bytes; published versions are skipped)
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}
+          VERSION: ${{ needs.build.outputs.version }}
+          DRY: ${{ needs.build.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          cp "$RUNNER_TEMP/release/Cargo.lock.release" Cargo.lock
+          if [ "$DRY" != true ] && [ -z "$CARGO_REGISTRY_TOKEN" ]; then echo "::error::CARGO_REGISTRY_TOKEN is not set in the release environment"; exit 1; fi
+          echo "| crate | result |" >> "$GITHUB_STEP_SUMMARY"; echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          for c in $CRATES; do
+            file="$c-$VERSION.crate"
+            code="$(curl -s -o /dev/null -w '%{http_code}' -A "pca-release ($GITHUB_REPOSITORY)" "https://crates.io/api/v1/crates/$c/$VERSION")"
+            if [ "$code" = 200 ]; then echo "skip $c $VERSION (already on crates.io)"; echo "| $c $VERSION | already on crates.io |" >> "$GITHUB_STEP_SUMMARY"; continue; fi
+            if [ "$code" != 404 ] && [ "$DRY" != true ]; then echo "::error::crates.io answered $code for $c $VERSION; not publishing blind"; exit 1; fi
+            cargo package -p "$c" --locked --no-verify
+            want="$(awk -v f="$file" '$2 == f { print $1 }' "$RUNNER_TEMP/release/SHA256SUMS")"
+            got="$(sha256sum "target/package/$file" | cut -d' ' -f1)"
+            if [ -z "$want" ] || [ "$want" != "$got" ]; then
+              echo "::error::$file re-packaged to different bytes than the attested build ($got vs ${want:-none}); not publishing"; exit 1
+            fi
+            if [ "$DRY" = true ]; then
+              cargo publish -p "$c" --locked --no-verify --dry-run
+              echo "| $c $VERSION | would publish (bytes match the attested .crate) |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              cargo publish -p "$c" --locked --no-verify   # waits until the index serves it, so the next crate resolves
+              echo "| $c $VERSION | published |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - name: crates.io serves the attested bytes (index checksum = SHA-256 of the attested .crate)
+        env:
+          VERSION: ${{ needs.build.outputs.version }}
+          DRY: ${{ needs.build.outputs.dry_run }}
+        run: |
+          set -euo pipefail
+          bad=0
+          for c in $CRATES; do
+            # sparse index path: names of 4+ characters live at <first two>/<next two>/<name>
+            entry="$(curl -fsS -A "pca-release ($GITHUB_REPOSITORY)" "https://index.crates.io/${c:0:2}/${c:2:2}/$c" \
+              | jq -c --arg v "$VERSION" 'select(.vers == $v)')" || entry=""
+            want="$(awk -v f="$c-$VERSION.crate" '$2 == f { print $1 }' "$RUNNER_TEMP/release/SHA256SUMS")"
+            if [ -z "$entry" ]; then
+              if [ "$DRY" = true ]; then echo "$c $VERSION: not on crates.io (dry run)"; continue; fi
+              echo "::error::$c $VERSION is not in the crates.io index after publishing"; bad=1; continue
+            fi
+            got="$(jq -r .cksum <<<"$entry")"
+            if [ "$got" = "$want" ]; then
+              echo "$c $VERSION: crates.io checksum matches the attested .crate"
+            elif [ "$DRY" = true ]; then
+              echo "::warning::$c $VERSION on crates.io has checksum $got, not the attested $want (published from another build)"
+            else
+              echo "::error::$c $VERSION on crates.io has checksum $got, not the attested $want"; bad=1
+            fi
+          done
+          exit $bad
+
+  github-release:
+    name: GitHub Release
+    needs: [build, evidence, publish-crates]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ needs.build.outputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: rust-release
+          path: ${{ runner.temp }}/release
+      - uses: actions/download-artifact@v4
+        with:
+          name: security-evidence
+          path: ${{ runner.temp }}/release
+      - name: Release notes (changelog section + how to verify)
+        run: >-
+          node .github/scripts/release-notes.mjs --version "${{ needs.build.outputs.version }}" --repo "$GITHUB_REPOSITORY"
+          --changelog crates/atlas-pca/CHANGELOG.md
+          --registry "crates.io: \`atlas-pca\`, \`stark-pca\` and \`pca-folding-ivc\` at ${{ needs.build.outputs.version }} (crates.io keeps no provenance: compare the .crate you download with the attested one below)"
+          --sbom sbom-crates.cdx.json --evidence "security-evidence-${GITHUB_REPOSITORY##*/}-${{ needs.build.outputs.version }}.md"
+          > "$RUNNER_TEMP/notes.md"
+      - name: Create or update the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.tag }}
+          VERSION: ${{ needs.build.outputs.version }}
+          DRY: ${{ needs.build.outputs.dry_run }}
+          PRE: ${{ needs.build.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release"
+          cat SHA256SUMS.evidence >> SHA256SUMS && rm SHA256SUMS.evidence
+          sha256sum -c SHA256SUMS --quiet
+          assets=(*.crate *.cdx.json security-evidence-* SHA256SUMS)
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            if [ "$DRY" = true ]; then
+              echo "dry run: the Release $TAG already exists; left unchanged" | tee -a "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            gh release upload "$TAG" "${assets[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --draft=false --prerelease="$PRE" --repo "$GITHUB_REPOSITORY"
+            echo "updated the existing Release $TAG" >> "$GITHUB_STEP_SUMMARY"
+          else
+            flags=(--verify-tag --title "pca-rust $VERSION" --notes-file "$RUNNER_TEMP/notes.md")
+            [ "$DRY" = true ] && flags+=(--draft)
+            [ "$PRE" = true ] && flags+=(--prerelease)
+            gh release create "$TAG" "${assets[@]}" "${flags[@]}" --repo "$GITHUB_REPOSITORY"
+            echo "created the Release $TAG$([ "$DRY" = true ] && echo ' (draft)')" >> "$GITHUB_STEP_SUMMARY"
+          fi

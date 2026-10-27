@@ -1,0 +1,1 @@
+{"id":"expand-adv-custom-pca-new","kind":"expand","input":{"custom_traits":[{"id":"pca.fresh","implies":[],"floor":{"risk":0,"rev":"reversible","blast_ppm":0,"esc":0,"caveats":[],"context":[],"prules":[]},"card_phrase":"pca.fresh"}],"traits":["pca.fresh"]},"expect":{"error":true}}

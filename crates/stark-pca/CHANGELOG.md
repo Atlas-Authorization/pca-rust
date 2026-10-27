@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+- Lockstep release. Tier: hardened, awaiting independent audit. No wire change.
+
 ## 0.4.1 - 2026-10-12
 
 - Lockstep release with the PCA 0.4.1 security fix (root caveats enforced in the policy layer). No change in this crate.

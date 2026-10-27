@@ -32,7 +32,7 @@ fn header_for(p: &Value) -> String {
 fn cfg_for(grant: &Value, aud: &str) -> GuardConfig {
     let g = grant.clone();
     let id = g["id"].as_str().unwrap().to_string();
-    GuardConfig::new(aud.to_string(), move |r: &str| if r == id { Some(g.clone()) } else { None })
+    GuardConfig::new(aud.to_string(), move |r: &str| if r == id { Some(g.clone()) } else { None }).with_signature_only()
 }
 
 fn block_on<F: Future>(mut fut: F) -> F::Output {

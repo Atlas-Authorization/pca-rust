@@ -101,7 +101,7 @@ sh('unsigned carries sig', (d) => (d.sig = signed.sig), { signed: false });
 for (const x of [[], null, 'x', 7]) shape.push({ name: `doc ${JSON.stringify(x)}`, doc: x, signed: true, err: actionSchemaShapeError(x) });
 sh('doc unknown member', (d) => (d.extra = 1));
 sh('doc constructor member', (d) => (d['constructor'] = 1));
-sh('v=2', (d) => (d.v = 2));
+sh('v=3', (d) => (d.v = 3));
 sh('v="1"', (d) => (d.v = '1'));
 sh('v missing', (d) => delete d.v);
 sh('kind wrong', (d) => (d.kind = 'pca-action-schemas'));

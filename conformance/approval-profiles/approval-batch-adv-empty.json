@@ -1,0 +1,1 @@
+{"id":"approval-batch-adv-empty","kind":"approval_batch","input":{"items":[]},"expect":{"ok":false,"code":"psd2_unlinkable"}}

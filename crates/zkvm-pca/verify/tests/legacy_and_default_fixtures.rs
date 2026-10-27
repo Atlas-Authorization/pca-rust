@@ -5,7 +5,8 @@ use risc0_zkvm::sha::Digest;
 use risc0_zkvm::Receipt;
 use serde_json::Value;
 
-const CURRENT_ID: &str = "432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060";
+const CURRENT_ID: &str = "6bb6b7d5e66671fb314eaa5018e04463346374ced15df7bc784815cb95de1f6e";
+const PRE_V11_ID: &str = "432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060";
 const PRE_V10_ID: &str = "c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39";
 const PRE_V9_ID: &str = "0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7";
 const PRE_042_ID: &str = "3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad";
@@ -131,6 +132,16 @@ fn legacy_receipts_verify_only_under_the_legacy_image_id() {
         assert!(r.verify(current_id).is_err(), "{f} must NOT verify under the current image id");
         assert!(r.verify(l8).is_err());
     }
+    // the tenth generation (guest version 10: no rule 22, refuses every version 2 action schema)
+    let (l10, hex10) = id("legacy/432b4713/image_id.json");
+    assert_eq!(hex10, PRE_V11_ID);
+    assert_ne!(l10, current_id);
+    for f in ["legacy/432b4713/receipt_succinct.bin", "legacy/432b4713/receipt_groth16.bin"] {
+        let r: Receipt = bincode::deserialize(&read(f)).unwrap();
+        r.verify(l10).unwrap_or_else(|e| panic!("{f} must verify under its own id: {e}"));
+        assert!(r.verify(current_id).is_err(), "{f} must NOT verify under the current image id");
+        assert!(r.verify(l9).is_err());
+    }
     // and the current receipts must not verify under the legacy id
     for f in ["receipt_succinct.bin", "receipt_groth16.bin"] {
         let r: Receipt = bincode::deserialize(&read(f)).unwrap();
@@ -144,6 +155,7 @@ fn legacy_receipts_verify_only_under_the_legacy_image_id() {
         assert!(r.verify(l7).is_err(), "{f} must not verify under the round-6 (pre-0.4.1) image id");
         assert!(r.verify(l8).is_err(), "{f} must not verify under the guest-version-8 (pre-R3-01) image id");
         assert!(r.verify(l9).is_err(), "{f} must not verify under the guest-version-9 image id");
+        assert!(r.verify(l10).is_err(), "{f} must not verify under the guest-version-10 image id");
     }
 }
 
@@ -160,8 +172,8 @@ fn legacy_guests_attest_the_same_statement_and_the_current_one_adds_the_context(
 #[test]
 fn r6_zk06_every_legacy_image_id_is_superseded_and_the_current_one_is_not() {
     use pca_zkvm_verify::{image_id_hex, is_superseded, SUPERSEDED_IMAGE_IDS};
-    let legacy = [LEGACY_ID, LEGACY2_ID, PRE_R3_ID, PRE_R4_ID, PRE_R5_ID, PRE_R6_ID, PRE_042_ID, PRE_V9_ID, PRE_V10_ID];
-    for rel in ["legacy/image_id.json", "legacy/dcf198fc/image_id.json", "legacy/6b0ac893/image_id.json", "legacy/ce0b5423/image_id.json", "legacy/1c1b8bbd/image_id.json", "legacy/e922536c/image_id.json", "legacy/3b1eebb5/image_id.json", "legacy/0c97a02b/image_id.json", "legacy/c5107456/image_id.json"] {
+    let legacy = [LEGACY_ID, LEGACY2_ID, PRE_R3_ID, PRE_R4_ID, PRE_R5_ID, PRE_R6_ID, PRE_042_ID, PRE_V9_ID, PRE_V10_ID, PRE_V11_ID];
+    for rel in ["legacy/image_id.json", "legacy/dcf198fc/image_id.json", "legacy/6b0ac893/image_id.json", "legacy/ce0b5423/image_id.json", "legacy/1c1b8bbd/image_id.json", "legacy/e922536c/image_id.json", "legacy/3b1eebb5/image_id.json", "legacy/0c97a02b/image_id.json", "legacy/c5107456/image_id.json", "legacy/432b4713/image_id.json"] {
         let (d, hex) = id(rel);
         assert_eq!(image_id_hex(&d), hex, "{rel}: hex form of the digest");
         assert!(legacy.contains(&hex.as_str()));
