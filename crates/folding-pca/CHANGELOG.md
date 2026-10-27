@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Documented the hash parameter source (neptune's standard-strength Poseidon constants as vendored by Nova; this crate adds none). No code change.
+
+- Maturity tier raised from experimental to hardened (experimental: hardened, awaiting audit). The construction is a standard one (Nova folding over Pallas/Vesta, Spartan with IPA, the neptune Poseidon vendored by nova-snark); the only crate-specific part is the step circuit; the Poseidon instance is neptune's standard-strength constants, unchanged.
+- New `tests/property_differential.rs`: Nova fold vs native replay on seeded random histories, digest collision and single-edit sensitivity, exact budget sum.
+
 ## 0.4.1 - 2026-10-12
 
 - Lockstep release with the PCA 0.4.1 security fix (root caveats enforced in the policy layer). No change in this crate.

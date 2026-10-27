@@ -1,5 +1,7 @@
 # stark-pca — a transparent STARK of the PCA release gate
 
+> Maturity: **experimental**. Its API may change or be removed in any release, and it is outside the stable and production tiers. See [maturity tiers](https://github.com/Atlas-Authorization/pca/blob/main/docs/maturity.md).
+
 Install: `cargo add stark-pca`
 
 A **genuine, verifiable STARK** (succinct, transparent, post-quantum) of the core *release decision* of Proof-Carrying
@@ -26,7 +28,7 @@ Security level (pinned options: 37 queries, blow-up 8, no extension): 110 bits c
 (list decoding), 30 bits proven (unique decoding). The conjectured figure rests on a proximity-gap conjecture; the
 proven figures are the honest lower bound.
 
-Winterfell version: **0.13.1**. Status: **0.4.2, unaudited.**
+Winterfell version: **0.13.1**. Status: **0.4.1, unaudited.**
 
 ---
 

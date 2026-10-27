@@ -36,6 +36,19 @@ jobs:
         run: cargo build --workspace --all-targets --release --features atlas-pca/less
       - name: Tests (all crates) + conformance corpus
         run: cargo test --workspace --release --no-fail-fast --features atlas-pca/less
+      # the vendor attestation verifiers (AMD SEV-SNP, Intel TDX, Azure MAA, GCP Confidential Space, NVIDIA): the evidence-vector
+      # file comes with the flagship corpus above; a missing file fails the tests, it never skips them
+      # rules 20-21 and the ternary decision: packages/pca/conformance/decision-vectors.json (a missing file fails, never skips)
+      - name: Decision vectors (units, tighten-only, decision lattice, multi-check fold, escalation answers under every suite, rules 20-21 end to end)
+        run: |
+          test -s packages/pca/conformance/decision-vectors.json
+          test -s packages/pca/conformance/model-rules-vectors.json
+          cargo test -p atlas-pca --release --test decision_conformance --test escalation --test model_rules
+      - name: Vendor attestation verifiers (primitives, fail-closed table, evidence vectors, passport vendor rows)
+        run: |
+          test -f packages/pca/conformance/attestation-evidence-vectors.json
+          cargo test -p atlas-pca --release --test attest_primitives --test attest_failclosed --test attestation_vectors
+          cargo test -p atlas-pca --release --test passport_conformance passport_hardware_vectors
 
   verifier:
     name: atlas-pca (${{ matrix.os }})
@@ -75,3 +88,15 @@ jobs:
         env:
           RISC0_SKIP_BUILD: '1'
         run: cargo test --locked --release --no-fail-fast -p pca-zkvm-core -p pca-zkvm-verify
+
+  maturity:
+    name: every published package declares its maturity tier
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # tier in every manifest, a matching "Maturity:" line in every README header, experimental said where it applies
+      - run: node .github/scripts/maturity-check.mjs
