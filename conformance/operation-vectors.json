@@ -1,0 +1,1327 @@
+{
+  "format": 1,
+  "generator": "packages/pca/scripts/gen-conformance-native-parity.ts",
+  "suite": "operation-records",
+  "layer": "extension",
+  "description": "Operation records (T3): execute an authorized operation at most once. Each scenario runs against ONE fresh in-memory OperationStore and a fixed clock per step (`at`, epoch ms); `expect[i]` is the answer to `steps[i]`. `execute` takes a pre-authorized operation {id, verb, resource, params_digest} with a PCActn that carries `exp` and a signed reversibility class (`signed_class`), the server class, an optional recheck (ok / refuse with reason / throw with message), `recheck_for`, `timeout_ms`, and a function that commits `result` (default: the idempotency key), throws `message`, or re-enters the same execution; answers are {outcome, fn_calls, record}. Reason and error strings are compared exactly. `no_store` / `not_allowed` exercise the refusals.",
+  "constants": {
+    "pending_timeout_ms": 300000
+  },
+  "scenarios": [
+    {
+      "name": "commit-reversible",
+      "description": "a reversible operation runs once and is committed; the idempotency key is the operation id",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op1",
+            "result": {
+              "done": true
+            },
+            "replayed": false,
+            "recorded": true
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op1",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": {
+              "done": true
+            },
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "retry-is-answered-from-record",
+      "description": "a second execution of a committed id never runs fn again",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000001000
+        },
+        {
+          "op": "get",
+          "id": "op1"
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op1",
+            "result": {
+              "done": true
+            },
+            "replayed": false,
+            "recorded": true
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op1",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": {
+              "done": true
+            },
+            "finishedAt": 1800000000000
+          }
+        },
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op1",
+            "result": {
+              "done": true
+            },
+            "replayed": true,
+            "recorded": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": {
+              "done": true
+            },
+            "finishedAt": 1800000000000
+          }
+        },
+        {
+          "id": "op1",
+          "state": "committed",
+          "verb": "payments.refund",
+          "resource": "/orders/1",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility": "reversible",
+          "startedAt": 1800000000000,
+          "executingAt": 1800000000000,
+          "result": {
+            "done": true
+          },
+          "finishedAt": 1800000000000
+        }
+      ]
+    },
+    {
+      "name": "fn-throws-is-failed-and-not-rerun",
+      "description": "a throwing fn is recorded failed; a retry is answered failed without running fn",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "throw",
+            "message": "boom"
+          },
+          "id": "op1",
+          "at": 1800000000000
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000005
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "failed",
+            "operationId": "op1",
+            "error": "boom",
+            "replayed": false
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op1",
+            "state": "failed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "error": "boom",
+            "finishedAt": 1800000000000
+          }
+        },
+        {
+          "outcome": {
+            "status": "failed",
+            "operationId": "op1",
+            "error": "boom",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "failed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "error": "boom",
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "irreversible-needs-recheck",
+      "description": "an irreversible operation without a recheck is refused before anything is recorded",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "irreversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000
+        },
+        {
+          "op": "get",
+          "id": "op1"
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "refused",
+            "reason": "executeAuthorized: a irreversible operation needs a recheck (revocation, expiry, approval) before it runs (fail closed)"
+          },
+          "fn_calls": 0,
+          "record": null
+        },
+        null
+      ]
+    },
+    {
+      "name": "server-class-makes-irreversible",
+      "description": "the stricter of server and signed class applies",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "server_class": "irreversible"
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op2",
+          "at": 1800000000000,
+          "server_class": "costly"
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "refused",
+            "reason": "executeAuthorized: a irreversible operation needs a recheck (revocation, expiry, approval) before it runs (fail closed)"
+          },
+          "fn_calls": 0,
+          "record": null
+        },
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op2",
+            "result": {
+              "done": true
+            },
+            "replayed": false,
+            "recorded": true
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op2",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "rate_limited",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": {
+              "done": true
+            },
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "unknown-class-is-irreversible",
+      "description": "a missing or unknown server class is irreversible (fail closed)",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "no-such-class",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000
+        },
+        {
+          "op": "execute",
+          "signed_class": "no-such-class",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op2",
+          "at": 1800000000000,
+          "recheck": "ok"
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "refused",
+            "reason": "executeAuthorized: a irreversible operation needs a recheck (revocation, expiry, approval) before it runs (fail closed)"
+          },
+          "fn_calls": 0,
+          "record": null
+        },
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op2",
+            "result": {
+              "done": true
+            },
+            "replayed": false,
+            "recorded": true
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op2",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": {
+              "done": true
+            },
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "irreversible-recheck-ok",
+      "description": "an irreversible operation runs after a passing recheck",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "irreversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "recheck": "ok"
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op1",
+            "result": {
+              "done": true
+            },
+            "replayed": false,
+            "recorded": true
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op1",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": {
+              "done": true
+            },
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "recheck-refuses-aborts",
+      "description": "a refusing recheck records aborted and fn never runs; a retry is answered aborted",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "irreversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "recheck": {
+            "refuse": "grant revoked"
+          }
+        },
+        {
+          "op": "execute",
+          "signed_class": "irreversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000001,
+          "recheck": "ok"
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "aborted",
+            "operationId": "op1",
+            "reason": "recheck: grant revoked",
+            "replayed": false
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "aborted",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "error": "recheck: grant revoked",
+            "finishedAt": 1800000000000
+          }
+        },
+        {
+          "outcome": {
+            "status": "aborted",
+            "operationId": "op1",
+            "reason": "recheck: grant revoked",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "aborted",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "error": "recheck: grant revoked",
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "recheck-throws-fails-closed",
+      "description": "a throwing recheck counts as a refusal",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "irreversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "recheck": {
+            "throw": "store down"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "aborted",
+            "operationId": "op1",
+            "reason": "recheck: recheck error (fail closed): store down",
+            "replayed": false
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "aborted",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "error": "recheck: recheck error (fail closed): store down",
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "expired-pcactn-aborts",
+      "description": "the PCActn expiry is always checked with the recheck",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "irreversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "recheck": "ok",
+          "exp": 1799999999999
+        },
+        {
+          "op": "execute",
+          "signed_class": "irreversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op2",
+          "at": 1800000000000,
+          "recheck": "ok",
+          "exp": 1800000000000
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "aborted",
+            "operationId": "op1",
+            "reason": "recheck: the PCActn expired at 1799999999999",
+            "replayed": false
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "aborted",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "error": "recheck: the PCActn expired at 1799999999999",
+            "finishedAt": 1800000000000
+          }
+        },
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op2",
+            "result": {
+              "done": true
+            },
+            "replayed": false,
+            "recorded": true
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op2",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": {
+              "done": true
+            },
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "recheck-always",
+      "description": "recheck_for always re-checks a reversible operation too",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "recheck": {
+            "refuse": "approval withdrawn"
+          },
+          "recheck_for": "always"
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op2",
+          "at": 1800000000000,
+          "recheck_for": "always"
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "aborted",
+            "operationId": "op1",
+            "reason": "recheck: approval withdrawn",
+            "replayed": false
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "aborted",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "error": "recheck: approval withdrawn",
+            "finishedAt": 1800000000000
+          }
+        },
+        {
+          "outcome": {
+            "status": "refused",
+            "reason": "executeAuthorized: a reversible operation needs a recheck (revocation, expiry, approval) before it runs (fail closed)"
+          },
+          "fn_calls": 0,
+          "record": null
+        }
+      ]
+    },
+    {
+      "name": "missing-store-refused",
+      "description": "no store is a refusal, nothing runs",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "no_store": true
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "refused",
+            "reason": "executeAuthorized: missing required component: store (fail closed)"
+          },
+          "fn_calls": 0,
+          "record": null
+        }
+      ]
+    },
+    {
+      "name": "not-allowed-refused",
+      "description": "an authorization that did not allow is refused",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000000000,
+          "not_allowed": true
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "refused",
+            "reason": "executeAuthorized: the authorization did not allow an operation"
+          },
+          "fn_calls": 0,
+          "record": null
+        }
+      ]
+    },
+    {
+      "name": "reentrant-execution-is-pending",
+      "description": "a second execution of the same id while the first is running does not run fn and reports pending",
+      "steps": [
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "reenter"
+          },
+          "id": "op1",
+          "at": 1800000000000
+        }
+      ],
+      "expect": [
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op1",
+            "result": "pending",
+            "replayed": false,
+            "recorded": true
+          },
+          "fn_calls": 1,
+          "record": {
+            "id": "op1",
+            "state": "committed",
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000,
+            "result": "pending",
+            "finishedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "pending-record-blocks-then-aborts",
+      "description": "a pending record younger than the timeout answers pending; older than it is settled aborted",
+      "steps": [
+        {
+          "op": "seed",
+          "record": {
+            "id": "op1",
+            "state": "pending",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000
+          }
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000001000,
+          "timeout_ms": 5000
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000005000,
+          "timeout_ms": 5000
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000005001,
+          "timeout_ms": 5000
+        },
+        {
+          "op": "get",
+          "id": "op1"
+        }
+      ],
+      "expect": [
+        null,
+        {
+          "outcome": {
+            "status": "pending",
+            "operationId": "op1",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "pending",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000
+          }
+        },
+        {
+          "outcome": {
+            "status": "pending",
+            "operationId": "op1",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "pending",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000
+          }
+        },
+        {
+          "outcome": {
+            "status": "aborted",
+            "operationId": "op1",
+            "reason": "not started within 5000 ms of the claim: the side effect never ran",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "aborted",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "error": "not started within 5000 ms of the claim: the side effect never ran",
+            "finishedAt": 1800000005001
+          }
+        },
+        {
+          "id": "op1",
+          "state": "aborted",
+          "verb": "v",
+          "resource": "/r",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility": "reversible",
+          "startedAt": 1800000000000,
+          "error": "not started within 5000 ms of the claim: the side effect never ran",
+          "finishedAt": 1800000005001
+        }
+      ]
+    },
+    {
+      "name": "executing-record-becomes-uncertain",
+      "description": "a record still executing after the timeout is uncertain and never re-run; resolve settles it",
+      "steps": [
+        {
+          "op": "seed",
+          "record": {
+            "id": "op1",
+            "state": "executing",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000010
+          }
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000300010
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000300011
+        },
+        {
+          "op": "resolve",
+          "id": "op1",
+          "at": 1800000300012,
+          "outcome": {
+            "state": "committed",
+            "result": "reconciled"
+          }
+        },
+        {
+          "op": "resolve",
+          "id": "op1",
+          "at": 1800000300013,
+          "outcome": {
+            "state": "failed",
+            "error": "late"
+          }
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000300014
+        }
+      ],
+      "expect": [
+        null,
+        {
+          "outcome": {
+            "status": "pending",
+            "operationId": "op1",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "executing",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000010
+          }
+        },
+        {
+          "outcome": {
+            "status": "uncertain",
+            "operationId": "op1",
+            "reason": "no outcome recorded within 300000 ms of the start: the side effect may or may not have happened",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "uncertain",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000010,
+            "error": "no outcome recorded within 300000 ms of the start: the side effect may or may not have happened",
+            "finishedAt": 1800000300011
+          }
+        },
+        true,
+        false,
+        {
+          "outcome": {
+            "status": "committed",
+            "operationId": "op1",
+            "result": "reconciled",
+            "replayed": true,
+            "recorded": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "committed",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "irreversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000010,
+            "error": "no outcome recorded within 300000 ms of the start: the side effect may or may not have happened",
+            "finishedAt": 1800000300012,
+            "result": "reconciled"
+          }
+        }
+      ]
+    },
+    {
+      "name": "executing-age-counts-from-fn-start",
+      "description": "an executing record is aged from executingAt, not from the claim (default 5 minute timeout)",
+      "steps": [
+        {
+          "op": "seed",
+          "record": {
+            "id": "op1",
+            "state": "executing",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000200000
+          }
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000300000
+        },
+        {
+          "op": "execute",
+          "signed_class": "reversible",
+          "fn": {
+            "kind": "commit",
+            "result": {
+              "done": true
+            }
+          },
+          "id": "op1",
+          "at": 1800000500001
+        }
+      ],
+      "expect": [
+        null,
+        {
+          "outcome": {
+            "status": "pending",
+            "operationId": "op1",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "executing",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000200000
+          }
+        },
+        {
+          "outcome": {
+            "status": "uncertain",
+            "operationId": "op1",
+            "reason": "no outcome recorded within 300000 ms of the start: the side effect may or may not have happened",
+            "replayed": true
+          },
+          "fn_calls": 0,
+          "record": {
+            "id": "op1",
+            "state": "uncertain",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000200000,
+            "error": "no outcome recorded within 300000 ms of the start: the side effect may or may not have happened",
+            "finishedAt": 1800000500001
+          }
+        }
+      ]
+    },
+    {
+      "name": "resolve-failed",
+      "description": "resolve to failed after reconciliation",
+      "steps": [
+        {
+          "op": "seed",
+          "record": {
+            "id": "op1",
+            "state": "uncertain",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "costly",
+            "startedAt": 1800000000000,
+            "error": "x"
+          }
+        },
+        {
+          "op": "resolve",
+          "id": "op1",
+          "at": 1800000000001,
+          "outcome": {
+            "state": "failed",
+            "error": "never applied"
+          }
+        },
+        {
+          "op": "resolve",
+          "id": "nope",
+          "at": 1800000000001,
+          "outcome": {
+            "state": "failed",
+            "error": "e"
+          }
+        },
+        {
+          "op": "get",
+          "id": "op1"
+        }
+      ],
+      "expect": [
+        null,
+        true,
+        false,
+        {
+          "id": "op1",
+          "state": "failed",
+          "verb": "v",
+          "resource": "/r",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility": "costly",
+          "startedAt": 1800000000000,
+          "error": "never applied",
+          "finishedAt": 1800000000001
+        }
+      ]
+    },
+    {
+      "name": "recover-all-open",
+      "description": "recover settles every stale open record and reports only those that changed",
+      "steps": [
+        {
+          "op": "seed",
+          "record": {
+            "id": "a",
+            "state": "pending",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000
+          }
+        },
+        {
+          "op": "seed",
+          "record": {
+            "id": "b",
+            "state": "executing",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "executingAt": 1800000000000
+          }
+        },
+        {
+          "op": "seed",
+          "record": {
+            "id": "c",
+            "state": "pending",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000100000
+          }
+        },
+        {
+          "op": "seed",
+          "record": {
+            "id": "d",
+            "state": "committed",
+            "verb": "v",
+            "resource": "/r",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility": "reversible",
+            "startedAt": 1800000000000,
+            "result": 1
+          }
+        },
+        {
+          "op": "recover",
+          "at": 1800000060000,
+          "older_than_ms": 30000
+        },
+        {
+          "op": "recover",
+          "at": 1800000060000,
+          "older_than_ms": 30000
+        },
+        {
+          "op": "recover_one",
+          "id": "c",
+          "at": 1800000200000,
+          "older_than_ms": 30000
+        },
+        {
+          "op": "recover_one",
+          "id": "zzz",
+          "at": 1800000200000
+        }
+      ],
+      "expect": [
+        null,
+        null,
+        null,
+        null,
+        [
+          {
+            "id": "a",
+            "state": "aborted"
+          },
+          {
+            "id": "b",
+            "state": "uncertain"
+          }
+        ],
+        [],
+        {
+          "id": "c",
+          "state": "aborted",
+          "verb": "v",
+          "resource": "/r",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "reversibility": "reversible",
+          "startedAt": 1800000100000,
+          "error": "not started within 30000 ms of the claim: the side effect never ran",
+          "finishedAt": 1800000200000
+        },
+        null
+      ]
+    }
+  ]
+}

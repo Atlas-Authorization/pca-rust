@@ -1,0 +1,155 @@
+# Conformance layers
+
+The conformance corpus is split into seven layers. Every vector belongs to exactly one layer, every implementation reports
+its results per layer, and **conformance is claimed per layer only**: an implementation is "wire-conformant" or
+"policy-conformant", never just "conformant". A layer is claimed when every section of it passes in that implementation
+with nothing skipped; a section that is report-only, unsupported or not run is not passed.
+
+The machine-readable manifest is `layers.json` (generated, do not edit): the layers, the sections each is made of and how
+each section is gated, the layer of every `primitives` table and vector file, per-layer counts, and the layer of every
+`vectors.json` PCActn vector by name. The tagging rule lives in one place, `scripts/conformance-layers.mjs`, used by the
+manifest generator, the TypeScript conformance test and the cross-language gate.
+
+| layer | what it covers | sections |
+|---|---|---|
+| **wire** | strict JSON profile, canonical form, base64url, the `PCA-Action` header, PCActn structure and version | `primitives.canonical`, `json_parse`, `b64u`, `pca_header`; PCActn vectors whose first failing check is `wire` or `version`; adversarial corpus kind `canon` |
+| **proof** | PCActn signatures and bindings: audience, validity window, plan inclusion, leaf signature, counter format, threshold shares, post-quantum artifacts and suites | `primitives.merkle`, `params_digest_empty`, `threshold_share`, `threshold_set`, `signer_set_hash`, `pq_artifact`; accepted PCActn vectors and those whose first failing check is `audience`, `validity`, `plan_inclusion`, `leaf_signature` or `counter`; the suite vector files (`fndsa-`, `frost-pq-`, `less-`, `sha384-vectors.json`) |
+| **capability** | delegation chains: signatures and lineage, attenuation, `grant_ref` binding, chain pins, depth, malformed capabilities | `primitives.chain_pin`, `malformed`, `depth`; PCActn vectors whose first failing check is `chain` or `grant_ref_bound`; adversarial corpus kind `chain` |
+| **policy** | policy decisions: caveats on the root, in the envelope and appended by hops, envelope predicates, `predicates` / `tool_schema` caveats, unknown types, missing context; Intent Layer decisions | `primitives.caveat_eval`, `primitives.intent_*`, PCActn vectors whose first failing check is `intent`; **`policy-vectors.json`** (`policy_decision`); **`intent-state-vectors.json`** (accumulators, monitors, session histories, sequencer receipts) |
+| **stateful** | ordered sequences against one store: replay, counter ordering, revocation mid-sequence, trust-budget depletion | **`stateful-vectors.json`** (`stateful`) |
+| **extension** | members that are not part of PCA Core: the optimistic path (claims, challenge window, fraud proofs at the wire level, settlement records) and the transparency ledger (Merkle inclusion, RFC 9162 consistency, signed tree heads, witness cosignatures, head-to-head consistency, checkpoint chains) | **`optimistic-vectors.json`**, **`ledger-vectors.json`** |
+| **integration** | adapter behaviour: HTTP middleware, framework adapters, MCP | no shared vectors yet; each SDK's own adapter tests |
+
+A PCActn vector is tagged with the layer of its **first failing check** in the order `wire, version, audience, validity,
+chain, grant_ref_bound, plan_inclusion, leaf_signature, counter, intent`; an accepted vector is `proof` (it exercised
+every check up to the leaf signature). In the cross-language gate the same rule is applied to the reference verdict of every
+vector, including the regression, sweep and fuzz vectors.
+
+## Current gating
+
+| layer / section | TypeScript reference | native SDKs (Go, Python, Ruby, PHP, .NET, Rust, Java, Kotlin, Swift) |
+|---|---|---|
+| wire, proof, capability | required | required (native suites and the cross-language gate) |
+| policy: `caveat_eval`, `intent_*` | required | required |
+| policy: `policy_decision`, caveat projection (`expect.caveats`) | required | **report-only** (gate driver kind `policy`; per-language pass / fail / unsupported, does not fail the build) |
+| policy: `policy_decision`, whole decision (`expect.decision`) | required | **unsupported** (no native SDK evaluates envelope predicates and the full decision yet) |
+| stateful | required | **not run** (no native SDK runs sequences yet) |
+| extension: `optimistic-vectors.json`, `ledger-vectors.json` | required | **required in Go, Python and Rust** (their own suites reproduce every vector); other native SDKs: not run |
+| integration | - | - |
+
+So today the native SDKs may claim the wire, proof and capability layers, and none of them may claim the policy or
+stateful layer. The policy_decision section becomes gating for a language when the cross-language gate is run with
+`--policy-required <lang>`; the native policy work (an `authorize` entry point per language) is tracked separately.
+
+## `policy-vectors.json` (`policy_decision`)
+
+Generated by `scripts/gen-conformance-policy.mjs` from the TypeScript reference (deterministic: fixed keys, Ed25519,
+seed `20261025`, no clock). Each entry:
+
+    { name, description, layer: "policy", features: [caveat types used, "envelope_predicates"],
+      grant, chain, context: { now, delegation_depth, blast_radius?, reversibility_class?, recent_action_times?,
+                               action: { verb, resource, params } },
+      expect: { decision: { allow, reasons: [code...], failed: { envelope: [type...], root: [type...], delegated: [type...] } },
+                caveats:  { allow, failed: [type...] } } }
+
+The input has the `primitives.caveat_eval` shape, so one input drives both results:
+
+- `expect.caveats` is `evaluate_caveats(policy_caveats(grant, chain), context)`: the grant's caveats minus its first
+  `envelope` caveat, then the caveats the hops appended, evaluated with the agent-native evaluator (`predicates` and
+  `tool_schema` included; any other type an evaluator does not implement is unsatisfied). This is what every native SDK
+  implements today (rule 10 of `README.md`).
+- `expect.decision` is the whole policy decision, with the risk inputs and trust budget held neutral (they are the
+  stateful layer's business): `allow` iff `reasons` is empty. `reasons` are codes, in this order:
+
+  | code | meaning |
+  |---|---|
+  | `envelope_missing` | the grant has no valid `envelope` caveat (nothing else is evaluated) |
+  | `predicates_unsatisfied` | no envelope predicate permits the action |
+  | `chain_malformed` | the delegation chain is empty or malformed |
+  | `envelope_caveats_unsatisfied` | a caveat inside the envelope is unsatisfied (`failed.envelope`) |
+  | `root_caveats_unsatisfied` | a caveat on the root grant outside the envelope is unsatisfied (`failed.root`) |
+  | `delegated_caveats_unsatisfied` | a caveat a delegation hop appended is unsatisfied (`failed.delegated`) |
+
+  The delegation depth is the chain's (`chain.length - 1`); a context member that is absent stays absent (a caveat that
+  needs it is unsatisfied).
+
+Families: `pd-<placement>-<type>-<case>` is every caveat type (`max_spend`, `expires`, `not_before`, `rate`,
+`max_blast_radius`, `reversibility_max`, `delegation_depth`, `budget_alloc`, `predicates`, `tool_schema`, unknown types)
+at every placement (`root-only`: on the root, no hop; `root`: on the root with a hop; `delegated`: appended by a hop;
+`envelope`: inside the envelope), satisfied, unsatisfied and with the context member missing. `pd-both-*`, `pd-dup-*`,
+`pd-conflict-*` combine placements (narrowing, a widening attempt, two hops, duplicates, conflicting windows); `pd-env-*`
+is missing or malformed policy; `pd-pred-*` envelope predicates (exact, prefix, verb lists, `where` conditions, empty);
+`pd-chain-*` an empty chain; `pd-ctx-*` every context member absent or present; `pd-rnd-NNNN` a seeded random batch over
+the same catalogue. Every chain is a valid capability chain (a malformed caveat such as an untyped one, or a widening
+`budget_alloc`, fails the capability layer, not policy).
+
+A runner answers each vector with `{ allow, failed }` for the caveat projection and, once it implements the decision,
+`decision: { allow, reasons, failed }`. Through the cross-language gate this is driver kind `policy` with `raw` = the JSON
+text of `{ grant, chain, context }`.
+
+## `stateful-vectors.json` (`stateful`)
+
+Generated by `scripts/gen-conformance-stateful.mjs` from the TypeScript reference. Each entry is one sequence run, in order,
+against ONE fresh replay / budget store:
+
+    { name, description, layer: "stateful",
+      setup: { audience, grants: [grant...], plan_nodes, risk, initial_budget?, revoked: [] },
+      steps: [ { op: "present", pcactn, params, now, expect: { allow, failed: [check...] } }
+             | { op: "revoke", id } ] }
+
+`setup` is the resource server's own state: the grants it resolves by `grant_ref`, the principal-authorized plan, the risk
+inputs it vouches for, the trust budget every holder stream starts with (absent: none, which is deny-metered), and the
+revoked capability ids. A `present` step authorizes one PCActn at time `now` with the default required checks (`counter`,
+`revocation`, `plan_root_authorized`, `audience`, `validity`, `grant_ref_bound`), a revocation check over the revoked set,
+and the replay counter and trust budget kept in the store per (grant, leaf holder). A `revoke` step adds an id to the
+revoked set. `expect.failed` names the checks that failed, sorted; there is no reason text. Families:
+
+| family | what it pins |
+|---|---|
+| `st-replay-*` | the same PCActn presented again is refused; counters are per (grant, holder) |
+| `st-counter-*` | lower and equal counters are refused, gaps are allowed, the first counter can be any positive integer, and a refused presentation (bad signature, outside the plan) does not consume its counter |
+| `st-revoke-*` | revoking the leaf hop or the root grant mid-sequence refuses every later action; an unrelated id changes nothing; one holder's revocation leaves another's stream alone |
+| `st-budget-*` | the trust budget depletes across admitted actions (then a step-up is needed: `threshold` fails); a replay or refused step spends nothing; a zero-risk action costs nothing; budgets are per holder; no budget is deny-metered |
+| `st-time-*` | a PCActn expires between steps of one sequence |
+| `st-holder-*` | two holders of one grant keep separate counter streams |
+
+The TypeScript conformance test runs every sequence with both the atomic store (`atomicMemoryPcaStore`) and the locked
+get / put store (`memoryPcaStore`) and requires identical results.
+
+## Regenerating and checking
+
+    node packages/pca/scripts/gen-conformance-policy.mjs        # policy-vectors.json   (--check: fail if out of date)
+    node packages/pca/scripts/gen-conformance-stateful.mjs      # stateful-vectors.json (--check)
+    node packages/pca/scripts/gen-conformance-layers.mjs        # layers.json           (--check; run after the others)
+
+Each reads the built package (`dist`); with `PCA_SRC=1` and `tsx` it reads the source instead, and the output is the same.
+The TypeScript conformance test (`src/conformance-layers.test.ts`) recomputes every policy and stateful expectation from
+source. The cross-language gate (`scripts/pca-conformance-all.mjs`) prints a per-layer table with one column per language
+and writes it to `MATRIX.md` and `report.json` (`layers`).
+
+## `optimistic-vectors.json` and `ledger-vectors.json` (extension)
+
+Generated by `scripts/gen-conformance-ext.mjs` from the TypeScript reference (library: `scripts/conformance-ext.mjs`;
+deterministic: fixed key seeds, Ed25519, no clock, no randomness). Every vector carries `expect`, computed by the
+reference and pinned to the intended outcome written next to the case, so a reference change that moves a verdict fails
+the generator instead of being re-blessed. Vectors named `pq-*` use ml-dsa-65 / hybrid-ed25519-ml-dsa-65 and carry an optional `pins` object ({ ed25519 identity: ML-DSA-65 public key }, b64u; in `ledger_cosign` it is `policy.pqPins`): with `pins` the artifact verifies under that pin set, without `pins` there is no pin and the PQ artifact is refused. A verifier that lacks a suite refuses it (not run, not a failure).
+
+`optimistic-vectors.json` (`{ format, layer: "extension", keys, window_policy, check_order, counts, domains?, <tables> }`):
+
+| table | input | `expect` |
+|---|---|---|
+| `optimistic_claim` | `claim`, `pcactn_digest`, `signer_public`, `server_now` (policy: `window_policy`) | `{ ok, check }`: the FIRST failing check of `malformed, irreversible, digest, claimed_r, window, signature`, or `ok`. Signature domain `atlas-pca/optimistic/v1\0` over the LENIENT canonical body without `sig`. |
+| `optimistic_window` | `issued_at`, `challenge_window_ms`, `now` | `{ end, within, phase }`: `end = issued_at + window`, `within` is `now <= end` (inclusive), `phase` is `open` or `finalized`. |
+| `optimistic_fraud_proof` | `claim`, `proof` | `{ ok, check }`: first failing of `malformed, digest, bond, claimed_r, kind, consistency`. Wire level: the proof names this claim and bond, has a known kind and carries the decision that kind requires. It does not recompute the policy decision. |
+| `optimistic_settlement` | `record`, `guardian_public` | `{ ok, check }`: first failing of `malformed, suite, shape, split, signature`. Domain `atlas-pca/bond-settlement/v1\0`; a slash's split must conserve its amount as `(challengerReward + victimCompensation) + treasuryRemainder === amount` in IEEE double arithmetic. |
+
+`ledger-vectors.json` (`{ format, layer: "extension", keys, empty_tree_root, domains, counts, <tables> }`): `ledger_inclusion`
+(`root`, `proof`, `leaf` -> `{ ok }`), `ledger_consistency` (`old_root`, `new_root`, `proof` -> `{ ok }`; sizes are JSON
+safe integers, never truncated to 32 bits), `ledger_tree_head` (`sth`, `guardian_public`), `ledger_cosign` (`sth`,
+`guardian_public`, `policy` k-of-n), `ledger_head_consistency` (`older`, `newer`, `proof`; the signed `prev_root` must link
+adjacent heads), `ledger_checkpoint_chain` (`chain`, `policy` -> `{ ok, at }`), `ledger_witnessed_head` and
+`ledger_equivocation` (the legacy witnessed head).
+
+Two properties the vectors pin on purpose: an inclusion proof binds the path shape and the root, not the claimed size
+(index 4 of nine leaves also verifies as index 4 of ten), and a consistency proof binds the roots and the walk, not
+`newSize`; the size is bound by the signed tree head, which `ledger_head_consistency` checks.

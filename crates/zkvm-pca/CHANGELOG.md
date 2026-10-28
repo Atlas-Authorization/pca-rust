@@ -1,5 +1,25 @@
 # Changelog
 
+## PCA 0.5.0: rule 22 in the guest (BREAKING: new guest image id `6bb6b7d5e66671fb314eaa5018e04463346374ced15df7bc784815cb95de1f6e`, guest version 11)
+
+Follows the TypeScript reference (unconfirmed means maximally dangerous). Image id `432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060` to `6bb6b7d5e66671fb314eaa5018e04463346374ced15df7bc784815cb95de1f6e`; `GUEST_VERSION` = `MIN_GUEST_VERSION` = 11; journal layout unchanged. Built and proved by the `zkvm-v11` GitHub Actions workflow (guest in the docker guest builder r0.1.97.0, RISC Zero 3.0.6, ubuntu-latest CPU): succinct receipt 7,650,370 ms (12 segments, 12,582,912 cycles), Groth16 wrap 293,325 ms (1,817 bytes), negative matrix with no receipt for any variant. `432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060` joins `SUPERSEDED_IMAGE_IDS` (`a_guest_version_10_receipt_is_refused`); its receipts moved to `fixtures/legacy/432b4713/`.
+
+- **Every unconfirmed verb must carry every trait.** `schema_verb_floor_error(verb, reg, pins)` and `schema_floor_error(doc, pins)`
+  (`rule22.rs`) take the verifier's reviewer pins as an additional OPTIONAL input (absent = none pinned). A verb without a valid
+  `confirmation` (`verb_confirmation_error`: pinned key with the `reviewer` role, validity window, def and trait-registry digests,
+  final traits carried, dismissals, Ed25519 signature) must list every trait of the registry, else
+  `schema_traits_forged: unconfirmed action must carry every trait (missing X)`. Previously a classifier miss could lower a verb's traits.
+- **The confirmation also signs the digest of the verb's facts.** The signed message domain is `atlas-pca/action-review/v2` and the body
+  gains `facts_digest` = b64u(sha256(strictCanonical({d: "atlas-pca/action-verb-facts/v1", verb: the verb without traits, floors,
+  confirmation, def}))); `verb_confirmation_error` rejects a confirmation whose `facts_digest` differs from the presented verb's, and
+  `confirmation_shape_error` requires it (canonical 32-byte base64url). Editing any fact makes the verb unconfirmed.
+- **`reviewer_pins_error`** is the exact pin-set rule (distinct kids, canonical 32-byte keys, known roles, no reviewer that is also an
+  importer/model, no shared key material); any pins error confirms nothing.
+- **v2 schema shape** accepts and validates `confirmation` on a verb (`confirmation_shape_error`); on a v1 document it stays an unknown member.
+- **Pipeline:** rule 14 reads `ctx.reviewers` (must be `{keys: [...]}` when present, else the context is malformed and fails closed).
+- Tests: `core/tests/rule22_vectors.rs` passes `pins` through `rule22_schema`, `rule22`, `schema_verb`, replays the new `schema_shape`
+  kind, and checks the pipeline unpinned (unconfirmed) and with a malformed `reviewers`.
+
 ## PCA 0.4.2 re-pin (BREAKING: new guest image id `432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060`, guest version 10)
 
 The guest follows the reference fix that `intentV2Active` is also true for a PRESENT but malformed v2 context (fail closed;

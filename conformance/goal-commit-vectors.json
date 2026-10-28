@@ -1,0 +1,368 @@
+{
+  "format": 1,
+  "suite": "goal-commit",
+  "layer": "proof",
+  "description": "Goal binding v3: the root grant goal commitment is H({d: \"atlas-pca/goal/v1\\u0000\", goal: \"pca-intent:v3:\" || goal_digest || \":\" || policy_digest, salt}) with both digests canonical base64url (32 bytes). `commit` vectors pin the function; `invalid` digests must be refused; `binding` vectors pin the intent check when the verifier is configured with approved_goal (v3) or not (v1/v2 retained). Verifiers must reproduce `expect` (pass or fail); reason text is not part of the contract.",
+  "domain": "atlas-pca/goal/v1\u0000",
+  "goal_prefix": "pca-intent:v3:",
+  "commit": [
+    {
+      "name": "basic",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "salt": "salt-1",
+      "goal": "pca-intent:v3:B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw:9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "commit": "MAj0tv773_WYA_rTKy6RD42gfhiEBDLbmeS_YophyV4"
+    },
+    {
+      "name": "digests-swapped",
+      "goal_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "policy_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "salt": "salt-1",
+      "goal": "pca-intent:v3:9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo:B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "commit": "Ie8JwQh9vO_hSARV_UMgUc794MvrcBM1TcwUcw5ZZYI"
+    },
+    {
+      "name": "other-goal",
+      "goal_digest": "2IyUfapeYjaiJMcm3hciIiFM6pGqDvvyvjg6n8SNFpc",
+      "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "salt": "salt-1",
+      "goal": "pca-intent:v3:2IyUfapeYjaiJMcm3hciIiFM6pGqDvvyvjg6n8SNFpc:9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "commit": "bYLaDxlX94Wy1SBHpU4uHIvyZHeCQ4b9JpwGwf5C8FY"
+    },
+    {
+      "name": "other-policy",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "policy_digest": "Ju0wHsTS_dwBEkIBwSJkWBcCdt-ip7BBrjqHRWqKJzY",
+      "salt": "salt-1",
+      "goal": "pca-intent:v3:B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw:Ju0wHsTS_dwBEkIBwSJkWBcCdt-ip7BBrjqHRWqKJzY",
+      "commit": "UAOpdvuuKvM67gbnVJ8cBDqpbpXdBxmoFIKiRXqvpK0"
+    },
+    {
+      "name": "other-salt",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "salt": "salt-2",
+      "goal": "pca-intent:v3:B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw:9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "commit": "E85qrqc4BLFx7xTPSxQZgwDThcz3GOoAgwiU2bxN5rY"
+    },
+    {
+      "name": "unicode-salt",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "salt": "sälz-✓",
+      "goal": "pca-intent:v3:B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw:9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "commit": "L-heibjGnBd37akMYvXJRr4e2htmS_pHjQMIVUAFpyU"
+    },
+    {
+      "name": "max-salt-128-bytes",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "salt": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "goal": "pca-intent:v3:B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw:9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+      "commit": "AmV5asbEi9b5QJNL4iD8VpfXZ3YM4DrJo6UB1vkN51c"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "goal-digest-not-canonical",
+      "goal_digest": "AAAA",
+      "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+    },
+    {
+      "name": "policy-digest-31-bytes",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "policy_digest": "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQ"
+    },
+    {
+      "name": "goal-digest-padded",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw=",
+      "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+    },
+    {
+      "name": "policy-digest-empty",
+      "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+      "policy_digest": ""
+    }
+  ],
+  "binding": [
+    {
+      "name": "v3-opens",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "pass"
+    },
+    {
+      "name": "v3-wrong-policy-digest",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "Ju0wHsTS_dwBEkIBwSJkWBcCdt-ip7BBrjqHRWqKJzY"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v3-wrong-goal-digest",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "2IyUfapeYjaiJMcm3hciIiFM6pGqDvvyvjg6n8SNFpc",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v3-digests-swapped",
+      "grant_commit": "l8wc4mG8U5P5tDr2MkcRgY6q7bblLxV_n3FSqlC95WM",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v3-wrong-salt",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "t",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v1-grant-under-v3-policy",
+      "grant_commit": "mJ0tTKL2wdOqNnkyUFPXWYXyfjPbaMPRoVAGNU5gfA0",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v2-grant-under-v3-policy",
+      "grant_commit": "e5nVEUbRSlaFIMKKIhCCRLK6dYkzRZvztZchtFp1wcM",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "session": "178zjRAbbP1VQ6RuXNEen2u_3kobbehjtouF5BFB90Q",
+      "expect": "fail"
+    },
+    {
+      "name": "v3-grant-under-v1-verifier",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "require": true
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v1-still-opens",
+      "grant_commit": "mJ0tTKL2wdOqNnkyUFPXWYXyfjPbaMPRoVAGNU5gfA0",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "require": true
+      },
+      "expect": "pass"
+    },
+    {
+      "name": "v2-still-opens",
+      "grant_commit": "e5nVEUbRSlaFIMKKIhCCRLK6dYkzRZvztZchtFp1wcM",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "require": true
+      },
+      "session": "178zjRAbbP1VQ6RuXNEen2u_3kobbehjtouF5BFB90Q",
+      "expect": "pass"
+    },
+    {
+      "name": "v3-absent-intent",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": null,
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v3-no-envelope-commit",
+      "grant_commit": null,
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v3-misconfigured-short-digest",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "AAAA",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v3-misconfigured-extra-member",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo",
+          "extra": 1
+        }
+      },
+      "expect": "fail"
+    },
+    {
+      "name": "v3-with-floor-met",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        },
+        "min_fidelity_ppm": 900000
+      },
+      "expect": "pass"
+    },
+    {
+      "name": "v3-with-floor-missed",
+      "grant_commit": "n1Nk-6_rXsW7KGxICHJUbf0uJZEqBAnB4TGYGkFhucI",
+      "intent": {
+        "ref": "lr1X2DsDvEahGTbM3loeIzh41brmMA4SLXjnl7vltOg",
+        "map_digest": "TPebdF1PgbeSX-jl7PJ_ceMORKir_3RMhoLtWpMK1PY",
+        "goal_salt": "s",
+        "fidelity_ppm": 900000,
+        "residual_risk_ppm": 10
+      },
+      "policy": {
+        "approved_goal": {
+          "goal_digest": "B5JcJLcCoUyZ2P4kdlU8dI9ukFkzuspDbELVR295azw",
+          "policy_digest": "9U7dBfYHPTNYZ84mWFHOiddEAPc7IEQ1AMEVp13dqSo"
+        },
+        "min_fidelity_ppm": 900001
+      },
+      "expect": "fail"
+    }
+  ]
+}
