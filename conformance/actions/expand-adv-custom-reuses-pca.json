@@ -1,0 +1,1 @@
+{"id":"expand-adv-custom-reuses-pca","kind":"expand","input":{"custom_traits":[{"id":"pca.money_moving","implies":[],"floor":{"risk":0,"rev":"reversible","blast_ppm":0,"esc":0,"caveats":[],"context":[],"prules":[]},"card_phrase":"pca.money_moving"}],"traits":["pca.money_moving"]},"expect":{"error":true}}

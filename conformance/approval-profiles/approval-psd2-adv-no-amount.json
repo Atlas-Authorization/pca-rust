@@ -1,0 +1,1 @@
+{"id":"approval-psd2-adv-no-amount","kind":"approval_psd2","input":{"render":{"v":1,"kind":"pca-approval-render","verb":"bank.transfer.send","def_digest":"YAdbPsdsGThnjuLJLOyOAzeII1l0XlJWY17v49ydS6U","unreviewed":false,"fields":[{"id":"payee","class":"party.payee","value":"x"}]}},"expect":{"ok":false,"code":"psd2_unlinkable"}}

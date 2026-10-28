@@ -117,6 +117,12 @@ pub struct IntentV2Check {
 pub struct IntentV2Decision {
     pub checks: Vec<IntentV2Check>,
     pub env: Map<String, Value>,
+    /// The action schema the action was checked against (when `schema` passed).
+    pub schema: Option<Value>,
+    /// Worlds decided by a single oracle (their `env.world.<name>` is model-derived, rule 21).
+    pub single_source: Vec<String>,
+    /// Rule 21's compatibility mode is in effect and a grant reads a model-derived path (reported degraded).
+    pub legacy_model_polarity: bool,
 }
 
 type Step = Result<(), String>;
@@ -142,8 +148,11 @@ pub fn intent_v2_context_error(ctx: &Value) -> Option<String> {
             None => return Some("policy must be an object".into()),
         };
         // closed member sets; every flag a JSON boolean, the age a non-negative safe integer (absent = default)
-        if let Some(k) = pol.keys().find(|k| !["session", "schema", "acc", "map"].contains(&k.as_str())) {
+        if let Some(k) = pol.keys().find(|k| !["session", "schema", "acc", "map", "model_polarity"].contains(&k.as_str())) {
             return Some(format!("policy: unknown member '{k}'"));
+        }
+        if pol.get("model_polarity").is_some_and(|m| m != "strict" && m != "legacy") {
+            return Some("policy.model_polarity must be 'strict' or 'legacy'".into());
         }
         if let Some(ps) = pol.get("session") {
             let o = match ps.as_object() {
@@ -204,6 +213,9 @@ pub fn intent_v2_context_error(ctx: &Value) -> Option<String> {
     }
     if !opt_obj(c.get("params")) {
         return Some("params must be an object".into());
+    }
+    if !opt_obj(c.get("env")) {
+        return Some("env must be an object".into());
     }
     for k in ["schema", "session", "acc"] {
         if !opt_obj(c.get(k)) {
@@ -784,12 +796,16 @@ pub fn decide_intent_v2(pcactn: &Value, grant: &Value, ctx: Option<&IntentV2Cont
         run(out, name, || if clock_ok { f() } else { Err("the verifier clock is not a safe integer (fail closed)".into()) })
     };
     let mut canon: Option<Map<String, Value>> = None;
+    let mut schema_doc: Option<Value> = None;
     if present || flag_on(ctx, &["policy", "schema", "closed_world"]) {
         run(&mut out, "schema", &mut || {
-            canon = Some(schema_step(p, ctx)?.1);
+            let (doc, c) = schema_step(p, ctx)?;
+            schema_doc = Some(doc.clone());
+            canon = Some(c);
             Ok(())
         });
     }
+    out.schema = schema_doc;
     if let Some(c) = &canon {
         out.env.insert("canon".into(), Value::Object(c.clone()));
     }
@@ -820,6 +836,7 @@ pub fn decide_intent_v2(pcactn: &Value, grant: &Value, ctx: Option<&IntentV2Cont
         if map_active {
             run(&mut out, "map", &mut || map_step(p, ctx));
         }
+        model_rules(&mut out, p, grant, ctx, &action, clock_ok);
         return out;
     }
     let mut acc_env = None;
@@ -834,34 +851,116 @@ pub fn decide_intent_v2(pcactn: &Value, grant: &Value, ctx: Option<&IntentV2Cont
     if map_active {
         run(&mut out, "map", &mut || map_step(p, ctx));
     }
-    let wi = match wb_input(p, ctx, now, action) {
-        Ok(wi) => wi,
-        Err(e) => {
-            out.checks.push(IntentV2Check { name: "facts", ok: false, reason: format!("W-B: {e}") });
-            return out;
-        }
-    };
-    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| decide_intent_wb(&wi))) {
-        Err(_) => out.checks.push(IntentV2Check { name: "facts", ok: false, reason: "W-B error (fail closed)".into() }),
-        Ok(wb) => {
-            for (name, c) in &wb.checks {
-                let (ok, reason) = match c {
-                    WbCheck::Pass => (true, String::new()),
-                    WbCheck::Question => (false, format!("intent_required: {}", if wb.reason.is_empty() { "a question is required" } else { &wb.reason })),
-                    WbCheck::Fail => (false, if wb.reason.is_empty() { "rejected".to_string() } else { wb.reason.clone() }),
-                };
-                out.checks.push(IntentV2Check { name, ok, reason });
-            }
-            if wb.outcome != "deny" {
-                for k in ["world", "prov", "class"] {
-                    if let Some(v) = wb.env.get(k) {
-                        out.env.insert(k.into(), v.clone());
+    let action_for_rules = action.clone();
+    match wb_input(p, ctx, now, action) {
+        Err(e) => out.checks.push(IntentV2Check { name: "facts", ok: false, reason: format!("W-B: {e}") }),
+        Ok(wi) => match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| decide_intent_wb(&wi))) {
+            Err(_) => out.checks.push(IntentV2Check { name: "facts", ok: false, reason: "W-B error (fail closed)".into() }),
+            Ok(wb) => {
+                for (name, c) in &wb.checks {
+                    let (ok, reason) = match c {
+                        WbCheck::Pass => (true, String::new()),
+                        WbCheck::Question => (false, format!("intent_required: {}", if wb.reason.is_empty() { "a question is required" } else { &wb.reason })),
+                        WbCheck::Fail => (false, if wb.reason.is_empty() { "rejected".to_string() } else { wb.reason.clone() }),
+                    };
+                    out.checks.push(IntentV2Check { name, ok, reason });
+                }
+                out.single_source = wb.single_source.clone();
+                if wb.outcome != "deny" {
+                    for k in ["world", "prov", "class"] {
+                        if let Some(v) = wb.env.get(k) {
+                            out.env.insert(k.into(), v.clone());
+                        }
                     }
                 }
             }
+        },
+    }
+    model_rules(&mut out, p, grant, ctx, &action_for_rules, clock_ok);
+    out
+}
+
+/// The predicate lists a model-derived path could widen: the grant's allow-list and the ceilings (V5 layers).
+fn allow_side_predicates(env: Option<&Map<String, Value>>, ctx: Option<&IntentV2Context>) -> Vec<Value> {
+    let mut lists = vec![env.and_then(|e| e.get("predicates")).cloned().unwrap_or(Value::Null)];
+    if let Ok(Some(Value::Object(l))) = member(ctx, &["layers"]) {
+        for k in ["org", "site", "std"] {
+            lists.push(l.get(k).and_then(|e| e.get("predicates")).cloned().unwrap_or(Value::Null));
         }
     }
-    out
+    lists
+}
+
+/// Rules 20 and 21 (intent-v2.ts `modelRules`), evaluated last so the verifier-computed `env` is complete. Both read the signed
+/// ENVELOPE of the stored grant: `units` (20) is reported iff `envelope.units` is present; `tighten` (21) iff `envelope.tighten`
+/// or a `model_polarity` (envelope or policy) is present, or a grant-side `where` reads a model-derived env path (so that case
+/// is refused, never silently skipped). A PCActn with none of these verifies byte-identically to a verifier without them.
+fn model_rules(out: &mut IntentV2Decision, p: &Map<String, Value>, grant: &Value, ctx: Option<&IntentV2Context>, action: &Value, clock_ok: bool) {
+    let env = crate::read_envelope(grant);
+    let preds = allow_side_predicates(env.as_ref(), ctx);
+    let verb = action["verb"].as_str().unwrap_or_default().to_string();
+    let gated = |f: &mut dyn FnMut() -> Step| -> Step {
+        if clock_ok {
+            f()
+        } else {
+            Err("the verifier clock is not a safe integer (fail closed)".into())
+        }
+    };
+    if let Some(units) = env.as_ref().and_then(|e| e.get("units")) {
+        let schema_doc = out.schema.clone();
+        run(out, "units", || {
+            gated(&mut || {
+                let doc: Value = match &schema_doc {
+                    Some(d) => d.clone(),
+                    None => schema_step(p, ctx)?.0.clone(),
+                };
+                let mut input = serde_json::json!({"units": units, "verb": verb, "predicates": preds});
+                if let Some(su) = doc.get("units") {
+                    input["schema_units"] = su.clone();
+                }
+                if let Some(vp) = schema_verb(&doc, &verb)?.and_then(|v| v.get("params")) {
+                    input["verb_params"] = vp.clone();
+                }
+                crate::decision::decide_units(&input)
+            })
+        });
+    }
+    let pol_ctx = member(ctx, &["policy", "model_polarity"]).ok().flatten().cloned();
+    let polarity: Option<Value> = match &pol_ctx {
+        Some(v) if v == "strict" => None,
+        Some(v) => Some(v.clone()),
+        None => env.as_ref().and_then(|e| e.get("model_polarity")).cloned(),
+    };
+    let has_tighten = env.as_ref().is_some_and(|e| e.contains_key("tighten"));
+    let single = out.single_source.clone();
+    if has_tighten || polarity.is_some() || pol_ctx.is_some() || !crate::decision::model_paths_read(&preds, &single).is_empty() {
+        let mut host_env = member(ctx, &["env"]).ok().flatten().and_then(Value::as_object).cloned().unwrap_or_default();
+        for (k, v) in &out.env {
+            host_env.insert(k.clone(), v.clone());
+        }
+        let mut input = serde_json::json!({"predicates": preds, "single_source": single, "context": {"action": action, "env": host_env}});
+        if let Some(t) = env.as_ref().and_then(|e| e.get("tighten")) {
+            input["tighten"] = t.clone();
+        }
+        if let Some(pv) = &polarity {
+            input["polarity"] = pv.clone();
+        }
+        let mut legacy = false;
+        run(out, "tighten", || {
+            gated(&mut || {
+                let r = crate::decision::decide_tighten(&input);
+                legacy = r.legacy;
+                if r.outcome == "ok" {
+                    Ok(())
+                } else {
+                    Err(r.reason.unwrap_or_else(|| "refused".into()))
+                }
+            })
+        });
+        if legacy {
+            out.legacy_model_polarity = true;
+        }
+    }
 }
 
 /// True iff any v2 check would be reported (the PCActn carries `intent_session`, a v2 policy flag is set, or the

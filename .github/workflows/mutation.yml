@@ -221,3 +221,10 @@ jobs:
           name: survivors-merged
           path: reports/survivors-merged.json
           if-no-files-found: ignore
+      - name: Merge result for the release evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-summary
+          path: reports/mutation-summary.json
+          if-no-files-found: ignore

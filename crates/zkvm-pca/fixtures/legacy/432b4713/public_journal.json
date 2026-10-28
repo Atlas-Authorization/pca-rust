@@ -1,0 +1,39 @@
+{
+  "guest_version": 10,
+  "allow": 1,
+  "r_scaled": 65000,
+  "tier": 1,
+  "action_commit": "bnuFmHc01pUB_V6KDEQQt8z-htOnvcjUiHXW3fBBcxM",
+  "policy_commit": "J4wDc2rZZjaXwAYik9yypnw6kqzVws3beR7gqHq7JVc",
+  "plan_commit": "XZPMhnvlFaDsi_0XJYo0SMhfGiCQNGZPlV7SbBq5q_c",
+  "chain_verified": 1,
+  "context": {
+    "now_bits": 4790031764267466752,
+    "subject_digest": "LyUg0MY_d1JfHwKJaH_mKFoHuNxPagcmVGiVkr-HXEM",
+    "env_digest": "YAhKIh81Ehcz0bGnp3PDoJ7_Nckqp45YLSS1_9bqv2o",
+    "rate_history_digest": "JTqILK1aOX5q3eW6LwcMVoUKimyMaZycWd6FBu2s_jY",
+    "delegation_depth": 1,
+    "grant_ref": "J4wDc2rZZjaXwAYik9yypnw6kqzVws3beR7gqHq7JVc",
+    "node_id": "n1",
+    "tool_binding": "3rdLEXkqzaXOqZYVuCgMwOJ9UD-S2pPeWQruzSjfzHY",
+    "risk_inputs_scaled": [
+      100000,
+      900000,
+      50000,
+      0,
+      950000,
+      100000
+    ],
+    "budget_scaled": 1000000,
+    "r_floor_scaled": 0,
+    "root_principal": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+    "pcactn_digest": "SQTa8nynF2axZsfn0uPbpFX7BHjPXzZOsBfHkvlpjnc",
+    "pcactn_ver": 2,
+    "pcactn_iat": 1760000000000,
+    "pcactn_exp": 1760001200000,
+    "pcactn_aud": "atlas-instance-1",
+    "pcactn_counter": 0,
+    "intent": null,
+    "intent_v2": null
+  }
+}

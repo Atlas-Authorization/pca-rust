@@ -1,0 +1,3612 @@
+{
+  "format": 1,
+  "suite": "producer",
+  "layer": "agent-side signing",
+  "description": "Exact outputs of the agent/issuer-side producers. Every key is a fixed Ed25519 seed (`keys`), every nonce/counter/timestamp is fixed, and Ed25519 is deterministic, so a native producer must reproduce `expect` BYTE FOR BYTE (compare parsed JSON). `op` names the producer; `args` its inputs (a name in `signer`/`principal`/`holder`/`to_holder` is a key name from `keys`; `message_utf8` is the UTF-8 text to sign). Domain strings are JSON strings: \\u0000 is a NUL byte. `header` is the PCA-Action header value (base64url of the sorted-key JSON of the PCActn). Randomised post-quantum signatures are not here: those are checked by cross-verification (TS verifies native-produced proofs, natives verify TS-produced ones) in CI.",
+  "keys": {
+    "principal": {
+      "seed": "_AfA9PfvLvyNcBKeA2U4u1YUggdW8RW5N_uw0zAhFb0",
+      "public": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E"
+    },
+    "agent": {
+      "seed": "Td68EkHLUvauqsvBbutbl2g7FuepPNel1m45EWCHQhc",
+      "public": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA"
+    },
+    "subagent": {
+      "seed": "EAgzWZiCiX2AzvLogmd1YYZFhpIqPwE4RGyaYJTAHTw",
+      "public": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70"
+    },
+    "rogue": {
+      "seed": "YdGqQ9wplOCV2fcbs701FTDaJ7I631mXwgYLcqwOvwI",
+      "public": "XzJ8sFL4oiS9b6dQPYwpTnQRut9pNFROpnIn7-_0OW0"
+    },
+    "rs": {
+      "seed": "fCltRPfr2o5InnzcFcT0FBzfH7m5otmAAe0U48eflOg",
+      "public": "tdcbFsEYJ4SqTOn8_zZkuNLhIF48YsSzvdcEcciuXVM"
+    },
+    "approver": {
+      "seed": "-AMvY9s2a0LL0GdLoQfwxV0QX9YmMNpoNHXFZ0XNKok",
+      "public": "JJdsZ6_oGNWzP9DPrc60wZlEJztvDaG7KRqZz-zsol0"
+    },
+    "issuer3p": {
+      "seed": "02Ag7eH3yy-_DdI5JDTQmlz5SYotmDiYLYefdSuhn2g",
+      "public": "LfkQO6JykkCtDBDYLf3YPWbrjLfCQidtvU3ZhW8ier8"
+    }
+  },
+  "cases": [
+    {
+      "name": "ed25519-empty",
+      "op": "ed25519_sign",
+      "args": {
+        "seed": "Td68EkHLUvauqsvBbutbl2g7FuepPNel1m45EWCHQhc",
+        "message_utf8": ""
+      },
+      "expect": {
+        "public": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "sig": "QkwLPwh9OiQXiJcfQcMym9L4wo6jvS0abIiWbJsFGzueogKK_PnxsHFnP3uSs9VhTVguV20tlvYX3ZaqQmVsAQ"
+      }
+    },
+    {
+      "name": "ed25519-ascii",
+      "op": "ed25519_sign",
+      "args": {
+        "seed": "Td68EkHLUvauqsvBbutbl2g7FuepPNel1m45EWCHQhc",
+        "message_utf8": "atlas-pca producer vector"
+      },
+      "expect": {
+        "public": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "sig": "lPYO9P1YBlDGux6PqmN-RfuggAyl6atWjWlrW0e35QyQMoX-JJn7LctUcV9ifVDpvB0kOXuW6-BVOqc-CJlLDA"
+      }
+    },
+    {
+      "name": "ed25519-unicode",
+      "op": "ed25519_sign",
+      "args": {
+        "seed": "Td68EkHLUvauqsvBbutbl2g7FuepPNel1m45EWCHQhc",
+        "message_utf8": "sälz ✓ \u0000 end"
+      },
+      "expect": {
+        "public": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "sig": "V1vIaBI7iB6LDNXtEUWwxG2TtHOPzty3hWfcoCFmKNdwA2VTCfJ8J1BDO6diLBOFISR4A06qZ2HPrCCJFJctDg"
+      }
+    },
+    {
+      "name": "goal-commit-basic",
+      "op": "goal_commit",
+      "args": {
+        "goal": "refund order 1",
+        "salt": "salt-1"
+      },
+      "expect": {
+        "commit": "TOQ4GKDhDhg4mpaRl7JPU7mdiM6un9AjOEH_-OusFZQ"
+      }
+    },
+    {
+      "name": "goal-commit-unicode",
+      "op": "goal_commit",
+      "args": {
+        "goal": "zurück ✓",
+        "salt": "sälz"
+      },
+      "expect": {
+        "commit": "_BFWs5a75oha-71gtvAW26lIrltmABG1ykCRReznl6Q"
+      }
+    },
+    {
+      "name": "params-digest-empty",
+      "op": "params_digest",
+      "args": {
+        "params": null
+      },
+      "expect": {
+        "digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o"
+      }
+    },
+    {
+      "name": "params-digest-nested",
+      "op": "params_digest",
+      "args": {
+        "params": {
+          "b": [
+            1,
+            2.5,
+            "x"
+          ],
+          "a": {
+            "z": true,
+            "y": null
+          }
+        }
+      },
+      "expect": {
+        "digest": "JSHi_GhM57-hAI5DRG_OtunlcPZHcg7eUwa1OOnCS8s"
+      }
+    },
+    {
+      "name": "plan-1",
+      "op": "plan_commit",
+      "args": {
+        "nodes": [
+          {
+            "id": "n1",
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          }
+        ]
+      },
+      "expect": {
+        "root": "uAyp8HwTHgFFdyI96PAl8qDNucNF78MtgM-yQH8WryI",
+        "proofs": {
+          "n1": {
+            "index": 0,
+            "size": 1,
+            "path": []
+          }
+        }
+      }
+    },
+    {
+      "name": "plan-3",
+      "op": "plan_commit",
+      "args": {
+        "nodes": [
+          {
+            "id": "n1",
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          {
+            "id": "n2",
+            "verb": "read",
+            "resource": "orders/1"
+          },
+          {
+            "id": "n3",
+            "verb": "notify",
+            "resource": "users/9",
+            "pre": {
+              "exists": true
+            },
+            "post": {
+              "sent": true
+            }
+          }
+        ]
+      },
+      "expect": {
+        "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+        "proofs": {
+          "n1": {
+            "index": 0,
+            "size": 3,
+            "path": [
+              {
+                "side": "R",
+                "hash": "0Ts5u1F3AOWqdavYbs_iHYOmSwq_XjSmyCSGPiqbOuk"
+              },
+              {
+                "side": "R",
+                "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+              }
+            ]
+          },
+          "n2": {
+            "index": 1,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "uAyp8HwTHgFFdyI96PAl8qDNucNF78MtgM-yQH8WryI"
+              },
+              {
+                "side": "R",
+                "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+              }
+            ]
+          },
+          "n3": {
+            "index": 2,
+            "size": 3,
+            "path": [
+              {
+                "side": "L",
+                "hash": "COh-_RyU9cMGflnTAtVMY3IZZWiG3W1ithzfK6Z01jk"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "mint-grant-basic",
+      "op": "mint_grant",
+      "args": {
+        "principal": "principal",
+        "holder": "agent",
+        "envelope": {
+          "predicates": [
+            {
+              "verb": "refund",
+              "resource": "orders/*"
+            },
+            {
+              "verb": "read",
+              "resource": "orders/*"
+            },
+            {
+              "verb": "notify",
+              "resource": "users/*"
+            }
+          ],
+          "caveats": [
+            {
+              "type": "budget_alloc",
+              "limit": 10
+            }
+          ],
+          "agent_binding": {
+            "operator": "acme"
+          },
+          "risk_policy": {
+            "weights": {
+              "alpha": 0.25,
+              "beta": 0.2,
+              "gamma": 0.2,
+              "delta": 0.2,
+              "epsilon": 0.1,
+              "zeta": 0.05
+            },
+            "theta1": 0.25,
+            "theta2": 0.6,
+            "kappa": 1,
+            "lambda": 0.0005,
+            "rho": 0.5,
+            "bMax": 1
+          }
+        },
+        "goal": "refund order 1 up to 5 dollars",
+        "salt": "fGOnmnbk8s9uZa-qhmBwXw"
+      },
+      "expect": {
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+        "goal_salt": "fGOnmnbk8s9uZa-qhmBwXw"
+      }
+    },
+    {
+      "name": "mint-grant-units-no-caveats",
+      "op": "mint_grant",
+      "args": {
+        "principal": "principal",
+        "holder": "agent",
+        "envelope": {
+          "predicates": [
+            {
+              "verb": "refund",
+              "resource": "orders/*"
+            },
+            {
+              "verb": "read",
+              "resource": "orders/*"
+            },
+            {
+              "verb": "notify",
+              "resource": "users/*"
+            }
+          ],
+          "caveats": [],
+          "agent_binding": {
+            "operator": "acme"
+          },
+          "risk_policy": {
+            "weights": {
+              "alpha": 0.25,
+              "beta": 0.2,
+              "gamma": 0.2,
+              "delta": 0.2,
+              "epsilon": 0.1,
+              "zeta": 0.05
+            },
+            "theta1": 0.25,
+            "theta2": 0.6,
+            "kappa": 1,
+            "lambda": 0.0005,
+            "rho": 0.5,
+            "bMax": 1
+          },
+          "units": {
+            "action.params.amount_cents": {
+              "kind": "money",
+              "currency": "USD",
+              "exponent": 2
+            }
+          }
+        },
+        "goal": "second",
+        "salt": "_X_kRunZZMkDPeg6X60kXA"
+      },
+      "expect": {
+        "grant": {
+          "id": "fDym4zE700hUUqT1rYUd45AStIQv34pq88hU_3e_XuA",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [],
+              "goal_commit": "5YADA_LpZBFwnOVHT69RXsG5zyZK8m9bPtY2qQIGg-Y",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope",
+              "units": {
+                "action.params.amount_cents": {
+                  "currency": "USD",
+                  "exponent": 2,
+                  "kind": "money"
+                }
+              }
+            }
+          ],
+          "body_digest": "fDym4zE700hUUqT1rYUd45AStIQv34pq88hU_3e_XuA",
+          "sig": "4mDECx4ZQ53dRNhg8ZnHoAxqA6Qk8jQlEmMVzJfTB2gpde1cwKgtfo8D6cfP0f76th0KWf4QKNvYoSavqVeaCA"
+        },
+        "goal_commit": "5YADA_LpZBFwnOVHT69RXsG5zyZK8m9bPtY2qQIGg-Y",
+        "goal_salt": "_X_kRunZZMkDPeg6X60kXA"
+      }
+    },
+    {
+      "name": "delegate-attenuate",
+      "op": "delegate",
+      "args": {
+        "parent": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "signer": "agent",
+        "to_holder": null,
+        "added_caveats": [
+          {
+            "type": "budget_alloc",
+            "limit": 5
+          }
+        ]
+      },
+      "expect": {
+        "id": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+        "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "agent_binding": {
+              "operator": "acme"
+            },
+            "caveats": [
+              {
+                "limit": 10,
+                "type": "budget_alloc"
+              }
+            ],
+            "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+            "predicates": [
+              {
+                "resource": "orders/*",
+                "verb": "refund"
+              },
+              {
+                "resource": "orders/*",
+                "verb": "read"
+              },
+              {
+                "resource": "users/*",
+                "verb": "notify"
+              }
+            ],
+            "risk_policy": {
+              "bMax": 1,
+              "kappa": 1,
+              "lambda": 0.0005,
+              "rho": 0.5,
+              "theta1": 0.25,
+              "theta2": 0.6,
+              "weights": {
+                "alpha": 0.25,
+                "beta": 0.2,
+                "delta": 0.2,
+                "epsilon": 0.1,
+                "gamma": 0.2,
+                "zeta": 0.05
+              }
+            },
+            "type": "envelope"
+          },
+          {
+            "limit": 5,
+            "type": "budget_alloc"
+          }
+        ],
+        "body_digest": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+        "sig": "Veohp0RTlD6d2iPpc_VZf5UFtx_HqIrDFc5C4ui2_BXM60ceFZWgl26KPSIjcIWfqSmRFN6GVShwTs7UxmZYDA",
+        "parent": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI"
+      }
+    },
+    {
+      "name": "delegate-subagent-sealed",
+      "op": "delegate",
+      "args": {
+        "parent": {
+          "id": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+          "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            },
+            {
+              "limit": 5,
+              "type": "budget_alloc"
+            }
+          ],
+          "body_digest": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+          "sig": "Veohp0RTlD6d2iPpc_VZf5UFtx_HqIrDFc5C4ui2_BXM60ceFZWgl26KPSIjcIWfqSmRFN6GVShwTs7UxmZYDA",
+          "parent": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI"
+        },
+        "signer": "agent",
+        "to_holder": "subagent",
+        "added_caveats": [
+          {
+            "type": "sealed"
+          }
+        ]
+      },
+      "expect": {
+        "id": "TYI8Wp6mZMICkBrPTkeeO2aX5JsNf6ka_stSgAHi37I",
+        "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+        "caveats": [
+          {
+            "agent_binding": {
+              "operator": "acme"
+            },
+            "caveats": [
+              {
+                "limit": 10,
+                "type": "budget_alloc"
+              }
+            ],
+            "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+            "predicates": [
+              {
+                "resource": "orders/*",
+                "verb": "refund"
+              },
+              {
+                "resource": "orders/*",
+                "verb": "read"
+              },
+              {
+                "resource": "users/*",
+                "verb": "notify"
+              }
+            ],
+            "risk_policy": {
+              "bMax": 1,
+              "kappa": 1,
+              "lambda": 0.0005,
+              "rho": 0.5,
+              "theta1": 0.25,
+              "theta2": 0.6,
+              "weights": {
+                "alpha": 0.25,
+                "beta": 0.2,
+                "delta": 0.2,
+                "epsilon": 0.1,
+                "gamma": 0.2,
+                "zeta": 0.05
+              }
+            },
+            "type": "envelope"
+          },
+          {
+            "limit": 5,
+            "type": "budget_alloc"
+          },
+          {
+            "type": "sealed"
+          }
+        ],
+        "body_digest": "TYI8Wp6mZMICkBrPTkeeO2aX5JsNf6ka_stSgAHi37I",
+        "sig": "oASpwma8qKQ-FK4zrkYo7ezdP6JJEDyHaO-9a3cishWN-qRxhdkDeiLwkbjg59Zt60e7Ga-2a4i6RxoN44ZlAw",
+        "parent": "UJWmdiTR1QJzOVFts7w53Tcq7iQiHSBo4KiN9jHB0UY"
+      }
+    },
+    {
+      "name": "delegate-subagent-max-uses",
+      "op": "delegate",
+      "args": {
+        "parent": {
+          "id": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+          "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            },
+            {
+              "limit": 5,
+              "type": "budget_alloc"
+            }
+          ],
+          "body_digest": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+          "sig": "Veohp0RTlD6d2iPpc_VZf5UFtx_HqIrDFc5C4ui2_BXM60ceFZWgl26KPSIjcIWfqSmRFN6GVShwTs7UxmZYDA",
+          "parent": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI"
+        },
+        "signer": "agent",
+        "to_holder": "subagent",
+        "added_caveats": [
+          {
+            "type": "max_uses",
+            "id": "m1",
+            "n": 3,
+            "until": 1800086400000
+          }
+        ]
+      },
+      "expect": {
+        "id": "Sl_iFRozFGnAw3z8L-E7HQtkrx0YPHVOu9TowffYxus",
+        "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+        "caveats": [
+          {
+            "agent_binding": {
+              "operator": "acme"
+            },
+            "caveats": [
+              {
+                "limit": 10,
+                "type": "budget_alloc"
+              }
+            ],
+            "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+            "predicates": [
+              {
+                "resource": "orders/*",
+                "verb": "refund"
+              },
+              {
+                "resource": "orders/*",
+                "verb": "read"
+              },
+              {
+                "resource": "users/*",
+                "verb": "notify"
+              }
+            ],
+            "risk_policy": {
+              "bMax": 1,
+              "kappa": 1,
+              "lambda": 0.0005,
+              "rho": 0.5,
+              "theta1": 0.25,
+              "theta2": 0.6,
+              "weights": {
+                "alpha": 0.25,
+                "beta": 0.2,
+                "delta": 0.2,
+                "epsilon": 0.1,
+                "gamma": 0.2,
+                "zeta": 0.05
+              }
+            },
+            "type": "envelope"
+          },
+          {
+            "limit": 5,
+            "type": "budget_alloc"
+          },
+          {
+            "id": "m1",
+            "n": 3,
+            "type": "max_uses",
+            "until": 1800086400000
+          }
+        ],
+        "body_digest": "Sl_iFRozFGnAw3z8L-E7HQtkrx0YPHVOu9TowffYxus",
+        "sig": "HV4cfeAnqr84m37c0PHObTYOxFX1KWpnRWLPqGmcSwuFqNmsm6FkNo7tnU401qzTbIO47N9Osg0hfUGt7IP8BQ",
+        "parent": "UJWmdiTR1QJzOVFts7w53Tcq7iQiHSBo4KiN9jHB0UY"
+      }
+    },
+    {
+      "name": "act-root-refund",
+      "op": "act",
+      "args": {
+        "aud": "rs-producer-vectors",
+        "iat": 1800000000000,
+        "exp": 1800001200000,
+        "params": {
+          "amount_cents": 500,
+          "currency": "USD"
+        },
+        "plan": [
+          {
+            "id": "n1",
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          {
+            "id": "n2",
+            "verb": "read",
+            "resource": "orders/1"
+          },
+          {
+            "id": "n3",
+            "verb": "notify",
+            "resource": "users/9",
+            "pre": {
+              "exists": true
+            },
+            "post": {
+              "sent": true
+            }
+          }
+        ],
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "chain": [
+          {
+            "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              }
+            ],
+            "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+          }
+        ],
+        "node_id": "n1",
+        "counter": 1,
+        "signer": "agent",
+        "nonce": "wa4sg5OAz7k7Do3IvrKfbA"
+      },
+      "expect": {
+        "pcactn": {
+          "ver": 2,
+          "action": {
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          "grant_ref": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "cap_chain": [
+            {
+              "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                }
+              ],
+              "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+            }
+          ],
+          "plan": {
+            "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+            "inclusion_proof": {
+              "index": 0,
+              "size": 3,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "0Ts5u1F3AOWqdavYbs_iHYOmSwq_XjSmyCSGPiqbOuk"
+                },
+                {
+                  "side": "R",
+                  "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+                }
+              ]
+            },
+            "node_id": "n1",
+            "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+          },
+          "attestation": {
+            "quote_digest": "",
+            "epoch": 0,
+            "model_id": "unattested",
+            "measurement": "",
+            "operator": "unattested"
+          },
+          "provenance": {
+            "causal_hash": "",
+            "taint_level": 0,
+            "trusted_refs": []
+          },
+          "freshness": {
+            "beacon_ref": "",
+            "epoch": 0,
+            "accumulator_witness": ""
+          },
+          "counter": 1,
+          "risk_claim": {
+            "r": 0,
+            "inputs": {}
+          },
+          "aud": "rs-producer-vectors",
+          "iat": 1800000000000,
+          "exp": 1800001200000,
+          "nonce": "wa4sg5OAz7k7Do3IvrKfbA",
+          "sig": "xasR2MZdLz7oLGuf4YJvnHEbhdgdYPAovIpukcQmXmxZix6qc88D4xiFdra8slBptmoTlJXt0CQNzymdNWreAA"
+        },
+        "threshold_message": "YXRsYXMtcGNhL2FjdG4vdjIAZ7JGXlIaiy598uyyORlDYZZkG1Xm-GqM5SqWIdmzOlg",
+        "header": "eyJhY3Rpb24iOnsicGFyYW1zX2RpZ2VzdCI6IkhjOGg5Vjg2V3J4M0NhdzJoRmw2ck9xUkRnLW9kUWtRXzFiY1dMaG1TQ1UiLCJyZXNvdXJjZSI6Im9yZGVycy8xIiwicmV2ZXJzaWJpbGl0eV9jbGFzcyI6ImNvbXBlbnNhYmxlIiwidmVyYiI6InJlZnVuZCJ9LCJhdHRlc3RhdGlvbiI6eyJlcG9jaCI6MCwibWVhc3VyZW1lbnQiOiIiLCJtb2RlbF9pZCI6InVuYXR0ZXN0ZWQiLCJvcGVyYXRvciI6InVuYXR0ZXN0ZWQiLCJxdW90ZV9kaWdlc3QiOiIifSwiYXVkIjoicnMtcHJvZHVjZXItdmVjdG9ycyIsImNhcF9jaGFpbiI6W3siYm9keV9kaWdlc3QiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiY2F2ZWF0cyI6W3siYWdlbnRfYmluZGluZyI6eyJvcGVyYXRvciI6ImFjbWUifSwiY2F2ZWF0cyI6W3sibGltaXQiOjEwLCJ0eXBlIjoiYnVkZ2V0X2FsbG9jIn1dLCJnb2FsX2NvbW1pdCI6Ik5wMTFMMDNKUzREbVpyd1V1X3N1anh2UGVsdHNfejE2Q1ozcEdyRDJrVWciLCJwcmVkaWNhdGVzIjpbeyJyZXNvdXJjZSI6Im9yZGVycy8qIiwidmVyYiI6InJlZnVuZCJ9LHsicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWFkIn0seyJyZXNvdXJjZSI6InVzZXJzLyoiLCJ2ZXJiIjoibm90aWZ5In1dLCJyaXNrX3BvbGljeSI6eyJiTWF4IjoxLCJrYXBwYSI6MSwibGFtYmRhIjowLjAwMDUsInJobyI6MC41LCJ0aGV0YTEiOjAuMjUsInRoZXRhMiI6MC42LCJ3ZWlnaHRzIjp7ImFscGhhIjowLjI1LCJiZXRhIjowLjIsImRlbHRhIjowLjIsImVwc2lsb24iOjAuMSwiZ2FtbWEiOjAuMiwiemV0YSI6MC4wNX19LCJ0eXBlIjoiZW52ZWxvcGUifV0sImhvbGRlciI6InJ1M29CRnA1WXNCZnpjbGdkSFREU0tLeWNYZUFCY2ZIUEEyVWlieFpMeUEiLCJpZCI6Ii1Jd2lkbXViLTh6cGFyRXU2dERLY3hWUWpFSzM0SFZTVGwxSERPQzFrSW8iLCJpc3N1ZXIiOiI1clYwTm01TDYyS3VYVktsMHhUTUZTUEJnOUVfNzR0eTJaV0lrMmc1R19FIiwic2lnIjoiNHR3alJXWkdmZDlxcnB1cjBDNW9TRldCbEprenJoV0VZZW5ZZUZkeXE2OXBYWUd0YzN5ZEZ1NjdWSEFYbGVnbVlXUWw0ZDRFZ1ZocjRjd0hJUHc4Q3cifV0sImNvdW50ZXIiOjEsImV4cCI6MTgwMDAwMTIwMDAwMCwiZnJlc2huZXNzIjp7ImFjY3VtdWxhdG9yX3dpdG5lc3MiOiIiLCJiZWFjb25fcmVmIjoiIiwiZXBvY2giOjB9LCJncmFudF9yZWYiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiaWF0IjoxODAwMDAwMDAwMDAwLCJub25jZSI6IndhNHNnNU9BejdrN0RvM0l2cktmYkEiLCJwbGFuIjp7ImNvbmRpdGlvbnNfZGlnZXN0IjoiWU04N0VnbW12QXI0V1lRRG0xd2tyQjdwRm9IczRlc2k4dE9tdjlfRFV4WSIsImluY2x1c2lvbl9wcm9vZiI6eyJpbmRleCI6MCwicGF0aCI6W3siaGFzaCI6IjBUczV1MUYzQU9XcWRhdllic19pSFlPbVN3cV9YalNteUNTR1BpcWJPdWsiLCJzaWRlIjoiUiJ9LHsiaGFzaCI6IkRWWUxuU0pzQ2NaTENQZUVOX3dheUZQMWpWblRMem5jXzloQVdJcUV3aVEiLCJzaWRlIjoiUiJ9XSwic2l6ZSI6M30sIm5vZGVfaWQiOiJuMSIsInJvb3QiOiJTQ0k5dk4yWDVydjF3R0ZZd2stOVBzanh0VDB3ckV3QmQ4am9MalVJY3RvIn0sInByb3ZlbmFuY2UiOnsiY2F1c2FsX2hhc2giOiIiLCJ0YWludF9sZXZlbCI6MCwidHJ1c3RlZF9yZWZzIjpbXX0sInJpc2tfY2xhaW0iOnsiaW5wdXRzIjp7fSwiciI6MH0sInNpZyI6Inhhc1IyTVpkTHo3b0xHdWY0WUp2bkhFYmhkZ2RZUEFvdklwdWtjUW1YbXhaaXg2cWM4OEQ0eGlGZHJhOHNsQnB0bW9UbEpYdDBDUU56eW1kTldyZUFBIiwidmVyIjoyfQ"
+      }
+    },
+    {
+      "name": "act-attenuated-caution",
+      "op": "act",
+      "args": {
+        "aud": "rs-producer-vectors",
+        "iat": 1800000000000,
+        "exp": 1800001200000,
+        "params": {
+          "amount_cents": 500,
+          "currency": "USD"
+        },
+        "plan": [
+          {
+            "id": "n1",
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          {
+            "id": "n2",
+            "verb": "read",
+            "resource": "orders/1"
+          },
+          {
+            "id": "n3",
+            "verb": "notify",
+            "resource": "users/9",
+            "pre": {
+              "exists": true
+            },
+            "post": {
+              "sent": true
+            }
+          }
+        ],
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "chain": [
+          {
+            "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              }
+            ],
+            "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+          },
+          {
+            "id": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              },
+              {
+                "limit": 5,
+                "type": "budget_alloc"
+              }
+            ],
+            "body_digest": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+            "sig": "Veohp0RTlD6d2iPpc_VZf5UFtx_HqIrDFc5C4ui2_BXM60ceFZWgl26KPSIjcIWfqSmRFN6GVShwTs7UxmZYDA",
+            "parent": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI"
+          }
+        ],
+        "node_id": "n1",
+        "counter": 2,
+        "signer": "agent",
+        "nonce": "j6hlzB3vH7SA5O8anKWjEA",
+        "caution": 0.25
+      },
+      "expect": {
+        "pcactn": {
+          "ver": 2,
+          "action": {
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          "grant_ref": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "cap_chain": [
+            {
+              "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                }
+              ],
+              "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+            },
+            {
+              "id": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+              "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                },
+                {
+                  "limit": 5,
+                  "type": "budget_alloc"
+                }
+              ],
+              "body_digest": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+              "sig": "Veohp0RTlD6d2iPpc_VZf5UFtx_HqIrDFc5C4ui2_BXM60ceFZWgl26KPSIjcIWfqSmRFN6GVShwTs7UxmZYDA",
+              "parent": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI"
+            }
+          ],
+          "plan": {
+            "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+            "inclusion_proof": {
+              "index": 0,
+              "size": 3,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "0Ts5u1F3AOWqdavYbs_iHYOmSwq_XjSmyCSGPiqbOuk"
+                },
+                {
+                  "side": "R",
+                  "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+                }
+              ]
+            },
+            "node_id": "n1",
+            "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+          },
+          "attestation": {
+            "quote_digest": "",
+            "epoch": 0,
+            "model_id": "unattested",
+            "measurement": "",
+            "operator": "unattested"
+          },
+          "provenance": {
+            "causal_hash": "",
+            "taint_level": 0,
+            "trusted_refs": []
+          },
+          "freshness": {
+            "beacon_ref": "",
+            "epoch": 0,
+            "accumulator_witness": ""
+          },
+          "counter": 2,
+          "risk_claim": {
+            "r": 0,
+            "inputs": {}
+          },
+          "aud": "rs-producer-vectors",
+          "iat": 1800000000000,
+          "exp": 1800001200000,
+          "nonce": "j6hlzB3vH7SA5O8anKWjEA",
+          "caution": 0.25,
+          "sig": "ipYmjO57DWAjKKIYapCBzhdqg6WXkyRPDoahkNphIm3I-rDr1erCOeL2ssF0YI0P4ARd-UmGcDRkpv25gPiXAg"
+        },
+        "threshold_message": "YXRsYXMtcGNhL2FjdG4vdjIAWE8RmP4AI08TT6l7LphJjK-H8RU-3fJC5K8JngJcv04",
+        "header": "eyJhY3Rpb24iOnsicGFyYW1zX2RpZ2VzdCI6IkhjOGg5Vjg2V3J4M0NhdzJoRmw2ck9xUkRnLW9kUWtRXzFiY1dMaG1TQ1UiLCJyZXNvdXJjZSI6Im9yZGVycy8xIiwicmV2ZXJzaWJpbGl0eV9jbGFzcyI6ImNvbXBlbnNhYmxlIiwidmVyYiI6InJlZnVuZCJ9LCJhdHRlc3RhdGlvbiI6eyJlcG9jaCI6MCwibWVhc3VyZW1lbnQiOiIiLCJtb2RlbF9pZCI6InVuYXR0ZXN0ZWQiLCJvcGVyYXRvciI6InVuYXR0ZXN0ZWQiLCJxdW90ZV9kaWdlc3QiOiIifSwiYXVkIjoicnMtcHJvZHVjZXItdmVjdG9ycyIsImNhcF9jaGFpbiI6W3siYm9keV9kaWdlc3QiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiY2F2ZWF0cyI6W3siYWdlbnRfYmluZGluZyI6eyJvcGVyYXRvciI6ImFjbWUifSwiY2F2ZWF0cyI6W3sibGltaXQiOjEwLCJ0eXBlIjoiYnVkZ2V0X2FsbG9jIn1dLCJnb2FsX2NvbW1pdCI6Ik5wMTFMMDNKUzREbVpyd1V1X3N1anh2UGVsdHNfejE2Q1ozcEdyRDJrVWciLCJwcmVkaWNhdGVzIjpbeyJyZXNvdXJjZSI6Im9yZGVycy8qIiwidmVyYiI6InJlZnVuZCJ9LHsicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWFkIn0seyJyZXNvdXJjZSI6InVzZXJzLyoiLCJ2ZXJiIjoibm90aWZ5In1dLCJyaXNrX3BvbGljeSI6eyJiTWF4IjoxLCJrYXBwYSI6MSwibGFtYmRhIjowLjAwMDUsInJobyI6MC41LCJ0aGV0YTEiOjAuMjUsInRoZXRhMiI6MC42LCJ3ZWlnaHRzIjp7ImFscGhhIjowLjI1LCJiZXRhIjowLjIsImRlbHRhIjowLjIsImVwc2lsb24iOjAuMSwiZ2FtbWEiOjAuMiwiemV0YSI6MC4wNX19LCJ0eXBlIjoiZW52ZWxvcGUifV0sImhvbGRlciI6InJ1M29CRnA1WXNCZnpjbGdkSFREU0tLeWNYZUFCY2ZIUEEyVWlieFpMeUEiLCJpZCI6Ii1Jd2lkbXViLTh6cGFyRXU2dERLY3hWUWpFSzM0SFZTVGwxSERPQzFrSW8iLCJpc3N1ZXIiOiI1clYwTm01TDYyS3VYVktsMHhUTUZTUEJnOUVfNzR0eTJaV0lrMmc1R19FIiwic2lnIjoiNHR3alJXWkdmZDlxcnB1cjBDNW9TRldCbEprenJoV0VZZW5ZZUZkeXE2OXBYWUd0YzN5ZEZ1NjdWSEFYbGVnbVlXUWw0ZDRFZ1ZocjRjd0hJUHc4Q3cifSx7ImJvZHlfZGlnZXN0IjoiQ3NWM08yQzU1NEc5ckNHTXRLOFZ4SVpFVUY5Y1lhaW9SaDBqb2xCS29KTSIsImNhdmVhdHMiOlt7ImFnZW50X2JpbmRpbmciOnsib3BlcmF0b3IiOiJhY21lIn0sImNhdmVhdHMiOlt7ImxpbWl0IjoxMCwidHlwZSI6ImJ1ZGdldF9hbGxvYyJ9XSwiZ29hbF9jb21taXQiOiJOcDExTDAzSlM0RG1acndVdV9zdWp4dlBlbHRzX3oxNkNaM3BHckQya1VnIiwicHJlZGljYXRlcyI6W3sicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWZ1bmQifSx7InJlc291cmNlIjoib3JkZXJzLyoiLCJ2ZXJiIjoicmVhZCJ9LHsicmVzb3VyY2UiOiJ1c2Vycy8qIiwidmVyYiI6Im5vdGlmeSJ9XSwicmlza19wb2xpY3kiOnsiYk1heCI6MSwia2FwcGEiOjEsImxhbWJkYSI6MC4wMDA1LCJyaG8iOjAuNSwidGhldGExIjowLjI1LCJ0aGV0YTIiOjAuNiwid2VpZ2h0cyI6eyJhbHBoYSI6MC4yNSwiYmV0YSI6MC4yLCJkZWx0YSI6MC4yLCJlcHNpbG9uIjowLjEsImdhbW1hIjowLjIsInpldGEiOjAuMDV9fSwidHlwZSI6ImVudmVsb3BlIn0seyJsaW1pdCI6NSwidHlwZSI6ImJ1ZGdldF9hbGxvYyJ9XSwiaG9sZGVyIjoicnUzb0JGcDVZc0JmemNsZ2RIVERTS0t5Y1hlQUJjZkhQQTJVaWJ4Wkx5QSIsImlkIjoiQ3NWM08yQzU1NEc5ckNHTXRLOFZ4SVpFVUY5Y1lhaW9SaDBqb2xCS29KTSIsImlzc3VlciI6InJ1M29CRnA1WXNCZnpjbGdkSFREU0tLeWNYZUFCY2ZIUEEyVWlieFpMeUEiLCJwYXJlbnQiOiJLQzQ1VklNNjNpSjBnOWFOS3pCVUdCbkJIUjNHeUZEaUJMV2hiMkViRHBJIiwic2lnIjoiVmVvaHAwUlRsRDZkMmlQcGNfVlpmNVVGdHhfSHFJckRGYzVDNHVpMl9CWE02MGNlRlpXZ2wyNktQU0lqY0lXZnFTbVJGTjZHVlNod1RzN1V4bVpZREEifV0sImNhdXRpb24iOjAuMjUsImNvdW50ZXIiOjIsImV4cCI6MTgwMDAwMTIwMDAwMCwiZnJlc2huZXNzIjp7ImFjY3VtdWxhdG9yX3dpdG5lc3MiOiIiLCJiZWFjb25fcmVmIjoiIiwiZXBvY2giOjB9LCJncmFudF9yZWYiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiaWF0IjoxODAwMDAwMDAwMDAwLCJub25jZSI6Imo2aGx6QjN2SDdTQTVPOGFuS1dqRUEiLCJwbGFuIjp7ImNvbmRpdGlvbnNfZGlnZXN0IjoiWU04N0VnbW12QXI0V1lRRG0xd2tyQjdwRm9IczRlc2k4dE9tdjlfRFV4WSIsImluY2x1c2lvbl9wcm9vZiI6eyJpbmRleCI6MCwicGF0aCI6W3siaGFzaCI6IjBUczV1MUYzQU9XcWRhdllic19pSFlPbVN3cV9YalNteUNTR1BpcWJPdWsiLCJzaWRlIjoiUiJ9LHsiaGFzaCI6IkRWWUxuU0pzQ2NaTENQZUVOX3dheUZQMWpWblRMem5jXzloQVdJcUV3aVEiLCJzaWRlIjoiUiJ9XSwic2l6ZSI6M30sIm5vZGVfaWQiOiJuMSIsInJvb3QiOiJTQ0k5dk4yWDVydjF3R0ZZd2stOVBzanh0VDB3ckV3QmQ4am9MalVJY3RvIn0sInByb3ZlbmFuY2UiOnsiY2F1c2FsX2hhc2giOiIiLCJ0YWludF9sZXZlbCI6MCwidHJ1c3RlZF9yZWZzIjpbXX0sInJpc2tfY2xhaW0iOnsiaW5wdXRzIjp7fSwiciI6MH0sInNpZyI6ImlwWW1qTzU3RFdBaktLSVlhcENCemhkcWc2V1hreVJQRG9haGtOcGhJbTNJLXJEcjFlckNPZUwyc3NGMFlJMFA0QVJkLVVtR2NEUmtwdjI1Z1BpWEFnIiwidmVyIjoyfQ"
+      }
+    },
+    {
+      "name": "act-subagent-no-params",
+      "op": "act",
+      "args": {
+        "aud": "rs-producer-vectors",
+        "iat": 1800000000000,
+        "exp": 1800001200000,
+        "plan": [
+          {
+            "id": "n1",
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          {
+            "id": "n2",
+            "verb": "read",
+            "resource": "orders/1"
+          },
+          {
+            "id": "n3",
+            "verb": "notify",
+            "resource": "users/9",
+            "pre": {
+              "exists": true
+            },
+            "post": {
+              "sent": true
+            }
+          }
+        ],
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "chain": [
+          {
+            "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              }
+            ],
+            "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+          },
+          {
+            "id": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              },
+              {
+                "limit": 5,
+                "type": "budget_alloc"
+              }
+            ],
+            "body_digest": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+            "sig": "Veohp0RTlD6d2iPpc_VZf5UFtx_HqIrDFc5C4ui2_BXM60ceFZWgl26KPSIjcIWfqSmRFN6GVShwTs7UxmZYDA",
+            "parent": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI"
+          },
+          {
+            "id": "TYI8Wp6mZMICkBrPTkeeO2aX5JsNf6ka_stSgAHi37I",
+            "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              },
+              {
+                "limit": 5,
+                "type": "budget_alloc"
+              },
+              {
+                "type": "sealed"
+              }
+            ],
+            "body_digest": "TYI8Wp6mZMICkBrPTkeeO2aX5JsNf6ka_stSgAHi37I",
+            "sig": "oASpwma8qKQ-FK4zrkYo7ezdP6JJEDyHaO-9a3cishWN-qRxhdkDeiLwkbjg59Zt60e7Ga-2a4i6RxoN44ZlAw",
+            "parent": "UJWmdiTR1QJzOVFts7w53Tcq7iQiHSBo4KiN9jHB0UY"
+          }
+        ],
+        "node_id": "n2",
+        "counter": 1,
+        "signer": "subagent"
+      },
+      "expect": {
+        "pcactn": {
+          "ver": 2,
+          "action": {
+            "verb": "read",
+            "resource": "orders/1",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility_class": "reversible"
+          },
+          "grant_ref": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "cap_chain": [
+            {
+              "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                }
+              ],
+              "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+            },
+            {
+              "id": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+              "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                },
+                {
+                  "limit": 5,
+                  "type": "budget_alloc"
+                }
+              ],
+              "body_digest": "CsV3O2C554G9rCGMtK8VxIZEUF9cYaioRh0jolBKoJM",
+              "sig": "Veohp0RTlD6d2iPpc_VZf5UFtx_HqIrDFc5C4ui2_BXM60ceFZWgl26KPSIjcIWfqSmRFN6GVShwTs7UxmZYDA",
+              "parent": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI"
+            },
+            {
+              "id": "TYI8Wp6mZMICkBrPTkeeO2aX5JsNf6ka_stSgAHi37I",
+              "issuer": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "holder": "lrmcHAqrMvwOKbvuPYzLz1rGEpqdRWrFtrbFxqvIu70",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                },
+                {
+                  "limit": 5,
+                  "type": "budget_alloc"
+                },
+                {
+                  "type": "sealed"
+                }
+              ],
+              "body_digest": "TYI8Wp6mZMICkBrPTkeeO2aX5JsNf6ka_stSgAHi37I",
+              "sig": "oASpwma8qKQ-FK4zrkYo7ezdP6JJEDyHaO-9a3cishWN-qRxhdkDeiLwkbjg59Zt60e7Ga-2a4i6RxoN44ZlAw",
+              "parent": "UJWmdiTR1QJzOVFts7w53Tcq7iQiHSBo4KiN9jHB0UY"
+            }
+          ],
+          "plan": {
+            "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+            "inclusion_proof": {
+              "index": 1,
+              "size": 3,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "uAyp8HwTHgFFdyI96PAl8qDNucNF78MtgM-yQH8WryI"
+                },
+                {
+                  "side": "R",
+                  "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+                }
+              ]
+            },
+            "node_id": "n2",
+            "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+          },
+          "attestation": {
+            "quote_digest": "",
+            "epoch": 0,
+            "model_id": "unattested",
+            "measurement": "",
+            "operator": "unattested"
+          },
+          "provenance": {
+            "causal_hash": "",
+            "taint_level": 0,
+            "trusted_refs": []
+          },
+          "freshness": {
+            "beacon_ref": "",
+            "epoch": 0,
+            "accumulator_witness": ""
+          },
+          "counter": 1,
+          "risk_claim": {
+            "r": 0,
+            "inputs": {}
+          },
+          "aud": "rs-producer-vectors",
+          "iat": 1800000000000,
+          "exp": 1800001200000,
+          "sig": "vFvq8Jd63C-IMkEIy30srj2ng6_2RBoEphRBP-ZRnGfi7h2p-_FNKROkM1BdHdKIyfS50KiOD8z66NmPzeksDQ"
+        },
+        "threshold_message": "YXRsYXMtcGNhL2FjdG4vdjIAl50Kzp4VmGgax647II9U7pfPJUCsqEIBfK89OTIA7kM",
+        "header": "eyJhY3Rpb24iOnsicGFyYW1zX2RpZ2VzdCI6IlJCTnZvMVd6WjRvUlJxMFc5LWhrbnBUN1Q4SWY1MzZERU1CZzloeXFfNG8iLCJyZXNvdXJjZSI6Im9yZGVycy8xIiwicmV2ZXJzaWJpbGl0eV9jbGFzcyI6InJldmVyc2libGUiLCJ2ZXJiIjoicmVhZCJ9LCJhdHRlc3RhdGlvbiI6eyJlcG9jaCI6MCwibWVhc3VyZW1lbnQiOiIiLCJtb2RlbF9pZCI6InVuYXR0ZXN0ZWQiLCJvcGVyYXRvciI6InVuYXR0ZXN0ZWQiLCJxdW90ZV9kaWdlc3QiOiIifSwiYXVkIjoicnMtcHJvZHVjZXItdmVjdG9ycyIsImNhcF9jaGFpbiI6W3siYm9keV9kaWdlc3QiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiY2F2ZWF0cyI6W3siYWdlbnRfYmluZGluZyI6eyJvcGVyYXRvciI6ImFjbWUifSwiY2F2ZWF0cyI6W3sibGltaXQiOjEwLCJ0eXBlIjoiYnVkZ2V0X2FsbG9jIn1dLCJnb2FsX2NvbW1pdCI6Ik5wMTFMMDNKUzREbVpyd1V1X3N1anh2UGVsdHNfejE2Q1ozcEdyRDJrVWciLCJwcmVkaWNhdGVzIjpbeyJyZXNvdXJjZSI6Im9yZGVycy8qIiwidmVyYiI6InJlZnVuZCJ9LHsicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWFkIn0seyJyZXNvdXJjZSI6InVzZXJzLyoiLCJ2ZXJiIjoibm90aWZ5In1dLCJyaXNrX3BvbGljeSI6eyJiTWF4IjoxLCJrYXBwYSI6MSwibGFtYmRhIjowLjAwMDUsInJobyI6MC41LCJ0aGV0YTEiOjAuMjUsInRoZXRhMiI6MC42LCJ3ZWlnaHRzIjp7ImFscGhhIjowLjI1LCJiZXRhIjowLjIsImRlbHRhIjowLjIsImVwc2lsb24iOjAuMSwiZ2FtbWEiOjAuMiwiemV0YSI6MC4wNX19LCJ0eXBlIjoiZW52ZWxvcGUifV0sImhvbGRlciI6InJ1M29CRnA1WXNCZnpjbGdkSFREU0tLeWNYZUFCY2ZIUEEyVWlieFpMeUEiLCJpZCI6Ii1Jd2lkbXViLTh6cGFyRXU2dERLY3hWUWpFSzM0SFZTVGwxSERPQzFrSW8iLCJpc3N1ZXIiOiI1clYwTm01TDYyS3VYVktsMHhUTUZTUEJnOUVfNzR0eTJaV0lrMmc1R19FIiwic2lnIjoiNHR3alJXWkdmZDlxcnB1cjBDNW9TRldCbEprenJoV0VZZW5ZZUZkeXE2OXBYWUd0YzN5ZEZ1NjdWSEFYbGVnbVlXUWw0ZDRFZ1ZocjRjd0hJUHc4Q3cifSx7ImJvZHlfZGlnZXN0IjoiQ3NWM08yQzU1NEc5ckNHTXRLOFZ4SVpFVUY5Y1lhaW9SaDBqb2xCS29KTSIsImNhdmVhdHMiOlt7ImFnZW50X2JpbmRpbmciOnsib3BlcmF0b3IiOiJhY21lIn0sImNhdmVhdHMiOlt7ImxpbWl0IjoxMCwidHlwZSI6ImJ1ZGdldF9hbGxvYyJ9XSwiZ29hbF9jb21taXQiOiJOcDExTDAzSlM0RG1acndVdV9zdWp4dlBlbHRzX3oxNkNaM3BHckQya1VnIiwicHJlZGljYXRlcyI6W3sicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWZ1bmQifSx7InJlc291cmNlIjoib3JkZXJzLyoiLCJ2ZXJiIjoicmVhZCJ9LHsicmVzb3VyY2UiOiJ1c2Vycy8qIiwidmVyYiI6Im5vdGlmeSJ9XSwicmlza19wb2xpY3kiOnsiYk1heCI6MSwia2FwcGEiOjEsImxhbWJkYSI6MC4wMDA1LCJyaG8iOjAuNSwidGhldGExIjowLjI1LCJ0aGV0YTIiOjAuNiwid2VpZ2h0cyI6eyJhbHBoYSI6MC4yNSwiYmV0YSI6MC4yLCJkZWx0YSI6MC4yLCJlcHNpbG9uIjowLjEsImdhbW1hIjowLjIsInpldGEiOjAuMDV9fSwidHlwZSI6ImVudmVsb3BlIn0seyJsaW1pdCI6NSwidHlwZSI6ImJ1ZGdldF9hbGxvYyJ9XSwiaG9sZGVyIjoicnUzb0JGcDVZc0JmemNsZ2RIVERTS0t5Y1hlQUJjZkhQQTJVaWJ4Wkx5QSIsImlkIjoiQ3NWM08yQzU1NEc5ckNHTXRLOFZ4SVpFVUY5Y1lhaW9SaDBqb2xCS29KTSIsImlzc3VlciI6InJ1M29CRnA1WXNCZnpjbGdkSFREU0tLeWNYZUFCY2ZIUEEyVWlieFpMeUEiLCJwYXJlbnQiOiJLQzQ1VklNNjNpSjBnOWFOS3pCVUdCbkJIUjNHeUZEaUJMV2hiMkViRHBJIiwic2lnIjoiVmVvaHAwUlRsRDZkMmlQcGNfVlpmNVVGdHhfSHFJckRGYzVDNHVpMl9CWE02MGNlRlpXZ2wyNktQU0lqY0lXZnFTbVJGTjZHVlNod1RzN1V4bVpZREEifSx7ImJvZHlfZGlnZXN0IjoiVFlJOFdwNm1aTUlDa0JyUFRrZWVPMmFYNUpzTmY2a2Ffc3RTZ0FIaTM3SSIsImNhdmVhdHMiOlt7ImFnZW50X2JpbmRpbmciOnsib3BlcmF0b3IiOiJhY21lIn0sImNhdmVhdHMiOlt7ImxpbWl0IjoxMCwidHlwZSI6ImJ1ZGdldF9hbGxvYyJ9XSwiZ29hbF9jb21taXQiOiJOcDExTDAzSlM0RG1acndVdV9zdWp4dlBlbHRzX3oxNkNaM3BHckQya1VnIiwicHJlZGljYXRlcyI6W3sicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWZ1bmQifSx7InJlc291cmNlIjoib3JkZXJzLyoiLCJ2ZXJiIjoicmVhZCJ9LHsicmVzb3VyY2UiOiJ1c2Vycy8qIiwidmVyYiI6Im5vdGlmeSJ9XSwicmlza19wb2xpY3kiOnsiYk1heCI6MSwia2FwcGEiOjEsImxhbWJkYSI6MC4wMDA1LCJyaG8iOjAuNSwidGhldGExIjowLjI1LCJ0aGV0YTIiOjAuNiwid2VpZ2h0cyI6eyJhbHBoYSI6MC4yNSwiYmV0YSI6MC4yLCJkZWx0YSI6MC4yLCJlcHNpbG9uIjowLjEsImdhbW1hIjowLjIsInpldGEiOjAuMDV9fSwidHlwZSI6ImVudmVsb3BlIn0seyJsaW1pdCI6NSwidHlwZSI6ImJ1ZGdldF9hbGxvYyJ9LHsidHlwZSI6InNlYWxlZCJ9XSwiaG9sZGVyIjoibHJtY0hBcXJNdndPS2J2dVBZekx6MXJHRXBxZFJXckZ0cmJGeHF2SXU3MCIsImlkIjoiVFlJOFdwNm1aTUlDa0JyUFRrZWVPMmFYNUpzTmY2a2Ffc3RTZ0FIaTM3SSIsImlzc3VlciI6InJ1M29CRnA1WXNCZnpjbGdkSFREU0tLeWNYZUFCY2ZIUEEyVWlieFpMeUEiLCJwYXJlbnQiOiJVSldtZGlUUjFRSnpPVkZ0czd3NTNUY3E3aVFpSFNCbzRLaU45akhCMFVZIiwic2lnIjoib0FTcHdtYThxS1EtRks0enJrWW83ZXpkUDZKSkVEeUhhTy05YTNjaXNoV04tcVJ4aGRrRGVpTHdrYmpnNTladDYwZTdHYS0yYTRpNlJ4b040NFpsQXcifV0sImNvdW50ZXIiOjEsImV4cCI6MTgwMDAwMTIwMDAwMCwiZnJlc2huZXNzIjp7ImFjY3VtdWxhdG9yX3dpdG5lc3MiOiIiLCJiZWFjb25fcmVmIjoiIiwiZXBvY2giOjB9LCJncmFudF9yZWYiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiaWF0IjoxODAwMDAwMDAwMDAwLCJwbGFuIjp7ImNvbmRpdGlvbnNfZGlnZXN0IjoiWU04N0VnbW12QXI0V1lRRG0xd2tyQjdwRm9IczRlc2k4dE9tdjlfRFV4WSIsImluY2x1c2lvbl9wcm9vZiI6eyJpbmRleCI6MSwicGF0aCI6W3siaGFzaCI6InVBeXA4SHdUSGdGRmR5STk2UEFsOHFETnVjTkY3OE10Z00teVFIOFdyeUkiLCJzaWRlIjoiTCJ9LHsiaGFzaCI6IkRWWUxuU0pzQ2NaTENQZUVOX3dheUZQMWpWblRMem5jXzloQVdJcUV3aVEiLCJzaWRlIjoiUiJ9XSwic2l6ZSI6M30sIm5vZGVfaWQiOiJuMiIsInJvb3QiOiJTQ0k5dk4yWDVydjF3R0ZZd2stOVBzanh0VDB3ckV3QmQ4am9MalVJY3RvIn0sInByb3ZlbmFuY2UiOnsiY2F1c2FsX2hhc2giOiIiLCJ0YWludF9sZXZlbCI6MCwidHJ1c3RlZF9yZWZzIjpbXX0sInJpc2tfY2xhaW0iOnsiaW5wdXRzIjp7fSwiciI6MH0sInNpZyI6InZGdnE4SmQ2M0MtSU1rRUl5MzBzcmoybmc2XzJSQm9FcGhSQlAtWlJuR2ZpN2gycC1fRk5LUk9rTTFCZEhkS0l5ZlM1MEtpT0Q4ejY2Tm1QemVrc0RRIiwidmVyIjoyfQ"
+      }
+    },
+    {
+      "name": "act-pre-post-conditions",
+      "op": "act",
+      "args": {
+        "aud": "rs-producer-vectors",
+        "iat": 1800000000000,
+        "exp": 1800001200000,
+        "plan": [
+          {
+            "id": "n1",
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          {
+            "id": "n2",
+            "verb": "read",
+            "resource": "orders/1"
+          },
+          {
+            "id": "n3",
+            "verb": "notify",
+            "resource": "users/9",
+            "pre": {
+              "exists": true
+            },
+            "post": {
+              "sent": true
+            }
+          }
+        ],
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "chain": [
+          {
+            "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              }
+            ],
+            "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+          }
+        ],
+        "node_id": "n3",
+        "counter": 7,
+        "signer": "agent",
+        "rationale_commitment": "K-I8WF8V5f0yedBmMDbdn25jT0Il7zJvyD-4dNu4Gg8",
+        "tool_binding": "fJu-Xsmz-3dOj6D1QkfpPDTd-OXRb-MHNCDeCugaJi0"
+      },
+      "expect": {
+        "pcactn": {
+          "ver": 2,
+          "action": {
+            "verb": "notify",
+            "resource": "users/9",
+            "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+            "reversibility_class": "reversible"
+          },
+          "grant_ref": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "cap_chain": [
+            {
+              "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                }
+              ],
+              "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+            }
+          ],
+          "plan": {
+            "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+            "inclusion_proof": {
+              "index": 2,
+              "size": 3,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "COh-_RyU9cMGflnTAtVMY3IZZWiG3W1ithzfK6Z01jk"
+                }
+              ]
+            },
+            "node_id": "n3",
+            "conditions_digest": "NiAs4D2IR6tDKo91x1eU61i1zdXZvHDzGVUI-2aDnZo"
+          },
+          "attestation": {
+            "quote_digest": "",
+            "epoch": 0,
+            "model_id": "unattested",
+            "measurement": "",
+            "operator": "unattested"
+          },
+          "provenance": {
+            "causal_hash": "",
+            "taint_level": 0,
+            "trusted_refs": []
+          },
+          "freshness": {
+            "beacon_ref": "",
+            "epoch": 0,
+            "accumulator_witness": ""
+          },
+          "counter": 7,
+          "risk_claim": {
+            "r": 0,
+            "inputs": {}
+          },
+          "aud": "rs-producer-vectors",
+          "iat": 1800000000000,
+          "exp": 1800001200000,
+          "rationale_commitment": "K-I8WF8V5f0yedBmMDbdn25jT0Il7zJvyD-4dNu4Gg8",
+          "tool_binding": "fJu-Xsmz-3dOj6D1QkfpPDTd-OXRb-MHNCDeCugaJi0",
+          "sig": "94xjN4vUEXEWxE61PtrJcxmuD5UYTviMUut4tkPD2jffL6rxnn9L98rkpFevmLvBOiVlORJIIoWq7UHrylYxCg"
+        },
+        "threshold_message": "YXRsYXMtcGNhL2FjdG4vdjIAyGuOvsJjRBvwRcZnbnvd5gn3Z8hu6IpriVqPRxUECj0",
+        "header": "eyJhY3Rpb24iOnsicGFyYW1zX2RpZ2VzdCI6IlJCTnZvMVd6WjRvUlJxMFc5LWhrbnBUN1Q4SWY1MzZERU1CZzloeXFfNG8iLCJyZXNvdXJjZSI6InVzZXJzLzkiLCJyZXZlcnNpYmlsaXR5X2NsYXNzIjoicmV2ZXJzaWJsZSIsInZlcmIiOiJub3RpZnkifSwiYXR0ZXN0YXRpb24iOnsiZXBvY2giOjAsIm1lYXN1cmVtZW50IjoiIiwibW9kZWxfaWQiOiJ1bmF0dGVzdGVkIiwib3BlcmF0b3IiOiJ1bmF0dGVzdGVkIiwicXVvdGVfZGlnZXN0IjoiIn0sImF1ZCI6InJzLXByb2R1Y2VyLXZlY3RvcnMiLCJjYXBfY2hhaW4iOlt7ImJvZHlfZGlnZXN0IjoiLUl3aWRtdWItOHpwYXJFdTZ0REtjeFZRakVLMzRIVlNUbDFIRE9DMWtJbyIsImNhdmVhdHMiOlt7ImFnZW50X2JpbmRpbmciOnsib3BlcmF0b3IiOiJhY21lIn0sImNhdmVhdHMiOlt7ImxpbWl0IjoxMCwidHlwZSI6ImJ1ZGdldF9hbGxvYyJ9XSwiZ29hbF9jb21taXQiOiJOcDExTDAzSlM0RG1acndVdV9zdWp4dlBlbHRzX3oxNkNaM3BHckQya1VnIiwicHJlZGljYXRlcyI6W3sicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWZ1bmQifSx7InJlc291cmNlIjoib3JkZXJzLyoiLCJ2ZXJiIjoicmVhZCJ9LHsicmVzb3VyY2UiOiJ1c2Vycy8qIiwidmVyYiI6Im5vdGlmeSJ9XSwicmlza19wb2xpY3kiOnsiYk1heCI6MSwia2FwcGEiOjEsImxhbWJkYSI6MC4wMDA1LCJyaG8iOjAuNSwidGhldGExIjowLjI1LCJ0aGV0YTIiOjAuNiwid2VpZ2h0cyI6eyJhbHBoYSI6MC4yNSwiYmV0YSI6MC4yLCJkZWx0YSI6MC4yLCJlcHNpbG9uIjowLjEsImdhbW1hIjowLjIsInpldGEiOjAuMDV9fSwidHlwZSI6ImVudmVsb3BlIn1dLCJob2xkZXIiOiJydTNvQkZwNVlzQmZ6Y2xnZEhURFNLS3ljWGVBQmNmSFBBMlVpYnhaTHlBIiwiaWQiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiaXNzdWVyIjoiNXJWME5tNUw2Mkt1WFZLbDB4VE1GU1BCZzlFXzc0dHkyWldJazJnNUdfRSIsInNpZyI6IjR0d2pSV1pHZmQ5cXJwdXIwQzVvU0ZXQmxKa3pyaFdFWWVuWWVGZHlxNjlwWFlHdGMzeWRGdTY3VkhBWGxlZ21ZV1FsNGQ0RWdWaHI0Y3dISVB3OEN3In1dLCJjb3VudGVyIjo3LCJleHAiOjE4MDAwMDEyMDAwMDAsImZyZXNobmVzcyI6eyJhY2N1bXVsYXRvcl93aXRuZXNzIjoiIiwiYmVhY29uX3JlZiI6IiIsImVwb2NoIjowfSwiZ3JhbnRfcmVmIjoiLUl3aWRtdWItOHpwYXJFdTZ0REtjeFZRakVLMzRIVlNUbDFIRE9DMWtJbyIsImlhdCI6MTgwMDAwMDAwMDAwMCwicGxhbiI6eyJjb25kaXRpb25zX2RpZ2VzdCI6Ik5pQXM0RDJJUjZ0REtvOTF4MWVVNjFpMXpkWFp2SER6R1ZVSS0yYURuWm8iLCJpbmNsdXNpb25fcHJvb2YiOnsiaW5kZXgiOjIsInBhdGgiOlt7Imhhc2giOiJDT2gtX1J5VTljTUdmbG5UQXRWTVkzSVpaV2lHM1cxaXRoemZLNlowMWprIiwic2lkZSI6IkwifV0sInNpemUiOjN9LCJub2RlX2lkIjoibjMiLCJyb290IjoiU0NJOXZOMlg1cnYxd0dGWXdrLTlQc2p4dFQwd3JFd0JkOGpvTGpVSWN0byJ9LCJwcm92ZW5hbmNlIjp7ImNhdXNhbF9oYXNoIjoiIiwidGFpbnRfbGV2ZWwiOjAsInRydXN0ZWRfcmVmcyI6W119LCJyYXRpb25hbGVfY29tbWl0bWVudCI6IkstSThXRjhWNWYweWVkQm1NRGJkbjI1alQwSWw3ekp2eUQtNGROdTRHZzgiLCJyaXNrX2NsYWltIjp7ImlucHV0cyI6e30sInIiOjB9LCJzaWciOiI5NHhqTjR2VUVYRVd4RTYxUHRySmN4bXVENVVZVHZpTVV1dDR0a1BEMmpmZkw2cnhubjlMOThya3BGZXZtTHZCT2lWbE9SSklJb1dxN1VIcnlsWXhDZyIsInRvb2xfYmluZGluZyI6ImZKdS1Yc216LTNkT2o2RDFRa2ZwUERUZC1PWFJiLU1ITkNEZUN1Z2FKaTAiLCJ2ZXIiOjJ9"
+      }
+    },
+    {
+      "name": "fresh-at-token",
+      "op": "fresh_at",
+      "args": {
+        "signer": "rs",
+        "scope": "inst_1",
+        "state": {
+          "revocation_epoch": 3,
+          "ledger_tree_size": 40,
+          "budget_version": 7,
+          "policy_revision": 2,
+          "policy_digest": "pol-2"
+        },
+        "issued_at": 1800000000000
+      },
+      "expect": {
+        "v": 1,
+        "scope": "inst_1",
+        "revocation_epoch": 3,
+        "ledger_tree_size": 40,
+        "budget_version": 7,
+        "policy_revision": 2,
+        "policy_digest": "pol-2",
+        "issued_at": 1800000000000,
+        "signer": "tdcbFsEYJ4SqTOn8_zZkuNLhIF48YsSzvdcEcciuXVM",
+        "sig": "tguyqFHn_QwL-Q_sLNcMGqJ7oGrn-tE5n1SgEJeqf_jy3g0AdhcmBcIm1HoQ2ESOp0b7OBjqgiLSyACnQqFqCQ"
+      }
+    },
+    {
+      "name": "act-fresh-at-member",
+      "op": "act",
+      "args": {
+        "aud": "rs-producer-vectors",
+        "iat": 1800000000000,
+        "exp": 1800001200000,
+        "params": {
+          "amount_cents": 500,
+          "currency": "USD"
+        },
+        "plan": [
+          {
+            "id": "n1",
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          {
+            "id": "n2",
+            "verb": "read",
+            "resource": "orders/1"
+          },
+          {
+            "id": "n3",
+            "verb": "notify",
+            "resource": "users/9",
+            "pre": {
+              "exists": true
+            },
+            "post": {
+              "sent": true
+            }
+          }
+        ],
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "chain": [
+          {
+            "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+            "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+            "caveats": [
+              {
+                "agent_binding": {
+                  "operator": "acme"
+                },
+                "caveats": [
+                  {
+                    "limit": 10,
+                    "type": "budget_alloc"
+                  }
+                ],
+                "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                "predicates": [
+                  {
+                    "resource": "orders/*",
+                    "verb": "refund"
+                  },
+                  {
+                    "resource": "orders/*",
+                    "verb": "read"
+                  },
+                  {
+                    "resource": "users/*",
+                    "verb": "notify"
+                  }
+                ],
+                "risk_policy": {
+                  "bMax": 1,
+                  "kappa": 1,
+                  "lambda": 0.0005,
+                  "rho": 0.5,
+                  "theta1": 0.25,
+                  "theta2": 0.6,
+                  "weights": {
+                    "alpha": 0.25,
+                    "beta": 0.2,
+                    "delta": 0.2,
+                    "epsilon": 0.1,
+                    "gamma": 0.2,
+                    "zeta": 0.05
+                  }
+                },
+                "type": "envelope"
+              }
+            ],
+            "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+            "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+          }
+        ],
+        "node_id": "n1",
+        "counter": 3,
+        "signer": "agent",
+        "fresh_at": {
+          "v": 1,
+          "scope": "inst_1",
+          "revocation_epoch": 3,
+          "ledger_tree_size": 40,
+          "budget_version": 7,
+          "policy_revision": 2,
+          "policy_digest": "pol-2",
+          "issued_at": 1800000000000,
+          "signer": "tdcbFsEYJ4SqTOn8_zZkuNLhIF48YsSzvdcEcciuXVM",
+          "sig": "tguyqFHn_QwL-Q_sLNcMGqJ7oGrn-tE5n1SgEJeqf_jy3g0AdhcmBcIm1HoQ2ESOp0b7OBjqgiLSyACnQqFqCQ"
+        }
+      },
+      "expect": {
+        "pcactn": {
+          "ver": 2,
+          "action": {
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          "grant_ref": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "cap_chain": [
+            {
+              "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                }
+              ],
+              "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+            }
+          ],
+          "plan": {
+            "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+            "inclusion_proof": {
+              "index": 0,
+              "size": 3,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "0Ts5u1F3AOWqdavYbs_iHYOmSwq_XjSmyCSGPiqbOuk"
+                },
+                {
+                  "side": "R",
+                  "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+                }
+              ]
+            },
+            "node_id": "n1",
+            "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+          },
+          "attestation": {
+            "quote_digest": "",
+            "epoch": 0,
+            "model_id": "unattested",
+            "measurement": "",
+            "operator": "unattested"
+          },
+          "provenance": {
+            "causal_hash": "",
+            "taint_level": 0,
+            "trusted_refs": []
+          },
+          "freshness": {
+            "beacon_ref": "",
+            "epoch": 0,
+            "accumulator_witness": ""
+          },
+          "counter": 3,
+          "risk_claim": {
+            "r": 0,
+            "inputs": {}
+          },
+          "aud": "rs-producer-vectors",
+          "iat": 1800000000000,
+          "exp": 1800001200000,
+          "fresh_at": {
+            "v": 1,
+            "scope": "inst_1",
+            "revocation_epoch": 3,
+            "ledger_tree_size": 40,
+            "budget_version": 7,
+            "policy_revision": 2,
+            "policy_digest": "pol-2",
+            "issued_at": 1800000000000,
+            "signer": "tdcbFsEYJ4SqTOn8_zZkuNLhIF48YsSzvdcEcciuXVM",
+            "sig": "tguyqFHn_QwL-Q_sLNcMGqJ7oGrn-tE5n1SgEJeqf_jy3g0AdhcmBcIm1HoQ2ESOp0b7OBjqgiLSyACnQqFqCQ"
+          },
+          "sig": "8X707IIJgHEXcuyciF6tTyXn8V1C80zXIKrP27mrn-ETcYyPjk9QCtJG9nQ9yL31VHKVw8RqFoC-Vn3pBaf4Aw"
+        },
+        "threshold_message": "YXRsYXMtcGNhL2FjdG4vdjIAKORDF7ABFzLDuCazvrVViOGFjkYCRTZL-5_cPbChix0",
+        "header": "eyJhY3Rpb24iOnsicGFyYW1zX2RpZ2VzdCI6IkhjOGg5Vjg2V3J4M0NhdzJoRmw2ck9xUkRnLW9kUWtRXzFiY1dMaG1TQ1UiLCJyZXNvdXJjZSI6Im9yZGVycy8xIiwicmV2ZXJzaWJpbGl0eV9jbGFzcyI6ImNvbXBlbnNhYmxlIiwidmVyYiI6InJlZnVuZCJ9LCJhdHRlc3RhdGlvbiI6eyJlcG9jaCI6MCwibWVhc3VyZW1lbnQiOiIiLCJtb2RlbF9pZCI6InVuYXR0ZXN0ZWQiLCJvcGVyYXRvciI6InVuYXR0ZXN0ZWQiLCJxdW90ZV9kaWdlc3QiOiIifSwiYXVkIjoicnMtcHJvZHVjZXItdmVjdG9ycyIsImNhcF9jaGFpbiI6W3siYm9keV9kaWdlc3QiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiY2F2ZWF0cyI6W3siYWdlbnRfYmluZGluZyI6eyJvcGVyYXRvciI6ImFjbWUifSwiY2F2ZWF0cyI6W3sibGltaXQiOjEwLCJ0eXBlIjoiYnVkZ2V0X2FsbG9jIn1dLCJnb2FsX2NvbW1pdCI6Ik5wMTFMMDNKUzREbVpyd1V1X3N1anh2UGVsdHNfejE2Q1ozcEdyRDJrVWciLCJwcmVkaWNhdGVzIjpbeyJyZXNvdXJjZSI6Im9yZGVycy8qIiwidmVyYiI6InJlZnVuZCJ9LHsicmVzb3VyY2UiOiJvcmRlcnMvKiIsInZlcmIiOiJyZWFkIn0seyJyZXNvdXJjZSI6InVzZXJzLyoiLCJ2ZXJiIjoibm90aWZ5In1dLCJyaXNrX3BvbGljeSI6eyJiTWF4IjoxLCJrYXBwYSI6MSwibGFtYmRhIjowLjAwMDUsInJobyI6MC41LCJ0aGV0YTEiOjAuMjUsInRoZXRhMiI6MC42LCJ3ZWlnaHRzIjp7ImFscGhhIjowLjI1LCJiZXRhIjowLjIsImRlbHRhIjowLjIsImVwc2lsb24iOjAuMSwiZ2FtbWEiOjAuMiwiemV0YSI6MC4wNX19LCJ0eXBlIjoiZW52ZWxvcGUifV0sImhvbGRlciI6InJ1M29CRnA1WXNCZnpjbGdkSFREU0tLeWNYZUFCY2ZIUEEyVWlieFpMeUEiLCJpZCI6Ii1Jd2lkbXViLTh6cGFyRXU2dERLY3hWUWpFSzM0SFZTVGwxSERPQzFrSW8iLCJpc3N1ZXIiOiI1clYwTm01TDYyS3VYVktsMHhUTUZTUEJnOUVfNzR0eTJaV0lrMmc1R19FIiwic2lnIjoiNHR3alJXWkdmZDlxcnB1cjBDNW9TRldCbEprenJoV0VZZW5ZZUZkeXE2OXBYWUd0YzN5ZEZ1NjdWSEFYbGVnbVlXUWw0ZDRFZ1ZocjRjd0hJUHc4Q3cifV0sImNvdW50ZXIiOjMsImV4cCI6MTgwMDAwMTIwMDAwMCwiZnJlc2hfYXQiOnsiYnVkZ2V0X3ZlcnNpb24iOjcsImlzc3VlZF9hdCI6MTgwMDAwMDAwMDAwMCwibGVkZ2VyX3RyZWVfc2l6ZSI6NDAsInBvbGljeV9kaWdlc3QiOiJwb2wtMiIsInBvbGljeV9yZXZpc2lvbiI6MiwicmV2b2NhdGlvbl9lcG9jaCI6Mywic2NvcGUiOiJpbnN0XzEiLCJzaWciOiJ0Z3V5cUZIbl9Rd0wtUV9zTE5jTUdxSjdvR3JuLXRFNW4xU2dFSmVxZl9qeTNnMEFkaGNtQmNJbTFIb1EyRVNPcDBiN09CanFnaUxTeUFDblFxRnFDUSIsInNpZ25lciI6InRkY2JGc0VZSjRTcVRPbjhfelprdU5MaElGNDhZc1N6dmRjRWNjaXVYVk0iLCJ2IjoxfSwiZnJlc2huZXNzIjp7ImFjY3VtdWxhdG9yX3dpdG5lc3MiOiIiLCJiZWFjb25fcmVmIjoiIiwiZXBvY2giOjB9LCJncmFudF9yZWYiOiItSXdpZG11Yi04enBhckV1NnRES2N4VlFqRUszNEhWU1RsMUhET0Mxa0lvIiwiaWF0IjoxODAwMDAwMDAwMDAwLCJwbGFuIjp7ImNvbmRpdGlvbnNfZGlnZXN0IjoiWU04N0VnbW12QXI0V1lRRG0xd2tyQjdwRm9IczRlc2k4dE9tdjlfRFV4WSIsImluY2x1c2lvbl9wcm9vZiI6eyJpbmRleCI6MCwicGF0aCI6W3siaGFzaCI6IjBUczV1MUYzQU9XcWRhdllic19pSFlPbVN3cV9YalNteUNTR1BpcWJPdWsiLCJzaWRlIjoiUiJ9LHsiaGFzaCI6IkRWWUxuU0pzQ2NaTENQZUVOX3dheUZQMWpWblRMem5jXzloQVdJcUV3aVEiLCJzaWRlIjoiUiJ9XSwic2l6ZSI6M30sIm5vZGVfaWQiOiJuMSIsInJvb3QiOiJTQ0k5dk4yWDVydjF3R0ZZd2stOVBzanh0VDB3ckV3QmQ4am9MalVJY3RvIn0sInByb3ZlbmFuY2UiOnsiY2F1c2FsX2hhc2giOiIiLCJ0YWludF9sZXZlbCI6MCwidHJ1c3RlZF9yZWZzIjpbXX0sInJpc2tfY2xhaW0iOnsiaW5wdXRzIjp7fSwiciI6MH0sInNpZyI6IjhYNzA3SUlKZ0hFWGN1eWNpRjZ0VHlYbjhWMUM4MHpYSUtyUDI3bXJuLUVUY1l5UGprOVFDdEpHOW5ROXlMMzFWSEtWdzhScUZvQy1WbjNwQmFmNEF3IiwidmVyIjoyfQ"
+      }
+    },
+    {
+      "name": "escalation-digests",
+      "op": "escalation_digests",
+      "args": {
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "pcactn": {
+          "ver": 2,
+          "action": {
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          "grant_ref": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "cap_chain": [
+            {
+              "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                }
+              ],
+              "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+            }
+          ],
+          "plan": {
+            "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+            "inclusion_proof": {
+              "index": 0,
+              "size": 3,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "0Ts5u1F3AOWqdavYbs_iHYOmSwq_XjSmyCSGPiqbOuk"
+                },
+                {
+                  "side": "R",
+                  "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+                }
+              ]
+            },
+            "node_id": "n1",
+            "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+          },
+          "attestation": {
+            "quote_digest": "",
+            "epoch": 0,
+            "model_id": "unattested",
+            "measurement": "",
+            "operator": "unattested"
+          },
+          "provenance": {
+            "causal_hash": "",
+            "taint_level": 0,
+            "trusted_refs": []
+          },
+          "freshness": {
+            "beacon_ref": "",
+            "epoch": 0,
+            "accumulator_witness": ""
+          },
+          "counter": 1,
+          "risk_claim": {
+            "r": 0,
+            "inputs": {}
+          },
+          "aud": "rs-producer-vectors",
+          "iat": 1800000000000,
+          "exp": 1800001200000,
+          "nonce": "wa4sg5OAz7k7Do3IvrKfbA",
+          "sig": "xasR2MZdLz7oLGuf4YJvnHEbhdgdYPAovIpukcQmXmxZix6qc88D4xiFdra8slBptmoTlJXt0CQNzymdNWreAA"
+        },
+        "last_counter": 0
+      },
+      "expect": {
+        "policy_digest": "hTMwQ2Lfqgo4PNbOfqHV3x6N0UfwsHU5w0K6sU4AAxU",
+        "action_digest": "5qoUdZG6zH4fs7FLAJPByltBgB3KcB64gPLSyb0b2C0",
+        "history_head": "JEkox_RFnMVQRypEQhmBIFo0XcmouDEcLM4fb7c63WI"
+      }
+    },
+    {
+      "name": "escalation-digests-no-history",
+      "op": "escalation_digests",
+      "args": {
+        "grant": {
+          "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "agent_binding": {
+                "operator": "acme"
+              },
+              "caveats": [
+                {
+                  "limit": 10,
+                  "type": "budget_alloc"
+                }
+              ],
+              "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+              "predicates": [
+                {
+                  "resource": "orders/*",
+                  "verb": "refund"
+                },
+                {
+                  "resource": "orders/*",
+                  "verb": "read"
+                },
+                {
+                  "resource": "users/*",
+                  "verb": "notify"
+                }
+              ],
+              "risk_policy": {
+                "bMax": 1,
+                "kappa": 1,
+                "lambda": 0.0005,
+                "rho": 0.5,
+                "theta1": 0.25,
+                "theta2": 0.6,
+                "weights": {
+                  "alpha": 0.25,
+                  "beta": 0.2,
+                  "delta": 0.2,
+                  "epsilon": 0.1,
+                  "gamma": 0.2,
+                  "zeta": 0.05
+                }
+              },
+              "type": "envelope"
+            }
+          ],
+          "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+        },
+        "pcactn": {
+          "ver": 2,
+          "action": {
+            "verb": "refund",
+            "resource": "orders/1",
+            "params_digest": "Hc8h9V86Wrx3Caw2hFl6rOqRDg-odQkQ_1bcWLhmSCU",
+            "reversibility_class": "compensable"
+          },
+          "grant_ref": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+          "cap_chain": [
+            {
+              "id": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "issuer": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+              "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+              "caveats": [
+                {
+                  "agent_binding": {
+                    "operator": "acme"
+                  },
+                  "caveats": [
+                    {
+                      "limit": 10,
+                      "type": "budget_alloc"
+                    }
+                  ],
+                  "goal_commit": "Np11L03JS4DmZrwUu_sujxvPelts_z16CZ3pGrD2kUg",
+                  "predicates": [
+                    {
+                      "resource": "orders/*",
+                      "verb": "refund"
+                    },
+                    {
+                      "resource": "orders/*",
+                      "verb": "read"
+                    },
+                    {
+                      "resource": "users/*",
+                      "verb": "notify"
+                    }
+                  ],
+                  "risk_policy": {
+                    "bMax": 1,
+                    "kappa": 1,
+                    "lambda": 0.0005,
+                    "rho": 0.5,
+                    "theta1": 0.25,
+                    "theta2": 0.6,
+                    "weights": {
+                      "alpha": 0.25,
+                      "beta": 0.2,
+                      "delta": 0.2,
+                      "epsilon": 0.1,
+                      "gamma": 0.2,
+                      "zeta": 0.05
+                    }
+                  },
+                  "type": "envelope"
+                }
+              ],
+              "body_digest": "-Iwidmub-8zparEu6tDKcxVQjEK34HVSTl1HDOC1kIo",
+              "sig": "4twjRWZGfd9qrpur0C5oSFWBlJkzrhWEYenYeFdyq69pXYGtc3ydFu67VHAXlegmYWQl4d4EgVhr4cwHIPw8Cw"
+            }
+          ],
+          "plan": {
+            "root": "SCI9vN2X5rv1wGFYwk-9PsjxtT0wrEwBd8joLjUIcto",
+            "inclusion_proof": {
+              "index": 0,
+              "size": 3,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "0Ts5u1F3AOWqdavYbs_iHYOmSwq_XjSmyCSGPiqbOuk"
+                },
+                {
+                  "side": "R",
+                  "hash": "DVYLnSJsCcZLCPeEN_wayFP1jVnTLznc_9hAWIqEwiQ"
+                }
+              ]
+            },
+            "node_id": "n1",
+            "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+          },
+          "attestation": {
+            "quote_digest": "",
+            "epoch": 0,
+            "model_id": "unattested",
+            "measurement": "",
+            "operator": "unattested"
+          },
+          "provenance": {
+            "causal_hash": "",
+            "taint_level": 0,
+            "trusted_refs": []
+          },
+          "freshness": {
+            "beacon_ref": "",
+            "epoch": 0,
+            "accumulator_witness": ""
+          },
+          "counter": 1,
+          "risk_claim": {
+            "r": 0,
+            "inputs": {}
+          },
+          "aud": "rs-producer-vectors",
+          "iat": 1800000000000,
+          "exp": 1800001200000,
+          "nonce": "wa4sg5OAz7k7Do3IvrKfbA",
+          "sig": "xasR2MZdLz7oLGuf4YJvnHEbhdgdYPAovIpukcQmXmxZix6qc88D4xiFdra8slBptmoTlJXt0CQNzymdNWreAA"
+        },
+        "last_counter": null
+      },
+      "expect": {
+        "policy_digest": "hTMwQ2Lfqgo4PNbOfqHV3x6N0UfwsHU5w0K6sU4AAxU",
+        "action_digest": "5qoUdZG6zH4fs7FLAJPByltBgB3KcB64gPLSyb0b2C0",
+        "history_head": "m79tWPGOXM6PibN8Dhix2rNkEIcDv_v3yZRjG3IZNlw"
+      }
+    },
+    {
+      "name": "escalation-answer-allow",
+      "op": "sign_escalation_answer",
+      "args": {
+        "signer": "approver",
+        "body": {
+          "v": 1,
+          "kind": "pca-escalation-answer",
+          "principal": "JJdsZ6_oGNWzP9DPrc60wZlEJztvDaG7KRqZz-zsol0",
+          "policy_digest": "hTMwQ2Lfqgo4PNbOfqHV3x6N0UfwsHU5w0K6sU4AAxU",
+          "action_digest": "5qoUdZG6zH4fs7FLAJPByltBgB3KcB64gPLSyb0b2C0",
+          "history_head": "JEkox_RFnMVQRypEQhmBIFo0XcmouDEcLM4fb7c63WI",
+          "decision": "allow",
+          "iat": 1800000000000,
+          "expires_at": 1800000600000,
+          "nonce": "vMzQuI4lO5s_vdTSH-O9TA"
+        }
+      },
+      "expect": {
+        "v": 1,
+        "kind": "pca-escalation-answer",
+        "principal": "JJdsZ6_oGNWzP9DPrc60wZlEJztvDaG7KRqZz-zsol0",
+        "policy_digest": "hTMwQ2Lfqgo4PNbOfqHV3x6N0UfwsHU5w0K6sU4AAxU",
+        "action_digest": "5qoUdZG6zH4fs7FLAJPByltBgB3KcB64gPLSyb0b2C0",
+        "history_head": "JEkox_RFnMVQRypEQhmBIFo0XcmouDEcLM4fb7c63WI",
+        "decision": "allow",
+        "iat": 1800000000000,
+        "expires_at": 1800000600000,
+        "nonce": "vMzQuI4lO5s_vdTSH-O9TA",
+        "sig": "RfO8_SXx073O2FYuAe-1B5j8qqCKpPTHxIN6kzhtMtwa7df-WhHOceuGlerHgTYyuH8hDOFqSsZh60XbAk_9Bg"
+      }
+    },
+    {
+      "name": "escalation-answer-deny-render",
+      "op": "sign_escalation_answer",
+      "args": {
+        "signer": "approver",
+        "body": {
+          "v": 1,
+          "kind": "pca-escalation-answer",
+          "principal": "JJdsZ6_oGNWzP9DPrc60wZlEJztvDaG7KRqZz-zsol0",
+          "policy_digest": "hTMwQ2Lfqgo4PNbOfqHV3x6N0UfwsHU5w0K6sU4AAxU",
+          "action_digest": "5qoUdZG6zH4fs7FLAJPByltBgB3KcB64gPLSyb0b2C0",
+          "history_head": "JEkox_RFnMVQRypEQhmBIFo0XcmouDEcLM4fb7c63WI",
+          "decision": "deny",
+          "iat": 1800000000000,
+          "expires_at": 1800000600000,
+          "nonce": "xkoNIkdAD6T0UyHH01Gi4A",
+          "render_digest": "iHJw0MvFYK818TJtVenb3DXqIwHCzSZjP7bUky3u4mg"
+        }
+      },
+      "expect": {
+        "v": 1,
+        "kind": "pca-escalation-answer",
+        "principal": "JJdsZ6_oGNWzP9DPrc60wZlEJztvDaG7KRqZz-zsol0",
+        "policy_digest": "hTMwQ2Lfqgo4PNbOfqHV3x6N0UfwsHU5w0K6sU4AAxU",
+        "action_digest": "5qoUdZG6zH4fs7FLAJPByltBgB3KcB64gPLSyb0b2C0",
+        "history_head": "JEkox_RFnMVQRypEQhmBIFo0XcmouDEcLM4fb7c63WI",
+        "decision": "deny",
+        "iat": 1800000000000,
+        "expires_at": 1800000600000,
+        "nonce": "xkoNIkdAD6T0UyHH01Gi4A",
+        "render_digest": "iHJw0MvFYK818TJtVenb3DXqIwHCzSZjP7bUky3u4mg",
+        "sig": "Dj8Ew7DXOZInGSymVnnp-PZOMW4DAFmToHPXplNN1nEig8y1Iim5e4uff5TCnIa9SrA0788A8z9AK-kZPgaKCg"
+      }
+    },
+    {
+      "name": "discharge-chain-hop",
+      "op": "sign_discharge",
+      "args": {
+        "signer": "issuer3p",
+        "body": {
+          "v": 1,
+          "kind": "pca-discharge",
+          "caveat_id": "kyc",
+          "issuer": "kyc-service",
+          "cap_hash": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI",
+          "bind": "chain_hop",
+          "claims": {
+            "kyc_level": 2,
+            "verified": true,
+            "region": "eu"
+          },
+          "iat": 1800000000000,
+          "not_after": 1800000300000,
+          "nonce": "4v8JVy9m_cI6gta4PrONSw"
+        }
+      },
+      "expect": {
+        "v": 1,
+        "kind": "pca-discharge",
+        "caveat_id": "kyc",
+        "issuer": "kyc-service",
+        "cap_hash": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI",
+        "bind": "chain_hop",
+        "claims": {
+          "kyc_level": 2,
+          "verified": true,
+          "region": "eu"
+        },
+        "iat": 1800000000000,
+        "not_after": 1800000300000,
+        "nonce": "4v8JVy9m_cI6gta4PrONSw",
+        "sig": "jBzQq_KW--vGeCM3EEBZJlNVI6uhxI5I491JT_PzKvAzlfAjinPLJ2W0ddfSSPC9PtaWlwTPr40Y_28p6XIjCg"
+      }
+    },
+    {
+      "name": "discharge-action-bound",
+      "op": "sign_discharge",
+      "args": {
+        "signer": "issuer3p",
+        "body": {
+          "v": 1,
+          "kind": "pca-discharge",
+          "caveat_id": "kyc",
+          "issuer": "kyc-service",
+          "cap_hash": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI",
+          "bind": "action",
+          "claims": {
+            "score": 90
+          },
+          "iat": 1800000000000,
+          "not_after": 1800000300000,
+          "nonce": "vneWKnzDlh0Qu241ieDQ2Q",
+          "action_digest": "aREjt8Jed2c3fDnVlYEO7JeLKBahDQVhHlZLQF95rV8"
+        }
+      },
+      "expect": {
+        "v": 1,
+        "kind": "pca-discharge",
+        "caveat_id": "kyc",
+        "issuer": "kyc-service",
+        "cap_hash": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI",
+        "bind": "action",
+        "claims": {
+          "score": 90
+        },
+        "iat": 1800000000000,
+        "not_after": 1800000300000,
+        "nonce": "vneWKnzDlh0Qu241ieDQ2Q",
+        "action_digest": "aREjt8Jed2c3fDnVlYEO7JeLKBahDQVhHlZLQF95rV8",
+        "sig": "r4Db434zD0jIJJS6_qA7CA9hLxhwqAZFLlKSmxSq1PxqTHIFoLklmFSxQmOgKFkARsIyQNucxNx50qwDLDFmAw"
+      }
+    },
+    {
+      "name": "discharge-ref",
+      "op": "discharge_digest",
+      "args": {
+        "discharge": {
+          "v": 1,
+          "kind": "pca-discharge",
+          "caveat_id": "kyc",
+          "issuer": "kyc-service",
+          "cap_hash": "KC45VIM63iJ0g9aNKzBUGBnBHR3GyFDiBLWhb2EbDpI",
+          "bind": "chain_hop",
+          "claims": {
+            "kyc_level": 2,
+            "verified": true,
+            "region": "eu"
+          },
+          "iat": 1800000000000,
+          "not_after": 1800000300000,
+          "nonce": "4v8JVy9m_cI6gta4PrONSw",
+          "sig": "jBzQq_KW--vGeCM3EEBZJlNVI6uhxI5I491JT_PzKvAzlfAjinPLJ2W0ddfSSPC9PtaWlwTPr40Y_28p6XIjCg"
+        }
+      },
+      "expect": {
+        "digest": "JMaHdAGtsQOEHVldaKuOWS_oUC6-y3eppMsGmNgvHRU"
+      }
+    },
+    {
+      "name": "narrow-self-attenuation",
+      "op": "sign_narrow",
+      "args": {
+        "signer": "agent",
+        "body": {
+          "v": 1,
+          "kind": "pca-narrow",
+          "cap_hash": "UJWmdiTR1QJzOVFts7w53Tcq7iQiHSBo4KiN9jHB0UY",
+          "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "caveats": [
+            {
+              "type": "expires",
+              "at": 1800000030000
+            }
+          ],
+          "iat": 1800000000000,
+          "not_after": 1800000060000,
+          "nonce": "QO2d4auRhWLKBl7lXp2A2g"
+        }
+      },
+      "expect": {
+        "v": 1,
+        "kind": "pca-narrow",
+        "cap_hash": "UJWmdiTR1QJzOVFts7w53Tcq7iQiHSBo4KiN9jHB0UY",
+        "holder": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+        "caveats": [
+          {
+            "type": "expires",
+            "at": 1800000030000
+          }
+        ],
+        "iat": 1800000000000,
+        "not_after": 1800000060000,
+        "nonce": "QO2d4auRhWLKBl7lXp2A2g",
+        "sig": "HW9Qh6vqffxpRbw8jm_hlWjrJVthIxr37KlNYkoUqnbTdJWm_9EzN1uqnBBdY5tCHXbqTKbxLjDwqxyX5xRiAw"
+      }
+    },
+    {
+      "name": "passport-sign",
+      "op": "sign_passport",
+      "args": {
+        "issuer": "principal",
+        "subject": "agent",
+        "identity": {
+          "model_id": "m1",
+          "weights_digest": "w1",
+          "operator": "acme",
+          "hardware_rooted": false,
+          "weights_measured": false,
+          "issued_at": 1799999999000
+        },
+        "exp": 1800003600000
+      },
+      "expect": {
+        "passport": {
+          "model_id": "m1",
+          "weights_digest": "w1",
+          "operator": "acme",
+          "hardware_rooted": false,
+          "weights_measured": false,
+          "issued_at": 1799999999000,
+          "id": "Gp9hn31eyJgTOfP0laCTH9aWXTEFDQo7fJ4f7gX2Iu0"
+        },
+        "signed": {
+          "typ": "atlas-pca/passport",
+          "ver": 1,
+          "passport": {
+            "model_id": "m1",
+            "weights_digest": "w1",
+            "operator": "acme",
+            "hardware_rooted": false,
+            "weights_measured": false,
+            "issued_at": 1799999999000,
+            "id": "Gp9hn31eyJgTOfP0laCTH9aWXTEFDQo7fJ4f7gX2Iu0"
+          },
+          "iss": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "sub": "ru3oBFp5YsBfzclgdHTDSKKycXeABcfHPA2UibxZLyA",
+          "iat": 1799999999000,
+          "nbf": 1799999999000,
+          "exp": 1800003600000,
+          "sig": "Fd6EOlmR0ii_kikcWhOLs-KzoZne4IlFbwsQLSZb2XaT_sxTHlXJRHLFdvqm7qsb5wzjL8GNGUDd7DIZD7O2AQ"
+        }
+      }
+    },
+    {
+      "name": "workflow-sign",
+      "op": "sign_workflow",
+      "args": {
+        "signer": "principal",
+        "body": {
+          "v": 1,
+          "id": "wf-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "goal_digest": null,
+          "plan_root": null,
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "steps": [
+            {
+              "id": "s1",
+              "verb": "pay",
+              "resource": "invoices/s1",
+              "params_digest": null,
+              "deps": [],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {}
+            },
+            {
+              "id": "s2",
+              "verb": "pay",
+              "resource": "invoices/s2",
+              "params_digest": null,
+              "deps": [
+                "s1"
+              ],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {
+                "pay": 1
+              }
+            }
+          ],
+          "edges": [
+            {
+              "from": {
+                "step": "s1",
+                "field": "amount"
+              },
+              "to": {
+                "step": "s2",
+                "param": "amount"
+              },
+              "op": "le",
+              "unit": "cents",
+              "deny_labels": [],
+              "promise": null
+            }
+          ],
+          "budget": {
+            "max_steps": 4,
+            "caps": {
+              "pay": 2
+            }
+          }
+        }
+      },
+      "expect": {
+        "body": {
+          "v": 1,
+          "id": "wf-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "goal_digest": null,
+          "plan_root": null,
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "steps": [
+            {
+              "id": "s1",
+              "verb": "pay",
+              "resource": "invoices/s1",
+              "params_digest": null,
+              "deps": [],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {}
+            },
+            {
+              "id": "s2",
+              "verb": "pay",
+              "resource": "invoices/s2",
+              "params_digest": null,
+              "deps": [
+                "s1"
+              ],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {
+                "pay": 1
+              }
+            }
+          ],
+          "edges": [
+            {
+              "from": {
+                "step": "s1",
+                "field": "amount"
+              },
+              "to": {
+                "step": "s2",
+                "param": "amount"
+              },
+              "op": "le",
+              "unit": "cents",
+              "deny_labels": [],
+              "promise": null
+            }
+          ],
+          "budget": {
+            "max_steps": 4,
+            "caps": {
+              "pay": 2
+            }
+          }
+        },
+        "sig": "4kbL8aRK5R9o2fRNwNo_ikof-XbX9BPjG8N53BE6SwZUQnvcRCKFmY7Jr9mSqTvwciHNDfJkK07TLENBjGSLBQ"
+      }
+    },
+    {
+      "name": "workflow-receipt-first",
+      "op": "sign_step_receipt",
+      "args": {
+        "signer": "rs",
+        "workflow": {
+          "v": 1,
+          "id": "wf-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "goal_digest": null,
+          "plan_root": null,
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "steps": [
+            {
+              "id": "s1",
+              "verb": "pay",
+              "resource": "invoices/s1",
+              "params_digest": null,
+              "deps": [],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {}
+            },
+            {
+              "id": "s2",
+              "verb": "pay",
+              "resource": "invoices/s2",
+              "params_digest": null,
+              "deps": [
+                "s1"
+              ],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {
+                "pay": 1
+              }
+            }
+          ],
+          "edges": [
+            {
+              "from": {
+                "step": "s1",
+                "field": "amount"
+              },
+              "to": {
+                "step": "s2",
+                "param": "amount"
+              },
+              "op": "le",
+              "unit": "cents",
+              "deny_labels": [],
+              "promise": null
+            }
+          ],
+          "budget": {
+            "max_steps": 4,
+            "caps": {
+              "pay": 2
+            }
+          }
+        },
+        "step": "s1",
+        "outcome": "ok",
+        "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+        "outputs": {
+          "amount": {
+            "digest": "39_lR5gFJkTGnwZmJkzZuzMLJLwyfT1vZqlDA7CKPwU",
+            "num": 400,
+            "unit": "cents",
+            "labels": []
+          }
+        },
+        "issued_at": 1800000001000,
+        "prev": null
+      },
+      "expect": {
+        "v": 1,
+        "wf": "8mRSNnLnKyDZAklqZICpjoRXyW3IJwKQViWjyXekRAA",
+        "step": "s1",
+        "seq": 0,
+        "prev": null,
+        "outcome": "ok",
+        "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+        "outputs": {
+          "amount": {
+            "digest": "39_lR5gFJkTGnwZmJkzZuzMLJLwyfT1vZqlDA7CKPwU",
+            "num": 400,
+            "unit": "cents",
+            "labels": []
+          }
+        },
+        "issued_at": 1800000001000,
+        "signer": "tdcbFsEYJ4SqTOn8_zZkuNLhIF48YsSzvdcEcciuXVM",
+        "sig": "6fZug0eaSEoHOEohXQ3R9QFTy1sNOjQrhugNGt81_wFZKlMkjyXvKG6os2WLrj7Axi85Kzn_85oJNHvDCmkXCg"
+      }
+    },
+    {
+      "name": "workflow-receipt-chained",
+      "op": "sign_step_receipt",
+      "args": {
+        "signer": "rs",
+        "workflow": {
+          "v": 1,
+          "id": "wf-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "goal_digest": null,
+          "plan_root": null,
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "steps": [
+            {
+              "id": "s1",
+              "verb": "pay",
+              "resource": "invoices/s1",
+              "params_digest": null,
+              "deps": [],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {}
+            },
+            {
+              "id": "s2",
+              "verb": "pay",
+              "resource": "invoices/s2",
+              "params_digest": null,
+              "deps": [
+                "s1"
+              ],
+              "sink": null,
+              "deny_labels": [],
+              "escalate_labels": [],
+              "fresh_ms": null,
+              "cost": {
+                "pay": 1
+              }
+            }
+          ],
+          "edges": [
+            {
+              "from": {
+                "step": "s1",
+                "field": "amount"
+              },
+              "to": {
+                "step": "s2",
+                "param": "amount"
+              },
+              "op": "le",
+              "unit": "cents",
+              "deny_labels": [],
+              "promise": null
+            }
+          ],
+          "budget": {
+            "max_steps": 4,
+            "caps": {
+              "pay": 2
+            }
+          }
+        },
+        "step": "s2",
+        "outcome": "failed",
+        "params_digest": "EgtbMQwSwHBbPkRiF54H-l5_buiSVNz0L7N6aimQPJw",
+        "outputs": {},
+        "issued_at": 1800000002000,
+        "prev": {
+          "v": 1,
+          "wf": "8mRSNnLnKyDZAklqZICpjoRXyW3IJwKQViWjyXekRAA",
+          "step": "s1",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "RBNvo1WzZ4oRRq0W9-hknpT7T8If536DEMBg9hyq_4o",
+          "outputs": {
+            "amount": {
+              "digest": "39_lR5gFJkTGnwZmJkzZuzMLJLwyfT1vZqlDA7CKPwU",
+              "num": 400,
+              "unit": "cents",
+              "labels": []
+            }
+          },
+          "issued_at": 1800000001000,
+          "signer": "tdcbFsEYJ4SqTOn8_zZkuNLhIF48YsSzvdcEcciuXVM",
+          "sig": "6fZug0eaSEoHOEohXQ3R9QFTy1sNOjQrhugNGt81_wFZKlMkjyXvKG6os2WLrj7Axi85Kzn_85oJNHvDCmkXCg"
+        }
+      },
+      "expect": {
+        "v": 1,
+        "wf": "8mRSNnLnKyDZAklqZICpjoRXyW3IJwKQViWjyXekRAA",
+        "step": "s2",
+        "seq": 1,
+        "prev": "cLMYg_MEFYzWl34oWImVtghOruQF_0DxzzxKbXrZ22c",
+        "outcome": "failed",
+        "params_digest": "EgtbMQwSwHBbPkRiF54H-l5_buiSVNz0L7N6aimQPJw",
+        "outputs": {},
+        "issued_at": 1800000002000,
+        "signer": "tdcbFsEYJ4SqTOn8_zZkuNLhIF48YsSzvdcEcciuXVM",
+        "sig": "ilLWf-Mgw67j_Vo6i-XiSlXu0MOTm3aJFG1UCdHgRSvb2p7btWbgR8Fmln_Vk7sdiXqIhphoO-K-rfvrhxohAA"
+      }
+    },
+    {
+      "name": "read-grant-sign",
+      "op": "sign_read_grant",
+      "args": {
+        "signer": "principal",
+        "body": {
+          "v": 1,
+          "id": "rg-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "reads": [
+            {
+              "verb": "read",
+              "resource_prefix": "customers/",
+              "purposes": [
+                "support"
+              ],
+              "modes": {
+                "email": "hash",
+                "ssn": "drop"
+              },
+              "default_mode": "show"
+            }
+          ],
+          "caps": {
+            "rows": 100
+          },
+          "sinks": {
+            "llm": {
+              "allow": [
+                "public"
+              ],
+              "escalate": [
+                "pii"
+              ]
+            }
+          }
+        }
+      },
+      "expect": {
+        "body": {
+          "v": 1,
+          "id": "rg-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "reads": [
+            {
+              "verb": "read",
+              "resource_prefix": "customers/",
+              "purposes": [
+                "support"
+              ],
+              "modes": {
+                "email": "hash",
+                "ssn": "drop"
+              },
+              "default_mode": "show"
+            }
+          ],
+          "caps": {
+            "rows": 100
+          },
+          "sinks": {
+            "llm": {
+              "allow": [
+                "public"
+              ],
+              "escalate": [
+                "pii"
+              ]
+            }
+          }
+        },
+        "sig": "uVdje7cjraoYae3vX3X79DgcEFpzEqwgpwCYHn34oqo1zE2xRTyrfuz-nn6UL2eWW1kGUgBsnjvrHfSVh4c6Aw"
+      }
+    },
+    {
+      "name": "aggregate-grant-sign",
+      "op": "sign_aggregate_grant",
+      "args": {
+        "signer": "principal",
+        "body": {
+          "v": 1,
+          "id": "ag-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "rules": [
+            {
+              "verb": "aggregate",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count",
+                "sum"
+              ],
+              "min_group": 5,
+              "clamp": 1000,
+              "epsilon_micro": 100000,
+              "dp": true
+            }
+          ],
+          "epsilon_budget_micro": 1000000,
+          "max_queries": 10
+        }
+      },
+      "expect": {
+        "body": {
+          "v": 1,
+          "id": "ag-1",
+          "principal": "5rV0Nm5L62KuXVKl0xTMFSPBg9E_74ty2ZWIk2g5G_E",
+          "issued_at": 1800000000000,
+          "expires_at": 1800003600000,
+          "rules": [
+            {
+              "verb": "aggregate",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count",
+                "sum"
+              ],
+              "min_group": 5,
+              "clamp": 1000,
+              "epsilon_micro": 100000,
+              "dp": true
+            }
+          ],
+          "epsilon_budget_micro": 1000000,
+          "max_queries": 10
+        },
+        "sig": "XCOam-U4WBydZifqAJ636HjM0rojLINa7kigfi8SwlhxbrdQDqj3z-LtAJRrobc8scXCVa84Ich1lSHxAnvFBQ"
+      }
+    }
+  ]
+}
