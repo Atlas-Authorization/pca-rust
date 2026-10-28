@@ -1,11 +1,28 @@
 # PCA release gate in a zkVM (RISC Zero)
 
-> Status: **experimental, unaudited, not published.**
+> Status: **not published; hardened, awaiting independent audit.**
 
 The Proof-Carrying Authority release decision (full predicate language, fixed-point risk,
 caveats, native SHA-256 commitments and an in-guest Ed25519 capability-chain check) runs inside a
 RISC Zero guest. The host produces a succinct receipt whose journal is the public statement
 (`allow`, `r_scaled`, `tier`, three commitments, `chain_verified`, and the evaluated `context`, see RT-06 below).
+
+## Rule 22 (action kit) in the guest source, pending the next re-pin
+
+`core/src/rule22.rs` and the version 2 branch of `core/src/action_schema.rs` port the action kit's rule 22: version 2 action schemas
+are accepted (shape, formats, `datetime` / `duration` / `object_ref`), the materialized floors and traits of a v2 schema are
+recomputed from the embedded 22-trait table and the document's own custom traits (`schema` fails with `schema_floor_forged` /
+`schema_traits_forged` / `unknown_trait` / `traits_digest_mismatch` / `bad_registry`), and a new `traits` check meets the floor
+decision of the verb against the grant (`envelope.caveats` kinds, `envelope.actions.{caveats,max_esc,preauth_esc}`) and the
+verifier-observed `ctx.call_context` into the decision (`escalate:` prefix for an escalation). The context validator also checks
+`call_context`, `actions` and `reviewers`. Packs and the semantic diff are host-side tooling and are not in the guest.
+Unconfirmed means maximally dangerous: a v2 verb counts as human-confirmed only with a valid signed `confirmation` (Ed25519 over
+`atlas-pca/action-review/v2\0` + strict canonical body, which includes the digest of the verb's own facts) by a key in the optional `ctx.reviewers` pins (`{keys: [{kid, pk, roles, not_before?, not_after?}], traits_digests?}`)
+with the `reviewer` role; any other verb must carry EVERY trait of its registry (`schema_traits_forged: unconfirmed action must
+carry every trait`). Absent pins = nothing is confirmed. Tested against the
+shared vectors (`core/tests/rule22_vectors.rs`). This is a change of guest semantics: the next guest rebuild is guest version 11
+(new image id, regenerated receipts and `public_journal.json`); until then the committed image is the version-10 one, which
+refuses every version 2 schema (fail closed), so its receipts remain sound.
 
 ## PCA 0.4.2 re-pin: `intentV2Active` fails closed (guest version 10, image id `432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060`)
 
@@ -155,7 +172,7 @@ variants (9 new: `r4_03_*`, `r4_04_*`, all with valid signatures). The round-3 r
 `fixtures/legacy/ce0b5423/`: they verify under their own id, do not decode as the current journal and are refused by
 `verify_with_context`. The statements below that cite `ce0b5423...cf1b`, "25 variants", "224418 bytes" or "5387 s" describe the
 round-3 build. Evidence: `core/tests/r4_regex_differential.rs` (7207 golden cases from the TS reference plus the 100k run in
-`redteam/round4/zk/differential-100k.result.txt`, 373,748 cases, 0 divergences), `core/tests/r4_tool_schema_fail_closed.rs`,
+the 100k differential run, 373,748 cases, 0 divergences), `core/tests/r4_tool_schema_fail_closed.rs`,
 `core/tests/r4_pcactn_freshness.rs`, `verify/tests/context_pinning.rs`.
 
 Still not covered (honest boundary): the strict wire form of `validateWireV2` (canonical numbers, caveat-count and size caps) is

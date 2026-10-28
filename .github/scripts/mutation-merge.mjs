@@ -40,7 +40,7 @@ for (let k = 1; k <= shards; k++) {
 }
 const tool = [...byShard.values()][0]?.tool ?? '?';
 console.log(`${crate}: ${tool}, ${byShard.size}/${shards} shard reports, counts ${JSON.stringify(totals)}, ${survivors.length} survivor(s)`);
-if (errors.length) { console.error(errors.join('\n')); console.error('FAIL: incomplete run'); summary('FAIL (incomplete run)'); process.exitCode = 1; }
+if (errors.length) { console.error(errors.join('\n')); console.error('FAIL: incomplete run'); summary('FAIL (incomplete run)'); evidence('fail', null); process.exitCode = 1; }
 else merge();
 
 function merge() {
@@ -69,6 +69,7 @@ const unlisted = (r.stderr ?? '').split('\n').filter((l) => l.startsWith('UNLIST
 const stale = (r.stderr ?? '').split('\n').filter((l) => l.startsWith('STALE')).length;
 console.log(`ledger entries for ${crate}: ${merged}; unlisted survivors: ${unlisted}; stale entries: ${stale}`);
 summary(rc === 0 ? 'PASS' : `FAIL (${unlisted} unlisted survivor(s), ${stale} stale entr${stale === 1 ? 'y' : 'ies'})`);
+evidence(rc === 0 ? 'pass' : 'fail', merged, { unlisted, stale });
 // exitCode, not process.exit(): exit() right after a large stderr write to a pipe drops the unflushed tail of the list
 process.exitCode = rc;
 }
@@ -78,4 +79,16 @@ function summary(verdict) {
   if (!f) return;
   const rows = Object.entries(totals).map(([s, n]) => `| ${s} | ${n} |`).join('\n');
   fs.appendFileSync(f, `### Mutation: ${crate} (${tool})\n\n**${verdict}**: ${survivors.length} survivor(s) over ${shards} shard(s)\n\n| status | mutants |\n|---|---|\n${rows}\n\n`);
+}
+
+// reports/mutation-summary.json: the merge result for the release evidence report (uploaded as the mutation-summary artifact).
+// score = detected / (detected + undetected) over the tool's counts (killed / caught / timeout vs survived / missed / no
+// tests); every undetected mutant of a passing merge is a listed equivalent.
+function evidence(verdict, listed, extra = {}) {
+  const sum = (re) => Object.entries(totals).filter(([k]) => re.test(k)).reduce((a, [, n]) => a + n, 0);
+  const det = sum(/^(killed|caught|timeout)$/i), und = sum(/^(survived|missed|no[ _-]?tests?|no[ _-]?coverage|nocov)$/i);
+  const score = det + und ? `${((100 * det) / (det + und)).toFixed(1)} %` : null;
+  fs.mkdirSync(reports, { recursive: true });
+  fs.writeFileSync(path.join(reports, 'mutation-summary.json'), JSON.stringify({ crate, tool, shards, shard_reports: byShard.size, verdict, score,
+    counts: totals, survivors: survivors.length, listed_equivalents: listed, ...extra }, null, 1) + '\n');
 }

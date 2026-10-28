@@ -1,5 +1,7 @@
 # stark-pca — a transparent STARK of the PCA release gate
 
+> Maturity: **hardened** (hardened, awaiting independent audit). The engineering is done and evidenced by tests, a constraint-ablation audit, a differential check against an exact integer reference and a second, independent implementation of the constraint system; it awaits an independent review of the AIR and of the in-AIR algebraic hash (a custom design), and it is **not zero-knowledge**. It is never production until that review is done, and its API may still change. See [maturity tiers](https://github.com/Atlas-Authorization/pca/blob/main/docs/maturity.md).
+
 Install: `cargo add stark-pca`
 
 A **genuine, verifiable STARK** (succinct, transparent, post-quantum) of the core *release decision* of Proof-Carrying
@@ -26,7 +28,7 @@ Security level (pinned options: 37 queries, blow-up 8, no extension): 110 bits c
 (list decoding), 30 bits proven (unique decoding). The conjectured figure rests on a proximity-gap conjecture; the
 proven figures are the honest lower bound.
 
-Winterfell version: **0.13.1**. Status: **0.4.3, unaudited.**
+Winterfell version: **0.13.1**. Status: **hardened, awaiting independent audit.**
 
 ---
 
@@ -45,7 +47,7 @@ scale `S`; the scale `S`; two opaque 256-bit commitments `policy_commitment`, `a
 commitment to the quantized action, which the AIR **constrains** (unlike the two opaque
 commitments, which it only transcript-binds). See the binding section below.
 
-**Private witnesses**: the six risk-magnitude inputs
+**Witness inputs (not hidden by this crate)**: the six risk-magnitude inputs
 `(d, rev, bl, taint, conf, age)` ∈ `[0, S]`; the trust budget `B` at scale `S`; a
 predicate-match bit `pm`; and a caveats-satisfied bit `co`.
 
@@ -153,9 +155,16 @@ cannot reach `0` and no proof exists. This soundness relies on the field order l
   watchdog (it found a process abort on a hostile nested length, now fixed); `tests/security_bits.rs` asserts the
   security level: 110 bits conjectured (floor 100), 54 (list decoding) and 30 (unique decoding) proven. Details in the
   security documentation.
+- **Second implementation and cell sweep.** `tests/independent_air.rs` transcribes the whole constraint system a second
+  time in plain modular integer arithmetic (no Winterfell types) and checks that its 88 transition values equal the
+  library AIR's on the honest traces and on random single-cell perturbations, then perturbs every one of the 56 x 64
+  trace cells five ways: a perturbed trace is accepted only if the intended statement still holds, and the only cells
+  that can change without breaking a constraint are the sixteen range-check bit cells of the last row, which no
+  transition reads. `tests/label.rs` pins the not-zero-knowledge label (the `ZERO_KNOWLEDGE` constant, the manifest,
+  the crate documentation and this file).
 - **Still not validated.** There is no external or official test-vector suite for this AIR, the
   construction has not been reviewed by a third party, and the in-AIR algebraic hash is a custom
-  design (not a standardized hash). The package remains experimental and unaudited.
+  design (not a standardized hash). The package remains hardened, awaiting independent audit.
 
 ---
 
@@ -227,7 +236,7 @@ setup-free** proof of the release decision and the fixed-point risk functional.
 ## Build, test, and regenerate fixtures
 
 ```bash
-cargo test --release                    # 15 tests: conformance, mutation, cross-check
+cargo test --release                    # conformance, mutation, soundness, independent-evaluator and label tests
 cargo run --release --bin gen_fixtures  # regenerate fixtures/
 ```
 

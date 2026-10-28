@@ -15,6 +15,7 @@ pub mod intent;
 pub mod jsnum;
 pub mod pq_suites;
 pub mod action_schema;
+pub mod rule22;
 pub mod intent_session;
 pub mod intent_acc;
 pub mod oracle_facts;
@@ -101,7 +102,9 @@ fn present<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<Value>, D::E
 /// 8 = PCA 0.4.1/0.4.2: root caveats outside the envelope are enforced and `max_spend` is implemented; 9 = PCA 0.4.2 R3-01:
 /// a PQ / hybrid session root verifies only under the verifier's pin (`intent_v2.session.pq_pins`); 10 = PCA 0.4.2 re-pin:
 /// `intent_v2_active` is also true for a present malformed v2 context (fail closed, as the reference), a guest rebuild with
-/// the same decision semantics.
+/// the same decision semantics. (Rule 22 / version 2 action schemas are in this source but NOT yet in a proven image: the rebuild
+/// that ships them is guest version 11 with a new image id and regenerated receipts; a version-10 image refuses every version 2
+/// schema, so its receipts stay sound and MIN_GUEST_VERSION stays 10.)
 pub const GUEST_VERSION: u32 = 10;
 /// The oldest guest semantics a verifier accepts. 9: a version-8 receipt may have admitted a pure-PQ / hybrid session root
 /// under the PQ key named in the root's own `principals[]` (anyone naming a principal could sign it), so it is refused; a

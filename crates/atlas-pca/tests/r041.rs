@@ -236,7 +236,7 @@ fn decode_pca_header_unit() {
 fn middleware_header_is_strict() {
     use atlas_pca::middleware::{verify_request, GuardConfig};
     let doc = load("vectors.json");
-    let cfg = GuardConfig::new("rs-conformance".to_string(), |_: &str| None);
+    let cfg = GuardConfig::new("rs-conformance".to_string(), |_: &str| None).with_signature_only();
     let mut bad = Vec::new();
     for c in section(&doc, "pca_header") {
         let name = c["name"].as_str().unwrap();

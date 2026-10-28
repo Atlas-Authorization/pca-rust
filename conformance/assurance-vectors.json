@@ -1,0 +1,1740 @@
+{
+  "format": 1,
+  "generator": "packages/pca/scripts/gen-conformance-native-parity.ts",
+  "suite": "assurance",
+  "layer": "extension",
+  "description": "Assurance labels and the high-assurance gate (T8, B7). `signature_level` (suite -> level); `report` (assuranceReport from checks, the presented PCActn alg / cap_chain algs / bond_ref, the verifier hooks labels {level, vendor?, preview?, ceremony?} or \"unlabelled\", the attestation hook that wins, thresholdT, allowUnboundPq, degraded); `requirement` (unmetAssurance(report, require) -> first unmet reason or null); `multi_root` (multiRootLevel). Labels come from the verifier configuration, never from the presented evidence. Reports and reasons are compared exactly (key order is irrelevant).",
+  "signature_level": [
+    {
+      "alg": "ed25519",
+      "level": "ed25519"
+    },
+    {
+      "alg": "ml-dsa-65",
+      "level": "pq"
+    },
+    {
+      "alg": "ml-dsa-87",
+      "level": "pq"
+    },
+    {
+      "alg": "hybrid-ed25519-ml-dsa-65",
+      "level": "hybrid"
+    },
+    {
+      "alg": "hybrid-ed25519-ml-dsa-87",
+      "level": "hybrid"
+    },
+    {
+      "alg": "hybrid-nested-ed25519-ml-dsa-65",
+      "level": "hybrid"
+    },
+    {
+      "alg": "slh-dsa-sha2-128f",
+      "level": "pq"
+    },
+    {
+      "alg": "hybrid-ed25519-slh-dsa-sha2-128f",
+      "level": "hybrid"
+    },
+    {
+      "alg": "slh-dsa-sha2-256s",
+      "level": "pq"
+    },
+    {
+      "alg": "hybrid-ed25519-slh-dsa-sha2-256s",
+      "level": "hybrid"
+    },
+    {
+      "alg": "no-such-suite",
+      "level": "unknown"
+    },
+    {
+      "alg": "",
+      "level": "unknown"
+    },
+    {
+      "alg": "ED25519",
+      "level": "unknown"
+    },
+    {
+      "alg": null,
+      "level": "ed25519"
+    }
+  ],
+  "report": [
+    {
+      "name": "plain-ed25519",
+      "checks": {
+        "leaf_signature": "pass",
+        "cap_chain": "pass",
+        "replay": "pass"
+      },
+      "pcactn": {
+        "cap_chain": [
+          {},
+          {}
+        ]
+      },
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      }
+    },
+    {
+      "name": "leaf-hybrid",
+      "checks": {
+        "leaf_signature": "pass"
+      },
+      "pcactn": {
+        "alg": "hybrid-ed25519-ml-dsa-65",
+        "cap_chain": []
+      },
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "hybrid-ed25519-ml-dsa-65"
+          ],
+          "level": "hybrid"
+        }
+      }
+    },
+    {
+      "name": "leaf-pure-pq",
+      "checks": {
+        "leaf_signature": "pass"
+      },
+      "pcactn": {
+        "alg": "ml-dsa-65"
+      },
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65"
+          ],
+          "level": "pq"
+        }
+      }
+    },
+    {
+      "name": "leaf-unknown-suite",
+      "checks": {
+        "leaf_signature": "pass"
+      },
+      "pcactn": {
+        "alg": "no-such-suite"
+      },
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "no-such-suite"
+          ],
+          "level": "unknown"
+        }
+      }
+    },
+    {
+      "name": "chain-weakest-wins",
+      "checks": {
+        "cap_chain": "pass"
+      },
+      "pcactn": {
+        "cap_chain": [
+          {
+            "alg": "ml-dsa-65"
+          },
+          {
+            "alg": "hybrid-ed25519-ml-dsa-65"
+          },
+          {}
+        ]
+      },
+      "report": {
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65",
+            "hybrid-ed25519-ml-dsa-65",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        }
+      }
+    },
+    {
+      "name": "chain-all-pq",
+      "checks": {
+        "cap_chain": "pass"
+      },
+      "pcactn": {
+        "cap_chain": [
+          {
+            "alg": "ml-dsa-65"
+          },
+          {
+            "alg": "ml-dsa-87"
+          }
+        ]
+      },
+      "report": {
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65",
+            "ml-dsa-87"
+          ],
+          "level": "pq"
+        }
+      }
+    },
+    {
+      "name": "chain-hybrid-and-pq",
+      "checks": {
+        "cap_chain": "pass"
+      },
+      "pcactn": {
+        "cap_chain": [
+          {
+            "alg": "ml-dsa-65"
+          },
+          {
+            "alg": "hybrid-ed25519-ml-dsa-65"
+          }
+        ]
+      },
+      "report": {
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65",
+            "hybrid-ed25519-ml-dsa-65"
+          ],
+          "level": "hybrid"
+        }
+      }
+    },
+    {
+      "name": "chain-empty",
+      "checks": {
+        "cap_chain": "pass"
+      },
+      "pcactn": {
+        "cap_chain": []
+      },
+      "report": {
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [],
+          "level": "unknown"
+        }
+      }
+    },
+    {
+      "name": "unbound-pq-leaf",
+      "checks": {
+        "leaf_signature": "pass"
+      },
+      "pcactn": {
+        "alg": "ml-dsa-65"
+      },
+      "allow_unbound_pq": true,
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65"
+          ],
+          "level": "unbound_pq"
+        }
+      }
+    },
+    {
+      "name": "unbound-pq-ed25519-stays-ed25519",
+      "checks": {
+        "leaf_signature": "pass"
+      },
+      "pcactn": {},
+      "allow_unbound_pq": true,
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        }
+      }
+    },
+    {
+      "name": "unbound-pq-chain",
+      "checks": {
+        "cap_chain": "pass"
+      },
+      "pcactn": {
+        "cap_chain": [
+          {
+            "alg": "ml-dsa-65"
+          }
+        ]
+      },
+      "allow_unbound_pq": true,
+      "report": {
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65"
+          ],
+          "level": "unbound_pq"
+        }
+      }
+    },
+    {
+      "name": "failed-check-has-no-level",
+      "checks": {
+        "leaf_signature": "fail",
+        "cap_chain": "not-enforced"
+      },
+      "pcactn": {
+        "alg": "ml-dsa-65",
+        "cap_chain": [
+          {
+            "alg": "ml-dsa-65"
+          }
+        ]
+      },
+      "report": {
+        "leaf_signature": {
+          "outcome": "fail"
+        },
+        "cap_chain": {
+          "outcome": "not-enforced"
+        }
+      }
+    },
+    {
+      "name": "attestation-hardware",
+      "checks": {
+        "attestation": "pass"
+      },
+      "hooks": {
+        "attestation": {
+          "level": "hardware",
+          "vendor": "amd-sev-snp"
+        }
+      },
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "hardware",
+          "vendor": "amd-sev-snp"
+        }
+      }
+    },
+    {
+      "name": "attestation-software",
+      "checks": {
+        "attestation": "pass"
+      },
+      "hooks": {
+        "attestation": {
+          "level": "software"
+        }
+      },
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "software"
+        }
+      }
+    },
+    {
+      "name": "attestation-unlabelled",
+      "checks": {
+        "attestation": "pass"
+      },
+      "hooks": {
+        "attestation": "unlabelled"
+      },
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "unknown"
+        }
+      }
+    },
+    {
+      "name": "attestation-no-hook",
+      "checks": {
+        "attestation": "pass"
+      },
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "unknown"
+        }
+      }
+    },
+    {
+      "name": "attestation-hook-override",
+      "checks": {
+        "attestation": "pass"
+      },
+      "hooks": {
+        "attestation": {
+          "level": "software"
+        }
+      },
+      "attestation_hook": {
+        "level": "multi_root",
+        "vendor": "multi"
+      },
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "multi_root",
+          "vendor": "multi"
+        }
+      }
+    },
+    {
+      "name": "attestation-failed",
+      "checks": {
+        "attestation": "fail"
+      },
+      "hooks": {
+        "attestation": {
+          "level": "hardware"
+        }
+      },
+      "report": {
+        "attestation": {
+          "outcome": "fail"
+        }
+      }
+    },
+    {
+      "name": "zk-groth16-single-party",
+      "checks": {
+        "zk_compliance": "pass"
+      },
+      "hooks": {
+        "zk": {
+          "level": "groth16",
+          "ceremony": "single-party"
+        }
+      },
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "groth16",
+          "ceremony": "single-party"
+        }
+      }
+    },
+    {
+      "name": "zk-groth16-multi-party",
+      "checks": {
+        "zk_compliance": "pass"
+      },
+      "hooks": {
+        "zk": {
+          "level": "groth16",
+          "ceremony": "multi-party",
+          "vendor": "snarkjs"
+        }
+      },
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "groth16",
+          "vendor": "snarkjs",
+          "ceremony": "multi-party"
+        }
+      }
+    },
+    {
+      "name": "zk-attested-vm",
+      "checks": {
+        "zk_compliance": "pass"
+      },
+      "hooks": {
+        "zk": {
+          "level": "attested_vm"
+        }
+      },
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "attested_vm"
+        }
+      }
+    },
+    {
+      "name": "zk-attested-vm-hw",
+      "checks": {
+        "zk_compliance": "pass"
+      },
+      "hooks": {
+        "zk": {
+          "level": "attested_vm_hw"
+        }
+      },
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "attested_vm_hw"
+        }
+      }
+    },
+    {
+      "name": "zk-no-hook",
+      "checks": {
+        "zk_compliance": "pass"
+      },
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "unknown"
+        }
+      }
+    },
+    {
+      "name": "threshold-multisig",
+      "checks": {
+        "threshold": "pass"
+      },
+      "hooks": {
+        "threshold": {
+          "level": "multisig"
+        }
+      },
+      "threshold_t": 2,
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig",
+          "t": 2
+        }
+      }
+    },
+    {
+      "name": "threshold-frost-preview-scheme",
+      "checks": {
+        "threshold": "pass"
+      },
+      "hooks": {
+        "threshold": {
+          "level": "frost"
+        }
+      },
+      "threshold_t": 2,
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "frost",
+          "preview": true,
+          "t": 2
+        }
+      }
+    },
+    {
+      "name": "threshold-mpc-labelled-preview",
+      "checks": {
+        "threshold": "pass"
+      },
+      "hooks": {
+        "threshold": {
+          "level": "mpc",
+          "preview": true
+        }
+      },
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "mpc",
+          "preview": true
+        }
+      }
+    },
+    {
+      "name": "threshold-multisig-flagged-preview",
+      "checks": {
+        "threshold": "pass"
+      },
+      "hooks": {
+        "threshold": {
+          "level": "multisig",
+          "preview": true
+        }
+      },
+      "threshold_t": 3,
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig",
+          "preview": true,
+          "t": 3
+        }
+      }
+    },
+    {
+      "name": "threshold-no-hook",
+      "checks": {
+        "threshold": "pass"
+      },
+      "report": {
+        "threshold": {
+          "outcome": "pass"
+        }
+      }
+    },
+    {
+      "name": "threshold-t-not-a-number",
+      "checks": {
+        "threshold": "pass"
+      },
+      "hooks": {
+        "threshold": {
+          "level": "multisig"
+        }
+      },
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig"
+        }
+      }
+    },
+    {
+      "name": "revocation-labelled",
+      "checks": {
+        "revocation": "pass"
+      },
+      "hooks": {
+        "revocation": {
+          "level": "signed_epoch",
+          "vendor": "guardian"
+        }
+      },
+      "report": {
+        "revocation": {
+          "outcome": "pass",
+          "level": "signed_epoch",
+          "vendor": "guardian"
+        }
+      }
+    },
+    {
+      "name": "revocation-unlabelled",
+      "checks": {
+        "revocation": "pass"
+      },
+      "hooks": {
+        "revocation": "unlabelled"
+      },
+      "report": {
+        "revocation": {
+          "outcome": "pass"
+        }
+      }
+    },
+    {
+      "name": "bond-ref-is-unsupported",
+      "checks": {
+        "replay": "pass"
+      },
+      "pcactn": {
+        "bond_ref": {
+          "id": "b1"
+        }
+      },
+      "report": {
+        "replay": {
+          "outcome": "pass"
+        },
+        "bond": {
+          "outcome": "unsupported",
+          "reason": "bond verification is not implemented by this verifier"
+        }
+      }
+    },
+    {
+      "name": "bond-ref-with-unsupported-check",
+      "checks": {
+        "bond": "unsupported"
+      },
+      "pcactn": {
+        "bond_ref": "x"
+      },
+      "report": {
+        "bond": {
+          "outcome": "unsupported",
+          "reason": "bond verification is not implemented by this verifier"
+        }
+      }
+    },
+    {
+      "name": "unsupported-check",
+      "checks": {
+        "zk_compliance": "unsupported",
+        "replay": "pass"
+      },
+      "report": {
+        "zk_compliance": {
+          "outcome": "unsupported",
+          "reason": "zk_compliance is not implemented by this verifier"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      }
+    },
+    {
+      "name": "degraded-pass",
+      "checks": {
+        "tighten": "pass",
+        "replay": "pass"
+      },
+      "degraded": {
+        "tighten": "model_polarity legacy",
+        "replay": "ignored: not a pass"
+      },
+      "report": {
+        "tighten": {
+          "outcome": "pass",
+          "degraded": true,
+          "reason": "model_polarity legacy"
+        },
+        "replay": {
+          "outcome": "pass",
+          "degraded": true,
+          "reason": "ignored: not a pass"
+        }
+      }
+    },
+    {
+      "name": "degraded-on-failed-check-ignored",
+      "checks": {
+        "tighten": "fail"
+      },
+      "degraded": {
+        "tighten": "model_polarity legacy"
+      },
+      "report": {
+        "tighten": {
+          "outcome": "fail"
+        }
+      }
+    },
+    {
+      "name": "everything",
+      "checks": {
+        "leaf_signature": "pass",
+        "cap_chain": "pass",
+        "attestation": "pass",
+        "zk_compliance": "pass",
+        "threshold": "pass",
+        "revocation": "pass"
+      },
+      "pcactn": {
+        "alg": "hybrid-ed25519-ml-dsa-65",
+        "cap_chain": [
+          {
+            "alg": "hybrid-ed25519-ml-dsa-65"
+          }
+        ]
+      },
+      "hooks": {
+        "attestation": {
+          "level": "multi_root",
+          "vendor": "v"
+        },
+        "zk": {
+          "level": "policyvm_snark",
+          "ceremony": "multi-party"
+        },
+        "threshold": {
+          "level": "multisig"
+        },
+        "revocation": {
+          "level": "signed_epoch"
+        }
+      },
+      "threshold_t": 2,
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "hybrid-ed25519-ml-dsa-65"
+          ],
+          "level": "hybrid"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "hybrid-ed25519-ml-dsa-65"
+          ],
+          "level": "hybrid"
+        },
+        "attestation": {
+          "outcome": "pass",
+          "level": "multi_root",
+          "vendor": "v"
+        },
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "policyvm_snark",
+          "ceremony": "multi-party"
+        },
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig",
+          "t": 2
+        },
+        "revocation": {
+          "outcome": "pass",
+          "level": "signed_epoch"
+        }
+      }
+    }
+  ],
+  "requirement": [
+    {
+      "name": "empty-requirement-passes",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      },
+      "require": {},
+      "unmet": null
+    },
+    {
+      "name": "pq-required-ed25519",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: post-quantum signatures required but leaf_signature is ed25519"
+    },
+    {
+      "name": "pq-required-hybrid-leaf-missing-chain",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "hybrid-ed25519-ml-dsa-65"
+          ],
+          "level": "hybrid"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: post-quantum signatures required but there is no cap_chain evidence"
+    },
+    {
+      "name": "pq-required-chain-has-ed25519",
+      "report": {
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65",
+            "hybrid-ed25519-ml-dsa-65",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: post-quantum signatures required but there is no leaf_signature evidence"
+    },
+    {
+      "name": "pq-required-chain-all-pq-leaf-absent",
+      "report": {
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65",
+            "ml-dsa-87"
+          ],
+          "level": "pq"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: post-quantum signatures required but there is no leaf_signature evidence"
+    },
+    {
+      "name": "pq-required-met",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "level": "hybrid",
+          "suites": [
+            "h"
+          ]
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "level": "pq",
+          "suites": [
+            "p"
+          ]
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": null
+    },
+    {
+      "name": "pq-required-unbound",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ml-dsa-65"
+          ],
+          "level": "unbound_pq"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: post-quantum signatures required but leaf_signature is unbound_pq"
+    },
+    {
+      "name": "pq-required-leaf-failed",
+      "report": {
+        "leaf_signature": {
+          "outcome": "fail"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "level": "pq"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: post-quantum signatures required but the leaf_signature check is fail"
+    },
+    {
+      "name": "pq-required-unknown-suite",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "no-such-suite"
+          ],
+          "level": "unknown"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: post-quantum signatures required but leaf_signature is unknown"
+    },
+    {
+      "name": "attestation-hardware-met-by-hardware",
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "hardware",
+          "vendor": "amd-sev-snp"
+        }
+      },
+      "require": {
+        "attestation": "hardware"
+      },
+      "unmet": null
+    },
+    {
+      "name": "attestation-hardware-not-met-by-software",
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "software"
+        }
+      },
+      "require": {
+        "attestation": "hardware"
+      },
+      "unmet": "assurance: hardware attestation required but the evidence is software"
+    },
+    {
+      "name": "attestation-software-met-by-hardware",
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "hardware",
+          "vendor": "amd-sev-snp"
+        }
+      },
+      "require": {
+        "attestation": "software"
+      },
+      "unmet": null
+    },
+    {
+      "name": "attestation-multi-root-not-met-by-hardware",
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "hardware",
+          "vendor": "amd-sev-snp"
+        }
+      },
+      "require": {
+        "attestation": "multi_root"
+      },
+      "unmet": "assurance: multi_root attestation required but the evidence is hardware"
+    },
+    {
+      "name": "attestation-multi-root-met",
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "multi_root",
+          "vendor": "multi"
+        }
+      },
+      "require": {
+        "attestation": "multi_root"
+      },
+      "unmet": null
+    },
+    {
+      "name": "attestation-unlabelled",
+      "report": {
+        "attestation": {
+          "outcome": "pass",
+          "level": "unknown"
+        }
+      },
+      "require": {
+        "attestation": "software"
+      },
+      "unmet": "assurance: software attestation required but the evidence is unknown"
+    },
+    {
+      "name": "attestation-absent",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      },
+      "require": {
+        "attestation": "software"
+      },
+      "unmet": "assurance: software attestation required but there is no attestation evidence"
+    },
+    {
+      "name": "attestation-failed",
+      "report": {
+        "attestation": {
+          "outcome": "fail"
+        }
+      },
+      "require": {
+        "attestation": "software"
+      },
+      "unmet": "assurance: software attestation required but the attestation check is fail"
+    },
+    {
+      "name": "zk-attested-vm-met",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "attested_vm"
+        }
+      },
+      "require": {
+        "zk": "attested_vm"
+      },
+      "unmet": null
+    },
+    {
+      "name": "zk-attested-vm-hardware-not-met-by-attested-vm",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "attested_vm"
+        }
+      },
+      "require": {
+        "zk": "attested_vm_hardware"
+      },
+      "unmet": "assurance: zk compliance (attested_vm_hardware) required but the prover key is not bound to hardware evidence"
+    },
+    {
+      "name": "zk-attested-vm-hardware-met",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "attested_vm_hw"
+        }
+      },
+      "require": {
+        "zk": "attested_vm_hardware"
+      },
+      "unmet": null
+    },
+    {
+      "name": "zk-attested-vm-hardware-met-by-proof",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "groth16",
+          "vendor": "snarkjs",
+          "ceremony": "multi-party"
+        }
+      },
+      "require": {
+        "zk": "attested_vm_hardware"
+      },
+      "unmet": null
+    },
+    {
+      "name": "zk-proof-not-met-by-attested-vm",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "attested_vm"
+        }
+      },
+      "require": {
+        "zk": "proof"
+      },
+      "unmet": "assurance: zk compliance (proof) required but the evidence is attested_vm"
+    },
+    {
+      "name": "zk-proof-met-by-snark",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "groth16",
+          "ceremony": "single-party"
+        }
+      },
+      "require": {
+        "zk": "proof"
+      },
+      "unmet": null
+    },
+    {
+      "name": "zk-snark-met",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "groth16",
+          "vendor": "snarkjs",
+          "ceremony": "multi-party"
+        }
+      },
+      "require": {
+        "zk": "snark"
+      },
+      "unmet": null
+    },
+    {
+      "name": "zk-snark-not-met-by-stark",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "stark"
+        }
+      },
+      "require": {
+        "zk": "snark"
+      },
+      "unmet": "assurance: zk compliance (snark) required but the evidence is stark"
+    },
+    {
+      "name": "zk-proof-met-by-stark",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "stark"
+        }
+      },
+      "require": {
+        "zk": "proof"
+      },
+      "unmet": null
+    },
+    {
+      "name": "zk-unlabelled",
+      "report": {
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "unknown"
+        }
+      },
+      "require": {
+        "zk": "attested_vm"
+      },
+      "unmet": "assurance: zk compliance (attested_vm) required but the evidence is unknown"
+    },
+    {
+      "name": "zk-absent",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      },
+      "require": {
+        "zk": "attested_vm"
+      },
+      "unmet": "assurance: zk compliance (attested_vm) required but there is no zk_compliance evidence"
+    },
+    {
+      "name": "threshold-multisig-allowed",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig",
+          "t": 2
+        }
+      },
+      "require": {
+        "threshold": [
+          "multisig"
+        ]
+      },
+      "unmet": null
+    },
+    {
+      "name": "threshold-multisig-not-in-list",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig",
+          "t": 2
+        }
+      },
+      "require": {
+        "threshold": [
+          "frost"
+        ]
+      },
+      "unmet": "assurance: threshold (frost) required but the scheme is multisig"
+    },
+    {
+      "name": "threshold-frost-listed-accepts-preview",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "frost",
+          "preview": true,
+          "t": 2
+        }
+      },
+      "require": {
+        "threshold": [
+          "frost"
+        ]
+      },
+      "unmet": null
+    },
+    {
+      "name": "threshold-frost-unlisted-and-preview",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "frost",
+          "preview": true,
+          "t": 2
+        }
+      },
+      "require": {
+        "threshold": [
+          "multisig"
+        ]
+      },
+      "unmet": "assurance: threshold (multisig) required but the scheme is frost"
+    },
+    {
+      "name": "threshold-no-hook",
+      "report": {
+        "threshold": {
+          "outcome": "pass"
+        }
+      },
+      "require": {
+        "threshold": [
+          "multisig"
+        ]
+      },
+      "unmet": "assurance: threshold (multisig) required but no threshold verifier enforced it"
+    },
+    {
+      "name": "threshold-multisig-flagged-preview-listed",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig",
+          "preview": true,
+          "t": 3
+        }
+      },
+      "require": {
+        "threshold": [
+          "multisig"
+        ]
+      },
+      "unmet": null
+    },
+    {
+      "name": "threshold-absent",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      },
+      "require": {
+        "threshold": [
+          "multisig"
+        ]
+      },
+      "unmet": "assurance: threshold (multisig) required but there is no threshold evidence"
+    },
+    {
+      "name": "preview-denies-by-default",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "mpc",
+          "preview": true
+        }
+      },
+      "require": {},
+      "unmet": "assurance: threshold rests on preview crypto (mpc); set allowPreview or list the scheme to accept it"
+    },
+    {
+      "name": "preview-denied-under-other-dimension",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "mpc",
+          "preview": true
+        },
+        "attestation": {
+          "outcome": "pass",
+          "level": "hardware"
+        }
+      },
+      "require": {
+        "attestation": "hardware"
+      },
+      "unmet": "assurance: threshold rests on preview crypto (mpc); set allowPreview or list the scheme to accept it"
+    },
+    {
+      "name": "preview-allowed",
+      "report": {
+        "threshold": {
+          "outcome": "pass",
+          "level": "mpc",
+          "preview": true
+        },
+        "attestation": {
+          "outcome": "pass",
+          "level": "hardware"
+        }
+      },
+      "require": {
+        "attestation": "hardware",
+        "allowPreview": true
+      },
+      "unmet": null
+    },
+    {
+      "name": "unsupported-denies-even-when-everything-else-met",
+      "report": {
+        "replay": {
+          "outcome": "pass"
+        },
+        "bond": {
+          "outcome": "unsupported",
+          "reason": "bond verification is not implemented by this verifier"
+        }
+      },
+      "require": {},
+      "unmet": "assurance: unsupported: bond (bond verification is not implemented by this verifier); a high-assurance policy never accepts it"
+    },
+    {
+      "name": "unsupported-check-denies",
+      "report": {
+        "zk_compliance": {
+          "outcome": "unsupported",
+          "reason": "zk_compliance is not implemented by this verifier"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      },
+      "require": {
+        "attestation": "software"
+      },
+      "unmet": "assurance: unsupported: zk_compliance (zk_compliance is not implemented by this verifier); a high-assurance policy never accepts it"
+    },
+    {
+      "name": "degraded-denies",
+      "report": {
+        "tighten": {
+          "outcome": "pass",
+          "degraded": true,
+          "reason": "model_polarity legacy"
+        },
+        "replay": {
+          "outcome": "pass",
+          "degraded": true,
+          "reason": "ignored: not a pass"
+        }
+      },
+      "require": {},
+      "unmet": "assurance: tighten rests on a degraded compatibility mode (model_polarity legacy); a high-assurance policy never accepts it"
+    },
+    {
+      "name": "degraded-denies-with-met-dimension",
+      "report": {
+        "tighten": {
+          "outcome": "pass",
+          "degraded": true,
+          "reason": "model_polarity legacy"
+        },
+        "replay": {
+          "outcome": "pass",
+          "degraded": true,
+          "reason": "ignored: not a pass"
+        }
+      },
+      "require": {
+        "signature": "pq"
+      },
+      "unmet": "assurance: tighten rests on a degraded compatibility mode (model_polarity legacy); a high-assurance policy never accepts it"
+    },
+    {
+      "name": "everything-met",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "hybrid-ed25519-ml-dsa-65"
+          ],
+          "level": "hybrid"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "hybrid-ed25519-ml-dsa-65"
+          ],
+          "level": "hybrid"
+        },
+        "attestation": {
+          "outcome": "pass",
+          "level": "multi_root",
+          "vendor": "v"
+        },
+        "zk_compliance": {
+          "outcome": "pass",
+          "level": "policyvm_snark",
+          "ceremony": "multi-party"
+        },
+        "threshold": {
+          "outcome": "pass",
+          "level": "multisig",
+          "t": 2
+        },
+        "revocation": {
+          "outcome": "pass",
+          "level": "signed_epoch"
+        }
+      },
+      "require": {
+        "signature": "pq",
+        "attestation": "multi_root",
+        "zk": "snark",
+        "threshold": [
+          "multisig"
+        ]
+      },
+      "unmet": null
+    },
+    {
+      "name": "first-unmet-attestation-before-zk",
+      "report": {
+        "leaf_signature": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "cap_chain": {
+          "outcome": "pass",
+          "suites": [
+            "ed25519",
+            "ed25519"
+          ],
+          "level": "ed25519"
+        },
+        "replay": {
+          "outcome": "pass"
+        }
+      },
+      "require": {
+        "zk": "snark",
+        "attestation": "software",
+        "signature": "pq"
+      },
+      "unmet": "assurance: software attestation required but there is no attestation evidence"
+    }
+  ],
+  "multi_root": [
+    {
+      "name": "two-hardware",
+      "roots": [
+        {
+          "level": "hardware"
+        },
+        {
+          "level": "hardware"
+        }
+      ],
+      "threshold": 2,
+      "level": "multi_root"
+    },
+    {
+      "name": "one-hardware-needed",
+      "roots": [
+        {
+          "level": "hardware"
+        },
+        {
+          "level": "hardware"
+        }
+      ],
+      "threshold": 1,
+      "level": "hardware"
+    },
+    {
+      "name": "quorum-can-pick-weakest",
+      "roots": [
+        {
+          "level": "hardware"
+        },
+        {
+          "level": "software"
+        },
+        {
+          "level": "hardware"
+        }
+      ],
+      "threshold": 2,
+      "level": "hardware"
+    },
+    {
+      "name": "required-fills-first",
+      "roots": [
+        {
+          "level": "hardware",
+          "required": true
+        },
+        {
+          "level": "software"
+        },
+        {
+          "level": "hardware"
+        }
+      ],
+      "threshold": 2,
+      "level": "hardware"
+    },
+    {
+      "name": "required-pair",
+      "roots": [
+        {
+          "level": "hardware",
+          "required": true
+        },
+        {
+          "level": "hardware",
+          "required": true
+        },
+        {
+          "level": "software"
+        }
+      ],
+      "threshold": 2,
+      "level": "multi_root"
+    },
+    {
+      "name": "all-software",
+      "roots": [
+        {
+          "level": "software"
+        },
+        {
+          "level": "software"
+        }
+      ],
+      "threshold": 2,
+      "level": "software"
+    },
+    {
+      "name": "unlabelled-root",
+      "roots": [
+        {
+          "level": "hardware"
+        },
+        {
+          "level": "unknown"
+        }
+      ],
+      "threshold": 2,
+      "level": "hardware"
+    },
+    {
+      "name": "threshold-zero",
+      "roots": [
+        {
+          "level": "hardware"
+        },
+        {
+          "level": "hardware"
+        }
+      ],
+      "threshold": 0,
+      "level": "software"
+    },
+    {
+      "name": "threshold-over-count",
+      "roots": [
+        {
+          "level": "hardware"
+        },
+        {
+          "level": "software"
+        }
+      ],
+      "threshold": 5,
+      "level": "hardware"
+    },
+    {
+      "name": "multi-root-labels",
+      "roots": [
+        {
+          "level": "multi_root"
+        },
+        {
+          "level": "hardware"
+        }
+      ],
+      "threshold": 2,
+      "level": "multi_root"
+    }
+  ]
+}
