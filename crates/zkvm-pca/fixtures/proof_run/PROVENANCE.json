@@ -1,54 +1,54 @@
 {
   "status": "experimental, unaudited",
-  "date_utc": "2026-10-21",
-  "statement": "RISC Zero guest pca-zkvm-guest for PCA 0.4.2 (guest_version 10): root caveats outside the envelope and max_spend (0.4.1 fix), the Intent Layer M2 intent binding, Intent Layer v2 rules 13-19 (schema, intent_session with revocation and the session root verified only under the verifier pins session.pq_pins (R3-01), V5 layers, accumulators with receipt / key-set freshness and equivocation, the V15 committed-map check with the disclosure as a private input, W-B facts / provenance / classes), and every signature suite but LESS (ML-DSA, SLH-DSA, hybrids, FN-DSA); journal = fixtures/proof_run/journal.json",
-  "image_id_hex": "432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060",
-  "supersedes_image_id": "c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39",
+  "date_utc": "2026-10-27T12:14:44-04:00",
+  "statement": "RISC Zero guest pca-zkvm-guest for PCA 0.5.0 (guest_version 11): everything of guest version 10 plus rule 22 of the action kit (version 2 action schemas: floors and traits recomputed from the embedded trait table, the traits check against the grant and the verifier-observed call context, unconfirmed verbs carry every trait, reviewer pins); journal = fixtures/proof_run/journal.json",
+  "image_id_hex": "6bb6b7d5e66671fb314eaa5018e04463346374ced15df7bc784815cb95de1f6e",
+  "supersedes_image_id": "432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060",
   "guest_elf_note": "ELF not committed (gitignored); Cargo.lock files pin the dependency graph. The image id above is the authoritative identity.",
   "versions": {
     "risc0-zkvm": "3.0.6",
     "r0vm": "3.0.6",
-    "guest build": "risczero/risc0-guest-builder:r0.1.97.0 (docker, context sdks/zkvm-pca, path-independent; methods/build.rs)",
-    "host rustc": "stable (rust-toolchain.toml) as installed by rustup on the box",
-    "groth16 prover docker image": "risczero/risc0-groth16-prover (tag per risc0-zkvm 3.0.6 default, pulled by the host); docker.io from Ubuntu 24.04"
+    "guest build": "risczero/risc0-guest-builder:r0.1.97.0 (docker, context crates/zkvm-pca, path-independent; methods/build.rs)",
+    "host rustc": "stable (rust-toolchain.toml) as installed by rustup on the runner",
+    "groth16 prover docker image": "risczero/risc0-groth16-prover (tag per risc0-zkvm 3.0.6 default, pulled by the host)"
   },
   "host": {
-    "cloud": "GCP (pca-box, us-east1-b, existing VM; no paid cloud beyond it)",
-    "vm": "n2 custom 12 vCPU / 62 GB x86_64 Linux (Ubuntu 24.04)",
-    "cpu": "12 of 12 vCPU",
-    "gpu": "none (CPU proving)"
+    "cloud": "GitHub Actions (public repo Atlas-Authorization/pca)",
+    "vm": "ubuntu-latest hosted runner, x86_64 Linux",
+    "gpu": "none (CPU proving)",
+    "run": "https://github.com/Atlas-Authorization/pca-rust/actions/runs/40539012473"
   },
-  "reproduce": "bash sdks/zkvm-pca/host/box-prove.sh <out-dir> on an x86_64 Linux box (installs rzup rust 1.97.0 + r0vm 3.0.6 and docker.io when missing)",
+  "reproduce": "bash crates/zkvm-pca/host/box-prove.sh <out-dir> on an x86_64 Linux box (installs rzup rust 1.97.0 + r0vm 3.0.6 and docker.io when missing), or the zkvm-v11 workflow",
   "pipeline": [
     {
       "step": "succinct receipt",
       "where": "CPU",
-      "wall_ms": 3426705,
+      "wall_ms": 7650370,
       "cycles_total": 12582912,
-      "cycles_user": 11143341,
+      "cycles_user": 11117488,
       "segments": 12,
       "artifact": "receipt_succinct.bin"
     },
     {
       "step": "groth16 wrap (stark-to-snark) of that succinct receipt",
       "where": "CPU, docker risc0-groth16-prover (x86_64)",
-      "wall_ms": 106350,
+      "wall_ms": 293325,
       "artifact": "receipt_groth16.bin"
     },
     {
       "step": "negative proving matrix",
-      "where": "same run (execute + full proving attempt per variant)",
+      "where": "separate job (execute + full proving attempt per variant)",
       "artifact": "negative_proving.json",
       "result": "55 of 55 variants: guest panicked, no receipt"
     }
   ],
   "verified_on": "cargo test -p pca-zkvm-verify (see README)",
   "artifacts_sha256": {
-    "receipt_succinct.bin": "4d80a28ebf587c38637c1db680a636657bbeb69d2d047815083209f4b446feaa",
-    "receipt_groth16.bin": "dc253f22677deec6accb395db2b7029b172fd5f38122d0ccb9b0d7ef01de51cc",
-    "journal.json": "2091eb286e56937f38ce9b34410ee3ef9cf421c2df49dcc749cc429eabcc32cd",
-    "image_id.json": "dbae3b6e2579f8fb4b545f7959d91c0d1ee2a3bcb785ab5910f304a683464bfa",
+    "receipt_succinct.bin": "b0d8aab2d756fdbeb139d1aadcea90982723eff015812378a3878643a6fac3af",
+    "receipt_groth16.bin": "a2e5f845f0da9e1455a8aa21829879c39437e66d549322c88707581f58a70574",
+    "journal.json": "561869b30e6bc4c4f88035525fa743f4ebb40cff0b5d773b2420d694cea33c1f",
+    "image_id.json": "183359749a7072f3beb16b443b8b545adfc1715742ba1955765afda0c8d240c2",
     "negative_proving.json": "c768239602454283dd332919dea3ddd24cf746cf36cd82e30b3b5cfdc27b6281",
-    "run_stats.json": "99eb686fe699221803854b623d56e8087300b92af45786beb2f52a4bf987d917"
+    "run_stats.json": "07bc3a81d25098d8f28618a8e908701e3bd7a6e4b52a4b2abc88613a192f202b"
   }
 }

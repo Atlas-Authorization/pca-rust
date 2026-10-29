@@ -1,0 +1,46 @@
+name: zkVM image id
+
+# Rebuilds the guest in the docker guest builder from THIS (synced) tree and asserts the id equals the pinned one
+# (fixtures/image_id.json): proves the published source is the source the pinned receipts were proved for.
+on:
+  push:
+    branches: [main, 'ci/**']
+    paths:
+      - 'crates/zkvm-pca/core/src/**'
+      - 'crates/zkvm-pca/core/Cargo.toml'
+      - 'crates/zkvm-pca/methods/**'
+      - 'crates/zkvm-pca/Cargo.lock'
+      - 'crates/zkvm-pca/Cargo.toml'
+      - 'crates/zkvm-pca/rust-toolchain.toml'
+      - 'crates/zkvm-pca/fixtures/image_id.json'
+      - '.github/workflows/zkvm-image-id.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  image-id:
+    name: guest image id equals the pinned id
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/zkvm-pca
+      - name: Build the guest, compare with fixtures/image_id.json
+        env:
+          PCA_ONLY_BUILD: '1'
+          PCA_TARGET_DIR: ${{ github.workspace }}/crates/zkvm-pca/target
+        run: |
+          export PCA_TMPDIR="$RUNNER_TEMP/zkvm-tmp"
+          built=$(bash crates/zkvm-pca/host/box-prove.sh "$RUNNER_TEMP/out" | sed -n 's/^image id: //p')
+          pinned=$(python3 -c 'import json;print(json.load(open("crates/zkvm-pca/fixtures/image_id.json"))["image_id_hex"])')
+          echo "built $built pinned $pinned"
+          test -n "$built" && test "$built" = "$pinned"

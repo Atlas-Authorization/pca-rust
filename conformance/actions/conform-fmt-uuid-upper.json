@@ -1,0 +1,1 @@
+{"id":"conform-fmt-uuid-upper","kind":"conform","input":{"schema":{"verbs":[{"verb":"fmt.item.check","kind":"write","params":{"action.params.x":{"semantic":"generic.string","sensitivity":"free","type":"string","format":"uuid"}},"effects":["update"]}]},"verb":"fmt.item.check","params":{"x":"123E4567-E89B-12D3-A456-426614174000"}},"expect":{"ok":false,"code":"out_of_domain"}}
