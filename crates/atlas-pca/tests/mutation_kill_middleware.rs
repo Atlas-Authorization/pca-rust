@@ -32,7 +32,7 @@ fn header_for(p: &Value) -> String {
 fn cfg_for(grant: &Value, aud: &str) -> GuardConfig {
     let g = grant.clone();
     let id = g["id"].as_str().unwrap().to_string();
-    GuardConfig::new(aud.to_string(), move |r: &str| if r == id { Some(g.clone()) } else { None })
+    GuardConfig::new(aud.to_string(), move |r: &str| if r == id { Some(g.clone()) } else { None }).with_signature_only()
 }
 
 fn block_on<F: Future>(mut fut: F) -> F::Output {
@@ -155,12 +155,13 @@ fn json_body_and_challenge_shapes() {
     let b = bad.json_body();
     assert_eq!(b["error"], json!("insufficient_authority"));
     assert_eq!(b["error_description"], json!(bad.description));
+    assert!(b["doc"].as_str().unwrap().starts_with("https://github.com/Atlas-Authorization/pca/blob/main/docs/reference/"));
     assert_eq!(b["allow"], json!(false));
     assert_eq!(b["checks"]["audience"], json!(false));
     assert!(b.get("ok").is_none());
     let un = verify_request(None, None, &cfg);
     let b = un.json_body();
-    assert_eq!(b, json!({"error": "invalid_request", "error_description": "no PCA-Action header or body supplied"}));
+    assert_eq!(b, json!({"error": "invalid_request", "error_description": "no PCA-Action header or body supplied", "doc": "https://github.com/Atlas-Authorization/pca/blob/main/docs/reference/refusals.md"}));
     assert_eq!(un.www_authenticate().unwrap(), "PCA realm=\"pca\", error=\"invalid_request\"");
     let q = verify_request(Some("!!"), None, &cfg_for(&grant, "a\"b\\c"));
     assert!(q.www_authenticate().is_some());

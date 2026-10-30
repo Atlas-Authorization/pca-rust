@@ -17,7 +17,8 @@ use risc0_zkvm::{InnerReceipt, Receipt, VerifierContext};
 /// a verifier that kept a pre-R5 id pinned no longer accepts its receipts. The round-6 guest (`3b1eebb5...`, guest version 7)
 /// is superseded by guest version 8 (0.4.1: root caveats enforced, `max_spend`), and guest version 8 (`0c97a02b...`) by guest
 /// version 9 (R3-01: a PQ / hybrid session root verifies only under the verifier's `session.pq_pins`); guest version 9
-/// (`c5107456...`) by guest version 10 (the 0.4.2 re-pin: `intent_v2_active` fails closed on a malformed v2 context).
+/// (`c5107456...`) by guest version 10 (the 0.4.2 re-pin: `intent_v2_active` fails closed on a malformed v2 context), and guest
+/// version 10 (`432b4713...`) by guest version 11 (rule 22: version 2 action schemas).
 pub const SUPERSEDED_IMAGE_IDS: &[&str] = &[
     "ac95031feecea70e62bfb998a14acd645f400d5a33d5e1bc6200d2aa63ed96e3", // mixed-order delegator key accepted
     "dcf198fcfedd63182ddd8c392070d73f03c595b56e5d8649242e878fe530813a", // journal without context (RT-06)
@@ -28,6 +29,7 @@ pub const SUPERSEDED_IMAGE_IDS: &[&str] = &[
     "3b1eebb56b046e737fb15009bdd065b67d7938cb8d47f3f3f0dadc801f84fdad", // root caveats outside the envelope ignored (0.4.1)
     "0c97a02b9d6f99131fb1d76207377ccb3546be8b8f6c33387ab078b1d49453a7", // PQ session root under its own principals key (R3-01)
     "c5107456f3885cfe87f0da62d24aa273e1fe94c982eed57324374dcefa80ac39", // guest version 9: intent_v2_active open on a malformed v2 context (0.4.2 re-pin)
+    "432b4713d7981afc30907003d3a2c7e7d0003cc34b2367b4cba8d61b642c0060", // guest version 10: refuses every version 2 action schema (no rule 22)
 ];
 
 /// Lower-case hex of an image id digest (the form used in `fixtures/image_id.json`).

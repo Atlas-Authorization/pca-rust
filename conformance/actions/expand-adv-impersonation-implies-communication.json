@@ -1,0 +1,1 @@
+{"id":"expand-adv-impersonation-implies-communication","kind":"expand","input":{"traits":["pca.impersonation"]},"expect":{"closure":["pca.external_communication","pca.impersonation"],"floor":{"risk":2,"rev":"irreversible","blast_ppm":0,"esc":1,"caveats":["rate_cap","recipient_scope"],"context":[],"prules":["recipient_param_declared"]}}}

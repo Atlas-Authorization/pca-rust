@@ -41,7 +41,7 @@ impl<'a> Ctx<'a> {
 
     /// `resolvePath`: dotted path rooted at action|subject|env; own properties only; numeric array
     /// indices; forbidden keys and unknown roots => not found.
-    fn resolve(&self, path: &str) -> Option<&'a Value> {
+    pub(crate) fn resolve(&self, path: &str) -> Option<&'a Value> {
         if path.is_empty() {
             return None;
         }
@@ -597,6 +597,139 @@ fn predicate_matches_inner(p: &Value, ctx: &Ctx) -> bool {
 /// resource AND every `where`). Default-deny: an empty list allows nothing.
 pub fn evaluate_predicates(predicates: &[Value], ctx: &Ctx) -> bool {
     super::safe_regex::with_regex_budget(|| predicates.iter().any(|p| predicate_matches(p, ctx)))
+}
+
+// ---- naming the unmet limit in a denial reason (0.5) -----------------------------------------------------------------
+
+const MAX_SHOWN_STRING: usize = 64;
+const MAX_SHOWN_ITEMS: usize = 8;
+
+fn op_text(op: &str) -> Option<&'static str> {
+    Some(match op {
+        "eq" => "==",
+        "ne" => "!=",
+        "lt" => "<",
+        "lte" => "<=",
+        "gt" => ">",
+        "gte" => ">=",
+        "in" => "in",
+        "nin" => "not in",
+        "prefix" => "starts with",
+        "like" => "like",
+        "matches" => "matches",
+        "is_a" => "is a",
+        "member_of" => "member of",
+        _ => return None,
+    })
+}
+
+/// A scalar operand in a denial reason: only safe integers, booleans, null and plain short strings are spelled out; a
+/// top-level array of at most 8 such values.
+fn show_value(v: &Value, depth: usize) -> String {
+    match v {
+        Value::Null => "null".into(),
+        Value::Bool(b) => b.to_string(),
+        Value::Number(n) => match n.as_f64() {
+            Some(f) if f.is_finite() && f.fract() == 0.0 && f.abs() <= 9_007_199_254_740_991.0 => format!("{}", f as i64),
+            _ => "<number>".into(),
+        },
+        Value::String(s) => {
+            let plain = s.encode_utf16().count() <= MAX_SHOWN_STRING
+                && !s.chars().any(|c| (c as u32) < 0x20 || c == '"' || c == '\\' || (c as u32) > 0xFFFF);
+            if plain {
+                format!("\"{s}\"")
+            } else {
+                "\"...\"".into()
+            }
+        }
+        Value::Array(a) if depth == 0 => {
+            if a.len() <= MAX_SHOWN_ITEMS {
+                format!("[{}]", a.iter().map(|x| show_value(x, 1)).collect::<Vec<_>>().join(", "))
+            } else {
+                "[...]".into()
+            }
+        }
+        _ => "<value>".into(),
+    }
+}
+
+fn describe_children(a: &[Value], depth: usize) -> String {
+    a.iter().take(MAX_SHOWN_ITEMS).map(|x| describe_condition(x, depth + 1)).collect::<Vec<_>>().join("; ")
+}
+
+/// The condition as the limit a reader recognises: `amount <= 500`, `currency in ["usd", "eur"]`.
+fn describe_condition(c: &Value, depth: usize) -> String {
+    let o = match c {
+        Value::Object(o) => o,
+        _ => return "<condition>".into(),
+    };
+    if is_group_condition(c) {
+        if depth >= 2 {
+            return "(...)".into();
+        }
+        if let Some(a) = o.get("all_of").and_then(Value::as_array) {
+            return format!("all of ({})", describe_children(a, depth));
+        }
+        if let Some(a) = o.get("any_of").and_then(Value::as_array) {
+            return format!("any of ({})", describe_children(a, depth));
+        }
+        if let Some(n) = o.get("not") {
+            return format!("not ({})", describe_condition(n, depth + 1));
+        }
+        return "<condition>".into();
+    }
+    let f = o.get("field").and_then(Value::as_str).unwrap_or("<field>");
+    let name = f.strip_prefix("action.params.").unwrap_or(f);
+    let op = o.get("op").and_then(Value::as_str);
+    if op == Some("exists") {
+        return if o.get("value") == Some(&Value::Bool(false)) { format!("{name} absent") } else { format!("{name} present") };
+    }
+    let text = match op.and_then(op_text) {
+        Some(t) => t,
+        None => return format!("{name} <condition>"),
+    };
+    match o.get("ref") {
+        Some(Value::String(r)) => format!("{name} {text} {r}"),
+        Some(_) => format!("{name} {text} <ref>"),
+        None => format!("{name} {text} {}", o.get("value").map_or("<value>".to_string(), |v| show_value(v, 0))),
+    }
+}
+
+/// Inside an unmet top-level condition, the narrowest part that failed (an `all_of` points at its first unmet child).
+fn narrowest_unmet<'v>(c: &'v Value, ctx: &Ctx, depth: usize) -> &'v Value {
+    if depth < 4 && is_group_condition(c) {
+        if let Some(a) = c.get("all_of").and_then(Value::as_array) {
+            if let Some(x) = a.iter().find(|x| !evaluate_condition(x, ctx)) {
+                return narrowest_unmet(x, ctx, depth + 1);
+            }
+        }
+    }
+    c
+}
+
+/// When the verb and resource are in scope but a `where` limit is not met, name that limit (the first unmet one of the
+/// first in-scope predicate). `None` when no predicate is in scope: the plain "no predicate permits" wording stays.
+pub fn first_unmet_limit(predicates: &[Value], ctx: &Ctx) -> Option<String> {
+    let action = ctx.root.get("action")?;
+    let verb = action.get("verb")?.as_str()?;
+    let resource = action.get("resource")?.as_str()?;
+    for p in predicates {
+        let o = match p.as_object() {
+            Some(o) => o,
+            None => continue,
+        };
+        if !o.get("verb").map_or(false, |v| verb_matches(v, verb)) || !resource_matches(o.get("resource"), resource) {
+            continue;
+        }
+        if let Some(where_clause) = o.get("where").and_then(Value::as_array) {
+            for c in where_clause {
+                if !evaluate_condition(c, ctx) {
+                    return Some(describe_condition(narrowest_unmet(c, ctx, 0), 0));
+                }
+            }
+        }
+    }
+    None
 }
 
 #[cfg(test)]
