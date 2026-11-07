@@ -2488,3 +2488,236 @@ fn intent_v2_activity_is_each_signal_alone() {
     assert!(intent_v2_active(&plain, Some(&ctx(json!(null)))));
     assert!(intent_v2_active(&with_session, Some(&ctx(json!({"params": 5})))));
 }
+
+// ---- rule 22 and grant action pins (intent-v2.ts:83-87, :321-325, :614-634) -----------------------------------------------
+
+const R22_VERB: &str = "stripe.refund";
+const R22_FORGED_PREFIX: &str = "schema_floor_forged: stripe.refund: schema_floor_forged";
+const R22_DENY: &str = "the action floors exceed what the grant authorizes (rule 22)";
+const R22_ESCALATE: &str = "escalate: the action floors need a caveat, context or confirmation the grant does not provide (rule 22)";
+
+fn r22_vector(name: &str) -> Value {
+    let base = concat!(env!("CARGO_MANIFEST_DIR"));
+    let text = ["../../packages/pca-conformance/vectors/actions", "../../conformance/actions", "conformance/actions"]
+        .iter()
+        .find_map(|d| std::fs::read_to_string(format!("{base}/{d}/{name}.json")).ok())
+        .expect("rule 22 vector");
+    serde_json::from_str::<Value>(&text).unwrap()["input"].clone()
+}
+/// The shared vector's document (no confirmation, every trait: the top floors), signed by the site for this audience.
+fn r22_doc(vector: &str, edit: impl FnOnce(&mut Value)) -> Value {
+    let mut doc = r22_vector(vector)["doc"].clone();
+    doc["aud"] = json!(AUD);
+    doc["pack"] = json!({"ns": "stripe", "version": "1", "root": "A".repeat(43)});
+    edit(&mut doc["verbs"][0]);
+    sign_schema(doc, "site")
+}
+fn r22_top() -> Value {
+    r22_doc("rule22-unconf-with-top-grant-allows", |_| {})
+}
+fn r22_params() -> Value {
+    json!({"amount": 100, "charge": "ch_1", "idempotency_key": "k1"})
+}
+fn r22_p() -> Value {
+    json!({"aud": AUD, "action": {"verb": R22_VERB, "resource": "pay.example/refunds", "params_digest": hash_canonical_strict(&r22_params()).unwrap()}})
+}
+fn r22_ctx(doc: Value, more: Value) -> Value {
+    let mut c = json!({"policy": {"schema": {"closed_world": true}}, "params": r22_params(), "schema": {"docs": [doc], "keys": schema_keys()}});
+    for (k, v) in more.as_object().unwrap() {
+        c[k] = v.clone();
+    }
+    c
+}
+fn r22_grant(types: &[&str], pin: Option<Value>) -> Value {
+    let caveats: Vec<Value> = types.iter().map(|t| json!({"type": t})).collect();
+    let weights = json!({"alpha": 0, "beta": 0, "gamma": 0, "delta": 0, "epsilon": 0, "zeta": 0});
+    let mut e = json!({"type": "envelope", "goal_commit": "g", "predicates": [], "caveats": caveats, "agent_binding": {}, "risk_policy": {"weights": weights, "theta1": 0.3, "theta2": 0.7, "kappa": 1, "lambda": 1, "rho": 1, "bMax": 1}});
+    if let Some(p) = pin {
+        e["actions"] = p;
+    }
+    json!({"id": "grant-1", "issuer": "issuer-1", "caveats": [e]})
+}
+fn r22_top_grant() -> Value {
+    r22_vector("rule22-unconf-with-top-grant-allows")["grant"].clone()
+}
+fn r22_top_kinds() -> Vec<String> {
+    r22_top_grant()["caveats"].as_array().unwrap().iter().map(|k| k.as_str().unwrap().to_string()).collect()
+}
+fn r22_top_context() -> Value {
+    r22_vector("rule22-unconf-with-top-grant-allows")["context"].clone()
+}
+fn r22_pin(max_esc: i64, preauth: i64) -> Value {
+    json!({"pack": {"ns": "stripe", "root": "A".repeat(43)}, "defs": {R22_VERB: r22_top()["verbs"][0]["def"]}, "on_new_action": "deny", "max_esc": max_esc, "preauth_esc": preauth, "caveats": r22_top_kinds()})
+}
+fn r22_checks(g: &Value, ctx: Option<&Value>) -> Vec<(String, bool, String)> {
+    let c = ctx.map(|c| IntentV2Context::from_json(c).unwrap());
+    decide_intent_v2(&r22_p(), g, c.as_ref(), NOW).checks.into_iter().map(|c| (c.name.to_string(), c.ok, c.reason)).collect()
+}
+fn r22_check(g: &Value, ctx: &Value, name: &str) -> (bool, String) {
+    r22_checks(g, Some(ctx)).into_iter().find(|c| c.0 == name).map(|c| (c.1, c.2)).unwrap_or_else(|| panic!("no check {name}"))
+}
+
+#[test]
+fn rule22_the_pin_and_traits_checks_report_in_the_reference_order() {
+    let ctx = r22_ctx(r22_top(), json!({"call_context": r22_top_context()}));
+    let got = r22_checks(&r22_grant(&[], Some(r22_pin(3, 3))), Some(&ctx));
+    assert_eq!(got.iter().map(|c| (c.0.as_str(), c.1)).collect::<Vec<_>>(), [("schema", true), ("pin", true), ("traits", true)], "{got:?}");
+}
+
+#[test]
+fn rule22_forged_floors_traits_and_unknown_traits_refuse_the_schema() {
+    let g = r22_grant(&[], Some(r22_pin(3, 3)));
+    let forged = r22_ctx(r22_doc("rule22-unconf-with-top-grant-allows", |v| v["floors"]["esc"] = json!(0)), json!({}));
+    let got = r22_checks(&g, Some(&forged));
+    assert_eq!(got.iter().map(|c| c.0.as_str()).collect::<Vec<_>>(), ["schema", "pin"], "the pin reads the same refused schema; no traits answer on it: {got:?}");
+    for c in &got {
+        assert!(!c.1 && c.2.starts_with(R22_FORGED_PREFIX), "{c:?}");
+    }
+    let dropped = r22_ctx(r22_doc("rule22-unconf-with-top-grant-allows", |v| { v["traits"].as_array_mut().unwrap().retain(|t| t != "pca.irreversible"); }), json!({}));
+    let (ok, why) = r22_check(&g, &dropped, "schema");
+    assert!(!ok && why.starts_with("schema_floor_forged: ") && why.contains("schema_traits_forged"), "{why}");
+    // kept sorted, or the schema shape check refuses it before the integrity check this pins
+    let unknown = r22_ctx(r22_doc("rule22-unconf-with-top-grant-allows", |v| { let t = v["traits"].as_array_mut().unwrap(); t.push(json!("pca.not_a_trait")); t.sort_by(|a, b| a.as_str().cmp(&b.as_str())); }), json!({}));
+    let (ok, why) = r22_check(&g, &unknown, "schema");
+    assert!(!ok && why.starts_with("schema_floor_forged: ") && why.contains("unknown_trait"), "{why}");
+}
+
+#[test]
+fn rule22_integrity_reads_the_reviewers_of_the_context() {
+    let doc = r22_doc("rule22-conf-allow", |_| {});
+    let g = r22_grant(&[], None);
+    let pins = r22_vector("rule22-conf-allow")["pins"].clone();
+    assert_eq!(r22_check(&g, &r22_ctx(doc.clone(), json!({"reviewers": pins})), "schema"), (true, String::new()));
+    // no pinned reviewer: nothing is confirmed, and a verb short of every trait is forged
+    let (ok, why) = r22_check(&g, &r22_ctx(doc, json!({})), "schema");
+    assert!(!ok && why.starts_with("schema_floor_forged: stripe.refund: schema_traits_forged: unconfirmed action must carry every trait"), "{why}");
+}
+
+#[test]
+fn rule22_the_integrity_check_comes_after_aud_and_before_the_params() {
+    let forged = r22_doc("rule22-unconf-with-top-grant-allows", |v| v["floors"]["esc"] = json!(0));
+    let g = r22_grant(&[], None);
+    let mut other_aud = forged["aud"].clone();
+    other_aud = json!(format!("{}x", other_aud.as_str().unwrap()));
+    let mut p = r22_p();
+    p["aud"] = other_aud;
+    let c = r22_ctx(forged.clone(), json!({}));
+    let c = IntentV2Context::from_json(&c).unwrap();
+    let d = decide_intent_v2(&p, &g, Some(&c), NOW);
+    assert_eq!(d.checks[0].reason, "schema aud does not match the PCActn aud");
+    let mut bad_params = r22_ctx(forged, json!({}));
+    bad_params["params"] = json!({"amount": 1});
+    assert!(r22_check(&g, &bad_params, "schema").1.starts_with(R22_FORGED_PREFIX));
+}
+
+#[test]
+fn rule22_the_floor_decision_meets_the_grant() {
+    let ctx = |more: Value| r22_ctx(r22_top(), more);
+    let full = json!({"call_context": r22_top_context()});
+    // the verb's esc floor is 3: a max_esc of 2 denies, a preauth of 2 escalates
+    assert_eq!(r22_check(&r22_grant(&[], Some(r22_pin(2, 2))), &ctx(full.clone()), "traits"), (false, R22_DENY.to_string()));
+    assert_eq!(r22_check(&r22_grant(&[], Some(r22_pin(3, 2))), &ctx(full.clone()), "traits"), (false, R22_ESCALATE.to_string()));
+    // a missing context key escalates; with no call_context the context is empty
+    assert_eq!(r22_check(&r22_grant(&[], Some(r22_pin(3, 3))), &ctx(json!({"call_context": ["idempotency"]})), "traits"), (false, R22_ESCALATE.to_string()));
+    assert_eq!(r22_check(&r22_grant(&[], Some(r22_pin(3, 3))), &ctx(json!({})), "traits"), (false, R22_ESCALATE.to_string()));
+    // no pin: traits still runs on a v2 schema, max_esc defaults to 3 (escalate, not deny) and preauth to 0
+    let kinds = r22_top_kinds();
+    let kinds: Vec<&str> = kinds.iter().map(String::as_str).collect();
+    let got = r22_checks(&r22_grant(&kinds, None), Some(&ctx(full.clone())));
+    assert_eq!(got.iter().map(|c| c.0.as_str()).collect::<Vec<_>>(), ["schema", "traits"]);
+    assert_eq!((got[1].1, got[1].2.as_str()), (false, R22_ESCALATE));
+}
+
+#[test]
+fn rule22_the_caveats_are_the_envelopes_and_the_valid_pins() {
+    let ctx = r22_ctx(r22_top(), json!({"call_context": r22_top_context()}));
+    let kinds = r22_top_kinds();
+    let kinds: Vec<&str> = kinds.iter().map(String::as_str).collect();
+    // all from the envelope, none from the pin
+    let mut p = r22_pin(3, 3);
+    p.as_object_mut().unwrap().remove("caveats");
+    assert_eq!(r22_check(&r22_grant(&kinds, Some(p.clone())), &ctx, "traits"), (true, String::new()));
+    // split between the two
+    let mut q = p.clone();
+    q["caveats"] = json!(kinds[1..]);
+    assert_eq!(r22_check(&r22_grant(&kinds[..1], Some(q)), &ctx, "traits"), (true, String::new()));
+    // one missing anywhere
+    assert_eq!(r22_check(&r22_grant(&kinds[1..], Some(p.clone())), &ctx, "traits"), (false, R22_ESCALATE.to_string()));
+    // a malformed pin grants nothing: its caveats and tiers do not count, and the pin check itself refuses
+    let mut bad = r22_pin(3, 3);
+    bad["unexpected"] = json!(1);
+    let g = r22_grant(&[], Some(bad));
+    let (ok, why) = r22_check(&g, &ctx, "pin");
+    assert!(!ok && why.starts_with("bad_pin: "), "{why}");
+    assert_eq!(r22_check(&g, &ctx, "traits"), (false, R22_ESCALATE.to_string()));
+}
+
+#[test]
+fn rule22_the_pin_reason_strings() {
+    let ctx = r22_ctx(r22_top(), json!({"call_context": r22_top_context()}));
+    let pin = |edit: &dyn Fn(&mut Value)| {
+        let mut p = r22_pin(3, 3);
+        edit(&mut p);
+        r22_check(&r22_grant(&[], Some(p)), &ctx, "pin")
+    };
+    let other = d32("other def");
+    assert_eq!(pin(&|p| p["defs"] = json!({R22_VERB: other})), (false, "def_changed: the definition differs from the pinned digest and no signed evolution record chains to it".to_string()));
+    assert_eq!(pin(&|p| p["defs"] = json!({"stripe.other": other})), (false, "new_action: the grant does not name 'stripe.refund' (on_new_action: deny)".to_string()));
+    assert_eq!(
+        pin(&|p| { p["defs"] = json!({"stripe.other": other}); p["on_new_action"] = json!("escalate"); }),
+        (false, "escalate: new_action: the grant does not name 'stripe.refund' (on_new_action: escalate)".to_string())
+    );
+    assert_eq!(pin(&|p| p["pack"]["ns"] = json!("square")), (false, "pack_mismatch: the schema does not come from the pinned pack 'square'".to_string()));
+    // the pack as a whole: the root decides
+    assert_eq!(pin(&|p| { p.as_object_mut().unwrap().remove("defs"); }), (true, String::new()));
+}
+
+#[test]
+fn rule22_a_pin_runs_without_a_schema_check_and_fails_closed_without_a_schema() {
+    let g = r22_grant(&[], Some(r22_pin(3, 3)));
+    let got = r22_checks(&g, None);
+    assert_eq!(got, [("pin".to_string(), false, "this verifier has no action schema configured".to_string())]);
+    // no closed_world, no session: the pin alone reads the schema, and on a v2 one traits follows
+    let mut c = r22_ctx(r22_top(), json!({"call_context": r22_top_context()}));
+    c.as_object_mut().unwrap().remove("policy");
+    let got = r22_checks(&g, Some(&c));
+    assert_eq!(got.iter().map(|x| (x.0.as_str(), x.1)).collect::<Vec<_>>(), [("pin", true), ("traits", true)], "{got:?}");
+    // a grant without a pin on the same context reports neither
+    assert!(r22_checks(&r22_grant(&[], None), Some(&c)).is_empty());
+}
+
+#[test]
+fn rule22_a_v1_schema_gets_no_traits_check() {
+    let mut p = r22_p();
+    p["action"]["verb"] = json!("air.book");
+    p["action"]["params_digest"] = json!(hash_canonical_strict(&params()).unwrap());
+    let c = json!({"policy": {"schema": {"closed_world": true}}, "params": params(), "schema": {"docs": [schema()], "keys": schema_keys()}});
+    let c = IntentV2Context::from_json(&c).unwrap();
+    let d = decide_intent_v2(&p, &r22_grant(&[], None), Some(&c), NOW);
+    assert_eq!(d.checks.iter().map(|x| (x.name, x.ok)).collect::<Vec<_>>(), [("schema", true)]);
+}
+
+#[test]
+fn rule22_context_members_are_validated_with_the_reference_messages() {
+    let err = |v: Value| intent_v2_context_error(&v);
+    assert_eq!(err(json!({"reviewers": {"keys": []}, "call_context": ["a"], "actions": {"records": [], "keys": [], "reapprovals": []}})), None);
+    for r in [json!(null), json!([]), json!("x"), json!({}), json!({"keys": 1}), json!({"keys": null})] {
+        assert_eq!(err(json!({"reviewers": r})).as_deref(), Some("reviewers must be {keys: [...]}"), "{r}");
+    }
+    for c in [json!(null), json!("x"), json!({}), json!([1]), json!(["a", null])] {
+        assert_eq!(err(json!({"call_context": c})).as_deref(), Some("call_context must be an array of strings"), "{c}");
+    }
+    for a in [json!(null), json!([]), json!(1)] {
+        assert_eq!(err(json!({"actions": a})).as_deref(), Some("actions must be an object"), "{a}");
+    }
+    for k in ["records", "keys", "reapprovals"] {
+        for bad in [json!(null), json!({}), json!("x")] {
+            assert_eq!(err(json!({"actions": {k: bad}})), Some(format!("actions.{k} must be an array")));
+        }
+    }
+    // reviewers are read before call_context, actions and params, as the reference does
+    assert_eq!(err(json!({"reviewers": 1, "call_context": 1, "actions": 1, "params": 1})).as_deref(), Some("reviewers must be {keys: [...]}"));
+    assert_eq!(err(json!({"call_context": 1, "actions": 1, "params": 1})).as_deref(), Some("call_context must be an array of strings"));
+    assert_eq!(err(json!({"actions": 1, "params": 1})).as_deref(), Some("actions must be an object"));
+}
+

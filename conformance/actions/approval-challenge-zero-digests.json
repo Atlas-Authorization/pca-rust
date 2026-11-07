@@ -1,0 +1,1 @@
+{"id":"approval-challenge-zero-digests","kind":"approval_challenge","input":{"action_digest":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","render_digest":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},"expect":{"ok":true,"challenge":"tGl-YGe16jQ61tj1sOnJEj42eyZXHYWilVgRzDIlS9Q"}}

@@ -1,14 +1,15 @@
 //! # stark-pca — a transparent STARK of the PCA release gate
 //!
-//! A genuine, verifiable zk-STARK (Winterfell, hash-based, **no trusted setup**,
-//! **post-quantum**) proving the *core release gate* of Proof-Carrying Authority.
+//! A genuine, verifiable STARK (Winterfell, hash-based, **no trusted setup**,
+//! **post-quantum**) proving the *core release gate* of Proof-Carrying Authority. It is
+//! **not zero-knowledge** ([`ZERO_KNOWLEDGE`] is `false`): the proof can leak the witness.
 //!
 //! ## What the AIR proves
 //!
 //! Given PUBLIC inputs — the risk weights `(α,β,γ,δ,ε,ζ)`, the tier-1 threshold `θ₁`,
 //! the cost scale `κ`, the budget ceiling `bMax`, the fixed-point scale `S = 1e6`, and
-//! two opaque commitments `(policy_commitment, action_commitment)` — and PRIVATE
-//! witnesses — the six risk-magnitude inputs `(d, rev, bl, taint, conf, age)`, the trust
+//! two opaque commitments `(policy_commitment, action_commitment)` — and the witness
+//! (NOT hidden by this crate) — the six risk-magnitude inputs `(d, rev, bl, taint, conf, age)`, the trust
 //! budget `B`, a predicate-match bit `pm`, and a caveats-satisfied bit `co` — the prover
 //! demonstrates knowledge of a witness such that
 //!
@@ -31,7 +32,7 @@
 //!
 //! ## Witness ↔ commitment binding (the in-AIR hash)
 //!
-//! The private witness is now **bound in-AIR** to a public commitment. A genuine in-AIR
+//! The witness is **bound in-AIR** to a public commitment. A genuine in-AIR
 //! algebraic hash (`NUM_LANES=10`-wide cube-S-box SPN: `a_k = (Hₖ + 2^row + RCₖ)³`,
 //! diffusion `H'ⱼ = Σₖ aₖ + aⱼ`, one round per trace row) absorbs the **nine quantized
 //! witness quantities** `(d, rev, bl, taint, conf, age, B, pm, co)` on row 0 (lanes 0..8) +
@@ -70,6 +71,11 @@ use winterfell::{
     Proof, ProofOptions, Prover, ProverError, StarkDomain, TraceInfo, TracePolyTable, TraceTable,
     TransitionConstraintDegree,
 };
+
+/// This crate's proofs are NOT zero-knowledge: Winterfell 0.13.1 does not blind the trace or the composition
+/// polynomial, so openings at the sampled positions are deterministic functions of the witness. Callers must not
+/// rely on witness privacy; for a hiding proof of the same statement use `stark-pca-plonky3`.
+pub const ZERO_KNOWLEDGE: bool = false;
 
 /// Fixed-point scale (parts-per-million). Matches the reference risk model and Groth16 circuit (`S = 1e6`).
 pub const S: u64 = 1_000_000;

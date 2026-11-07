@@ -1,10 +1,13 @@
 # atlas-pca
 
+> Maturity: **stable** (stable core). See [maturity tiers](https://github.com/Atlas-Authorization/pca/blob/main/docs/maturity.md).
+
 Reference verifier for **Proof-Carrying Authority (PCA)**, an execution-authentication framework for
 autonomous agents. The agent presents a self-contained proof-carrying action (PCActn) with every
 request, and the resource server verifies it offline instead of trusting a bearer token.
 
-> Status: **0.4.3, unaudited.** Not independently security-reviewed.
+> Status: **0.5.0, stable core verifier.** The shared conformance corpus is reproduced byte for byte; the middleware
+> checks the proof only (see the security contract for what each surface enforces).
 
 ## Install
 
@@ -17,14 +20,386 @@ cargo add atlas-pca --features axum
 ## Checks
 
 Verification is stateless and fail-closed, in a fixed normative order: `wire`, `version`, `audience`,
-`validity`, `chain`, `grant_ref_bound`, `plan_inclusion`, `leaf_signature`, `counter`.
+`validity`, `chain`, `grant_ref_bound`, `plan_inclusion`, `leaf_signature`, `counter_format`.
 
 `grant_ref_bound` (new in 0.2.0) requires the signed `grant_ref` to be byte-equal to the id of the root
 capability (`cap_chain[0]`). Proofs that previously verified with a mismatched `grant_ref` are now
 rejected. ML-DSA-65 (FIPS-204) leaf signatures are supported alongside Ed25519.
 
-The crate passes the shared 172-vector PCA conformance corpus that the other language verifiers
-(TypeScript, Python, Go, ...) also pass.
+The crate runs the shared PCA conformance corpus: 676 PCActn vectors (129 that must verify, 547 that must be
+refused) and 984 primitive vectors (canonical JSON, base64url, JSON parsing, Merkle proofs, caveat evaluation,
+threshold shares, chain pins and more). The cross-language gate also runs it against the full adversarial set of
+4,358 PCActn vectors and 1,178 adversarial primitives. The TypeScript, Python, Go and other verifiers run the same files. Vectors
+that need a signature suite this crate does not implement are skipped by the runner; the verifier refuses such a
+suite with `unsupported_suite`.
+
+## What a passing result does not cover
+
+`counter_format: pass` is a format check: the counter is a non-negative integer. It does **not** mean the action was not
+replayed. Verification is stateless by design, and the crate has no replay store, so the resource server must persist,
+per grant and agent, the last accepted counter and refuse anything not strictly greater, atomically across all of its
+processes.
+
+The `axum` middleware runs `authorize` by default (next section). Only if you opt in with `with_signature_only()` does it run
+the core verifier alone, and then it does not check replay, revocation, caveats, envelope predicates, plan authorization,
+risk or thresholds, and does not compare the request body with the signed `params_digest`. Do those checks in your handler
+(the caveat and predicate helpers below, `params_digest` on the body you will execute, your replay and revocation stores).
+
+## authorize: verify the proof AND the operation (0.5)
+
+`authorize` verifies the PCActn and binds it to the operation your handler will execute: the params must open the signed
+digest (a proof for $50 cannot execute $400, a proof for X cannot execute Y), the grant's envelope predicates and root and
+delegated caveats are evaluated (an unknown caveat type fails closed), revocation is checked, and only then is an atomic
+replay claim made. A missing component (audience, grant resolver, replay store, revocation check, operation) denies with
+status 403 and names what is missing.
+
+```rust
+use atlas_pca::{authorize, AuthorizeInput, MemoryStateStore, Operation};
+
+let store = MemoryStateStore::new(); // one process; feature `sqlite`: SqliteStateStore::open("replay.db")
+let op = Operation::new("payments.send", "payments/acme", params); // from YOUR routing and parsed input
+let resolve = |grant_ref: &str| Ok::<_, String>(grants.get(grant_ref).cloned());
+let revoked = |_pcactn: &_, grant: &_| Ok::<_, String>(revocations.contains(grant));
+let result = authorize(Some(&pcactn), &AuthorizeInput {
+    operation: Some(&op),
+    audience: "payments-rs",
+    resolve_grant: Some(&resolve),
+    state_store: Some(&store),
+    is_revoked: Some(&revoked),
+    plan: Some("single-step"),
+    ..Default::default()
+});
+if !result.allow { /* result.status is 401 or 403, result.reason the decisive reason */ }
+```
+
+Implement `StateStore::claim(key, counter)` over your database as one atomic operation (strictly increasing counter per
+key). `MemoryStateStore` is the in-process reference; the `sqlite` feature adds `SqliteStateStore` (one upsert per claim).
+
+With the `axum` feature the default guard runs `authorize`. Configure it with
+`GuardConfig::with_authorize(AuthorizeOptions::new(store, is_revoked))` and
+`GuardConfig::with_operation(|parts, body| Some(Operation::new(..)))`: a denied request never reaches the inner service, and
+an allowed one carries the `AuthorizeResult` as a request extension. A `GuardConfig` without `with_authorize` refuses every
+request with 403 `authorize_config`, naming what is missing (`state_store`, `is_revoked`); it never falls back to
+signature-only.
+
+Verifying the signature, chain and freshness only is an explicit opt-in, `GuardConfig::new(..).with_signature_only()`: no
+policy, replay, revocation or operation binding. Calling both `with_signature_only` and `with_authorize` panics at construction.
+
+### Check names and denial reasons
+
+- `counter_format` is the core verifier's check that the counter is a well-formed non-negative safe integer
+  (`counter_format: missing or not a non-negative safe integer`).
+- `replay` is the stateful check in `authorize`: `replay: 3 is not greater than last seen 3 (replay)`,
+  `replay: 3 was already claimed (replay)` or `replay: the replay store failed (fail closed)`.
+- `DEFAULT_REQUIRED_CHECKS` (must be `pass`): `counter_format`, `replay`, `revocation`, `plan_root_authorized`, `audience`,
+  `validity`, `grant_ref_bound`, `operation`, `params_digest`, `policy`, plus `AuthorizeInput::require`. The name `counter`
+  in `require` is accepted as an alias of `replay`.
+- When the action's verb and resource are in scope of a predicate but one of its `where` limits is not met, the denial names
+  the limit: `policy: amount <= 100 not satisfied for payments.send on payments/acme`, or
+  `currency in ["usd", "eur"] not satisfied for ...`. When no predicate is in scope the reason stays
+  `no predicate permits <verb> on <resource>`.
+
+### Upgrading to 0.5
+
+- `GuardConfig` now runs `authorize` by default. Add `with_authorize(..)` and `with_operation(..)`, or call
+  `with_signature_only()` to keep the old signature-only behaviour.
+- The check `counter` is now `counter_format` in the core verdict; a replay refusal is reported under `replay`.
+- `DEFAULT_REQUIRED_CHECKS` has 10 entries instead of 9.
+- A reason `no predicate permits ...` for an unmet limit now names the limit.
+- Provenance is checked by default: pin your agent harness's mediator key (`with_provenance_mediators`) and have it send
+  `PCA-Provenance`, or sensitive calls escalate (see "Provenance by default").
+
+## protect(): secure defaults in one call (feature `axum`)
+
+`protect` builds the default-deny guard so you do not wire it by hand: the grant lookup from your own list or function
+(never the request), an in-memory replay store, a revocation source, and `plan: single-step`. It is still `authorize`,
+bound to the operation your route executes. Options you pass win over the defaults.
+
+```rust
+use atlas_pca::protect::{protect, ProtectOptions};
+use atlas_pca::Operation;
+
+let p = protect(ProtectOptions::new("payments-rs", vec![grant], |parts, body| {
+    Some(Operation::new("payments.send", "payments/acme", serde_json::from_slice(body).ok()?)) // from YOUR routing and body
+}));
+let app = Router::new().route("/refunds", post(refund)).layer(p.layer());
+p.revoker.revoke(&grant_id); // later: every action under that grant is refused
+```
+
+Pass your own replay store (`.state_store(..)`, needed for more than one process), an extra revocation source
+(`.is_revoked(..)`) or a clock (`.clock(..)`); `.tune(..)` adjusts the `AuthorizeOptions`. Unlike the TypeScript `protect()`
+there is no connector catalog here, so risk is not priced by default.
+
+A runnable server using it is in `examples/axum-server` in the source repository.
+
+### Explaining a refusal
+
+Refusal reasons are fixed strings and never reworded. `explain_refusal(reason)` maps one to what it means, how to fix it
+and the page that explains it (`check`, `meaning`, `fix`, `docs`); it never panics and an unknown reason still links the
+table. Refusal bodies from the axum guard carry the same link as a `doc` member next to `error` and `error_description`.
+
+```rust
+let help = atlas_pca::explain_refusal("replay: 1 is not greater than last seen 1");
+assert_eq!(help.check, "replay");
+```
+
+## Provenance by default (0.5)
+
+An agent must not be steered by injected content (an email, a web page, a tool result) into choosing who, where or how much.
+`authorize` checks this on every call as check `provenance_flow`, with no configuration. A sensitive action (anything that is
+not read-only, and every action you did not describe) runs only when the choice of action and each argument come from the
+principal; otherwise the call is refused as an escalation (`provenance_flow: escalate: ...`), which only the principal's
+signed escalation answer admits. A forged or malformed provenance bundle is a plain deny.
+
+Provenance is a hash chain of receipts signed by a MEDIATOR: the agent harness or gateway that sees content enter the model's
+context and holds a key the model cannot reach. Pin its key on the server:
+
+```rust
+let opts = AuthorizeOptions::new(store, is_revoked)
+    .with_provenance_mediators(vec![json!({"mediator": "assistant-harness", "kid": "k1", "pk": mediator_public_key})])
+    .with_provenance_actions(|op| facts_for(&op.verb)); // {effects, traits, params?}; None = unknown = sensitive
+```
+
+The guard reads the bundle from the `PCA-Provenance` header (base64url of its JSON), else the body member `pca_provenance`;
+`AuthorizeInput::provenance` passes one explicitly and `with_provenance_bundle` reads it yourself. An undecodable header fails
+closed. `with_provenance_observed` adds untrusted content the server itself saw reach the agent (raise only). An operation
+that is a node of an executable plan the principal authorized in your plan registry, or an admitted step of a
+principal-signed workflow, counts as the principal's choice.
+
+The agent side records the bundle with `ProvenanceRecorder` (the same receipts as the TypeScript recorder):
+
+```rust
+use atlas_pca::arg_provenance::{encode_provenance_header, ProvenanceRecorder};
+
+let mut rec = ProvenanceRecorder::new("assistant-harness", "k1", Some(mediator_seed))?;
+rec.principal("Pay my electricity bill")?;            // the principal's own message: trusted
+rec.web("https://utility.example/bill", &page)?;      // fetched content: untrusted
+let bundle = rec.for_action(&op)?;                    // the chosen action, bound to the exact operation
+let header = encode_provenance_header(&bundle)?;      // send as PCA-Provenance
+```
+
+`principal_direct_provenance(&mut rec, &op)` is the bundle for an operation the user asked for directly in your own UI. The
+recorder also signs under the post-quantum and hybrid suites (`with_suite`); the pin then carries `pq_pk`.
+
+The only opt-out is the grant's principal-signed envelope member `provenance: {mode: "insecure_off"}` (the check reports
+`not-enforced`). It is dangerous: injected content can then steer that grant's sensitive actions. The same member may list
+`mediators` the principal designates; they are pinned for that grant.
+
+## Undo windows (0.5)
+
+A reversible action can run at once under a veto window instead of waiting for approval; the principal can undo it until
+the window ends. The coordinator that opens windows, compensates and notifies runs in the TypeScript package or the hosted
+ledger; this crate has the verification layer (`atlas_pca::undo`): `compensation_digest`, the one-click undo token
+(`sign_undo_token`, `undo_token_check`, `encode_undo_token`, `decode_undo_token`, `undo_token_digest`), the signed,
+hash-chained receipts (`sign_undo_receipt`, `verify_undo_receipt`, `undo_receipt_chain_error`), the record state machine
+(`undo_transition`) and the window clamp (`resolve_undo_window`: 30 s to 24 h, 15 min by default).
+
+```rust
+use atlas_pca::undo::{undo_receipt_chain_error, undo_token_check};
+
+// a one-click undo link: valid through window_end inclusive; "ok" or the first failing check
+match undo_token_check(&token, &undo_service_key, &record, now_ms as f64) {
+    "ok" => { /* run the veto */ }
+    why => { /* malformed | signer | signature | record | binding | expired */ }
+}
+// the audit trail of a record: None when every receipt verifies and links
+assert!(undo_receipt_chain_error(&record_with_receipts, &undo_service_key).is_none());
+```
+
+`authorize` takes an optional admission hook (`AuthorizeInput::undo`, `AuthorizeOptions::with_undo`). It is consulted only
+for an escalation with no answer presented, and never for a provenance escalation (`provenance_flow` or rule 17
+`provenance` failing). Return an admission ONLY after your coordinator has durably opened the window; an error, a panic or
+`None` leaves the escalation standing. On an admission the call is allowed, `AuthorizeResult::undo` carries it and
+`obligations` carries `{kind: "undo_window", params: {id, window_end}, due: window_end}`. An enforcement point that does not
+run undo windows must not list `undo_window` as a supported obligation.
+
+## Goal binding, revocation staleness, operation records, plans and assurance (0.5)
+
+### Goal binding v3
+
+`IntentPolicy::approved_goal` pins the root grant to the exact goal the principal signed and the policy compiled from it:
+
+```rust
+use atlas_pca::{intent_goal_commit_v3, ApprovedGoalRef, IntentPolicy};
+
+let goal = ApprovedGoalRef { goal_digest, policy_digest }; // canonical base64url, 32 bytes each
+let policy = IntentPolicy { approved_goal: Some(goal.clone()), ..Default::default() }; // implies `require`
+// a wallet mints the grant with the commitment of the same goal:
+let commit = intent_goal_commit_v3(&goal, &goal_salt);
+```
+
+Under `approved_goal` the grant must open against the v3 goal and only that: a v1 / v2 grant does not open it, a v3 grant
+does not open under a different goal or policy digest, an absent `intent` or a grant without a goal commitment fails, and
+the fidelity and risk floors still apply. A malformed digest (short, padded, empty, an extra member) is a misconfiguration
+and fails closed.
+
+### Revocation staleness
+
+A guardian-signed revocation epoch carries its own validity window; staleness lets YOU cap how old the revocation state may be,
+with a stricter window for actions that cannot be undone. Off unless configured.
+
+```rust
+use atlas_pca::{AuthorizeOptions, RevocationStaleness, RevocationStalenessPolicy, RevocationState};
+
+let gate = RevocationStaleness::new(RevocationStalenessPolicy { max_revocation_age_ms: Some(300_000.0), ..Default::default() }, |_pcactn, _grant| {
+    Ok(Some(RevocationState { epoch: Some(latest_signed_epoch()), ..Default::default() }))
+})?
+.with_guardian(guardian_public_key);
+let options = AuthorizeOptions::new(store, is_revoked).with_revocation_staleness(gate); // or AuthorizeInput::revocation_staleness
+```
+
+The class is the stricter of your context's authoritative `reversibility_class` and the PCActn's signed class; a missing or
+unknown class counts as irreversible. Setting any age option turns the cap on: any action 5 minutes by default, irreversible
+2 minutes (`max_revocation_age_ms`, `staleness.irreversible` and `staleness.costly` override them). An irreversible action needs a signed epoch unless
+`allow_unsigned_root_for_irreversible` is set; a bare root needs its issue time (`root_issued_at`), and an unknown age is denied.
+The gate runs after your boolean `is_revoked` hook (which keeps working unchanged) and fails the same `revocation` check.
+
+The gate also checks that no capability in the chain is revoked: after the freshness step, every capability id (default: each
+`id` in the PCActn's `cap_chain`, override with `.with_ids(..)`) needs a valid non-membership proof against the epoch's root,
+supplied by `.with_proofs(|pcactn, id| Some(proof))`. A missing proof denies (fail closed), so a gate without a proof source
+denies every request that has a capability chain. `verify_non_membership(root, proof, id)` is public for custom use.
+
+### Operation records: run it at most once
+
+`authorize` consumes the replay counter; a crash, a client retry or two workers can still run the side effect twice.
+`execute_authorized` closes that gap with one record per operation id:
+
+```rust
+use atlas_pca::{execute_authorized, ExecutableAuthorization, ExecuteOptions, MemoryOperationStore};
+
+let store = MemoryOperationStore::new(); // KvOperationStore over SqliteAtomicKv (feature `sqlite`) is durable
+let out = execute_authorized(
+    &ExecutableAuthorization::from(&result),
+    |h| call_downstream(&h.idempotency_key), // the operation id is the downstream idempotency key
+    &ExecuteOptions { store: Some(&store), recheck: Some(&recheck), ..Default::default() },
+);
+```
+
+The record goes `pending`, then `executing`, then `committed` or `failed`; a second execution of the same id is answered from the
+record and never runs the function again. An irreversible operation (the stricter of the signed class and
+`ExecuteOptions::reversibility_class`) needs a `recheck` that confirms revocation, expiry and approval immediately before it
+runs; a refusal records `aborted`. An open record older than the timeout is settled by `recover_operations`: `pending` becomes
+`aborted`, `executing` becomes `uncertain` (the effect may have happened: reconcile it by idempotency key and settle it with
+`resolve_operation`). `Executor` combines `authorize` and `execute_authorized` and answers a replay-only denial from the record.
+With the `axum` feature `GuardResult::execute` runs it for an allowed request and `operation_response` maps the outcome to a status.
+
+### Plan lifecycle
+
+`PlanRegistry` tracks a plan commitment: `draft`, `validate`, `commit`, `authorize` (the principal's approval, optionally until
+`expires_at`) and `revoke`, each one atomic. The root is the Merkle root of the node leaves, computed from the nodes. A plan is
+executable only when authorized, unexpired and its stored nodes still hash to the root; `check` adds the per-action rules (the
+node exists, the operation matches what was approved). `AuthorizeInput::plans` feeds the registered plan into `authorize`; an
+operation whose plan is not executable fails `plan_root_authorized` and `plan_state` with the plan's own reason.
+
+### Assurance labels
+
+Every `AuthorizeResult` carries `assurance`: per check, its outcome and what a pass rests on (the signature suites and their
+`ed25519` / `hybrid` / `pq` level, the label of an attestation, proof or threshold hook). Labels come from YOUR configuration
+(`AssuranceHooks`, `AssuranceLabelled`), never from the presented evidence; an unlabelled hook is `unknown` and satisfies nothing.
+A PCActn that carries `bond_ref` reports `bond` as `unsupported` and is denied unless listed in `allow_unsupported`.
+
+```rust
+let req = AssuranceRequirement { signature_pq: true, attestation: Some("hardware".into()), ..Default::default() };
+let result = authorize(Some(&pcactn), &AuthorizeInput { require_assurance: Some(&req), ..input });
+```
+
+A requirement that is not met fails the `assurance` check before any replay state is written. Weaker, missing, failed,
+unlabelled, awaiting-audit (FROST, DKG, MPC), degraded and unsupported evidence never meets a requirement.
+
+### Step-up from the principal's device
+
+`atlas_pca::stepup` lists, approves and denies PCA step-ups. `PrincipalDeviceKey` keeps the principal's Ed25519 key in a
+`SecretStore` you provide (the key is a software key: gate approvals behind a user-presence check) and `StepUpClient` signs the
+step-up's threshold message and posts it. You supply the HTTP stack through `StepUpTransport`; the crate adds no HTTP dependency.
+
+### Testing your own store
+
+`atlas_pca::store_conformance` runs the replay-state contract (`run_state_store_conformance`: claim burst, concurrent claims,
+durability, crash after the claim) and the operation-record contract (`run_operation_store_conformance`: create once,
+compare-and-set transitions, terminal states, durability, execute once across handles) against a factory of handles on your
+backend. Put `report.assert_passed()` in your test suite.
+
+## Acting as an agent (producing proofs)
+
+The crate also produces the proofs it verifies, so an agent written in Rust needs no other runtime. The principal mints a root
+grant for the agent's public key; the agent signs one PCActn per action and sends it in the `PCA-Action` header (`Agent` keeps
+the replay counter, picks the nonce and builds the headers).
+
+```rust
+use atlas_pca::agent::*;
+use atlas_pca::serde_json::{json, Map};
+
+let principal = KeyPair::generate()?; // the principal's key stays with the principal
+let agent_key = KeyPair::generate()?;
+let envelope = json!({
+    "predicates": [{"verb": "refund", "resource": "orders/*"}],
+    "caveats": [{"type": "max_spend", "usd": 50}],
+    "risk_policy": default_risk_policy(),
+});
+let minted = mint_grant(&principal, &agent_key.public, &envelope, "refund order 1", None, None, &Suite::default())?;
+
+let agent = Agent::new(agent_key, minted.grant, "https://api.example.com", 0);
+let params = json!({"amount_cents": 500});
+let action = agent.act("refund", "orders/1", Some(&params), Map::new(), &Suite::default())?;
+// action.headers: Vec<(name, value)> to set on any HTTP client request
+```
+
+`agent.delegate(sub_key, &json!([sealed_caveat()]), &Suite::default())?` returns a sub-agent holding the chain plus one narrower hop
+(caveats are only ever appended). Third-party and approval artifacts: `sign_discharge`, `sign_narrow`, `sign_escalation_answer`,
+`sign_passport`, `sign_workflow` / `sign_step_receipt`, `sign_read_grant`, `sign_fresh_at`. Ed25519 outputs are byte-exact against
+the shared producer vectors; ML-DSA and SLH-DSA suites sign through `fips204` / `fips205` (`PqKeyPair::generate("ML-DSA-65")`, then
+`Suite { alg: Some("hybrid-ed25519-ml-dsa-65"), pq: Some(&pq) }`). Persist the counter if the process can restart: a lower counter is
+refused as a replay.
+
+## Ledger and optimistic-path verification (0.5)
+
+`atlas_pca::ledger` checks the transparency ledger: RFC 9162 consistency proofs, signed tree heads pinned to the guardian key, k-of-n witness cosignatures, head-to-head consistency, whole checkpoint chains and equivocation between witnessed heads. Tamper evidence holds as long as at least one independent honest witness cosigns the heads you pin.
+
+```rust
+use atlas_pca::ledger::{verify_checkpoint_chain, verify_tree_head};
+// policy = {"witnessKeys": [...], "threshold": 1}; chain = [{"sth": ..}, {"sth": .., "proof": ..}, ...]
+let ok = verify_tree_head(&sth, guardian_public, Some(&policy));
+let verdict = verify_checkpoint_chain(&chain, guardian_public, Some(&policy));
+```
+
+`atlas_pca::optimistic` checks the wire form of the optimistic path: `claim_check` names the first failing check of a bonded claim, `settlement_wire_check` does the same for a guardian-signed settlement record, and `fraud_proof_wire_check` confirms a fraud proof is well-formed and consistent with its claim. Settlement is internal accounting only; no money moves. Deciding whether a fraud proof is true means re-running the policy engine and is done by the TypeScript settlement layer, not here. Only Ed25519 heads, cosignatures, claims and records are verified; any other suite is refused.
+
+## Hardware attestation
+
+The verifier checks hardware evidence itself: AMD SEV-SNP, Intel TDX (DCAP, with the Intel PCS collateral), Azure Attestation,
+Google Confidential Space and NVIDIA GPU (device chain, SPDM transcript, signed reference manifests, CRLs and OCSP). Build one
+from a configuration and run it over the evidence for one action:
+
+```rust
+use atlas_pca::attest::{verifier_from_config, Binding};
+use serde_json::json;
+
+let v = verifier_from_config(
+    "amd-sev-snp",
+    &json!({
+        "family": "genoa",
+        "binding": "report-data",
+        "policy": { "measurements": ["<hex of the 48-byte launch measurement>"] },
+    }),
+)?; // a configuration that would accept anything (no allowlist, no trust anchor) is refused here
+let expected = Binding { holder_pub: key, grant_ref: format!("passport:{id}"), epoch: 0.0, nonce };
+let res = v.verify_evidence(Some(&evidence), now_ms, &expected);
+// res.ok && res.bound == Some(true): the quote is genuine, bound to that holder, grant, epoch and nonce,
+// and res.measured is the hardware-measured identity
+```
+
+The configuration and the evidence of each vendor are the language-neutral ones of the shared conformance vectors, and the
+verifiers answer exactly what the TypeScript verifiers answer, reason text included. They fail closed: a missing allowlist,
+trust anchor, issuer, collateral or binding is a denial, never a pass. They are classical (ECDSA, RSA), not post-quantum, and do
+no network I/O: the evidence, the collateral (Intel PCS, NVIDIA reference manifests, CRLs, OCSP responses) and the trust anchors
+are yours to supply. The Azure signing-key discovery and rotation store is not part of the crate: you configure the trust anchors.
+
+To verify hardware-rooted passports with it, set `PassportOptions::default_verifier`; an `attest` verifier you supply still wins:
+
+```rust
+let verifier = verifier_from_config(vendor, &config)?.with_evidence(evidence); // the evidence reaches the verifier out of band
+let o = PassportOptions { trusted_issuers: &issuers, now_ms, default_verifier: Some(&verifier), revoked: Some(&revoked), ..options };
+```
 
 ## Caveats (policy layer)
 
@@ -65,4 +440,4 @@ License: MIT
 
 - No list (`None`) means no restriction: the verifier accepts every signature suite it knows.
 - An empty list (`Some(&[])`) means refuse everything.
-- The hosted API defaults to `ed25519` plus the hybrids that include Ed25519, and refuses the pure post-quantum suites (`ml-dsa-*`, `slh-dsa-*`, `fn-dsa-*`, `less-cat1`) unless the operator lists them. To match it offline, pass `allowed_suites` exactly: `ed25519`, `hybrid-ed25519-ml-dsa-65`, `hybrid-nested-ed25519-ml-dsa-65`, `hybrid-ed25519-ml-dsa-87`, `hybrid-ed25519-slh-dsa-sha2-128f`, `hybrid-ed25519-slh-dsa-sha2-256s`, `hybrid-ed25519-less-cat1`. The effective hosted list is readable at `GET /v1/pca/suites`; see docs/pca/reference/wire-formats.md.
+- The hosted API defaults to `ed25519` plus the hybrids that include Ed25519, and refuses the pure post-quantum suites (`ml-dsa-*`, `slh-dsa-*`, `fn-dsa-*`, `less-cat1`) unless the operator lists them. To match it offline, pass `allowed_suites` exactly: `ed25519`, `hybrid-ed25519-ml-dsa-65`, `hybrid-nested-ed25519-ml-dsa-65`, `hybrid-ed25519-ml-dsa-87`, `hybrid-ed25519-slh-dsa-sha2-128f`, `hybrid-ed25519-slh-dsa-sha2-256s`, `hybrid-ed25519-less-cat1`. The effective hosted list is readable at `GET /v1/pca/suites`; see the [wire formats reference](https://github.com/Atlas-Authorization/pca/blob/main/docs/reference/wire-formats.md).

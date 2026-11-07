@@ -1,0 +1,5509 @@
+{
+  "keys": {
+    "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+    "rs": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+    "other": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk"
+  },
+  "digests": {
+    "workflow": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+    "receipt_refs": [
+      "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+      "dS8NKoW4vInid74uGjwkYtjtjFBNRuGI7Ww2gPg5gmU",
+      "wO3aR36GNlckeQ0DnY6i4okyT3ZaWzkzjM3L7lla92c",
+      "RF7Y5HaV6IchLu0uNekeuDDWizr1QNSh2e-pVKmxw8A"
+    ],
+    "values": [
+      {
+        "value": "ord_42",
+        "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU"
+      },
+      {
+        "value": 2500,
+        "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI"
+      },
+      {
+        "value": true,
+        "digest": "RlSOxI5_S6UfTK0O1UP3isXVPumkj-tYFhKF7ZaKcBs"
+      }
+    ],
+    "params": [
+      {
+        "params": {
+          "order": "ord_42"
+        },
+        "digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ"
+      }
+    ]
+  },
+  "workflows": {
+    "main": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 6,
+          "caps": {
+            "calls": 6,
+            "money": 5000
+          }
+        }
+      },
+      "sig": "R400D_3jRH4omGCsc3D2hgKx4KnNTVOyKz9t9ZNjkT4qCeCmMHJIeGVJZhrSqUHRZxC-zbYlox9A_puNQd8NDQ"
+    },
+    "tampered_body": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 60,
+          "caps": {
+            "calls": 6,
+            "money": 5000
+          }
+        }
+      },
+      "sig": "R400D_3jRH4omGCsc3D2hgKx4KnNTVOyKz9t9ZNjkT4qCeCmMHJIeGVJZhrSqUHRZxC-zbYlox9A_puNQd8NDQ"
+    },
+    "attacker_signed": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 6,
+          "caps": {
+            "calls": 6,
+            "money": 5000
+          }
+        }
+      },
+      "sig": "6X2a0fjH3pJRSK8gTrpC7VKrvFG_B9cv3cpVxwItfUE-c_CE7LRNwQy-IFsPS3l4bUiYK54T8B2TKWmStWOeDw"
+    },
+    "wrong_domain": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 6,
+          "caps": {
+            "calls": 6,
+            "money": 5000
+          }
+        }
+      },
+      "sig": "7SJwH0BMZ8R4JrKQ26yOiBZWI31NUiPN6qL2yvVvupxM9SSfZ9ZaXgDQqVKKZZ2NAO1U56xSuI0S_Fm4sboTDw"
+    },
+    "cycle": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {}
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {}
+          }
+        ],
+        "edges": [],
+        "budget": {
+          "max_steps": 3,
+          "caps": {}
+        }
+      },
+      "sig": "HPrblRXtI4qKiEEjGpw3Ucky9kMOcoMn-QLPhXE54w7DosgG7ZmSGMbsXHnuGP18zXP5elCNeTWLOG0vAMkdBA"
+    },
+    "duplicate_ids": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "a.b",
+            "resource": "r",
+            "params_digest": null,
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {}
+          },
+          {
+            "id": "lookup",
+            "verb": "a.c",
+            "resource": "r2",
+            "params_digest": null,
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {}
+          }
+        ],
+        "edges": [],
+        "budget": {
+          "max_steps": 3,
+          "caps": {}
+        }
+      },
+      "sig": "sGsskt_hboNdDQ9KZrORnOScVDtrCy-4CbJHragvEoUBtMBORUZ2F2ijyodUQNFRSCaWSFhysnzZK2_9YGtPBA"
+    },
+    "edge_backwards": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "audit",
+              "field": "x"
+            },
+            "to": {
+              "step": "lookup",
+              "param": "y"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          }
+        ],
+        "budget": {
+          "max_steps": 6,
+          "caps": {
+            "calls": 6,
+            "money": 5000
+          }
+        }
+      },
+      "sig": "25iTJpJB8AFIrM8uBjiULFpzeBMBN4mMq4R1T23QUFNNoChxPa77cXHidJf02X_6AlcflvXuIA5Ybd71vn55Ag"
+    },
+    "unknown_dep": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "a.b",
+            "resource": "r",
+            "params_digest": null,
+            "deps": [
+              "ghost"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {}
+          }
+        ],
+        "edges": [],
+        "budget": {
+          "max_steps": 3,
+          "caps": {}
+        }
+      },
+      "sig": "O2jQsL5KPQUVn5y5nvVrW1ydADK4Zl53AcI_o7L03uxE6bZjFRVjzlhOp6NujOqJXBUDoFgTZZMcSiDVlGbTDw"
+    },
+    "uncapped_cost": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 6,
+          "caps": {
+            "calls": 6
+          }
+        }
+      },
+      "sig": "YcQa2wLNrc3m9hSG44GCdxviEnIozr6KE13s-TX_8ImAlwbmq6T79poHxqIAj2o_jLsGcqoJHI_CkTQn7O9UAw"
+    },
+    "extra_member": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 6,
+          "caps": {
+            "calls": 6,
+            "money": 5000
+          }
+        },
+        "extra": 1
+      },
+      "sig": "R400D_3jRH4omGCsc3D2hgKx4KnNTVOyKz9t9ZNjkT4qCeCmMHJIeGVJZhrSqUHRZxC-zbYlox9A_puNQd8NDQ"
+    },
+    "unsorted_deps": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "a.b",
+            "resource": "r",
+            "params_digest": null,
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {}
+          },
+          {
+            "id": "refund",
+            "verb": "a.c",
+            "resource": "r2",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {}
+          }
+        ],
+        "edges": [],
+        "budget": {
+          "max_steps": 3,
+          "caps": {}
+        }
+      },
+      "sig": "8FpfXc4S7m9qwEocfIFGydVECV5uqatbxRLMRb9TXZcG1uKWWlUEUmGQGyokUMlWe_BUIC7px7CFMlcBa628DA"
+    },
+    "not_an_object": "workflow",
+    "max_one_step": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 1,
+          "caps": {
+            "calls": 6,
+            "money": 5000
+          }
+        }
+      },
+      "sig": "V9GnSq9SZk7mSCzQeaUi_lpK_Fcs4bTzp9iC_I4tiYIrHCFI439b1c0EmrrS1wditBF0buyl0YNOvg-Eha5YCA"
+    },
+    "money_cap": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 6,
+          "caps": {
+            "calls": 6,
+            "money": 4999
+          }
+        }
+      },
+      "sig": "KxsYVIWCKwNaA_-ygMOi8p41t_Aq1Ok6J-G8VWi9NVG_RCoKv8_GNCojiTCZoDu1PmPrclLFL0A8i5a9Dz3YCQ"
+    },
+    "exact_budget": {
+      "body": {
+        "v": 1,
+        "id": "wf-refund-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "steps": [
+          {
+            "id": "lookup",
+            "verb": "orders.get",
+            "resource": "orders/42",
+            "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+            "deps": [],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "refund",
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params_digest": null,
+            "deps": [
+              "lookup"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": 600000,
+            "cost": {
+              "calls": 1,
+              "money": 5000
+            }
+          },
+          {
+            "id": "notify",
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params_digest": null,
+            "deps": [
+              "lookup",
+              "refund"
+            ],
+            "sink": "external_communication",
+            "deny_labels": [
+              "secret"
+            ],
+            "escalate_labels": [
+              "pii"
+            ],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          },
+          {
+            "id": "audit",
+            "verb": "audit.log",
+            "resource": "audit/1",
+            "params_digest": null,
+            "deps": [
+              "refund"
+            ],
+            "sink": null,
+            "deny_labels": [],
+            "escalate_labels": [],
+            "fresh_ms": null,
+            "cost": {
+              "calls": 1
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": {
+              "step": "lookup",
+              "field": "refund_cents"
+            },
+            "to": {
+              "step": "refund",
+              "param": "amount"
+            },
+            "op": "le",
+            "unit": "usd_c",
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "lookup",
+              "field": "order"
+            },
+            "to": {
+              "step": "refund",
+              "param": "order"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "confirmation"
+            },
+            "to": {
+              "step": "notify",
+              "param": "ref"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [
+              "secret"
+            ],
+            "promise": null
+          },
+          {
+            "from": {
+              "step": "refund",
+              "field": "id"
+            },
+            "to": {
+              "step": "audit",
+              "param": "refund_id"
+            },
+            "op": "eq",
+            "unit": null,
+            "deny_labels": [],
+            "promise": "refund-id-of-this-order"
+          }
+        ],
+        "budget": {
+          "max_steps": 2,
+          "caps": {
+            "calls": 2,
+            "money": 5000
+          }
+        }
+      },
+      "sig": "NbT4i0V-pb_ilkxf4YlorzIMa73lLXPcCJ59pwcYY3rZvZRvRkr1GgmnTOC_i7W5mZ7wM3w6dSjz2DByLWszCg"
+    }
+  },
+  "admit": [
+    {
+      "name": "lookup-first-step",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-after-lookup",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-exactly-the-computed-amount",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-one-over-the-computed-amount",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2501,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_relation",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-below-the-computed-amount",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 1,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-for-another-order",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_43"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_digest",
+        "step": "refund",
+        "at": 1,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-amount-absent",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_missing",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-amount-wrong-unit",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "eur_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_unit",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-amount-without-unit",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_unit",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-amount-not-an-integer-type",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": "2500",
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_value",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "refund-before-lookup-is-unconstrained-pipelining",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "escalate",
+        "code": "pipeline_unconstrained",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "notify-before-lookup-denies-reorder",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "notify",
+        "verb": "mail.send",
+        "resource": "mail/out",
+        "params": {
+          "ref": "conf_9"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "deps_unmet",
+        "step": "notify",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "audit-pipelined-before-refund-receipt",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_7"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "audit",
+        "at": null,
+        "pending": [
+          3
+        ]
+      }
+    },
+    {
+      "name": "audit-after-refund",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999971000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "f2JBh5u-ZfwoGvnQTso7gyU26m40YEXc0fwj4eV8YBoTPG1Fb7wZDYBQhQYCoRMOxcreRV1jjR0Oz6orPrBLAg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_7"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "audit",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "audit-wrong-refund-id",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999971000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "f2JBh5u-ZfwoGvnQTso7gyU26m40YEXc0fwj4eV8YBoTPG1Fb7wZDYBQhQYCoRMOxcreRV1jjR0Oz6orPrBLAg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_8"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_digest",
+        "step": "audit",
+        "at": 3,
+        "pending": []
+      }
+    },
+    {
+      "name": "notify-with-pii-escalates",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999971000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "f2JBh5u-ZfwoGvnQTso7gyU26m40YEXc0fwj4eV8YBoTPG1Fb7wZDYBQhQYCoRMOxcreRV1jjR0Oz6orPrBLAg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "notify",
+        "verb": "mail.send",
+        "resource": "mail/out",
+        "params": {
+          "ref": "conf_9"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "escalate",
+        "code": "taint_escalate",
+        "step": "notify",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "notify-without-labels-allows",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "gruQXZ4ktlr9SYljOhwbuxgA79H1cPqC0hr6HG_VzH4gDSebjT-mm7Lkpt3Gjt8CXUkIcajbQ41T2ZRiESIvAQ"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 1,
+          "prev": "JkbyKX2UEhdA7yGJdfryjCon95AZX9LAukCukHf71ps",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999971000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "ecJCfUCVulKUvWjv6uFuXrCCHYuaeQ-BtTyC-YKKW_mk9sgHzVbI3x382p_Bnjfs4LyS1GR3v-pRDrhbVG86Aw"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "notify",
+        "verb": "mail.send",
+        "resource": "mail/out",
+        "params": {
+          "ref": "conf_9"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "notify",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "notify-with-secret-denies",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "secret"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "PukGUMECBJmRng0UxmzqdB0jj2vzvjl0zJsyxh1aKmHrkYQdU-IcsZBOT9zFINVxn2g_m9tPfNKe-JHzIEzlCg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 1,
+          "prev": "eNp4_v_uCVpNiZn9gBlBm9Cn_vTRVoFzKslggj5FOUo",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999971000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "bT5JlkuxzFUz4r-BJu3EFH6NC653-y62ztN2wvZ9LDBurFvGZqSrqdRhJx-7yKSQy3EaiohhPzj3tldxxacVAA"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "notify",
+        "verb": "mail.send",
+        "resource": "mail/out",
+        "params": {
+          "ref": "conf_9"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "taint_flow",
+        "step": "notify",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "unplanned-step",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "wire",
+        "verb": "payments.wire",
+        "resource": "payments/9",
+        "params": {
+          "amount": 1
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "unplanned_step",
+        "step": "wire",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "known-step-other-verb",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.send",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "step_mismatch",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "known-step-other-resource",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/43",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "step_mismatch",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "committed-params-differ",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_43"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "params_mismatch",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "step-already-executed",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "already_done",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "dependency-failed",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "failed",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "tabStBdF2UZ13lyrAQzAcv-tHhu960V5li3PNefgiqGGEJdsdivCBP9cQUkNgzdq6r0ZTmENQHM5GgkdlItkAA"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "dep_failed",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "dependency-stale",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000700000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "stale_dep",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "dependency-just-fresh",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000570000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "dependency-one-ms-stale",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000570001,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "stale_dep",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "other-goal",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "jCTOA2qlZp6TjdbERu51ILL-gPgQWYJVJjnYQRldc6g",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "goal_mismatch",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "goal-omitted",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": null,
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "goal_mismatch",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "other-plan-root",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "qWVwNxYGyl8R-sdshQHvKy5m9eVXY4z9vkl3hVcsK_M"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "plan_root_mismatch",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "before-issued",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1799996399999,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "not_yet",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "at-expiry",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800003600000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "expired",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "last-valid-ms",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800003599999,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "unpinned-principal",
+      "workflow": "main",
+      "principal": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "tampered-body",
+      "workflow": "tampered_body",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "attacker-signed-naming-itself",
+      "workflow": "attacker_signed",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "signature-under-another-domain",
+      "workflow": "wrong_domain",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "cyclic-dag",
+      "workflow": "cycle",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {},
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_dag",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "duplicate-step-ids",
+      "workflow": "duplicate_ids",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {},
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_dag",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "edge-against-the-dependency-direction",
+      "workflow": "edge_backwards",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_dag",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "dependency-on-unknown-step",
+      "workflow": "unknown_dep",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {},
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_dag",
+        "step": "lookup",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "cost-name-without-a-cap",
+      "workflow": "uncapped_cost",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_workflow",
+        "step": null,
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "unknown-body-member",
+      "workflow": "extra_member",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_workflow",
+        "step": null,
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "duplicate-dependency-entries",
+      "workflow": "unsorted_deps",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {},
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_workflow",
+        "step": null,
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "workflow-is-a-string",
+      "workflow": "not_an_object",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {},
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_workflow",
+        "step": null,
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "request-with-extra-member",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": "ord_42"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+        "extra": 1
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_workflow",
+        "step": null,
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "request-float-param",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "order": 1.5
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_workflow",
+        "step": null,
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "proto-named-param",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [],
+      "now": 1800000000000,
+      "request": {
+        "step": "lookup",
+        "verb": "orders.get",
+        "resource": "orders/42",
+        "params": {
+          "__proto__": "x"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_workflow",
+        "step": null,
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "step-count-budget",
+      "workflow": "max_one_step",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "8U6DMQYSuo66vHfppkHFM6WEvCmZvKEzTwYA6rUm_IQ",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "PlN_85t0Q0tRkmpv04s6YgngKfXvjuAeIHW3WtWBSxLuVOtW9-wCqVIXEhNrLu7aUWEzeVuqN_caJf_S-sSHCg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "budget_exceeded",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "cost-cap-exceeded-by-this-step",
+      "workflow": "money_cap",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "ZSIOBAsLHsnVaYWlKML20WD2pM3mIXh_9-KGXjgglMg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "BGaJVXpAX4x3co6aDIayO6Tx2mFgw8HHuug2nqadSGM3UhWuA43360F49XuRYIIRWbVtTOuad_Z4u5VINUhLBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "budget_exceeded",
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "budget-exactly-met",
+      "workflow": "exact_budget",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "4G36cwoW4GqfSoxD_pjdFMOX_0WqmMQa0FmO-x4FSNU",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "1277ZSW6S-QWGtNgl3nklB3dM-IH7g4AMwugpShc9Tc_1S5Kkhlz96sShIg1wRl_uwMhtzkdNbIZDCbJB9iyBw"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "refund",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-bad-signature",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "f2JBh5u-ZfwoGvnQTso7gyU26m40YEXc0fwj4eV8YBoTPG1Fb7wZDYBQhQYCoRMOxcreRV1jjR0Oz6orPrBLAg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-from-an-unpinned-signer",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+          "sig": "qzgiEAWUzx3RE0G8YdEIaL23tLOKwGYaDIFyDoHYgct9fDFJLId0_L7ozsbTCtvb3M5gQH89O1WNCeljpZP5AA"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-of-another-workflow",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "gwhsS5QvcjxQMa0R6s4yMnRi6xz52ZAsUfPDAsQsoXo",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "9nrxm_1OaFGTKDet19gErXqfpFAajQRl7TR6KltE1_RIfPFPys45UQPYp6FwGMXWmLqEs2lscmjWbAPWckxjCg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-gap",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "notify",
+          "seq": 2,
+          "prev": "dS8NKoW4vInid74uGjwkYtjtjFBNRuGI7Ww2gPg5gmU",
+          "outcome": "ok",
+          "params_digest": "gvGaF7IWQ517jrbl1ZWaFusW2vXE0K-dnGvNNYru6d0",
+          "outputs": {},
+          "issued_at": 1799999972000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "qL6mRG6CCA3TUlq7e-AGqqLGqfdPUBuZxoqGV9iglwS_cADg4fmjoXJNtbwUI4nOUrbJbyKuG0cmQsPs77_tCA"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 1,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-reordered-without-promise",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999971000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "f2JBh5u-ZfwoGvnQTso7gyU26m40YEXc0fwj4eV8YBoTPG1Fb7wZDYBQhQYCoRMOxcreRV1jjR0Oz6orPrBLAg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_7"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "audit",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-duplicated",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 1,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-from-the-future",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1800000005000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "6P_9tdhpxyRhqXhM80KcS68ElBS3o06lV8ClKlWiToJ6gqm01k9x5rj2hDYWNkBpenmo4lhgTt5RNDH8ZRK1Dw"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-labels-unsorted",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii",
+                "a"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-not-an-object",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        "x"
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-for-an-unplanned-step",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "wire",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "1fkYlUOfCL1ItMvpUvuhLwRlj3ujihlS6wttVWv7TiQ",
+          "outputs": {},
+          "issued_at": 1799999999999,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "DumBJOnrAMicw9jRcDbnsqyeXFPjFPnxE4ohPg4SF-yEQLbaLlpMQYO-HswAKo2hWRWD547QJ3WRWwsnD05pDQ"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    },
+    {
+      "name": "receipt-signed-under-the-workflow-domain",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "0f2_9_C0Bzas5OOQldVJaqeXVtQ1-vnqjUqmHP8edIbP0A6LEH-7OB2Qal51vAG7tO10dPW5_uNrWZLQRghtBA"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "refund",
+        "verb": "payments.refund",
+        "resource": "payments/42",
+        "params": {
+          "amount": 2500,
+          "order": "ord_42"
+        },
+        "units": {
+          "amount": "usd_c"
+        },
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "step": "refund",
+        "at": 0,
+        "pending": []
+      }
+    }
+  ],
+  "bind": [
+    {
+      "name": "promise-kept",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "audit",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "vNEYYflqD-UJmTLNAd7ZrKsSMpevV7_wNbdlBzQVkVY",
+          "outputs": {},
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "q0Ni9NWekeiYqPQf8RPHYEu73KMRYJmQxzfW6AkHNmaQSIAhVhBmRZ5QABpSD9Pe0j70MLVYoQ25icWLwE_PDQ"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 2,
+          "prev": "Zgs5o4_kMPfyQoDNsMxTUu_mIjLNhaMXPHQmuJXsrlc",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999990000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "amC11QVzbNYktkBJjzV94Z6svOKqzN4gpBICQ-No5R3b41L_v_rO1YVDWSc6SdE5sANPWiHnI81sWCapMxBdAA"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_7"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "step": "audit",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "promise-broken",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "audit",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "vNEYYflqD-UJmTLNAd7ZrKsSMpevV7_wNbdlBzQVkVY",
+          "outputs": {},
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "q0Ni9NWekeiYqPQf8RPHYEu73KMRYJmQxzfW6AkHNmaQSIAhVhBmRZ5QABpSD9Pe0j70MLVYoQ25icWLwE_PDQ"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 2,
+          "prev": "Zgs5o4_kMPfyQoDNsMxTUu_mIjLNhaMXPHQmuJXsrlc",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999990000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "amC11QVzbNYktkBJjzV94Z6svOKqzN4gpBICQ-No5R3b41L_v_rO1YVDWSc6SdE5sANPWiHnI81sWCapMxBdAA"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_other"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "params_mismatch",
+        "step": "audit",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "promise-violated-by-the-late-receipt",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "audit",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "FTEEcJOfFtFPwNqccqzCoZqUKJ2MsXfhnleYzUPwmHw",
+          "outputs": {},
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "pu2ggWyCXEsI0gfeni8EIViojVBmW8m3gsXUpbY175RxKIRLbBBA4asdemb-F3wH3rzp_-vKz9THoevxr71oAQ"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 2,
+          "prev": "32CaICVOxgdOUYhb0gta1s7r-jRQ91YHA1dXUMVyHSQ",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999990000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-rkDxeL2ruqZBOECEvVSgxOYosRnjR58d47mnkahfnCuJfPAEXqxsOP-BaKUvYUeBLEY1WisQo2He09adEaoDQ"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_other"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "edge_digest",
+        "step": "audit",
+        "at": 3,
+        "pending": []
+      }
+    },
+    {
+      "name": "bind-before-the-dependency-receipt",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "audit",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "vNEYYflqD-UJmTLNAd7ZrKsSMpevV7_wNbdlBzQVkVY",
+          "outputs": {},
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "q0Ni9NWekeiYqPQf8RPHYEu73KMRYJmQxzfW6AkHNmaQSIAhVhBmRZ5QABpSD9Pe0j70MLVYoQ25icWLwE_PDQ"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_7"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "deps_unmet",
+        "step": "audit",
+        "at": null,
+        "pending": []
+      }
+    },
+    {
+      "name": "bind-without-own-receipt",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "receipts": [
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "lookup",
+          "seq": 0,
+          "prev": null,
+          "outcome": "ok",
+          "params_digest": "vBYHInoMCc1qBtNIStEqCveXarPfAfvZR_p6MQJpigQ",
+          "outputs": {
+            "refund_cents": {
+              "digest": "07WwyvhB3Qs7tI76wYD2_sRowOrbCZob6YXtR55i7BI",
+              "num": 2500,
+              "unit": "usd_c",
+              "labels": []
+            },
+            "order": {
+              "digest": "d9VZNDrKt5q_NfrGz0r_AolN-k2izwa6yr6ji9faquU",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "email": {
+              "digest": "PR7EY2AZq_h8qm4DxlrHAIJ5nkjSsPhC9I32mU1O_Dg",
+              "num": null,
+              "unit": null,
+              "labels": [
+                "pii"
+              ]
+            }
+          },
+          "issued_at": 1799999970000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "-o0LPtsSZppjTl5xRcdC26LkUU0cVZVabJ2H3UZL2aDTJEOZ1sNQE2i4FNR6CFRbOdoK4D3LVZkprGONnf_HBg"
+        },
+        {
+          "v": 1,
+          "wf": "lIlpHajms-20AWzyA2trgX9wmX7n-oDAPb9tReUOeIg",
+          "step": "refund",
+          "seq": 1,
+          "prev": "96qz7bimrc2S-vnmY8pHkoiy-FUAXq-YyMl_kUL41V4",
+          "outcome": "ok",
+          "params_digest": "_YpD9TUUuCBTlCJBkWRxl8RMM7EJFaqeg5gK8mb2oBE",
+          "outputs": {
+            "confirmation": {
+              "digest": "Evf7F9o2dnLAME8CC6Tym4dtCUxR8ygYnbVWfCzudLI",
+              "num": null,
+              "unit": null,
+              "labels": []
+            },
+            "id": {
+              "digest": "16FjKrAUySeJGfQBzJdPDePVkrmw0JicAjviX1AkEhs",
+              "num": null,
+              "unit": null,
+              "labels": []
+            }
+          },
+          "issued_at": 1799999971000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "f2JBh5u-ZfwoGvnQTso7gyU26m40YEXc0fwj4eV8YBoTPG1Fb7wZDYBQhQYCoRMOxcreRV1jjR0Oz6orPrBLAg"
+        }
+      ],
+      "now": 1800000000000,
+      "request": {
+        "step": "audit",
+        "verb": "audit.log",
+        "resource": "audit/1",
+        "params": {
+          "refund_id": "rf_7"
+        },
+        "units": {},
+        "goal_digest": "XbJFM98XeNwA_IViaror9sHJwl2-Aj561oSV6bp9z6Q",
+        "plan_root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "params_mismatch",
+        "step": "audit",
+        "at": null,
+        "pending": []
+      }
+    }
+  ],
+  "plan_root": [
+    {
+      "name": "authorized",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "now": 1800000000000,
+      "root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+      "expect": true
+    },
+    {
+      "name": "other-root",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "now": 1800000000000,
+      "root": "qWVwNxYGyl8R-sdshQHvKy5m9eVXY4z9vkl3hVcsK_M",
+      "expect": false
+    },
+    {
+      "name": "unpinned-principal",
+      "workflow": "main",
+      "principal": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+      "now": 1800000000000,
+      "root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+      "expect": false
+    },
+    {
+      "name": "expired",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "now": 1800003600000,
+      "root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+      "expect": false
+    },
+    {
+      "name": "not-yet",
+      "workflow": "main",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "now": 1799996399999,
+      "root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+      "expect": false
+    },
+    {
+      "name": "tampered",
+      "workflow": "tampered_body",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "now": 1800000000000,
+      "root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+      "expect": false
+    },
+    {
+      "name": "cyclic",
+      "workflow": "cycle",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "now": 1800000000000,
+      "root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+      "expect": false
+    },
+    {
+      "name": "not-an-object",
+      "workflow": "not_an_object",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "now": 1800000000000,
+      "root": "rHO1a5SdwC1SDyEAxLCsp681vmlzWD2IQkMoJp97eOo",
+      "expect": false
+    }
+  ]
+}

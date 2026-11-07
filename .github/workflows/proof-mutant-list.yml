@@ -1,0 +1,62 @@
+name: Mutant count
+
+# Lists (never runs) mutants to size the mutation gate: cargo-mutants' for atlas-pca and the published proof crates (per
+# file and function), and the statement mutants of tools/pca-audit/rust-mutate/stmt-mut for atlas-pca.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['ci/0.5.0-int']
+
+permissions:
+  contents: read
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants@27.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship tooling
+        run: .github/scripts/mutation-layout.sh rust-pca crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - name: Proof crates (cargo-mutants)
+        run: |
+          mkdir -p mutant-lists
+          for c in stark-pca folding-pca; do
+            cargo mutants -d "crates/$c" --list --json --all-features > "mutant-lists/$c.json"
+            node -e '
+              const all = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+              const by = {}, files = {};
+              for (const m of all) { const k = m.file + " " + (m.function?.function_name ?? "-"); by[k] = (by[k] || 0) + 1; files[m.file] = (files[m.file] || 0) + 1; }
+              console.log("== " + process.argv[2] + ": " + all.length + " mutants " + JSON.stringify(files));
+              for (const [k, v] of Object.entries(by)) console.log(v + " " + k);
+            ' "mutant-lists/$c.json" "$c"
+          done
+      - name: Statement mutants (stmt-mut) and cargo-mutants totals per crate, as the mutation workflow plans them
+        run: |
+          M="$MONO/tools/pca-audit/rust-mutate/stmt-mut/Cargo.toml"
+          cargo test -q --manifest-path "$M" --target-dir "$RUNNER_TEMP/stmt-mut-target"
+          cargo build -q --release --manifest-path "$M" --target-dir "$RUNNER_TEMP/stmt-mut-target"
+          for c in "atlas-pca crates/atlas-pca -" "stark-pca crates/stark-pca src/bin" "pca-folding-ivc crates/folding-pca src/bin"; do
+            set -- $c; ex=; [ "$3" = - ] || ex="$2/$3/**"
+            node "$MONO/tools/pca-audit/rust-mutate/stmt-run.mjs" list --tool="$RUNNER_TEMP/stmt-mut-target/release/stmt-mut" --pkg="$1" --exclude="$ex" > "mutant-lists/$1-stmt.json"
+            node -e '
+              const p = require(process.argv[1]); const g = {}, f = {};
+              for (const m of p.mutants) { g[m.genre] = (g[m.genre] || 0) + 1; f[m.file] = (f[m.file] || 0) + 1; }
+              console.log("== " + process.argv[2], JSON.stringify({ cargo_mutants: p.cargo_mutants, statement: p.count, generated: p.generated, skipped: p.skipped_lines_with_a_cargo_mutant, files: p.files }));
+              console.log(JSON.stringify(g)); console.log(JSON.stringify(f));
+            ' "$PWD/mutant-lists/$1-stmt.json" "$1"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mutant-lists
+          path: mutant-lists/
+          retention-days: 7

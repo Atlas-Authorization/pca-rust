@@ -121,3 +121,19 @@ pub fn unsupported_suite(v: &Value) -> Option<String> {
     }
 }
 
+
+/// The conformance harness mediator every allow-expecting authorize test presents provenance from (as the TypeScript harness
+/// does): Ed25519 seed = 32 bytes of 0x01, mediator `conformance-harness`, kid `k1`.
+pub fn harness_recorder() -> atlas_pca::arg_provenance::ProvenanceRecorder {
+    atlas_pca::arg_provenance::ProvenanceRecorder::new("conformance-harness", "k1", Some([1u8; 32])).expect("harness recorder")
+}
+
+/// The harness mediator pin, configured as the verifier's provenance mediators.
+pub fn harness_pins() -> Vec<Value> {
+    vec![harness_recorder().pin()]
+}
+
+/// The principal-direct bundle of `op` under the harness mediator (the bundle hook of allow-expecting tests).
+pub fn principal_direct(op: &atlas_pca::Operation) -> Result<Option<Value>, String> {
+    atlas_pca::arg_provenance::principal_direct_provenance(&mut harness_recorder(), op).map(Some)
+}

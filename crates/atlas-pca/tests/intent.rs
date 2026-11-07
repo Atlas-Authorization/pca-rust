@@ -82,7 +82,7 @@ fn verify(p: &Value, grant: &Value, pol: Option<&IntentPolicy>) -> Verdict {
 }
 
 fn pol(require: bool, min: Option<f64>, max: Option<f64>) -> IntentPolicy {
-    IntentPolicy { require, min_fidelity_ppm: min, max_residual_risk_ppm: max }
+    IntentPolicy { require, min_fidelity_ppm: min, max_residual_risk_ppm: max, ..Default::default() }
 }
 
 #[test]
@@ -189,7 +189,7 @@ fn policy_from_json_is_lenient() {
 
 // ---- mutation-kill: every intent boundary pinned on both sides --------------------------------------------------
 
-const PRIOR: [&str; 9] = ["wire", "version", "audience", "validity", "chain", "grant_ref_bound", "plan_inclusion", "leaf_signature", "counter"];
+const PRIOR: [&str; 9] = ["wire", "version", "audience", "validity", "chain", "grant_ref_bound", "plan_inclusion", "leaf_signature", "counter_format"];
 
 fn bound() -> Value {
     root_grant(json!([envelope(json!(bound_commit(SALT)))]))
@@ -387,7 +387,7 @@ fn kill_root_grant_binding() {
 #[test]
 fn kill_verdict_shape_and_order() {
     let g = bound();
-    // counter is evaluated before intent: both fail, counter is the reason
+    // counter_format is evaluated before intent: both fail, counter_format is the reason
     let mut p = pcactn(&g, Some(patched("goal_salt", json!("wrong"))));
     p["counter"] = json!(-1);
     let m = p.as_object_mut().unwrap();
@@ -395,8 +395,8 @@ fn kill_verdict_shape_and_order() {
     let msg = threshold_message(m).unwrap();
     m.insert("sig".into(), json!(b64(&key("agent").sign(&msg).to_bytes())));
     let v = verify(&p, &g, None);
-    assert!(!v.allow && v.checks.len() == 10 && v.checks.get("counter") == Some(&false) && v.checks.get("intent") == Some(&false), "{v:?}");
-    assert!(v.reason.starts_with("counter: "), "{}", v.reason);
+    assert!(!v.allow && v.checks.len() == 10 && v.checks.get("counter_format") == Some(&false) && v.checks.get("intent") == Some(&false), "{v:?}");
+    assert!(v.reason.starts_with("counter_format: "), "{}", v.reason);
     // a wire failure never reports intent, even under an active policy
     must_wire("wire beats policy", &verify(&pcactn(&g, Some(patched("fidelity_ppm", json!(-1)))), &g, Some(&pol(true, None, None))));
     // the JSON entry point threads the policy too
