@@ -260,3 +260,12 @@ fn kill_predicates_and_lists() {
     assert!(bad.is_empty(), "{} differ:\n{}", bad.len(), bad.iter().take(20).cloned().collect::<Vec<_>>().join("\n"));
     });
 }
+
+/// showValue's plain-string test (predicates.ts:622, /[\u0000-\u001f"\\\ud800-\udfff]/ plus at most 64 UTF-16 units): a space
+/// (U+0020) and U+FFFF are spelled out; U+001F and an astral character (a surrogate pair in UTF-16) are not.
+#[test]
+fn show_value_spells_out_a_string_at_both_edges_of_the_plain_range() {
+    for (s, want) in [(" ", "\" \""), ("\u{FFFF}", "\"\u{FFFF}\""), ("\u{1F}", "\"...\""), ("\u{10000}", "\"...\""), ("\u{7F}", "\"\u{7F}\"")] {
+        assert_eq!(show_value(&Value::String(s.into()), 0), want, "{s:?}");
+    }
+}

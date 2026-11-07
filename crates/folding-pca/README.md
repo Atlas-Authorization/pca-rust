@@ -1,6 +1,8 @@
 # pca-folding-ivc
 
-> Status: **0.4.3, unaudited.** Install: `cargo add pca-folding-ivc`
+> Maturity: **hardened** (hardened, formally verified (model), awaiting independent audit). It awaits an independent review of the step circuit and of neptune's Poseidon margin and MDS choices, and it is outside the stable and production tiers. See [maturity tiers](https://github.com/Atlas-Authorization/pca/blob/main/docs/maturity.md).
+
+> Status: **0.5.0, hardened, awaiting independent audit.** Install: `cargo add pca-folding-ivc`
 
 **One succinct proof of an agent's entire PCA action history — via a folding scheme (Nova), not naive recursion.**
 
@@ -72,6 +74,10 @@ fixtures to `fixtures/`:
   `nova_snark::frontend::gadgets::poseidon` (the same code Nova uses for its own folding random
   oracle) — arity 2, `Strength::Standard`. No hash is hand-rolled.
 
+## Hash parameter source
+
+Nothing in the hash is self-designed. The chain hash is the `neptune` Poseidon that `nova-snark` vendors, at its `Strength::Standard` constants: width t = 3, x^5 S-box, 8 full and 55 partial rounds (the Poseidon paper's round-number inequalities with neptune's standard margin), Grain-LFSR round constants and a Cauchy MDS matrix, exactly as neptune generates them (the same instance Nova uses for its own random oracle). This crate adds no constants. Replacing the instance with another would mean a hand-written Poseidon circuit, which is the self-designed route; the independent Python reference in `tools/` therefore re-derives neptune's instance and is checked against the published IAIK vectors, rather than defining a new one. What an audit still has to cover is neptune's choice of margin and MDS points, which are published but not covered by an official vector for this exact instance.
+
 ## Honest scope
 
 - The chain hash `H` is a **production, collision-resistant Poseidon** over the circuit's native
@@ -112,10 +118,7 @@ fixtures to `fixtures/`:
   `poseidonperm_x5_254_3` (source URL, retrieval date and SHA-256 are in
   `fixtures/poseidon_crosscheck.json`) before it is used. The match covers the permutation, the Grain
   round constants, the round numbers (8 full, 55 partial), the Cauchy MDS matrix and the sponge
-  domain tag. The parameter choices themselves (Cauchy MDS with x_i = i, y_i = t + i; the +2 full /
-  x1.075 partial round margin; Grain S-box field bits set to 1) are this instance's own, so there
-  is no published test vector for the exact instance; the published vectors validate the reference,
-  not the instance parameters.
+  domain tag. The parameter choices themselves (Cauchy MDS with x_i = i, y_i = t + i; the +2 full / x1.075 partial round margin; Grain S-box field bits set to 1) are neptune's standard constants, which this crate does not choose (see "Hash parameter source"); there is no published test vector for the exact instance, so the published vectors validate the reference, not the instance parameters.
 - **Cost binding (RT-05).** The metered cost is absorbed into the chain through the leaf
   `H(action_digest, cost)`, so the final `chain_digest` commits to the exact ordered (action, cost)
   sequence. A prover cannot relabel a history with cheaper costs and keep the honest digest: the
@@ -153,9 +156,23 @@ fixtures to `fixtures/`:
 - **Security level.** `tests/security_bits.rs` asserts the arithmetic: about 2^126.8 for the discrete log on the
   curve cycle and Poseidon round numbers above the paper's bounds for 128 bits; classical adversary,
   random-oracle model, not post-quantum.
+- **Property and differential tests.** `tests/property_differential.rs` folds seeded random histories with Nova and compares the
+  folded output with the native replay (two independent evaluations of the same Poseidon chain), checks that 300 random histories
+  never collide on the chain digest, that every single edit (digest, cost, append, drop, swap) changes it, and that the budget
+  component is the exact sum of the costs. The suite runs in the Rust CI workflow with the rest of the workspace.
 - **Decoder fuzzing.** `tests/fuzz_decoder.rs` mutates the committed proof under an allocation watchdog and a
   child-process pass with hostile length prefixes: no panic escapes decode-and-verify, no mutant verifies,
   no hostile length makes the process abort.
 - **Not validated.** There is no official test-vector suite for this circuit, and the construction
-  has not been reviewed by a third party. The package remains unaudited and the folding scheme is
+  has not been reviewed by a third party. The package remains hardened, awaiting independent audit, and the folding scheme is
   not post-quantum.
+
+## Formal evidence
+
+Statement binding, `PcaComp/Wrap.lean`. What a machine checked, and what it did not.
+
+- Proved: the verifier recomputes the statement digest from the claim and runs the proof verifier on it, so an accepted proof is about this claim and two claims with one digest are a hash collision (`statement_bound`, `claims_collide`).
+- Assumed (named): NA-NOVA (knowledge soundness of Nova folding in the ROM, Poseidon as a random oracle), NA-ROM. The folding scheme is not post-quantum.
+- Not modelled: the step circuit and the Poseidon parameters (reviewed by differential checks only).
+
+Reproduce: `formal/computational/check.sh lean` (core Lean 4, no Mathlib; it also prints the axioms each theorem uses, only `propext`, `Classical.choice` and `Quot.sound`). The models are hand-written from the code and are NOT statements about the shipped implementation: the independent audit of the implementation is still required, and this package stays hardened until then.

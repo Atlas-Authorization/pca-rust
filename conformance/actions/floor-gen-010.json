@@ -1,0 +1,1 @@
+{"id":"floor-gen-010","kind":"floor","input":{"grant":{"caveats":[],"max_esc":0,"preauth_esc":3},"call":{"context":["fresh_revocation","sandbox_attested"]},"profile":{"risk":2,"rev":"rate_limited","blast_ppm":300000,"esc":2,"caveats":["approval_ref"],"context":["fresh_revocation","idempotency","revocable"],"prules":[]}},"expect":{"decision":"deny"}}

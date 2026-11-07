@@ -1,0 +1,188 @@
+[
+ {
+  "file": "src/lib.rs",
+  "fn": "body_too_deep",
+  "text": "[\"issuer\", \"holder\", \"caveats\", \"parent\", \"holder_pq\", \"alg\", \"pq_pk\"]",
+  "mutant": "replace body_too_deep -> bool with false",
+  "lineno": 1385,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with == in split",
+  "lineno": 69,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): n = 2 gives k = 2 = n, so the root of two leaves recurses on the same slice forever; n = 4 gives k = 1, a wrong but finite split. Which shows first depends on the test order: an overflow (listed) or a plain FAIL on a wrong root (an ordinary catch), so this entry may also match 0."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "let mut k = 1u64;",
+  "mutant": "replace split -> u64 with 0",
+  "lineno": 752,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): split returns 0 for every n, so the root of n >= 2 leaves recurses on hs[..0] (length 0, not the base case 1), whose split is 0 again: unbounded recursion on any tree of two or more leaves, never a wrong answer."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with == in split",
+  "lineno": 753,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): n = 2 gives k = 2 = n, so the root of two leaves recurses on the same slice forever; n = 4 gives k = 1, a wrong but finite split. Which shows first depends on the test order: an overflow (listed) or a plain FAIL on a wrong root (an ordinary catch), so this entry may also match 0."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with <= in split",
+  "lineno": 753,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k*2 <= n stops at k = n for every power of two n >= 2 (n = 2: k = 2), so the root recurses on the same n-leaf slice forever; for other n the split is unchanged (the largest power of two below n), so the mutant never yields a wrong root, only the overflow."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with <= in split",
+  "lineno": 69,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k*2 <= n stops at k = n for every power of two n >= 2 (n = 2: k = 2), so the root recurses on the same n-leaf slice forever; for other n the split is unchanged (the largest power of two below n), so the mutant never yields a wrong root, only the overflow."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "k *= 2;",
+  "mutant": "replace *= with += in split",
+  "lineno": 754,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k grows 1, 3, 5...: n = 3 gives k = 3 = n, so the root of three leaves recurses on the same slice forever; n = 4..6 give a wrong but finite split. Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "let mut st: Vec<(&Value, usize)> = vec![(v, at)];",
+  "mutant": "replace deeper_than_cap -> bool with false",
+  "lineno": 1367,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "Value::Array(a) => Box::new(a.iter()),",
+  "mutant": "delete match arm Value::Array(a) in deeper_than_cap",
+  "lineno": 1370,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "Value::Object(m) => Box::new(m.values()),",
+  "mutant": "delete match arm Value::Object(m) in deeper_than_cap",
+  "lineno": 1371,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "st.extend(kids.map(|k| (k, d + 1)));",
+  "mutant": "replace + with * in deeper_than_cap",
+  "lineno": 1377,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "split",
+  "text": "k *= 2;",
+  "mutant": "replace *= with += in split",
+  "lineno": 70,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k grows 1, 3, 5...: n = 3 gives k = 3 = n, so the root of three leaves recurses on the same slice forever; n = 4..6 give a wrong but finite split. Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "tree_root",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in tree_root",
+  "lineno": 76,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "let mut k = 1;",
+  "mutant": "replace split -> usize with 0",
+  "lineno": 440,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): split returns 0 for every n, so the root of n >= 2 leaves recurses on hs[..0] (length 0, not the base case 1), whose split is 0 again: unbounded recursion on any tree of two or more leaves, never a wrong answer."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with == in split",
+  "lineno": 441,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): n = 2 gives k = 2 = n, so the root of two leaves recurses on the same slice forever; n = 4 gives k = 1, a wrong but finite split. Which shows first depends on the test order: an overflow (listed) or a plain FAIL on a wrong root (an ordinary catch), so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with <= in split",
+  "lineno": 441,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k*2 <= n stops at k = n for every power of two n >= 2 (n = 2: k = 2), so the root recurses on the same n-leaf slice forever; for other n the split is unchanged (the largest power of two below n), so the mutant never yields a wrong root, only the overflow."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "k *= 2;",
+  "mutant": "replace *= with += in split",
+  "lineno": 442,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k grows 1, 3, 5...: n = 3 gives k = 3 = n, so the root of three leaves recurses on the same slice forever; n = 4..6 give a wrong but finite split. Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "build",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in build",
+  "lineno": 447,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "prove",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in prove",
+  "lineno": 454,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/actions.rs",
+  "fn": "subroot",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in subroot",
+  "lineno": 1246,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::atom",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::atom",
+  "lineno": 290,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): self.i *= 1 never moves past the `.` atom, so the parser re-reads it and pushes a node per pass without end until the 6 GiB per-process cap fails the allocation (10 GiB request) or the cgroup OOM killer ends the test; it never returns, so no assertion can decide it."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "split",
+  "text": "let mut k = 1;",
+  "mutant": "replace split -> usize with 0",
+  "lineno": 68,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): split returns 0 for every n, so the root of n >= 2 leaves recurses on hs[..0] (length 0, not the base case 1), whose split is 0 again: unbounded recursion on any tree of two or more leaves, never a wrong answer."
+ }
+]

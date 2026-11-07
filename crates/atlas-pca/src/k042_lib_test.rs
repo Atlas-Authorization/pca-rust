@@ -79,7 +79,7 @@ fn an_intent_without_a_fidelity_is_below_every_floor() {
     let commit = intent_goal_commit(r, md, salt).unwrap();
     let grant = json!({"caveats": [{"type": "envelope", "goal_commit": commit}]});
     let intent = json!({"ref": r, "map_digest": md, "goal_salt": salt, "residual_risk_ppm": 0});
-    let pol = IntentPolicy { require: true, min_fidelity_ppm: Some(0.0), max_residual_risk_ppm: None };
+    let pol = IntentPolicy { require: true, min_fidelity_ppm: Some(0.0), max_residual_risk_ppm: None, ..Default::default() };
     let e = decide_intent(Some(&intent), &grant, Some(&pol), None).unwrap().unwrap_err();
     assert!(e.contains("fidelity -1 ppm is below the policy minimum 0"), "{e}");
     let with = json!({"ref": r, "map_digest": md, "goal_salt": salt, "residual_risk_ppm": 0, "fidelity_ppm": 0});

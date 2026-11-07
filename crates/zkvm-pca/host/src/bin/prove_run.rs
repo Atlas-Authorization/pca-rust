@@ -9,6 +9,7 @@
 //!
 //! Set PCA_SKIP_GROTH16=1 to skip the wrap (e.g. a CUDA build: the CUDA Groth16 wrap needs the `risc0-groth16` rzup
 //! component), and PCA_WRAP_ONLY=<succinct receipt> to only wrap an existing succinct receipt via docker.
+//! Set PCA_SKIP_NEGATIVE=1 to skip the negative matrix (CI runs it as its own job).
 //! Set PCA_ONLY_NEGATIVE=1 to run only the negative matrix (fast, no proving of the compliant input).
 //!
 //! Writes: receipt_succinct.bin, receipt_groth16.bin, journal.json, run_stats.json, negative_proving.json.
@@ -215,6 +216,10 @@ fn main() {
     }
 
     // ---- negative proving matrix ---------------------------------------------------------------------
+    if std::env::var("PCA_SKIP_NEGATIVE").is_ok() {
+        println!("ALL DONE: negative matrix skipped (PCA_SKIP_NEGATIVE)");
+        return;
+    }
     let mut neg = Vec::new();
     for (name, v) in negative_variants(&input) {
         let s = serde_json::to_string(&v).unwrap();

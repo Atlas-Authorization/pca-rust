@@ -1,0 +1,1 @@
+{"id":"rule22-schema-v1-verb","kind":"rule22_schema","input":{"doc":{"verbs":[{"verb":"a.b.c","kind":"write","params":{}}]},"pins":{"keys":[{"kid":"test-reviewer","pk":"AfzkqKf2RLbXX-KNKluhNmy3yPIuVm5mnAI1PbwslcI","roles":["reviewer"]}]}},"expect":{"ok":false,"code":"schema_floor_forged"}}

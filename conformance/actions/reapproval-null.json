@@ -1,0 +1,1 @@
+{"id":"reapproval-null","kind":"reapproval_verify","input":{"reapproval":null,"grant":{"id":"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG","issuer":"dTcT71juzhuipDdtc3DiYScTGAyQECK9ZF3051P9AZg"},"verb":"stripe.refund","diff":"bIpLXbe99NEK1BvnXEGMgOlgDGl7Fu6rVXcKofRg5zU"},"expect":{"ok":false}}

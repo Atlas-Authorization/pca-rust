@@ -42,9 +42,9 @@ fn acc_reason(c: &Value) -> String {
 }
 
 #[test]
-fn guest_version_10_keeps_the_session_root_pin_rule() {
-    assert_eq!(GUEST_VERSION, 10);
-    assert_eq!(MIN_GUEST_VERSION, 10, "a version-8 receipt may have admitted an unpinned PQ session root; version 9 is the superseded build");
+fn guest_version_11_keeps_the_session_root_pin_rule() {
+    assert_eq!(GUEST_VERSION, 11);
+    assert_eq!(MIN_GUEST_VERSION, 11, "a version-8 receipt may have admitted an unpinned PQ session root; version 9 is the superseded build");
 }
 
 #[test]

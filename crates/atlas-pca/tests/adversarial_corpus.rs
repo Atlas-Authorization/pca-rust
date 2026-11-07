@@ -27,7 +27,7 @@ fn adversarial_vectors() {
         } else if has_lone(&v["pcactn"]) {
             let mut checks = std::collections::BTreeMap::new();
             checks.insert("wire".to_string(), false);
-            Verdict { allow: false, checks, reason: "wire: lone surrogate".into() }
+            Verdict { allow: false, checks, reason: "wire: lone surrogate".into(), reasons: Vec::new(), legacy_model_polarity: false }
         } else {
             verify_pcactn_core_policy(&v["pcactn"], &v["grant"], now, aud, allowed.as_deref())
         };

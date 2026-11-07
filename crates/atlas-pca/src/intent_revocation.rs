@@ -196,7 +196,8 @@ pub fn check_session_revocation(
         }
         let le = le.as_object().ok_or_else(malformed)?;
         let last_list = revoked_list(le, lo.get("revoked")).map_err(|_| malformed())?;
-        let (e_now, e_last) = (nonneg(o.get("epoch")).unwrap_or(-1), nonneg(le.get("epoch")).unwrap_or(-1));
+        // both epochs passed revocation_epoch_shape_error, which requires a non-negative safe integer epoch
+        let (Some(e_now), Some(e_last)) = (nonneg(o.get("epoch")), nonneg(le.get("epoch"))) else { return Err(malformed()) };
         if e_now < e_last {
             return Err("revocation epoch rollback (older than the last accepted)".into());
         }

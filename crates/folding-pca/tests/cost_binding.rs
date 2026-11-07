@@ -1,6 +1,6 @@
 //! RT-05 regression: the per-step cost must be bound to the committed action, so a history relabelled
 //! with a forged (lower) cost cannot reproduce the honest history's chain digest.
-//! Regression test for an internal red-team finding (fold cost not bound to the step).
+//! PoC: redteam/stark/src/folding_cost_unbound.rs
 
 use pca_folding_ivc::*;
 

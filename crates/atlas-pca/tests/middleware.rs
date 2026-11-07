@@ -121,6 +121,7 @@ fn config_for(grant: &Value, aud: &str, now: i64) -> GuardConfig {
             None
         }
     })
+    .with_signature_only()
     .with_clock(move || now)
 }
 
@@ -162,7 +163,7 @@ fn absent_proof_is_401_with_www_authenticate() {
 fn unknown_grant_is_401() {
     let (pcactn, _grant, now, aud) = vector("valid-in-plan-action");
     // A resolver that knows no grants at all.
-    let cfg = GuardConfig::new(aud, |_: &str| None).with_clock(move || now);
+    let cfg = GuardConfig::new(aud, |_: &str| None).with_signature_only().with_clock(move || now);
     let header = header_for(&pcactn);
 
     let result = verify_request(Some(&header), None, &cfg);
@@ -337,7 +338,7 @@ fn challenge_header_carries_no_request_derived_text() {
     let (pcactn, _grant, now, aud) = vector("valid-in-plan-action");
     let mut p = pcactn.clone();
     p["grant_ref"] = Value::String("x\"\r\nSet-Cookie: pwned=1".into());
-    let cfg = GuardConfig::new(aud, |_: &str| None).with_clock(move || now);
+    let cfg = GuardConfig::new(aud, |_: &str| None).with_signature_only().with_clock(move || now);
     let result = verify_request(Some(&header_for(&p)), None, &cfg);
     assert_eq!(result.status, 401);
     assert_eq!(result.www_authenticate().unwrap(), "PCA realm=\"pca\", error=\"unknown_grant\"");

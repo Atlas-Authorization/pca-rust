@@ -1,0 +1,1 @@
+{"id":"conform-fmt-cidr4-octet","kind":"conform","input":{"schema":{"verbs":[{"verb":"fmt.item.check","kind":"write","params":{"action.params.x":{"semantic":"generic.string","sensitivity":"free","type":"string","format":"cidr"}},"effects":["update"]}]},"verb":"fmt.item.check","params":{"x":"256.0.0.0/8"}},"expect":{"ok":false,"code":"out_of_domain"}}
