@@ -121,3 +121,33 @@ pub fn unsupported_suite(v: &Value) -> Option<String> {
     }
 }
 
+
+/// The conformance harness mediator every allow-expecting authorize test presents provenance from (as the TypeScript harness
+/// does): Ed25519 seed = 32 bytes of 0x01, mediator `conformance-harness`, kid `k1`.
+pub fn harness_recorder() -> atlas_pca::arg_provenance::ProvenanceRecorder {
+    atlas_pca::arg_provenance::ProvenanceRecorder::new("conformance-harness", "k1", Some([1u8; 32])).expect("harness recorder")
+}
+
+/// The harness mediator pin, configured as the verifier's provenance mediators.
+pub fn harness_pins() -> Vec<Value> {
+    vec![harness_recorder().pin()]
+}
+
+/// The principal-direct bundle of `op` under the harness mediator (the bundle hook of allow-expecting tests).
+pub fn principal_direct(op: &atlas_pca::Operation) -> Result<Option<Value>, String> {
+    atlas_pca::arg_provenance::principal_direct_provenance(&mut harness_recorder(), op).map(Some)
+}
+
+/// k05 deadline (BRIEF "Timeouts are not kills"): `f` must answer within 2 s on its own thread, so a mutant that stops a
+/// loop advancing FAILS here instead of timing out the mutation run. Same contract as the crate's k042_support::within.
+pub fn within<T: Send + 'static>(what: &str, f: impl FnOnce() -> T + Send + 'static) -> T {
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = tx.send(f());
+    });
+    match rx.recv_timeout(std::time::Duration::from_secs(2)) {
+        Ok(v) => v,
+        Err(std::sync::mpsc::RecvTimeoutError::Timeout) => panic!("{what}: no answer within 2 s (a loop that stopped advancing)"),
+        Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => panic!("{what}: panicked"),
+    }
+}

@@ -378,7 +378,7 @@ fn run_vector(v: &Value) -> Verdict {
         // the Rust API clock is an i64: a vector whose clock is not an integer is reported as a failed verdict, never a panic
         let now = match v["context"]["now"].as_i64() {
             Some(n) => n,
-            None => return Verdict { allow: false, checks: std::collections::BTreeMap::new(), reason: "runner: context.now is not an integer".into() },
+            None => return Verdict { allow: false, checks: std::collections::BTreeMap::new(), reason: "runner: context.now is not an integer".into(), reasons: Vec::new(), legacy_model_polarity: false },
         };
         let aud = v["context"]["aud"].as_str().unwrap();
         let allowed: Option<Vec<String>> = v["context"]["allowed_suites"]
@@ -392,14 +392,14 @@ fn run_vector(v: &Value) -> Verdict {
         };
         // Intent Layer v2: `schema-*` / `session-*` / `acc-*` / `layers-*` vectors carry the verifier state in context.intent_v2.
         let intent_v2 = v["context"].get("intent_v2").and_then(IntentV2Context::from_json);
-        let opts = VerifyOptions { allowed: allowed.as_deref(), intent: intent.as_ref(), intent_v2: intent_v2.as_ref() };
+        let opts = VerifyOptions { allowed: allowed.as_deref(), intent: intent.as_ref(), intent_v2: intent_v2.as_ref(), authorized_plan_roots: None, insecure_skip_plan_root_check: true, freshness_gate: None, pq_pins: None };
         if let Some(raw) = v.get("pcactn_json").and_then(Value::as_str) {
             verify_pcactn_json_with(raw, &v["grant"], now, aud, &opts)
         } else if has_lone(&v["pcactn"]) {
             // not representable as a Rust String: a lone surrogate is a wire failure
             let mut checks = std::collections::BTreeMap::new();
             checks.insert("wire".to_string(), false);
-            Verdict { allow: false, checks, reason: "wire: lone surrogate".into() }
+            Verdict { allow: false, checks, reason: "wire: lone surrogate".into(), reasons: Vec::new(), legacy_model_polarity: false }
         } else {
             verify_pcactn_core_with(&v["pcactn"], &v["grant"], now, aud, &opts)
         }

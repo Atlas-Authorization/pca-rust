@@ -567,6 +567,7 @@ fn decide_offer_set(
         return Err("offers: the offer set is bound to another session".into());
     }
     let now = match now {
+        // skew is validated policy or the default; checked again here (defence in depth)
         Some(n) if safe_integer_f64(skew) => n as f64,
         _ => return Err("offers: no usable clock (now must be a safe integer): the offer set counts as stale".into()),
     };
@@ -596,12 +597,7 @@ fn decide_offer_set(
         return Err("offers: the chosen offer does not satisfy the intent filter".into());
     }
     let price = |x: &Value| nonneg(x.get("price")).unwrap_or(0);
-    let mut min = price(chosen);
-    for x in &offers {
-        if offer_matches(x, &fo) && price(x) < min {
-            min = price(x);
-        }
-    }
+    let min = offers.iter().filter(|x| offer_matches(x, &fo)).map(&price).fold(price(chosen), i64::min);
     Ok(price(chosen) - min)
 }
 
@@ -765,18 +761,12 @@ fn flow_rule_for<'a>(rules: &'a Map<String, Value>, cls: &str) -> Option<&'a str
     if let Some((k, _)) = rules.get_key_value(cls) {
         return Some(k.as_str());
     }
-    let mut best: Option<&str> = None;
-    for p in rules.keys() {
-        if let Some(prefix) = p.strip_suffix('*') {
-            if p.ends_with(".*") && cls.starts_with(prefix) && best.is_none_or(|b| p.encode_utf16().count() > b.encode_utf16().count()) {
-                best = Some(p.as_str());
-            }
-        }
-    }
-    if best.is_some() {
-        return best;
-    }
-    rules.get_key_value("*").map(|(k, _)| k.as_str())
+    // the longest matching `<prefix>.*`: two matching prefixes of one length are the same key, so there is no tie
+    let best = rules
+        .keys()
+        .filter(|p| p.strip_suffix('*').is_some_and(|pre| pre.ends_with('.') && cls.starts_with(pre)))
+        .max_by_key(|p| p.encode_utf16().count());
+    best.or_else(|| rules.get_key_value("*").map(|(k, _)| k)).map(String::as_str)
 }
 
 fn flow_allowed(rules: &Map<String, Value>, cls: &str, origin: &str, aud: &str) -> bool {
@@ -796,7 +786,7 @@ fn parse_label_ref(r: &str) -> Option<(&str, &str)> {
 }
 
 /// Place `value` at the dotted `path` under `root`; false on a collision (`setNested`).
-fn set_nested(root: &mut Map<String, Value>, path: &str, value: Value) -> bool {
+pub(crate) fn set_nested(root: &mut Map<String, Value>, path: &str, value: Value) -> bool {
     let segs: Vec<&str> = path.split('.').collect();
     let mut cur = root;
     for k in &segs[..segs.len() - 1] {
@@ -830,6 +820,18 @@ pub fn decide_param_provenance(input: &Value) -> ProvenanceDecision {
             env: Map::new(),
         },
     }
+}
+
+/// The first pair `(a, b)` of `paths` where `b` lies under `a` (`b` starts with `a.`).
+pub(crate) fn first_overlap(paths: &[String]) -> Option<(&String, &String)> {
+    for a in paths {
+        for b in paths {
+            if b.starts_with(&format!("{a}.")) {
+                return Some((a, b));
+            }
+        }
+    }
+    None
 }
 
 fn prov_inner(input: &Value, labels: &mut Map<String, Value>, classes: &mut Map<String, Value>) -> Result<Result<ProvenanceDecision, String>, String> {
@@ -872,12 +874,8 @@ fn prov_inner(input: &Value, labels: &mut Map<String, Value>, classes: &mut Map<
             return Ok(Err(format!("prov names '{p}', a parameter the action does not carry")));
         }
     }
-    for a in &paths {
-        for b in &paths {
-            if a != b && b.starts_with(&format!("{a}.")) {
-                return Ok(Err(format!("prov paths '{a}' and '{b}' overlap")));
-            }
-        }
+    if let Some((a, b)) = first_overlap(&paths) {
+        return Ok(Err(format!("prov paths '{a}' and '{b}' overlap")));
     }
     let mut receipts: Map<String, Value> = Map::new();
     for r in delivered(input.get("labels"))? {
@@ -898,7 +896,8 @@ fn prov_inner(input: &Value, labels: &mut Map<String, Value>, classes: &mut Map<
         for rv in prov_map.get(p).and_then(Value::as_array).cloned().unwrap_or_default() {
             let r = s(Some(&rv)).unwrap_or("");
             if !r.starts_with(LABEL_REF_PREFIX) {
-                // classifyRef: the registry level when the registry has the ref as an OWN key, else agent
+                // classifyRef: the registry level when the registry has the ref as an OWN key, else agent (rank() reads any
+                // non-level as agent's rank)
                 let lvl = match reg.get(r) {
                     Some(l) if is_taint_level(Some(l)) => s(Some(l)).unwrap_or("agent"),
                     _ => "agent",

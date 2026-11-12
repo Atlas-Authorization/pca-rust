@@ -1,0 +1,147 @@
+name: zkVM guest v11
+
+# Builds the RISC Zero guest (guest version 11: rule 22 of the action kit) reproducibly in risc0's docker guest builder
+# (toolchain pinned by host/box-prove.sh: rust 1.97.0, r0vm 3.0.6, builder image r0.1.97.0), proves the sample input
+# (succinct receipt, then the Groth16 wrap as its own job, then the negative matrix as its own job so each stays far inside the
+# 6 h job cap) and uploads the small fixtures artifact (image id, receipts, journal, provenance). The regular CI verifies
+# the committed fixtures (cargo test -p pca-zkvm-verify); this workflow regenerates them.
+on:
+  push:
+    branches: ['ci/0.5.0-zk11']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PCA_TARGET_DIR: ${{ github.workspace }}/crates/zkvm-pca/target
+
+jobs:
+  build:
+    name: guest build and image id
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk (the risc0 toolchain, the docker builders and the target dir are large)
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/zkvm-pca
+      - name: Build the guest in the docker guest builder, print the image id
+        env:
+          PCA_ONLY_BUILD: '1'
+        run: |
+          export PCA_TMPDIR="$RUNNER_TEMP/zkvm-tmp"
+          bash crates/zkvm-pca/host/box-prove.sh "$RUNNER_TEMP/out" | tee "$RUNNER_TEMP/id.txt"
+      - name: Image id must be a 64-hex digest
+        run: |
+          grep -Eq '^image id: [0-9a-f]{64}$' "$RUNNER_TEMP/id.txt"
+
+  succinct:
+    name: succinct receipt (CPU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk (the risc0 toolchain, the docker builders and the target dir are large)
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/zkvm-pca
+      - name: Prove
+        env:
+          PCA_SKIP_GROTH16: '1'
+          PCA_SKIP_NEGATIVE: '1'
+        run: |
+          export PCA_TMPDIR="$RUNNER_TEMP/zkvm-tmp"
+          bash crates/zkvm-pca/host/box-prove.sh "$RUNNER_TEMP/succinct"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: succinct
+          path: ${{ runner.temp }}/succinct
+          retention-days: 14
+
+  wrap:
+    name: Groth16 wrap
+    needs: succinct
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk (the risc0 toolchain, the docker builders and the target dir are large)
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/zkvm-pca
+      - uses: actions/download-artifact@v4
+        with:
+          name: succinct
+          path: ${{ runner.temp }}/succinct
+      - name: Wrap
+        env:
+          PCA_WRAP_ONLY: ${{ runner.temp }}/succinct/receipt_succinct.bin
+        run: |
+          export PCA_TMPDIR="$RUNNER_TEMP/zkvm-tmp"
+          bash crates/zkvm-pca/host/box-prove.sh "$RUNNER_TEMP/wrap"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wrap
+          path: |
+            ${{ runner.temp }}/wrap/receipt_groth16.bin
+            ${{ runner.temp }}/wrap/run_stats_wrap.json
+          retention-days: 14
+
+  negative:
+    name: negative matrix (no receipt for a denied input)
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk (the risc0 toolchain, the docker builders and the target dir are large)
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/zkvm-pca
+      - name: Run the matrix
+        env:
+          PCA_ONLY_NEGATIVE: '1'
+        run: |
+          export PCA_TMPDIR="$RUNNER_TEMP/zkvm-tmp"
+          bash crates/zkvm-pca/host/box-prove.sh "$RUNNER_TEMP/negative"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: negative
+          path: ${{ runner.temp }}/negative/negative_proving.json
+          retention-days: 14
+
+  fixtures:
+    name: assemble and upload the fixtures
+    needs: [build, wrap, negative]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/in
+      - name: Assemble
+        env:
+          PCA_PROVENANCE_DATE: ${{ github.event.head_commit.timestamp }}
+          PCA_PROVENANCE_RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 crates/zkvm-pca/host/ci-finalize.py "$RUNNER_TEMP/in/succinct" "$RUNNER_TEMP/in/wrap" "$RUNNER_TEMP/in/negative" "$RUNNER_TEMP/fixtures"
+          find "$RUNNER_TEMP/fixtures" -type f -exec ls -l {} +
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zk11-fixtures
+          path: ${{ runner.temp }}/fixtures
+          retention-days: 30

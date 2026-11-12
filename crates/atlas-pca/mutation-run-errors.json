@@ -1,0 +1,547 @@
+[
+ {
+  "file": "src/lib.rs",
+  "fn": "body_too_deep",
+  "text": "[\"issuer\", \"holder\", \"caveats\", \"parent\", \"holder_pq\", \"alg\", \"pq_pk\"]",
+  "mutant": "replace body_too_deep -> bool with false",
+  "lineno": 1385,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with == in split",
+  "lineno": 69,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): n = 2 gives k = 2 = n, so the root of two leaves recurses on the same slice forever; n = 4 gives k = 1, a wrong but finite split. Which shows first depends on the test order: an overflow (listed) or a plain FAIL on a wrong root (an ordinary catch), so this entry may also match 0."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "let mut k = 1u64;",
+  "mutant": "replace split -> u64 with 0",
+  "lineno": 752,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): split returns 0 for every n, so the root of n >= 2 leaves recurses on hs[..0] (length 0, not the base case 1), whose split is 0 again: unbounded recursion on any tree of two or more leaves, never a wrong answer."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with == in split",
+  "lineno": 753,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): n = 2 gives k = 2 = n, so the root of two leaves recurses on the same slice forever; n = 4 gives k = 1, a wrong but finite split. Which shows first depends on the test order: an overflow (listed) or a plain FAIL on a wrong root (an ordinary catch), so this entry may also match 0."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with <= in split",
+  "lineno": 753,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k*2 <= n stops at k = n for every power of two n >= 2 (n = 2: k = 2), so the root recurses on the same n-leaf slice forever; for other n the split is unchanged (the largest power of two below n), so the mutant never yields a wrong root, only the overflow."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with <= in split",
+  "lineno": 69,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k*2 <= n stops at k = n for every power of two n >= 2 (n = 2: k = 2), so the root recurses on the same n-leaf slice forever; for other n the split is unchanged (the largest power of two below n), so the mutant never yields a wrong root, only the overflow."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "k *= 2;",
+  "mutant": "replace *= with += in split",
+  "lineno": 754,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k grows 1, 3, 5...: n = 3 gives k = 3 = n, so the root of three leaves recurses on the same slice forever; n = 4..6 give a wrong but finite split. Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "let mut st: Vec<(&Value, usize)> = vec![(v, at)];",
+  "mutant": "replace deeper_than_cap -> bool with false",
+  "lineno": 1367,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "Value::Array(a) => Box::new(a.iter()),",
+  "mutant": "delete match arm Value::Array(a) in deeper_than_cap",
+  "lineno": 1370,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "Value::Object(m) => Box::new(m.values()),",
+  "mutant": "delete match arm Value::Object(m) in deeper_than_cap",
+  "lineno": 1371,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "deeper_than_cap",
+  "text": "st.extend(kids.map(|k| (k, d + 1)));",
+  "mutant": "replace + with * in deeper_than_cap",
+  "lineno": 1377,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the mutant disables the iterative hop-body depth guard (always false, an array/object never measured, or depth never growing past the hop`s own), whose only job is to refuse a caller-built value nested 1,000,000 deep before signable_hop_body clones and serialises it recursively; a shallower over-cap body is refused later by the strict canonicaliser either way, so the only observable effect is the stack overflow on that input (tests/depth_strict_digest.rs deep_caveat)."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "split",
+  "text": "k *= 2;",
+  "mutant": "replace *= with += in split",
+  "lineno": 70,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k grows 1, 3, 5...: n = 3 gives k = 3 = n, so the root of three leaves recurses on the same slice forever; n = 4..6 give a wrong but finite split. Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/intent_map.rs",
+  "fn": "tree_root",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in tree_root",
+  "lineno": 76,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "let mut k = 1;",
+  "mutant": "replace split -> usize with 0",
+  "lineno": 440,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): split returns 0 for every n, so the root of n >= 2 leaves recurses on hs[..0] (length 0, not the base case 1), whose split is 0 again: unbounded recursion on any tree of two or more leaves, never a wrong answer."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with == in split",
+  "lineno": 441,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): n = 2 gives k = 2 = n, so the root of two leaves recurses on the same slice forever; n = 4 gives k = 1, a wrong but finite split. Which shows first depends on the test order: an overflow (listed) or a plain FAIL on a wrong root (an ordinary catch), so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "while k * 2 < n {",
+  "mutant": "replace < with <= in split",
+  "lineno": 441,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k*2 <= n stops at k = n for every power of two n >= 2 (n = 2: k = 2), so the root recurses on the same n-leaf slice forever; for other n the split is unchanged (the largest power of two below n), so the mutant never yields a wrong root, only the overflow."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "split",
+  "text": "k *= 2;",
+  "mutant": "replace *= with += in split",
+  "lineno": 442,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k grows 1, 3, 5...: n = 3 gives k = 3 = n, so the root of three leaves recurses on the same slice forever; n = 4..6 give a wrong but finite split. Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "build",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in build",
+  "lineno": 447,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/agent.rs",
+  "fn": "prove",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in prove",
+  "lineno": 454,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/actions.rs",
+  "fn": "subroot",
+  "text": "if hs.len() == 1 {",
+  "mutant": "replace == with != in subroot",
+  "lineno": 1246,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the base case is inverted: a one-leaf slice splits at 1 and recurses on itself forever (every tree reaches a one-leaf slice), while a slice of two or more returns its first leaf (a wrong but finite root). Overflow (listed) or a plain FAIL on a wrong root, depending on test order, so this entry may also match 0."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "path_shape",
+  "text": "while n > 1 {",
+  "mutant": "replace > with >= in path_shape",
+  "lineno": 783,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): every walk of path_shape ends on n == 1 with idx == 0 (idx < n is invariant: the else arm subtracts k from both, the if arm sets n = k > idx), so with `n >= 1` the loop body runs there: k = split(1) = 1, idx < 1, it pushes b'R' and sets n = k = 1 again, forever; `out` grows by one byte per turn until the allocator fails (SIGKILL on the memory cap). Unmutated, `n > 1` is false at n == 1 and the loop ends after at most log2(size)+1 turns; every inclusion proof that passes the size/index guard of verify_inclusion (size >= 1, 0 <= index < size) reaches this walk, so any such proof, valid or not, exhausts memory under the mutant."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::escape_inner",
+  "text": "self.i += 1;",
+  "mutant": "replace += with -= in Parser<'a>::escape_inner",
+  "lineno": 313,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the plain `self.i += 1` sites of escape_inner (the backslash line and the `\\c` letter line carry trailing comments or other text) are the one after reading the escape char at line 313 and the one after `\\cX` at line 355. At 313, `-=` puts the cursor back ON the backslash (i = bs + 1 - 1 = bs): every simple escape (`\\d \\w \\s \\n \\t \\. ...`, which return Ok with no further cursor move) hands atom (or read_atom in a class) back a cursor still at the same backslash, so the enclosing cat loop (`while let Some(c) = self.at(self.i)`, pushing one node per turn) or the class loop (`ranges.extend`, one range per turn) re-parses the same escape forever and its Vec grows until the allocator fails (SIGKILL on the memory cap). Unmutated, the cursor ends after the escape and the pattern is consumed in at most one turn per code unit. (Line 355 under `-=` only re-reads the letter after `\\c` as a literal: a finite, wrong parse.)"
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::atom",
+  "text": "self.i += 1;",
+  "mutant": "replace += with -= in Parser<'a>::atom",
+  "lineno": 286,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the plain-consume sites of atom (`.` `^` `$` and the default literal arm, plus the two group sites) step the cursor back by one after consuming one code unit at position p: at p == 0 that is a usize underflow panic (an ordinary FAIL), at p >= 1 the cursor lands on p - 1 and the enclosing cat loop re-parses the previous unit and consumes it again, arriving back at p, where the mutated site steps back again: a cycle in which every turn pushes a node onto cat's `items` (`\\da`: the escape ends at 2, the literal `a` returns with i = 1, `a` is read again as a literal, ... the sequence 1 -> 2 -> 1 repeats), so the Vec grows until the allocator fails (SIGKILL/SIGABRT). Unmutated, each consumed unit advances the cursor, so the loop ends at the end of the pattern after at most one turn per unit."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::atom",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::atom",
+  "lineno": 286,
+  "multiplicity": 4,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): `self.i *= 1` leaves the cursor where it is. The four consuming sites for `.` `^` `$` and the default literal arm (lines 286, 290, 294, 303; this is the multiplicity of four) return Ok(node) without advancing, so cat's `while let Some(c) = self.at(self.i)` loop (c is never `|` or `)` for these units) calls quantified/atom on the SAME unit again and pushes another node onto `items`, forever; the Vec grows until the allocator fails (SIGKILL/SIGABRT). Unmutated, each such arm advances by one and the loop ends at the end of the pattern. (The two group sites at 265 and 281 under `*=` merely re-read `(` or `)`, which the depth cap or the unbalanced-paren refusal ends: finite.)"
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::element",
+  "text": "if self.s[self.i] == b'<' {",
+  "mutant": "replace == with != in Parser<'a>::element",
+  "lineno": 288,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this test selects, inside an element's content, a child element ('<' that is not `</`, CDATA, a comment or a PI) from character data. Inverted, a child element's '<' falls through to the text scan below, whose loop `while self.i < len && s[i] != b'<'` is false at once, so `raw` is empty, `text` gains nothing, and the content loop returns to the same cursor with the same state: an infinite loop with no allocation and no FAIL line. Every RIM document has a child element (the Signature, the Resource), so the first such document hangs. Unmutated, '<' enters the element branch and consumes it."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::element",
+  "text": "while self.i < self.s.len() && self.s[self.i] != b'<' {",
+  "mutant": "replace < with == in Parser<'a>::element",
+  "lineno": 298,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this is the character-data scan of an element's content, entered with i < len. `self.i == self.s.len()` is false there, so the loop body never runs, the cursor does not move past the text character it is on, `raw` is empty, and the content loop comes back to the same cursor and the same text branch: an infinite loop with no allocation (decode_entities of the empty string is empty) and no FAIL line, on the first document with any character data in an element. Unmutated, the scan advances to the next '<'."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::element",
+  "text": "while self.i < self.s.len() && self.s[self.i] != b'<' {",
+  "mutant": "replace < with > in Parser<'a>::element",
+  "lineno": 298,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the character-data scan is entered with i < len, so `self.i > self.s.len()` is false at once: the body never runs, the cursor stays on the text character, `raw` is empty, and the content loop re-enters the same text branch forever, with no allocation and no FAIL line, on the first document with any character data in an element. Unmutated, the scan advances to the next '<'."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::at",
+  "text": "self.s.get(k).copied()",
+  "mutant": "replace Parser<'a>::at -> Option<u16> with Some(0)",
+  "lineno": 152,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): at is the parser's only end-of-input signal: it returns None past the end of the pattern. Constant Some(0) never ends: cat's `while let Some(c) = self.at(self.i)` sees c = 0 (neither `|` nor `)`) at every cursor, quantified/atom takes the default arm (`self.i += 1`, one Set node), so i climbs past len forever and `items` grows one node per turn until the allocator fails (SIGKILL/SIGABRT), for every pattern including the empty one. Unmutated, at(len) is None and the loop ends."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::at",
+  "text": "self.s.get(k).copied()",
+  "mutant": "replace Parser<'a>::at -> Option<u16> with Some(1)",
+  "lineno": 152,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): at is the parser's only end-of-input signal: it returns None past the end of the pattern. Constant Some(1) never ends: cat's `while let Some(c) = self.at(self.i)` sees c = 1 (neither `|` nor `)`) at every cursor, quantified/atom takes the default arm (`self.i += 1`, one Set node), so i climbs past len forever and `items` grows one node per turn until the allocator fails (SIGKILL/SIGABRT), for every pattern including the empty one. Unmutated, at(len) is None and the loop ends."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::element",
+  "text": "while self.i < self.s.len() && self.s[self.i] != b'<' {",
+  "mutant": "replace != with == in Parser<'a>::element",
+  "lineno": 298,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the character-data scan is entered on a text character (the branch above handles '<'), so `s[i] == b'<'` is false at once: the body never runs, the cursor stays on that character, `raw` is empty, and the content loop re-enters the same text branch forever, with no allocation and no FAIL line, on the first document with any character data in an element. Unmutated, the scan advances to the next '<'."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::element",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::element",
+  "lineno": 209,
+  "multiplicity": 2,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): `self.i *= 1` does not advance. Of the plain `self.i += 1` sites of element (188, 197, 203, 209, 215, 271, 299) two spin forever: the attribute-value scan at line 209 (`while i < len && s[i] != q`, whose body reaches the increment for every ordinary value character, so the cursor and the loop test never change) and the character-data scan at line 299 (the same, `s[i] != b'<'`); neither allocates and neither prints a FAIL line (multiplicity two). The other sites only mis-parse a delimiter and end in an Err or a wrong tree. Unmutated, both scans advance one byte per turn to the closing quote or the next '<'."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "structural_guard",
+  "text": "i += 1;",
+  "mutant": "replace += with *= in structural_guard",
+  "lineno": 751,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): `i *= 1` leaves the cursor unchanged. At the plain-atom site (line 751, the fall-through for every unit that is not `\\ [ ( ) | * + ? {`) the loop `while i < len` returns to the same unit with the same state: an infinite loop with no allocation and no FAIL line on the first pattern that contains an ordinary character (`i` stays below len). (The `(`, `)`, `|` and lazy-`?` sites under `*=` also fail to advance but end in the stack-pop refusal, the bit budget or the nothing-to-repeat refusal: finite.) Unmutated each branch advances, so the loop ends after at most len turns. The same mutant at another site of the same line text ended as a timeout rather than a signal-killed test (one mechanism, a runner-speed difference between the two outcomes): the unmutated suite passes under the same caps (cargo-mutants baseline of this run): `i *= 1` leaves the cursor unchanged. At the plain-atom site (line 751, the fall-through for every unit that is not `\\ [ ( ) | * + ? {`) the loop `while i < len` returns to the same unit with the same state: an infinite loop with no allocation, a timeout, on the first pattern that contains an ordinary character. (The `(` site at 654 also fails to advance and pushes a Frame per turn; the `)`, `|` and lazy-`?` sites under `*=` end in the stack-pop refusal, the bit budget or the nothing-to-repeat refusal: finite.) Unmutated each branch advances, so the loop ends after at most len turns.",
+  "multiplicity": 2
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "split",
+  "text": "k *= 2;",
+  "mutant": "replace *= with /= in split",
+  "lineno": 756,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): k starts at 1; `k /= 2` makes it 0 at once, and 0 / 2 = 0, so for every n >= 3 the loop test `k * 2 < n` is `0 < n` forever: split never returns (no allocation, no FAIL line). For n == 2 the loop test is false and split returns 1 as before, which is why the mutant only hangs on a tree of three or more leaves (build, prove, path_shape and verify_inclusion all call split on every tree). Unmutated, k doubles to the largest power of two below n in log2(n) turns."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::alt",
+  "text": "while self.at(self.i) == Some(b'|' as u16) {",
+  "mutant": "replace == with != in Parser<'a>::alt",
+  "lineno": 165,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): alt is entered after cat() has returned, which stops only at `|`, `)` or the end of the pattern. Inverted, the loop runs exactly when the cursor is NOT on `|`, i.e. at the end (None) or on `)`: each turn does `self.i += 1` and pushes cat()'s node (an empty Cat once the cursor is past the end), and at(i) stays None forever, so `items` grows one element per turn until the allocator fails (SIGKILL/SIGABRT) on every pattern. Unmutated, the loop runs only once per `|`."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::alt",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::alt",
+  "lineno": 166,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): `self.i *= 1` leaves the cursor on the `|` that the loop test just matched; cat() returns an empty Cat at once (it breaks on `|`), `items` gains one element, and the test `self.at(self.i) == Some('|')` is true again, forever, until the allocator fails (SIGKILL). Unmutated, the cursor steps over each `|`, so the loop runs once per `|`."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "path_shape",
+  "text": "while n > 1 {",
+  "mutant": "replace > with == in path_shape",
+  "lineno": 783,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): with `n == 1` the loop is entered exactly for a one-leaf tree (size 1, the only admitted index being 0): k = split(1) = 1, idx = 0 < 1, so it pushes b'R' and sets n = k = 1 again, forever, and `out` grows by one byte per turn until the allocator fails (SIGKILL on the memory cap). Unmutated, `n > 1` is false for n == 1 and the walk returns an empty path at once; for size >= 2 the mutant skips the loop (a wrong, empty shape, but finite), so the unbounded growth is the size-1 case alone."
+ },
+ {
+  "file": "src/intent_v2.rs",
+  "fn": "js_number_string",
+  "text": "if f.is_sign_negative() {",
+  "mutant": "replace if condition with true in js_number_string",
+  "lineno": 400,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this is the line after the NaN, zero and infinity returns. With the condition forced true, every finite nonzero f takes `format!(\"-{}\", js_number_string(-f))`: the argument's sign flips each call (positive to negative to positive ...), never reaches the `else` fallthrough, and each call nests one more frame in the recursive call, a stack overflow (SIGABRT, 'has overflowed its stack') on the first number formatted. Unmutated, the recursion goes at most one level deep, because -f is positive for a negative f."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "parse_xml",
+  "text": "break;",
+  "mutant": "delete break in parse_xml",
+  "lineno": 330,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the prolog loop `loop { skip_ws; if i >= len return Err; if misc()? continue; break; }` leaves only at its final `break` (line 330; the second `break;` of parse_xml at line 339, the trailing loop's end test, is a different mutant: without it every document returns the Err \"content after the root element\" at its end, a plain FAIL). Without the break at 330, the first byte that is not whitespace, a comment, a PI or a DOCTYPE (the '<' of every root element) makes misc() return Ok(false) with the cursor unmoved, so the loop runs again at the same cursor forever, with no allocation and no FAIL line. Unmutated, the loop leaves at that byte."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "Parser::ws",
+  "text": "break;",
+  "mutant": "delete break in Parser::ws",
+  "lineno": 504,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): ws loops `while let Some(c) = peek()` and its else branch exists only to `break` on the first non-whitespace byte. Without it the else arm is empty, so on the first non-whitespace byte the loop re-peeks the same byte forever, with no allocation and no FAIL line; every parse calls ws before a value or a token. Unmutated, the break ends the loop at that byte."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "CharSet::has",
+  "text": "break;",
+  "mutant": "delete break in CharSet::has",
+  "lineno": 79,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): has binary-searches `ranges` for c and, on a hit, sets `inside = true` and breaks. Without the break, lo and hi are unchanged after the hit, so `while lo <= hi` is true again with the same mid and the same hit, forever, with no allocation and no FAIL line: the first membership test that lands inside a range (`\\d` against '5' in the first compiled pattern that matches) hangs. Unmutated, the break ends the search."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::skip_ws",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::skip_ws",
+  "lineno": 110,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): `self.i *= 1` does not advance: the loop `while i < len && s[i] is a space, tab, CR or LF` keeps its test true at the first whitespace byte forever, with no allocation and no FAIL line. Unmutated, it steps over each whitespace byte. Every RIM test document has whitespace between its prolog or tags and the parser, so the first one hangs."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::brace_quantifier",
+  "text": "k += 1;",
+  "mutant": "replace += with *= in Parser<'a>::brace_quantifier",
+  "lineno": 192,
+  "multiplicity": 2,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the two digit scans `while k < len && k - d0 < 4 && is_digit(s[k]) { k += 1; }` (line 192 for the minimum, line 204 for the maximum; this is the multiplicity of two) end only because k moves (k - d0 stays 0 under `*= 1`, so the 4-digit cap never triggers either): `k *= 1` keeps k on the first digit forever, with no allocation and no FAIL line, on the first counted quantifier (`a{2}`, `a{1,3}`). (At line 201, after the comma, `*=` re-reads the comma itself and returns None: finite.) Unmutated, k steps over at most four digits."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "structural_guard",
+  "text": "while j < len && src[j] != 0x5d {",
+  "mutant": "replace < with == in structural_guard",
+  "lineno": 634,
+  "racy": true,
+  "kind": "timeout",
+  "proof": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): j starts at the `[` itself (j = i < len), so `j == len` is false at once: the class scan is skipped, j stays = i, `j >= len` is false, `i = j` leaves i on the same `[`, prev = Atom, and the outer `while i < len` returns to the same `[` forever (no allocation, so a timeout), on the first pattern with a character class. Unmutated, the scan moves j to the first unescaped `]`, strictly after the `[`, so i strictly increases.",
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): j starts at the `[` itself (j = i < len), so `j == len` is false at once: the class scan is skipped, j stays = i, `j >= len` is false, `i = j` leaves i on the same `[`, prev = Atom, and the outer `while i < len` returns to the same `[` forever (no allocation, so a timeout), on the first pattern with a character class. Unmutated, the scan moves j to the first unescaped `]`, strictly after the `[`, so i strictly increases."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "Parser<'a>::string",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::string",
+  "lineno": 578,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the plain `self.i += 1` sites of string (531, 536, 574, 578; the opening-quote site carries a comment). At 578, the arm for an ordinary character, `*= 1` pushes the byte onto `out` and leaves the cursor on it, so the loop pushes the same byte forever and `out` grows until the allocator fails (SIGKILL) on the first string with an ordinary character. The other sites only mis-parse a delimiter and end in a wrong value or an Err. Unmutated, the cursor advances past each byte to the closing quote."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "structural_guard",
+  "text": "while j < len && src[j] != 0x5d {",
+  "mutant": "replace < with > in structural_guard",
+  "lineno": 634,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): j starts at the `[` itself (j = i < len), so `j > len` is false at once: the class scan is skipped, j stays = i, `j >= len` is false, `i = j` leaves i on the same `[`, prev = Atom, and the outer `while i < len` returns to the same `[` forever, with no allocation and no FAIL line, on the first pattern with a character class. Unmutated, the scan moves j to the first unescaped `]`, which lies strictly after the `[`, so i strictly increases."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "structural_guard",
+  "text": "while j < len && src[j] != 0x5d {",
+  "mutant": "replace != with == in structural_guard",
+  "lineno": 634,
+  "racy": true,
+  "kind": "timeout",
+  "proof": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): j starts at the `[` itself, and `src[j] == 0x5d` is false for a `[`, so the class scan is skipped: j stays = i, `j >= len` is false, `i = j` leaves i on the same `[`, prev = Atom, and the outer `while i < len` returns to the same `[` forever (no allocation, so a timeout), on the first pattern with a character class. Unmutated, the scan moves j to the first unescaped `]`, strictly after the `[`, so i strictly increases.",
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): j starts at the `[` itself, and `src[j] == 0x5d` is false for a `[`, so the class scan is skipped: j stays = i, `j >= len` is false, `i = j` leaves i on the same `[`, prev = Atom, and the outer `while i < len` returns to the same `[` forever (no allocation, so a timeout), on the first pattern with a character class. Unmutated, the scan moves j to the first unescaped `]`, strictly after the `[`, so i strictly increases."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::name",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::name",
+  "lineno": 130,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): `self.i *= 1` does not advance: the loop `while i < len && is_name_char(s[i])` keeps its test true at the first name character forever (no allocation, no FAIL line); every element and attribute name in a document enters it. Unmutated, it advances one byte per turn to the first non-name byte."
+ },
+ {
+  "file": "src/attest/rim.rs",
+  "fn": "Parser<'a>::misc",
+  "text": "if self.starts(\"<!--\") {",
+  "mutant": "replace Parser<'a>::misc -> Result<bool, String> with Ok(true)",
+  "lineno": 139,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): misc's contract is `true when something was consumed`; the constant Ok(true) consumes nothing. In parse_xml's prolog loop `if p.misc()? { continue; }` it makes the loop `skip_ws; i < len; misc() = true; continue` run at the same cursor forever, with no allocation and no FAIL line, on every document that has a byte after the leading whitespace. Unmutated, misc is false at the root element's '<' and the loop breaks."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "structural_guard",
+  "text": "j += 1;",
+  "mutant": "replace += with *= in structural_guard",
+  "lineno": 638,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the class scan has two `j += 1` sites: the escape skip (line 636) and the step (line 638). `j *= 1` at 638 is a no-op, so the loop `while j < len && src[j] != 0x5d` re-reads the same unit forever (the first unit is the `[` itself, never `]`), with no allocation and no FAIL line, on the first pattern with a character class. (At 636 the mutant would only fail to skip the escaped unit: a wrong, finite answer.) Unmutated, j advances one unit per turn."
+ },
+ {
+  "file": "src/lib.rs",
+  "fn": "Parser<'a>::number",
+  "text": "self.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::number",
+  "lineno": 594,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): number has two digit scans, `while peek() is a digit { self.i += 1; }` at line 594 (the integer part after a 1-9) and line 606 (the fraction). `*= 1` keeps the cursor on the first digit, so each loop's test stays true forever, with no allocation and no FAIL line, on the first number the parser reads (`5`, `12`, `0.5`). (The `-` and `.` sites under `*=` re-read the sign or dot and return Err(\"bad number\"): finite.) Unmutated, the cursor steps over each digit."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "structural_guard",
+  "text": "i += 3;",
+  "mutant": "replace += with *= in structural_guard",
+  "lineno": 652,
+  "racy": true,
+  "kind": "timeout",
+  "proof": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this is the `(?:` opener. `i *= 3` leaves i = 0 when the pattern begins with `(?:` (0 * 3 = 0): a Frame is pushed on `stack` and the loop returns to the same `(` at i = 0 forever, growing `stack` by one frame per turn (a timeout before the memory cap). Unmutated, i = 3 and the scan proceeds. (For i >= 1 the jump is merely a different, finite distance.)",
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this is the `(?:` opener. `i *= 3` leaves i = 0 when the pattern begins with `(?:` (0 * 3 = 0): a Frame is pushed on `stack` and the loop returns to the same `(` at i = 0 forever, growing `stack` by one frame per turn (a timeout before the memory cap). Unmutated, i = 3 and the scan proceeds. (For i >= 1 the jump is merely a different, finite distance.)"
+ },
+ {
+  "file": "src/attest/x509.rs",
+  "fn": "pem_blocks",
+  "text": "base += end;",
+  "mutant": "replace += with *= in pem_blocks",
+  "lineno": 646,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): base starts at 0; `base *= end` keeps it at 0, so `rest = &text[0..]` is the whole text again and `rest.find(B)` finds the first BEGIN again, then the same END, so the same block is pushed onto `out` and the loop repeats forever (no FAIL line; `out` grows without bound, slowly) on any text with one complete certificate block. Unmutated, base advances past each block, so the loop ends after as many turns as there are blocks."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::quantified",
+  "text": "self.i += 1;",
+  "mutant": "replace += with -= in Parser<'a>::quantified",
+  "lineno": 223,
+  "multiplicity": 3,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the plain increments after `*`, `+` and `?` (lines 223, 228, 233; the lazy-`?` line carries a comment and is not this key) with `-=` put the cursor back ON the last unit of the atom (p - 1, p >= 1 because an atom precedes). For a literal or escape atom (`a*`, `\\d+`) cat re-reads that unit as a new atom, consumes it, reaches the quantifier again at p and steps back again: a cycle in which every turn pushes a node onto cat's `items`, so the Vec grows until the allocator fails (SIGKILL, 'memory allocation of 40 bytes failed'); under the 12-14 s caps the same cycle can instead run out of time (the timeout twin of this entry). Unmutated, each quantifier advances the cursor, so the loop ends after at most len turns. (For a group atom `(a)*` the cursor lands on `)`, which cat refuses at the top level: finite.) The same mutant at another site of the same line text ended as a timeout rather than a signal-killed test (one mechanism, a runner-speed difference between the two outcomes): the unmutated suite passes under the same caps (cargo-mutants baseline of this run): the plain increments after `*`, `+` and `?` (lines 223, 228, 233) with `-=` put the cursor back ON the last unit of the atom (p - 1, p >= 1 because an atom precedes). For a literal or escape atom (`a*`, `\\d+`) cat re-reads that unit as a new atom, consumes it, reaches the quantifier again at p and steps back again: a cycle in which every turn pushes a node onto cat's `items` (a timeout before the allocator fails). Unmutated, each quantifier advances the cursor, so the loop ends after at most len turns."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::cls::read_atom",
+  "text": "p.i += 1;",
+  "mutant": "replace += with *= in Parser<'a>::cls::read_atom",
+  "lineno": 392,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): read_atom consumes one plain class member. `p.i *= 1` returns Ok((vec![(c, c)], ...)) without advancing, so the class loop in cls (which breaks only on `]`) finds the same member at the same cursor every turn and `ranges.extend` adds one range per turn, forever; the Vec grows until the allocator fails (SIGKILL/SIGABRT) on the first class with a plain member (`[a]`). Unmutated, the cursor advances to the `]` and the loop breaks."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "CharSet::has",
+  "text": "hi = mid - 1;",
+  "mutant": "replace - with + in CharSet::has",
+  "lineno": 74,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this arm runs when c is below the range at mid. With `hi = mid + 1`, the window does not shrink: once lo == mid (every window of one or two entries, reached for any c below the first range), mid = (lo + hi) >> 1 = lo again, c < r.0 again, hi = lo + 1 again: an infinite loop with no allocation and no FAIL line, on the first character below a set's first range (e.g. a control character against `\\d`). Unmutated, hi = mid - 1 shrinks the window and the loop ends in at most log2(len) + 1 turns."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "CharSet::has",
+  "text": "hi = mid - 1;",
+  "mutant": "replace - with / in CharSet::has",
+  "lineno": 74,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this arm runs when c is below the range at mid. `hi = mid / 1` is `hi = mid`, which does not exclude mid: the window narrows to lo == hi == mid and then stays there (mid = lo, c < r.0 again, hi = mid again) for every c below the first range of the set: an infinite loop with no allocation and no FAIL line. Unmutated, hi = mid - 1 excludes mid, so lo > hi ends the search."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "CharSet::has",
+  "text": "lo = mid + 1;",
+  "mutant": "replace + with * in CharSet::has",
+  "lineno": 76,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): this arm runs when c is above the range at mid. `lo = mid * 1` is `lo = mid`, which does not exclude mid: once hi - lo <= 1, mid = lo, c > r.1 again, lo = lo again, and the window never shrinks (a one-range set such as `\\d` against 'a': lo = hi = 0 forever): an infinite loop with no allocation and no FAIL line. Unmutated, lo = mid + 1 excludes mid, so the search ends."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "structural_guard",
+  "text": "k += 1;",
+  "mutant": "replace += with *= in structural_guard",
+  "lineno": 705,
+  "racy": true,
+  "proof": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): inside the `{n,m}` reader the digit scans `while k < len && is_digit(src[k]) { k += 1; }` (lines 694 and 705) end only because k moves. `k *= 1` keeps k on the first digit of the count (after the brace or after the comma), so the loop test is true forever, with no allocation (a timeout), on the first pattern with a counted quantifier (`a{2}` or `a{1,3}`). (At line 702, after the comma, `*=` re-reads the comma itself and returns false: finite.) Unmutated, k steps over the digits.",
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): inside the `{n,m}` reader the digit scans `while k < len && is_digit(src[k]) { k += 1; }` (lines 694 and 705) end only because k moves. `k *= 1` keeps k on the first digit of the count (after the brace or after the comma), so the loop test is true forever, with no allocation (a timeout), on the first pattern with a counted quantifier (`a{2}` or `a{1,3}`). (At line 702, after the comma, `*=` re-reads the comma itself and returns false: finite.) Unmutated, k steps over the digits. The same mutant at another site of the same line text ended as a timeout rather than a signal-killed test (one mechanism, a runner-speed difference between the two outcomes): the unmutated suite passes under the same caps (cargo-mutants baseline of this run): inside the `{n,m}` reader the digit scans `while k < len && is_digit(src[k]) { k += 1; }` (lines 694 and 705) end only because k moves. `k *= 1` keeps k on the first digit of the count (after the brace or after the comma), so the loop test is true forever, with no allocation and no FAIL line, on the first pattern with a counted quantifier (`a{2}`). (At line 702, after the comma, `*=` re-reads the comma itself and returns false: finite.) Unmutated, k steps over the digits.",
+  "multiplicity": 2
+ },
+ {
+  "file": "src/ledger.rs",
+  "fn": "verify_ledger_consistency",
+  "text": "while fnn & 1 == 1 {",
+  "mutant": "replace & with | in verify_ledger_consistency",
+  "lineno": 96,
+  "racy": true,
+  "kind": "timeout",
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): Rust parses `fnn | 1 == 1` as `(fnn | 1) == 1`, which is true exactly when fnn is 0 or 1. The loop body only shifts (`fnn >>= 1; sn >>= 1`), so once fnn is 0 or 1 it reaches 0 and stays 0, the test stays true, and the loop never ends: no allocation, no FAIL line. fnn starts at first - 1, so any consistency proof with first = 1 or 2 (reaching this loop needs first != second, a non-empty path and the earlier guards) hangs; unmutated, `fnn & 1 == 1` stops at the first even fnn, in at most 64 turns.",
+  "proof": "mutant `(fnn | 1) == 1` is true for fnn in {0,1}; the body shifts right, 1 -> 0 -> 0, so the condition is true forever and the loop never exits (no counter advances); unmutated, the loop strips trailing one bits of first - 1 and ends in at most 64 turns."
+ },
+ {
+  "file": "src/safe_regex.rs",
+  "fn": "Parser<'a>::alt",
+  "text": "self.i += 1;",
+  "mutant": "replace += with -= in Parser<'a>::alt",
+  "lineno": 166,
+  "racy": true,
+  "reason": "the unmutated suite passes under the same caps (cargo-mutants baseline of this run): in `a|b` the cursor sits on the `|` at index p >= 1; `self.i -= 1` moves it to p - 1, `cat()` re-parses the item before the `|` and stops again on the same `|`, the loop test `at(i) == Some('|')` is true again, and each turn pushes one more item onto `items`: an unbounded Vec until the allocator fails (SIGKILL, 'memory allocation of N bytes failed'). Unmutated, the cursor steps over the `|` and the loop ends after at most (number of `|`) turns."
+ }
+]

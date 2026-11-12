@@ -1,0 +1,3834 @@
+{
+  "format": 1,
+  "suite": "allowlist-anchor",
+  "layer": "proof",
+  "description": "Wire-level vectors for transparency-anchored allowlist verification: an Ed25519-signed tree head, RFC 6962 root over the anchor commitments, inclusion and RFC 9162 consistency proofs, head freshness and the per-issuer version rules. Native verifiers must reproduce `expect.ok`, `expect.code` and `expect.highestAnchoredVersion`; reason text is not part of the contract.",
+  "trust": {
+    "logKey": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+    "instanceId": "inst-anchor-a",
+    "principal": "allowlist-anchor-log"
+  },
+  "allowlist_anchor": [
+    {
+      "name": "ok-single-entry",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 1
+      }
+    },
+    {
+      "name": "ok-latest-of-three",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 3
+      }
+    },
+    {
+      "name": "anchored-rollback-tree-size-2-first",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 2,
+          "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 2,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-tree-size-2-last",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 2,
+        "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 2,
+          "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          }
+        ],
+        "proof": {
+          "index": 1,
+          "size": 2,
+          "path": [
+            {
+              "side": "L",
+              "hash": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 2
+      }
+    },
+    {
+      "name": "anchored-rollback-tree-size-3-first",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 3,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-tree-size-3-last",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 3
+      }
+    },
+    {
+      "name": "anchored-rollback-tree-size-4-first",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "aQvoFcrCA5Cnvo-BeZKEdvvz-059I_qISo3jGnLf5MPDZQ5UgLar8CN5NrqfpMhnMQHCYTbzbUKTjat_GKWoAA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 4,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-tree-size-4-last",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 4,
+        "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "aQvoFcrCA5Cnvo-BeZKEdvvz-059I_qISo3jGnLf5MPDZQ5UgLar8CN5NrqfpMhnMQHCYTbzbUKTjat_GKWoAA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 3,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            },
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 4
+      }
+    },
+    {
+      "name": "anchored-rollback-tree-size-5-first",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 5,
+          "root": "rZo8yPn5h04f9JSbT10JX7aDMRYniLhhY2hYCtUCv64",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "dzycVio5GfGhsJDdofow2F2sKvR0V21DKLP8JJDv0EZZZ3Zeoc6bpkdCr0odnVZvE8YWOGxdqexT3szgaUBgDQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 5,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+            },
+            {
+              "side": "R",
+              "hash": "hxP8kzgbEXiBxCTtKq35lb2ml6U6miGRaiOU5ANOt04"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-tree-size-5-last",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 5,
+        "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 5,
+          "root": "rZo8yPn5h04f9JSbT10JX7aDMRYniLhhY2hYCtUCv64",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "dzycVio5GfGhsJDdofow2F2sKvR0V21DKLP8JJDv0EZZZ3Zeoc6bpkdCr0odnVZvE8YWOGxdqexT3szgaUBgDQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          }
+        ],
+        "proof": {
+          "index": 4,
+          "size": 5,
+          "path": [
+            {
+              "side": "L",
+              "hash": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 5
+      }
+    },
+    {
+      "name": "anchored-rollback-tree-size-7-first",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 7,
+          "root": "RtXTuVY9NbK9PTbIcgaMiMms6eRwqZnX2z1oP1KN74E",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "FiK7NVTCIrI2Y7gztuv3GqNW7sF2fvFPsduANGjwN6XHwXYbUT-hUuvTp2kBC2n1fOwfIspCfGS0KagAqtvvAw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          },
+          {
+            "issuer": "ops",
+            "version": 6,
+            "digest": "chEOenk7GjXFLdpTDBiBLRSdStk1qCRHaBZOQifPm2A"
+          },
+          {
+            "issuer": "ops",
+            "version": 7,
+            "digest": "DMGsyh1QDMpZaknjkTF84n7LRV-1MrB4r8sPax-I3UI"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 7,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+            },
+            {
+              "side": "R",
+              "hash": "8Kmpsik_nNVQloHnRfv-2X84KPiuaNxMGDRfn5PtsNk"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-tree-size-7-last",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 7,
+        "digest": "DMGsyh1QDMpZaknjkTF84n7LRV-1MrB4r8sPax-I3UI"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 7,
+          "root": "RtXTuVY9NbK9PTbIcgaMiMms6eRwqZnX2z1oP1KN74E",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "FiK7NVTCIrI2Y7gztuv3GqNW7sF2fvFPsduANGjwN6XHwXYbUT-hUuvTp2kBC2n1fOwfIspCfGS0KagAqtvvAw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          },
+          {
+            "issuer": "ops",
+            "version": 6,
+            "digest": "chEOenk7GjXFLdpTDBiBLRSdStk1qCRHaBZOQifPm2A"
+          },
+          {
+            "issuer": "ops",
+            "version": 7,
+            "digest": "DMGsyh1QDMpZaknjkTF84n7LRV-1MrB4r8sPax-I3UI"
+          }
+        ],
+        "proof": {
+          "index": 6,
+          "size": 7,
+          "path": [
+            {
+              "side": "L",
+              "hash": "x7aw7hCmBTASgC-Xji57fEGrcV_5eCYlDSo0fgI5HyM"
+            },
+            {
+              "side": "L",
+              "hash": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 7
+      }
+    },
+    {
+      "name": "anchored-rollback-tree-size-8-first",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 8,
+          "root": "PjXbx9tRkxfBfxl1LmVkmPt7ieARvJUfWL83IVH0kG4",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "WURgxFLBFdcR_yeUjDZ8Jb5y4idariHQJNzirE98SIiMeu-tgmPHGfzvx7WZ2fXM4zk6Zvlj7s9Tp3D4xScWBA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          },
+          {
+            "issuer": "ops",
+            "version": 6,
+            "digest": "chEOenk7GjXFLdpTDBiBLRSdStk1qCRHaBZOQifPm2A"
+          },
+          {
+            "issuer": "ops",
+            "version": 7,
+            "digest": "DMGsyh1QDMpZaknjkTF84n7LRV-1MrB4r8sPax-I3UI"
+          },
+          {
+            "issuer": "ops",
+            "version": 8,
+            "digest": "RLRCa651bJUP4BZxVMQEMNyS77wflLpfNJR7Rd_ot0s"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 8,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+            },
+            {
+              "side": "R",
+              "hash": "yiVAORjZ3ka5AGA8WQDxdBIqmD1y5eSF2VZOW-OYqOM"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-tree-size-8-last",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 8,
+        "digest": "RLRCa651bJUP4BZxVMQEMNyS77wflLpfNJR7Rd_ot0s"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 8,
+          "root": "PjXbx9tRkxfBfxl1LmVkmPt7ieARvJUfWL83IVH0kG4",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "WURgxFLBFdcR_yeUjDZ8Jb5y4idariHQJNzirE98SIiMeu-tgmPHGfzvx7WZ2fXM4zk6Zvlj7s9Tp3D4xScWBA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          },
+          {
+            "issuer": "ops",
+            "version": 6,
+            "digest": "chEOenk7GjXFLdpTDBiBLRSdStk1qCRHaBZOQifPm2A"
+          },
+          {
+            "issuer": "ops",
+            "version": 7,
+            "digest": "DMGsyh1QDMpZaknjkTF84n7LRV-1MrB4r8sPax-I3UI"
+          },
+          {
+            "issuer": "ops",
+            "version": 8,
+            "digest": "RLRCa651bJUP4BZxVMQEMNyS77wflLpfNJR7Rd_ot0s"
+          }
+        ],
+        "proof": {
+          "index": 7,
+          "size": 8,
+          "path": [
+            {
+              "side": "L",
+              "hash": "oePvrZuflkv-rszJF7FdDPIjmmwZHXP7AUZbdZarcAE"
+            },
+            {
+              "side": "L",
+              "hash": "x7aw7hCmBTASgC-Xji57fEGrcV_5eCYlDSo0fgI5HyM"
+            },
+            {
+              "side": "L",
+              "hash": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 8
+      }
+    },
+    {
+      "name": "anchored-rollback-tree-size-9-first",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 9,
+          "root": "G-2ecdcwkAfkMhyPBqyRadybVc3CYYCt-ib1_Hyw-3E",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "u1Ak44zSmLE19EKzIM_R0xK5sN5ztAigSSkSu4zJoKFqNw2w5WlvKenL7tN4kGA7odJ9Iui6QrEW4O_uqQcJDw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          },
+          {
+            "issuer": "ops",
+            "version": 6,
+            "digest": "chEOenk7GjXFLdpTDBiBLRSdStk1qCRHaBZOQifPm2A"
+          },
+          {
+            "issuer": "ops",
+            "version": 7,
+            "digest": "DMGsyh1QDMpZaknjkTF84n7LRV-1MrB4r8sPax-I3UI"
+          },
+          {
+            "issuer": "ops",
+            "version": 8,
+            "digest": "RLRCa651bJUP4BZxVMQEMNyS77wflLpfNJR7Rd_ot0s"
+          },
+          {
+            "issuer": "ops",
+            "version": 9,
+            "digest": "1lsGfEyEjY5uXcZNLW2g4ewmT6w2pvzDPZmGUSLmiuY"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 9,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+            },
+            {
+              "side": "R",
+              "hash": "yiVAORjZ3ka5AGA8WQDxdBIqmD1y5eSF2VZOW-OYqOM"
+            },
+            {
+              "side": "R",
+              "hash": "_mT0-kSO8PE5R-euNqc-viWsMgyBoPGKxqiwTAJpriU"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-tree-size-9-last",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 9,
+        "digest": "1lsGfEyEjY5uXcZNLW2g4ewmT6w2pvzDPZmGUSLmiuY"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 9,
+          "root": "G-2ecdcwkAfkMhyPBqyRadybVc3CYYCt-ib1_Hyw-3E",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "u1Ak44zSmLE19EKzIM_R0xK5sN5ztAigSSkSu4zJoKFqNw2w5WlvKenL7tN4kGA7odJ9Iui6QrEW4O_uqQcJDw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          },
+          {
+            "issuer": "ops",
+            "version": 5,
+            "digest": "9PrnMLUR2dPnmShc7W5VNx1wMCMoTywrogRyAxtgR-8"
+          },
+          {
+            "issuer": "ops",
+            "version": 6,
+            "digest": "chEOenk7GjXFLdpTDBiBLRSdStk1qCRHaBZOQifPm2A"
+          },
+          {
+            "issuer": "ops",
+            "version": 7,
+            "digest": "DMGsyh1QDMpZaknjkTF84n7LRV-1MrB4r8sPax-I3UI"
+          },
+          {
+            "issuer": "ops",
+            "version": 8,
+            "digest": "RLRCa651bJUP4BZxVMQEMNyS77wflLpfNJR7Rd_ot0s"
+          },
+          {
+            "issuer": "ops",
+            "version": 9,
+            "digest": "1lsGfEyEjY5uXcZNLW2g4ewmT6w2pvzDPZmGUSLmiuY"
+          }
+        ],
+        "proof": {
+          "index": 8,
+          "size": 9,
+          "path": [
+            {
+              "side": "L",
+              "hash": "PjXbx9tRkxfBfxl1LmVkmPt7ieARvJUfWL83IVH0kG4"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 9
+      }
+    },
+    {
+      "name": "ok-two-issuers-first-issuer-latest",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 2,
+        "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "lWjm4pPcIraholmlo2u5APPJzgOFno3Mi3-XVRJIOkE",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "emjqfRT4EMFgvSd45LYd4gY4DunzzeQpXfmJAaX8SrkxGkRcLTUQz_JQMAjYkAifDbD4hmV-VwjWcY_nnJMCBQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "other-issuer",
+            "version": 1,
+            "digest": "Zz9QlKVAzimK9I5dH3jeMbG4GyLg2qw6kqqASYTVGhc"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "other-issuer",
+            "version": 2,
+            "digest": "evBwK8GAlER-00zQU28cScIBSJNQp89K50jsY2vRuXY"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 4,
+          "path": [
+            {
+              "side": "R",
+              "hash": "1cUqxOfrHesqinNvAc7zAg5gbozMM4A5rDr6d-ZL_30"
+            },
+            {
+              "side": "L",
+              "hash": "tFpTp0oOJxkXA-bf5cW1Jk4BY3MnOvRn8NI89RljGac"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 2
+      }
+    },
+    {
+      "name": "ok-two-issuers-second-issuer-latest",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "other-issuer",
+        "version": 2,
+        "digest": "evBwK8GAlER-00zQU28cScIBSJNQp89K50jsY2vRuXY"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "lWjm4pPcIraholmlo2u5APPJzgOFno3Mi3-XVRJIOkE",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "emjqfRT4EMFgvSd45LYd4gY4DunzzeQpXfmJAaX8SrkxGkRcLTUQz_JQMAjYkAifDbD4hmV-VwjWcY_nnJMCBQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "other-issuer",
+            "version": 1,
+            "digest": "Zz9QlKVAzimK9I5dH3jeMbG4GyLg2qw6kqqASYTVGhc"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "other-issuer",
+            "version": 2,
+            "digest": "evBwK8GAlER-00zQU28cScIBSJNQp89K50jsY2vRuXY"
+          }
+        ],
+        "proof": {
+          "index": 3,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "L",
+              "hash": "tFpTp0oOJxkXA-bf5cW1Jk4BY3MnOvRn8NI89RljGac"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 2
+      }
+    },
+    {
+      "name": "anchored-rollback-other-issuer-oldest",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "other-issuer",
+        "version": 1,
+        "digest": "Zz9QlKVAzimK9I5dH3jeMbG4GyLg2qw6kqqASYTVGhc"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "lWjm4pPcIraholmlo2u5APPJzgOFno3Mi3-XVRJIOkE",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "emjqfRT4EMFgvSd45LYd4gY4DunzzeQpXfmJAaX8SrkxGkRcLTUQz_JQMAjYkAifDbD4hmV-VwjWcY_nnJMCBQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "other-issuer",
+            "version": 1,
+            "digest": "Zz9QlKVAzimK9I5dH3jeMbG4GyLg2qw6kqqASYTVGhc"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "other-issuer",
+            "version": 2,
+            "digest": "evBwK8GAlER-00zQU28cScIBSJNQp89K50jsY2vRuXY"
+          }
+        ],
+        "proof": {
+          "index": 1,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc"
+            },
+            {
+              "side": "R",
+              "hash": "DuwAUixXNZS6O-ej_3e9C7pHe7H6CFaVQQKvj3whA-E"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "ok-head-at-exact-max-age",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789913600000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "VfTi-LU5pHWsgmJuYwdnqjXYHzMxyJqUAcW81qh2i4Ph2VxTpcJC3r97CeMNLCr4tskcmTnqiz96EKyoUySLDg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 1
+      }
+    },
+    {
+      "name": "ok-head-exactly-skew-in-the-future",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1790000060000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "ulGW4uUxyFgucJgfqINBV71hSNsDtnOmlufEF0S7ZXl6cvef6Hsvt-nUL1RTGuJs9bE8bCiqWEyBPRVIu9IyCA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 1
+      }
+    },
+    {
+      "name": "ok-custom-max-age",
+      "now": 1790000000000,
+      "maxHeadAgeMs": 300000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999700000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "U7-c6bHgx1Z_pxs1We0Qa7_l4hQ9kDEPAmFIRJE9koa86HDnV1VQnewZjZfjEnw1zI2dp11IAQVneHEZK9SWAA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 1
+      }
+    },
+    {
+      "name": "ok-zero-skew-head-at-now",
+      "now": 1790000000000,
+      "clockSkewMs": 0,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1790000000000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "Zr9j4-Pc41fbLomAlR28TPiO6jRPx2QySNqcTsxxXBtPlYgjuaRuMJ1FUm4GKI4lEfijtYNKofn4iPR5iToZCg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 1
+      }
+    },
+    {
+      "name": "missing-evidence",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": null,
+      "expect": {
+        "ok": false,
+        "code": "missing-proof"
+      }
+    },
+    {
+      "name": "missing-head",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "missing-proof"
+      }
+    },
+    {
+      "name": "missing-proof-field",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ]
+      },
+      "expect": {
+        "ok": false,
+        "code": "missing-proof"
+      }
+    },
+    {
+      "name": "entries-not-an-array",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": "x",
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "missing-proof"
+      }
+    },
+    {
+      "name": "bad-head-signed-by-another-key",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "_RckOFqgx1tk-3jNYC-h2ZH96_drE8WO1wLqyDXp9hg",
+          "sig": "NFoGaF4x997oaerUZwoTwJ0LD08D-W8OSjLrTjmDB_VJ-M_YnhOYPkSfQt7e5n15QChqB4rA8poW2kR49efnCQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "bad-head-root-edited-after-signing",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "IcXFLMKbOLcmGfeu8HlUP5z4luNVswYFml_eyr6IEeo",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "bad-head-timestamp-edited-after-signing",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940001,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "bad-head-size-edited-after-signing",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 2,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "bad-head-other-instance",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-other",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "DnP1wio2n0F0CtSYvCO0c086KxXUbWaGZ3_peEolXOhh3zCtcQ5F1YpZAQPtMfvO3gFRt_0avsZ4WYLpk9t3DQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "bad-head-other-log-principal",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "other-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "Of1ai7e4J-7wqT2PN6e5iovE4sgCf_OTMoLZSEhmyxGzkl9m050OG1OGLbglcem1GF88z_tsuS4TKGl8r1GTBQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "bad-head-wrong-guardian-field",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "_RckOFqgx1tk-3jNYC-h2ZH96_drE8WO1wLqyDXp9hg",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "bad-head-unsigned",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": ""
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-head"
+      }
+    },
+    {
+      "name": "stale-head-one-ms-past-max-age",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789913599999,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "m94eqwdX7xjkYvSzWZmRFaxS9x25UG0bzgWP7oaCzbBlRTQB6dK0GSU_WSJQQzvq3ui5id-ceEcoax0HvVITCQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "stale-head"
+      }
+    },
+    {
+      "name": "stale-head-custom-max-age",
+      "now": 1790000000000,
+      "maxHeadAgeMs": 300000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999699999,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "7QVl8rND_J179ud38ycjuIpdYwo2LNnUEYF5S5xZz3Ejfje-D2DJ1m74RulVQISALxQh47MJ1JQ_aqs9BdqVBg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "stale-head"
+      }
+    },
+    {
+      "name": "stale-head-future-beyond-skew",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1790000060001,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "MwtBGypKROlm73GW1QNxsHbGsnoxG8ckEADbhzmnZ6ujc3UoMQcF6T_D_x1gBJqily-bAegi9plfuUglSa0FAA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "stale-head"
+      }
+    },
+    {
+      "name": "stale-head-future-beyond-custom-skew",
+      "now": 1790000000000,
+      "clockSkewMs": 0,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1790000000001,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "6_UCu3bRQKyANeRTHjtWPi7c0ZT5MUzYghJJyklkhV-grvRkmearlYdwZvvl-7axVjFtRwOdgHCSGk_L8a5lCQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "stale-head"
+      }
+    },
+    {
+      "name": "ok-cached-head-extended-by-consistency-proof",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 4,
+        "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4",
+          "prev_root": "",
+          "timestamp": 1789999970000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "-hmWIxr1po8UvNu7JfGEAO3F76fymeF4Oc6RoaoV02D2F3-SGFGGWJqAKOI_RXhdMV7GZtc-dhf0XQX04xstDA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 3,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            },
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        },
+        "consistency": {
+          "oldSize": 2,
+          "newSize": 4,
+          "path": [
+            "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 4
+      }
+    },
+    {
+      "name": "ok-cached-head-equal",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 2,
+        "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 2,
+          "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          }
+        ],
+        "proof": {
+          "index": 1,
+          "size": 2,
+          "path": [
+            {
+              "side": "L",
+              "hash": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc"
+            }
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 2
+      }
+    },
+    {
+      "name": "inconsistent-with-cache-no-consistency-proof",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 4,
+        "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4",
+          "prev_root": "",
+          "timestamp": 1789999970000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "-hmWIxr1po8UvNu7JfGEAO3F76fymeF4Oc6RoaoV02D2F3-SGFGGWJqAKOI_RXhdMV7GZtc-dhf0XQX04xstDA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 3,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            },
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+      },
+      "expect": {
+        "ok": false,
+        "code": "inconsistent-with-cache"
+      }
+    },
+    {
+      "name": "inconsistent-with-cache-tampered-proof",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 4,
+        "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4",
+          "prev_root": "",
+          "timestamp": 1789999970000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "-hmWIxr1po8UvNu7JfGEAO3F76fymeF4Oc6RoaoV02D2F3-SGFGGWJqAKOI_RXhdMV7GZtc-dhf0XQX04xstDA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 3,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            },
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        },
+        "consistency": {
+          "oldSize": 2,
+          "newSize": 4,
+          "path": [
+            "xoNw8BI020vguopzB9K70MTurnKeFFTyEUh7anCYXYI"
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+      },
+      "expect": {
+        "ok": false,
+        "code": "inconsistent-with-cache"
+      }
+    },
+    {
+      "name": "bad-cache-signed-by-another-key",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 4,
+        "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4",
+          "prev_root": "",
+          "timestamp": 1789999970000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "-hmWIxr1po8UvNu7JfGEAO3F76fymeF4Oc6RoaoV02D2F3-SGFGGWJqAKOI_RXhdMV7GZtc-dhf0XQX04xstDA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 3,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            },
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        },
+        "consistency": {
+          "oldSize": 2,
+          "newSize": 4,
+          "path": [
+            "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "_RckOFqgx1tk-3jNYC-h2ZH96_drE8WO1wLqyDXp9hg",
+        "sig": "BodIY-KXIU42W_4WlARZS93MOHXzq2YB4oyS_KajSzGCOr9W_W6KzOhTDH_z59HV29gfMCB9t0WhLQDbvNxtAw"
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-cache"
+      }
+    },
+    {
+      "name": "bad-cache-other-instance",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 4,
+        "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 4,
+          "root": "4Mt3JVjGXNrUgRsSljp8xpRqN-RO0RJF7xkFtAzqMP4",
+          "prev_root": "",
+          "timestamp": 1789999970000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "-hmWIxr1po8UvNu7JfGEAO3F76fymeF4Oc6RoaoV02D2F3-SGFGGWJqAKOI_RXhdMV7GZtc-dhf0XQX04xstDA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 3,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            },
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        },
+        "consistency": {
+          "oldSize": 2,
+          "newSize": 4,
+          "path": [
+            "IpYO3511Hs6jrzBOYaJKiaw8tfHf2aTIYn11MMVLCn0"
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-other",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "wbuexgYHjhrroEXDieWJPnO90UYRvrBOyXHsWkqS4ydBIl4EUHdj4gj0e0aIaR0vNUjki1Pz2PZ2uj63c4pQDw"
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-cache"
+      }
+    },
+    {
+      "name": "log-rollback-cached-head-is-larger",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+      },
+      "expect": {
+        "ok": false,
+        "code": "log-rollback"
+      }
+    },
+    {
+      "name": "split-view-same-size-different-root",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 2,
+        "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 2,
+          "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          }
+        ],
+        "proof": {
+          "index": 1,
+          "size": 2,
+          "path": [
+            {
+              "side": "L",
+              "hash": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc"
+            }
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "lKIfTFD8C2QmdP__o3b_FHWLGHVf_2VCqsFJgszEQnE",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "xbAp76L4dHXEUd73046rymtdXk09J3cjN0Mrb_19gisAKsfM2dvB4F-nNo_WY5IirH-2bWCq8IXRJ1W3JGnGDg"
+      },
+      "expect": {
+        "ok": false,
+        "code": "split-view"
+      }
+    },
+    {
+      "name": "ok-adjacent-heads-prev-root-chains",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "QAf0M-hrpnU9U6SJgJrJbLplpxod-fdK2B5Y-kTwnQOripcIlKgDq2Mf0aJ0y28a4B611PH1PHlhkaCtpOnMAA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        },
+        "consistency": {
+          "oldSize": 2,
+          "newSize": 3,
+          "path": [
+            "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 3
+      }
+    },
+    {
+      "name": "inconsistent-with-cache-adjacent-heads-prev-root-does-not-chain",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "ehoxNV8vqbaXs3CgToAWb7Po1Uq0cj2eSMP0SWrj_5M",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "Bb0lFmA5E4Kcnt2tD81uVfMcgzYO32pp0OkM7uIsaJYl5lfMbkUZ-D-7tuR5D9LD_gszNeEkGpzaUz0azQC0DA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        },
+        "consistency": {
+          "oldSize": 2,
+          "newSize": 3,
+          "path": [
+            "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+          ]
+        }
+      },
+      "cachedHead": {
+        "instance_id": "inst-anchor-a",
+        "principal": "allowlist-anchor-log",
+        "size": 2,
+        "root": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w",
+        "prev_root": "",
+        "timestamp": 1789999940000,
+        "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+        "sig": "CIKWqQdYOBzRX0-m8UvwhSMq2uccQhJMiPY8LbwmuWPjycGiOshH-bG7IeVAgiZMJj1GRolA32qhwYzs_VSnCw"
+      },
+      "expect": {
+        "ok": false,
+        "code": "inconsistent-with-cache"
+      }
+    },
+    {
+      "name": "feed-mismatch-fewer-entries-than-size",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-more-entries-than-size",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          },
+          {
+            "issuer": "ops",
+            "version": 4,
+            "digest": "xu_Goq_fO7c4vTT9oxXdMvvXcAGLaXQtX5ryCU0d8kM"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-entry-digest-altered",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "9GR7bRmejpfbZZYAz1WXr5s_qMOxoat5tac_2rTvIH8"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-entries-reordered",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-malformed-entry-extra-key",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4",
+            "extra": 1
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-malformed-entry-version-zero",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 0,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-malformed-entry-fractional-version",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1.5,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-malformed-entry-short-digest",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "abc"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-malformed-entry-empty-issuer",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": "",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "feed-mismatch-malformed-entry-non-string-issuer",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 1,
+          "root": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "bK5vZb-_0yG6dUTEfXgmRveflxK6EhYQK-OwsEf1CMiuVYm8s8G6V-PFq6qlgZ00A8aflPVS5FPZjpApsSZ4Dg"
+        },
+        "entries": [
+          {
+            "issuer": 5,
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "bad-proof-size-differs-from-head",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 4,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "bad-proof-for-another-leaf",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 3,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "bad-proof-path-hash-edited",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "RHZRt5_f6Crx-l4sg0JVeaCDoABq7HW1Tywm_hH4NHU"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "bad-proof-side-flipped",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "bad-proof-index-edited",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 2,
+        "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc"
+            },
+            {
+              "side": "R",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "bad-proof-empty-log",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 0,
+          "root": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "4C9tqLB81Bz8pk_kmCnDhgaysA1kk19pFXdzd24zdFJfgnk-bMflAUbjVowogyKnkyCLczydw5F0P63RCVurCA"
+        },
+        "entries": [],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "feed-mismatch-entries-supplied-for-an-empty-head",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 0,
+          "root": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "4C9tqLB81Bz8pk_kmCnDhgaysA1kk19pFXdzd24zdFJfgnk-bMflAUbjVowogyKnkyCLczydw5F0P63RCVurCA"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 1,
+          "path": []
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "feed-mismatch"
+      }
+    },
+    {
+      "name": "anchored-rollback-older-than-highest",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 3,
+          "path": [
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            },
+            {
+              "side": "R",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "anchored-rollback-middle-version",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 2,
+        "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 1,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc"
+            },
+            {
+              "side": "R",
+              "hash": "8Snp5NN5nJ2pExflhkTj8CAdIS229BL5csFuDHzfXis"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "anchored-rollback"
+      }
+    },
+    {
+      "name": "bad-proof-manifest-digest-is-not-in-the-log",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 3,
+        "digest": "M8SM93ZGLU89jqgDjyrsPvIGcMmykFvo5PY6-VRJ4Sc"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "bad-proof-manifest-version-is-not-in-the-log",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 9,
+        "digest": "1lsGfEyEjY5uXcZNLW2g4ewmT6w2pvzDPZmGUSLmiuY"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "bad-proof-manifest-issuer-is-not-in-the-log",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "stranger",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lCf6NKlNt3mM1jvu5HGOC4FOvp7qvEQGL60Zjdn63a8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "NJJq1CA4qMSJFbZIFsrQXKaZgJlumCMd1jIpxBwfV49FeoOn7JNqqknJyFG05Urf065oLU55MFRlxP4VOooAAg"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          },
+          {
+            "issuer": "ops",
+            "version": 3,
+            "digest": "0epvh1VLjvTiCSkYFhZeeMTbdrg64WQIxmhY6trLSXg"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "zA-YWO3ISq-CWssCS86dQItI0dRMw2wQrCLmfcyp83w"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "bad-proof"
+      }
+    },
+    {
+      "name": "log-conflict-two-digests-for-one-version",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 2,
+        "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lGEEqeOwTvvALONK43BfZAO_NWPPSiWhtTzz4o5nfQ8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "tyvVwrtPTUGBWdg3soGTrLRWviUtbNv1uqBezkWNE6OHAmYnGI4EXZG4AZ49mNdDT20jXVWMHt7X0oWiZbzmCQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "HW5B1ZT7-XbTJTNiMUgL0FirffUkk5XFeXLWOxMYmSY"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          }
+        ],
+        "proof": {
+          "index": 2,
+          "size": 3,
+          "path": [
+            {
+              "side": "L",
+              "hash": "NhPu7HxF0pue_JZscrSN0I91sAlzbw7NplrXyzQaF9E"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "log-conflict"
+      }
+    },
+    {
+      "name": "log-conflict-the-manifest-itself-is-one-of-them",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 3,
+          "root": "lGEEqeOwTvvALONK43BfZAO_NWPPSiWhtTzz4o5nfQ8",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "tyvVwrtPTUGBWdg3soGTrLRWviUtbNv1uqBezkWNE6OHAmYnGI4EXZG4AZ49mNdDT20jXVWMHt7X0oWiZbzmCQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "HW5B1ZT7-XbTJTNiMUgL0FirffUkk5XFeXLWOxMYmSY"
+          },
+          {
+            "issuer": "ops",
+            "version": 2,
+            "digest": "Jrcucn-Jkf-w5S4IRTsZMCBwt09yq23moiNaWF1fK7Q"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 3,
+          "path": [
+            {
+              "side": "R",
+              "hash": "YIBrj_iWTvL5xakBaf8o-xfK5mNWUrsx56MWGR9NYFQ"
+            },
+            {
+              "side": "R",
+              "hash": "-ixSFRgvjP6c5ELwuVBL1YFLi4rC95UB7SUu6S0ahok"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": false,
+        "code": "log-conflict"
+      }
+    },
+    {
+      "name": "ok-identical-entry-anchored-twice-is-not-a-conflict",
+      "now": 1790000000000,
+      "manifest": {
+        "issuer": "ops",
+        "version": 1,
+        "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+      },
+      "evidence": {
+        "head": {
+          "instance_id": "inst-anchor-a",
+          "principal": "allowlist-anchor-log",
+          "size": 2,
+          "root": "0dDpbXIq7jTCkggV19nLFsSbxZLhXKqzjtRFcQqNy6E",
+          "prev_root": "",
+          "timestamp": 1789999940000,
+          "guardian": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+          "sig": "g1lzTHTzUOeDwBjp3DVlRf4ns4U6z2KxNY5EZghDe54JpznvDYbLgU-SKkUfRA-PdkmBd6Fzog6WrMe0tcxdDQ"
+        },
+        "entries": [
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          },
+          {
+            "issuer": "ops",
+            "version": 1,
+            "digest": "96B05R9xqdmCXbrO-8HihHMStIHOYfZPqtVqgu70q-4"
+          }
+        ],
+        "proof": {
+          "index": 0,
+          "size": 2,
+          "path": [
+            {
+              "side": "R",
+              "hash": "0cUc_33APTwsmXCePpA37uGDIco8ystDsFZSBFOlIsc"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "ok": true,
+        "highestAnchoredVersion": 1
+      }
+    }
+  ]
+}

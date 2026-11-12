@@ -1,0 +1,1 @@
+{"id":"approval-challenge-not-string","kind":"approval_challenge","input":{"action_digest":7,"render_digest":"cnJycnJycnJycnJycnJycnJycnJycnJycnJycnJycnI"},"expect":{"ok":false}}

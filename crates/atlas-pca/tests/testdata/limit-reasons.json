@@ -1,0 +1,1940 @@
+{
+ "format": "pca-limit-reasons-v1",
+ "cases": [
+  {
+   "name": "lte",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "lt",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lt",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount < 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "gt",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "gt",
+       "value": 1000
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount > 1000 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "gte",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "gte",
+       "value": 1000
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount >= 1000 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "eq string",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "usd"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"usd\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "ne",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "ne",
+       "value": "gbp"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency != \"gbp\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "prefix",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.note",
+       "op": "prefix",
+       "value": "zz"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "note starts with \"zz\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "like",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.note",
+       "op": "like",
+       "value": "a*"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "note like \"a*\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "matches",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.note",
+       "op": "matches",
+       "value": "^a+$"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "note matches \"^a+$\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "is_a",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "is_a",
+       "value": "string"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount is a \"string\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "member_of",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.note",
+       "op": "member_of",
+       "value": "team"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "note member of \"team\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "in array",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "in",
+       "value": [
+        "usd",
+        "eur"
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency in [\"usd\", \"eur\"] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "nin array",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "nin",
+       "value": [
+        "gbp",
+        "eur"
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency not in [\"gbp\", \"eur\"] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "in empty array",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "in",
+       "value": []
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency in [] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "in 8 items",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "in",
+       "value": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency in [1, 2, 3, 4, 5, 6, 7, 8] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "in 9 items",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "in",
+       "value": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency in [...] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "in nested array",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "in",
+       "value": [
+        "a",
+        [
+         "b"
+        ]
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency in [\"a\", <value>] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "in mixed scalars",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "in",
+       "value": [
+        true,
+        null,
+        3,
+        "x"
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency in [true, null, 3, \"x\"] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "exists absent",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.missing",
+       "op": "exists",
+       "value": true
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "missing present not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "exists present",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "exists",
+       "value": false
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount absent not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "exists no value",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.missing",
+       "op": "exists"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "missing present not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "ref",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "ref": "env.limit"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= env.limit not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "ref non-string",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "ref": 5
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= <ref> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "long string",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"...\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "string 64",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "string with quote",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "a\"b"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"...\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "string with backslash",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "a\\b"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"...\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "string with newline",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "a\nb"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"...\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "string with emoji",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "a😀b"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"...\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "string with bmp unicode",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.currency",
+       "op": "eq",
+       "value": "café"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "currency == \"café\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "non-integer number",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 1.5
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= <number> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "huge number",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "gte",
+       "value": 1000000000000000000000
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount >= <number> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "unsafe integer",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "gte",
+       "value": 9007199254740992
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount >= <number> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "max safe integer",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lt",
+       "value": 9007199254740991
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 9007199254740991
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount < 9007199254740991 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "negative integer",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "gt",
+       "value": -5
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": -10
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount > -5 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "float integral",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "null value",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "eq",
+       "value": null
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount == null not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "bool value",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "eq",
+       "value": true
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount == true not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "object value",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "eq",
+       "value": {
+        "a": 1
+       }
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount == <value> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "missing value",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "eq"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount == <value> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "unknown op",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "wat",
+       "value": 1
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <condition> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "non-string op",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": 7,
+       "value": 1
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <condition> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "non-string field",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": 5,
+       "op": "eq",
+       "value": 1
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "<field> == 1 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "field without prefix",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "subject.role",
+       "op": "eq",
+       "value": "admin"
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "subject.role == \"admin\" not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "field env",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "env.region",
+       "op": "in",
+       "value": [
+        "eu"
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "env.region in [\"eu\"] not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "all_of first unmet child",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "all_of": [
+        {
+         "field": "action.params.currency",
+         "op": "eq",
+         "value": "gbp"
+        },
+        {
+         "field": "action.params.amount",
+         "op": "lte",
+         "value": 100
+        },
+        {
+         "field": "action.params.note",
+         "op": "eq",
+         "value": "q"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "all_of nested depth 4",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "all_of": [
+        {
+         "all_of": [
+          {
+           "all_of": [
+            {
+             "all_of": [
+              {
+               "field": "action.params.amount",
+               "op": "lte",
+               "value": 100
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "all_of nested depth 5",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "all_of": [
+        {
+         "all_of": [
+          {
+           "all_of": [
+            {
+             "all_of": [
+              {
+               "all_of": [
+                {
+                 "field": "action.params.amount",
+                 "op": "lte",
+                 "value": 100
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "all of (amount <= 100) not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "any_of",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "any_of": [
+        {
+         "field": "action.params.amount",
+         "op": "lte",
+         "value": 100
+        },
+        {
+         "field": "action.params.currency",
+         "op": "eq",
+         "value": "usd"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "any of (amount <= 100; currency == \"usd\") not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "not",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "not": {
+        "field": "action.params.currency",
+        "op": "eq",
+        "value": "gbp"
+       }
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "not (currency == \"gbp\") not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "any_of in all_of",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "all_of": [
+        {
+         "any_of": [
+          {
+           "field": "action.params.amount",
+           "op": "lte",
+           "value": 100
+          },
+          {
+           "field": "action.params.currency",
+           "op": "eq",
+           "value": "usd"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "any of (amount <= 100; currency == \"usd\") not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "all_of in any_of",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "any_of": [
+        {
+         "all_of": [
+          {
+           "field": "action.params.amount",
+           "op": "lte",
+           "value": 100
+          }
+         ]
+        },
+        {
+         "field": "action.params.currency",
+         "op": "eq",
+         "value": "usd"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "any of (all of (amount <= 100); currency == \"usd\") not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "not of any_of of all_of",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "not": {
+        "any_of": [
+         {
+          "all_of": [
+           {
+            "field": "action.params.currency",
+            "op": "eq",
+            "value": "gbp"
+           }
+          ]
+         }
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "not (any of ((...))) not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "any_of 9 children",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "any_of": [
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1000
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1001
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1002
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1003
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1004
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1005
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1006
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1007
+        },
+        {
+         "field": "action.params.amount",
+         "op": "eq",
+         "value": 1008
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "any of (amount == 1000; amount == 1001; amount == 1002; amount == 1003; amount == 1004; amount == 1005; amount == 1006; amount == 1007) not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "empty all_of",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "all_of": []
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "all of () not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "group not array",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "all_of": 5
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "<condition> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "non-object condition",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      "nonsense"
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "<condition> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "condition null",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      null
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "<condition> not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "second condition unmet",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "gte",
+       "value": 1
+      },
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "first predicate wins",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    },
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 200
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "verb list and star resource",
+   "predicates": [
+    {
+     "verb": [
+      "payments.send",
+      "x"
+     ],
+     "resource": "payments/*",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "scope other verb",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400
+   },
+   "verb": "payments.refund",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "no predicate permits payments.refund on payments/acme"
+  },
+  {
+   "name": "scope other resource",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400
+   },
+   "verb": "payments.send",
+   "resource": "payments/other",
+   "allowed": false,
+   "reason": "no predicate permits payments.send on payments/other"
+  },
+  {
+   "name": "out-of-scope predicate then in-scope",
+   "predicates": [
+    {
+     "verb": "other",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "where not array",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": "x"
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "no predicate permits payments.send on payments/acme"
+  },
+  {
+   "name": "where absent",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme"
+    }
+   ],
+   "params": {
+    "amount": 400
+   },
+   "verb": "zzz",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "no predicate permits zzz on payments/acme"
+  },
+  {
+   "name": "empty list",
+   "predicates": [],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "envelope grants no predicates"
+  },
+  {
+   "name": "non-object predicate",
+   "predicates": [
+    "x",
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "resource omitted",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "regex resource",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "re:payments/.*",
+     "where": [
+      {
+       "field": "action.params.amount",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+  },
+  {
+   "name": "tri unknown (absent param)",
+   "predicates": [
+    {
+     "verb": "payments.send",
+     "resource": "payments/acme",
+     "where": [
+      {
+       "field": "action.params.nope",
+       "op": "lte",
+       "value": 100
+      }
+     ]
+    }
+   ],
+   "params": {
+    "amount": 400,
+    "currency": "gbp",
+    "note": "x"
+   },
+   "verb": "payments.send",
+   "resource": "payments/acme",
+   "allowed": false,
+   "reason": "nope <= 100 not satisfied for payments.send on payments/acme"
+  }
+ ]
+}

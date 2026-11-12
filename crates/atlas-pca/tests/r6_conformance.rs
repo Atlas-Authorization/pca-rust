@@ -61,7 +61,7 @@ fn malformed_is_a_clean_deny() {
                 "chain" => verify_chain(input["chain"].as_array().unwrap(), input["expected_root_issuer"].as_str()).is_ok(),
                 "threshold_share" => verify_threshold_share(input),
                 "pcactn_json" => {
-                    verify_pcactn_json(input["text"].as_str().unwrap(), &input["grant"], input["now"].as_i64().unwrap(), input["aud"].as_str().unwrap()).allow
+                    verify_pcactn_json_with(input["text"].as_str().unwrap(), &input["grant"], input["now"].as_i64().unwrap(), input["aud"].as_str().unwrap(), &atlas_pca::VerifyOptions { insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() }).allow
                 }
                 other => panic!("unknown api {other}"),
             }
@@ -131,7 +131,7 @@ fn depth_vectors_match_reference() {
                 "chain" => verify_chain(input["chain"].as_array().unwrap(), input["expected_root_issuer"].as_str()).is_ok(),
                 "threshold_share" => verify_threshold_share(&input),
                 "pcactn_json" => {
-                    verify_pcactn_json(input["text"].as_str().unwrap(), &input["grant"], input["now"].as_i64().unwrap(), input["aud"].as_str().unwrap()).allow
+                    verify_pcactn_json_with(input["text"].as_str().unwrap(), &input["grant"], input["now"].as_i64().unwrap(), input["aud"].as_str().unwrap(), &atlas_pca::VerifyOptions { insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() }).allow
                 }
                 "json_parse" => strict_parse(input["text"].as_str().unwrap()).is_ok(),
                 other => panic!("unknown api {other}"),
