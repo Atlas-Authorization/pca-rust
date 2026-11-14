@@ -23,13 +23,13 @@ fn adversarial_vectors() {
             .as_array()
             .map(|a| a.iter().map(|x| x.as_str().unwrap().to_string()).collect());
         let got = if let Some(raw) = v.get("pcactn_json").and_then(Value::as_str) {
-            verify_pcactn_json_policy(raw, &v["grant"], now, aud, allowed.as_deref())
+            verify_pcactn_json_with(raw, &v["grant"], now, aud, &atlas_pca::VerifyOptions { allowed: allowed.as_deref(), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() })
         } else if has_lone(&v["pcactn"]) {
             let mut checks = std::collections::BTreeMap::new();
             checks.insert("wire".to_string(), false);
-            Verdict { allow: false, checks, reason: "wire: lone surrogate".into() }
+            Verdict { allow: false, checks, reason: "wire: lone surrogate".into(), reasons: Vec::new(), legacy_model_polarity: false }
         } else {
-            verify_pcactn_core_policy(&v["pcactn"], &v["grant"], now, aud, allowed.as_deref())
+            verify_pcactn_core_with(&v["pcactn"], &v["grant"], now, aud, &atlas_pca::VerifyOptions { allowed: allowed.as_deref(), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() })
         };
         if got.allow != v["expect"]["allow"].as_bool().unwrap() || got.checks.len() != want.len()
             || want.iter().any(|(k, w)| got.checks.get(k) != w.as_bool().as_ref())

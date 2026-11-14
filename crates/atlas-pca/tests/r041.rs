@@ -80,7 +80,7 @@ fn share_wire_vectors() {
         let want = v["expect"]["checks"].as_object().unwrap();
         let now = v["context"]["now"].as_i64().unwrap();
         let aud = v["context"]["aud"].as_str().unwrap();
-        let got = verify_pcactn_core_policy(&v["pcactn"], &v["grant"], now, aud, None);
+        let got = verify_pcactn_core_with(&v["pcactn"], &v["grant"], now, aud, &atlas_pca::VerifyOptions { allowed: None, insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() });
         if got.allow != v["expect"]["allow"].as_bool().unwrap() {
             bad.push(format!("{name}: allow = {}, want {} ({})", got.allow, v["expect"]["allow"], got.reason));
         }
@@ -236,7 +236,7 @@ fn decode_pca_header_unit() {
 fn middleware_header_is_strict() {
     use atlas_pca::middleware::{verify_request, GuardConfig};
     let doc = load("vectors.json");
-    let cfg = GuardConfig::new("rs-conformance".to_string(), |_: &str| None);
+    let cfg = GuardConfig::new("rs-conformance".to_string(), |_: &str| None).with_signature_only().with_insecure_skip_plan_root_check();
     let mut bad = Vec::new();
     for c in section(&doc, "pca_header") {
         let name = c["name"].as_str().unwrap();

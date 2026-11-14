@@ -1,0 +1,21 @@
+[package]
+name = "axum-server-example"
+version = "0.0.0"
+edition = "2021"
+publish = false
+description = "A minimal axum resource server guarded by atlas-pca protect()"
+
+# Its own workspace: this example is not a member of the atlas-pca workspace, so it never enters the published crate or its
+# dependency audit.
+[workspace]
+
+[dependencies]
+# Outside this repository use a plain version: atlas-pca = { version = "0.5", features = ["axum"] }
+atlas-pca = { path = "../..", version = "0.5", features = ["axum"] }
+axum = "0.7"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net"] }
+serde_json = "1"
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+base64 = "0.22"

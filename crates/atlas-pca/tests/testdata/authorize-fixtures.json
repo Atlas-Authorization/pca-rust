@@ -1,0 +1,6017 @@
+{
+ "format": "pca-authorize-fixtures/1",
+ "description": "authorize() acceptance cases for native SDKs. Run each case against ONE fresh replay store, steps in order. `expect` is the native pipeline outcome (sorted failing checks); `ts` is the TypeScript authorize() outcome when recorded.",
+ "now": 1792929600000,
+ "audience": "payments-rs",
+ "plan": "single-step",
+ "cases": [
+  {
+   "name": "envelope-predicate-within",
+   "description": "$100 limit (envelope-predicate), a $50 payment: allowed.",
+   "grant": {
+    "id": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "1TK8Ori0BCcg4WKpWQGRG6s3zr2vtRbDOKVHZQ-Nd9I",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": "payments.send",
+        "where": [
+         {
+          "field": "action.params.amount",
+          "op": "lte",
+          "value": 100
+         }
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+    "sig": "WKQI6v1LtVGKKZJiHKC8YGjRCPj01_wBRMs3OjTnWpYUqp6USYZE4lqa2202obhpUXJvMXtcOpTSn-NfFOuZBg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+      "cap_chain": [
+       {
+        "id": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "1TK8Ori0BCcg4WKpWQGRG6s3zr2vtRbDOKVHZQ-Nd9I",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": "payments.send",
+            "where": [
+             {
+              "field": "action.params.amount",
+              "op": "lte",
+              "value": 100
+             }
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+        "sig": "WKQI6v1LtVGKKZJiHKC8YGjRCPj01_wBRMs3OjTnWpYUqp6USYZE4lqa2202obhpUXJvMXtcOpTSn-NfFOuZBg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "9j0uzdpE1M1tpzg05IcSps0gtxkb3eP9eEhfipZNrmQMhBaJC_L1fqVSjy7bSwyW5TwFFLaLaqTJVZ8bs_XUBA"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "envelope-predicate-400-refused",
+   "description": "$100 limit (envelope-predicate), a validly signed $400 payment: refused before the handler runs.",
+   "grant": {
+    "id": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "1TK8Ori0BCcg4WKpWQGRG6s3zr2vtRbDOKVHZQ-Nd9I",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": "payments.send",
+        "where": [
+         {
+          "field": "action.params.amount",
+          "op": "lte",
+          "value": 100
+         }
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+    "sig": "WKQI6v1LtVGKKZJiHKC8YGjRCPj01_wBRMs3OjTnWpYUqp6USYZE4lqa2202obhpUXJvMXtcOpTSn-NfFOuZBg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "-j-IFmZnMZDMyUR-4TTIjypUjpTFv4FqOb57lGH2JEU",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+      "cap_chain": [
+       {
+        "id": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "1TK8Ori0BCcg4WKpWQGRG6s3zr2vtRbDOKVHZQ-Nd9I",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": "payments.send",
+            "where": [
+             {
+              "field": "action.params.amount",
+              "op": "lte",
+              "value": 100
+             }
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+        "sig": "WKQI6v1LtVGKKZJiHKC8YGjRCPj01_wBRMs3OjTnWpYUqp6USYZE4lqa2202obhpUXJvMXtcOpTSn-NfFOuZBg"
+       }
+      ],
+      "plan": {
+       "root": "wQ53cGotolBdKu5Xr2-EZ7ThkGehtZDOqDmEYwsZqBg",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "-oB8j1qd-s3JaZoJlrwgOP0xCZAj4-9nQUiNt89wdSvjfP1DSY5Et1lHH6tRMZ-ATw0P1qKfg4Ixk2okZEaZDQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "policy"
+      ],
+      "reason": "amount <= 100 not satisfied for payments.send on payments/acme"
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "envelope-predicate-signed-50-executes-400",
+   "description": "$100 limit (envelope-predicate): a proof signed for $50 used to execute $400 is refused (binding, and the limit judges the executed $400).",
+   "grant": {
+    "id": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "1TK8Ori0BCcg4WKpWQGRG6s3zr2vtRbDOKVHZQ-Nd9I",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": "payments.send",
+        "where": [
+         {
+          "field": "action.params.amount",
+          "op": "lte",
+          "value": 100
+         }
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+    "sig": "WKQI6v1LtVGKKZJiHKC8YGjRCPj01_wBRMs3OjTnWpYUqp6USYZE4lqa2202obhpUXJvMXtcOpTSn-NfFOuZBg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+      "cap_chain": [
+       {
+        "id": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "1TK8Ori0BCcg4WKpWQGRG6s3zr2vtRbDOKVHZQ-Nd9I",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": "payments.send",
+            "where": [
+             {
+              "field": "action.params.amount",
+              "op": "lte",
+              "value": 100
+             }
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "qL4c9Kg0rip6y6ZymwdC6E1RAcQ3EtBJ9PsLrDU6PmY",
+        "sig": "WKQI6v1LtVGKKZJiHKC8YGjRCPj01_wBRMs3OjTnWpYUqp6USYZE4lqa2202obhpUXJvMXtcOpTSn-NfFOuZBg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "9j0uzdpE1M1tpzg05IcSps0gtxkb3eP9eEhfipZNrmQMhBaJC_L1fqVSjy7bSwyW5TwFFLaLaqTJVZ8bs_XUBA"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "operation",
+       "params_digest",
+       "plan_root_authorized",
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "envelope-max-spend-within",
+   "description": "$100 limit (envelope-max-spend), a $50 payment: allowed.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "envelope-max-spend-400-refused",
+   "description": "$100 limit (envelope-max-spend), a validly signed $400 payment: refused before the handler runs.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "-j-IFmZnMZDMyUR-4TTIjypUjpTFv4FqOb57lGH2JEU",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "wQ53cGotolBdKu5Xr2-EZ7ThkGehtZDOqDmEYwsZqBg",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "jzJiVn59TkqmCIVHdZY4gox0ugOsl4K66MQHhrN8DC-81PLouEOxaefyjO0ey_t7zwwiHVes2e_xKXppQ2yiBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "envelope-max-spend-signed-50-executes-400",
+   "description": "$100 limit (envelope-max-spend): a proof signed for $50 used to execute $400 is refused (binding, and the limit judges the executed $400).",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "operation",
+       "params_digest",
+       "plan_root_authorized",
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "root-max-spend-within",
+   "description": "$100 limit (root-max-spend), a $50 payment: allowed.",
+   "grant": {
+    "id": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "SYVGA2GjvXd_JThJja2xYWpYuQNmnwVmz_vDpLyKmb4",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     },
+     {
+      "type": "max_spend",
+      "usd": 100
+     }
+    ],
+    "body_digest": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+    "sig": "xjITAm3XVLm05_ABrjqAmhdwH4OJmWA1kHXzi3YghCkeDIF2T984hIF1hu5n1orbiHugO8qKoSW-ycb2SfKlDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+      "cap_chain": [
+       {
+        "id": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "SYVGA2GjvXd_JThJja2xYWpYuQNmnwVmz_vDpLyKmb4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "type": "max_spend",
+          "usd": 100
+         }
+        ],
+        "body_digest": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+        "sig": "xjITAm3XVLm05_ABrjqAmhdwH4OJmWA1kHXzi3YghCkeDIF2T984hIF1hu5n1orbiHugO8qKoSW-ycb2SfKlDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "6lxgMGJ9rfHByv4PHO2jiCC95_sfDaxPLChvM4OAO12SIPZ2B3q0cOBoVEK6zslbzpowA6UoENvJ8RRUUogJDQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "root-max-spend-400-refused",
+   "description": "$100 limit (root-max-spend), a validly signed $400 payment: refused before the handler runs.",
+   "grant": {
+    "id": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "SYVGA2GjvXd_JThJja2xYWpYuQNmnwVmz_vDpLyKmb4",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     },
+     {
+      "type": "max_spend",
+      "usd": 100
+     }
+    ],
+    "body_digest": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+    "sig": "xjITAm3XVLm05_ABrjqAmhdwH4OJmWA1kHXzi3YghCkeDIF2T984hIF1hu5n1orbiHugO8qKoSW-ycb2SfKlDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "-j-IFmZnMZDMyUR-4TTIjypUjpTFv4FqOb57lGH2JEU",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+      "cap_chain": [
+       {
+        "id": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "SYVGA2GjvXd_JThJja2xYWpYuQNmnwVmz_vDpLyKmb4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "type": "max_spend",
+          "usd": 100
+         }
+        ],
+        "body_digest": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+        "sig": "xjITAm3XVLm05_ABrjqAmhdwH4OJmWA1kHXzi3YghCkeDIF2T984hIF1hu5n1orbiHugO8qKoSW-ycb2SfKlDg"
+       }
+      ],
+      "plan": {
+       "root": "wQ53cGotolBdKu5Xr2-EZ7ThkGehtZDOqDmEYwsZqBg",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "QMx-yYORGZFQEM02Mo9ndGN8gJTSh-XKhv8RM6Lk8TREbmpbEP_tNHA5h6XvdO041uWZo53C81wXdqY6nwKmDA"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "root-max-spend-signed-50-executes-400",
+   "description": "$100 limit (root-max-spend): a proof signed for $50 used to execute $400 is refused (binding, and the limit judges the executed $400).",
+   "grant": {
+    "id": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "SYVGA2GjvXd_JThJja2xYWpYuQNmnwVmz_vDpLyKmb4",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     },
+     {
+      "type": "max_spend",
+      "usd": 100
+     }
+    ],
+    "body_digest": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+    "sig": "xjITAm3XVLm05_ABrjqAmhdwH4OJmWA1kHXzi3YghCkeDIF2T984hIF1hu5n1orbiHugO8qKoSW-ycb2SfKlDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+      "cap_chain": [
+       {
+        "id": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "SYVGA2GjvXd_JThJja2xYWpYuQNmnwVmz_vDpLyKmb4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "type": "max_spend",
+          "usd": 100
+         }
+        ],
+        "body_digest": "2QeW3hDoZsPiaCJejqC9e9y0kvnh0Tdegm_s0zTrRaA",
+        "sig": "xjITAm3XVLm05_ABrjqAmhdwH4OJmWA1kHXzi3YghCkeDIF2T984hIF1hu5n1orbiHugO8qKoSW-ycb2SfKlDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "6lxgMGJ9rfHByv4PHO2jiCC95_sfDaxPLChvM4OAO12SIPZ2B3q0cOBoVEK6zslbzpowA6UoENvJ8RRUUogJDQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "operation",
+       "params_digest",
+       "plan_root_authorized",
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-max-spend-within",
+   "description": "$100 limit (delegated-max-spend), a $50 payment: allowed.",
+   "grant": {
+    "id": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+    "sig": "C41XxzlN6f5P9o6zjHkD-FzPYD9ZBKkk5PLlAAt3K-lPVSrC-c9CZQW7_thZv61mbHo47tqck3jGGF9GNTEpBA"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+      "cap_chain": [
+       {
+        "id": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+        "sig": "C41XxzlN6f5P9o6zjHkD-FzPYD9ZBKkk5PLlAAt3K-lPVSrC-c9CZQW7_thZv61mbHo47tqck3jGGF9GNTEpBA"
+       },
+       {
+        "id": "jpby09kJs2VpMTTwOCTi51dMMuok6xIEKf5RoCnc8u4",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "type": "max_spend",
+          "usd": 100
+         }
+        ],
+        "body_digest": "jpby09kJs2VpMTTwOCTi51dMMuok6xIEKf5RoCnc8u4",
+        "sig": "PHFKAJoeLT0z5GmYu6PcC1sooHFLCYX09igw_aHdXA6hnlexlktkIu0xVT4wUlHL9Yd0_HJ97LR_yh8IUT10Bw",
+        "parent": "cv502wFQdnQ8yWYTXqA9JIPsMGLzNS-2QYbaBwVqTqk"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "etH-Fqn4i0QuNwFInHdsRwm7VcMLZeq5URl0MHApBqSBwKabP0INVvtqGRTJ2DJNWOQzUuGsVEZu1ozOmon_Dw"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-max-spend-400-refused",
+   "description": "$100 limit (delegated-max-spend), a validly signed $400 payment: refused before the handler runs.",
+   "grant": {
+    "id": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+    "sig": "C41XxzlN6f5P9o6zjHkD-FzPYD9ZBKkk5PLlAAt3K-lPVSrC-c9CZQW7_thZv61mbHo47tqck3jGGF9GNTEpBA"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "-j-IFmZnMZDMyUR-4TTIjypUjpTFv4FqOb57lGH2JEU",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+      "cap_chain": [
+       {
+        "id": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+        "sig": "C41XxzlN6f5P9o6zjHkD-FzPYD9ZBKkk5PLlAAt3K-lPVSrC-c9CZQW7_thZv61mbHo47tqck3jGGF9GNTEpBA"
+       },
+       {
+        "id": "jpby09kJs2VpMTTwOCTi51dMMuok6xIEKf5RoCnc8u4",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "type": "max_spend",
+          "usd": 100
+         }
+        ],
+        "body_digest": "jpby09kJs2VpMTTwOCTi51dMMuok6xIEKf5RoCnc8u4",
+        "sig": "PHFKAJoeLT0z5GmYu6PcC1sooHFLCYX09igw_aHdXA6hnlexlktkIu0xVT4wUlHL9Yd0_HJ97LR_yh8IUT10Bw",
+        "parent": "cv502wFQdnQ8yWYTXqA9JIPsMGLzNS-2QYbaBwVqTqk"
+       }
+      ],
+      "plan": {
+       "root": "wQ53cGotolBdKu5Xr2-EZ7ThkGehtZDOqDmEYwsZqBg",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "2n6sSi12cJQL_5PHAd_-jpGmKpyiUPAPQ9R1kSh0JcqrKfAVmDjCNggcodZ9eRUPpHIBECT8HVJdTs8Cs30eCg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "delegated_caveats"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-max-spend-signed-50-executes-400",
+   "description": "$100 limit (delegated-max-spend): a proof signed for $50 used to execute $400 is refused (binding, and the limit judges the executed $400).",
+   "grant": {
+    "id": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+    "sig": "C41XxzlN6f5P9o6zjHkD-FzPYD9ZBKkk5PLlAAt3K-lPVSrC-c9CZQW7_thZv61mbHo47tqck3jGGF9GNTEpBA"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+      "cap_chain": [
+       {
+        "id": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "L7l2wQTQF9h9Fm5y_DX-fzBqWSfZ3P4WTYJiChe5kqI",
+        "sig": "C41XxzlN6f5P9o6zjHkD-FzPYD9ZBKkk5PLlAAt3K-lPVSrC-c9CZQW7_thZv61mbHo47tqck3jGGF9GNTEpBA"
+       },
+       {
+        "id": "jpby09kJs2VpMTTwOCTi51dMMuok6xIEKf5RoCnc8u4",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Q_zBqDaSiNBmfmiZrQAUlFQP6LyeRl7FStxtb20wmW4",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "type": "max_spend",
+          "usd": 100
+         }
+        ],
+        "body_digest": "jpby09kJs2VpMTTwOCTi51dMMuok6xIEKf5RoCnc8u4",
+        "sig": "PHFKAJoeLT0z5GmYu6PcC1sooHFLCYX09igw_aHdXA6hnlexlktkIu0xVT4wUlHL9Yd0_HJ97LR_yh8IUT10Bw",
+        "parent": "cv502wFQdnQ8yWYTXqA9JIPsMGLzNS-2QYbaBwVqTqk"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "etH-Fqn4i0QuNwFInHdsRwm7VcMLZeq5URl0MHApBqSBwKabP0INVvtqGRTJ2DJNWOQzUuGsVEZu1ozOmon_Dw"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "delegated_caveats",
+       "operation",
+       "params_digest",
+       "plan_root_authorized"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "operation-other-verb",
+   "description": "A payments.send proof used for payments.refund (same params): refused.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.refund",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "operation",
+       "plan_root_authorized"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "operation-other-resource",
+   "description": "A proof for payments/acme used on payments/mallory: refused.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/mallory",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "operation",
+       "plan_root_authorized"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "operation-other-params",
+   "description": "A proof for one payee used for another (same amount): refused.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "0R8KUyavNd1p9SX3latWIFPikj0QVhqSu_t3DdA3aPk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "8jvWlSgs39T739Eu1IuD37iv3etRn5Ql3unqjZeKuc8",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "qYkMerzgaytzw7GoHLId6UFBF3oHm2hJ5EnLY7xd2V0wvkzWqlw6DQjiyuBBn5twVcMYuts1N5b6I7_0EB1oCg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd",
+       "payee": "mallory"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "operation",
+       "params_digest",
+       "plan_root_authorized"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "replay",
+   "description": "Counter 1 allowed, the same PCActn again refused, counter 2 allowed, counter 1 again refused (monotone per grant + holder).",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    },
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "replay"
+      ],
+      "reason": "replay: 1 is not greater than last seen 1"
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    },
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "TkXQW5WySibMlPZemC4oRYgISGPfMDlOcmAoGm83JfM",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "8ym5KO2SlxpNw_e6c78zC77RpN8Vdlf0gi3fb99Z7iU",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 2,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "JK6z4EtdMUb6O5iFWSu-avqtM4F_tt8hDY2SoVlS8xfNRSRADSblx1Nc_HCkN6buUHbmk18TCIvOKMUrEBlLAg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 60,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    },
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "replay"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "denied-does-not-consume",
+   "description": "A denied action does not consume its counter: $500 refused at counter 1, then a $50 action at counter 1 is allowed.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "XHPtja-UBnjRZi-GwLLVxQ8gkb69eODvfyFHhftoijc",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "WFH8xoF-ScBZmg956DXfsZh_5jLFE7vqPSMH86SdzS8",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "lhRfFtB3U3J2FAcpCxxWUZIXNQv8ONGGwzPQGtgkXEIHrycKWkP9W75WQD85iAV2fGB6TVQUtiXzrPNH7j_0DA"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 500,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    },
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "revoked",
+   "description": "A valid $50 payment under a revoked grant: refused.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "O96A8yq43pRCaN7mi0P9gMJnNYZx5esuPY5x4OOBIi-w0Nakyl-i0GGs3MB48LxQBktDPoaQuJdA48fM0HjSBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": true,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "revocation"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "root-unknown-caveat",
+   "description": "An unknown root caveat type (\"note\") fails closed.",
+   "grant": {
+    "id": "zzYFqmecpNfr2OwbiSBI_vKelsLbD12BtMwb-_uhyQU",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "ygAFzUOxFHDyi88hjPQ6sFkyMC0ud1It_Dcq0UVb80Q",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     },
+     {
+      "text": "ops",
+      "type": "note"
+     }
+    ],
+    "body_digest": "zzYFqmecpNfr2OwbiSBI_vKelsLbD12BtMwb-_uhyQU",
+    "sig": "Z64sVStg9DfOyu6cZv94V8Xz5XETHbjjbW3kGuzBT9bNTMXjelYK62VmfqO99ZNtOSUR6iYth6ViCe8psWQDCA"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "0Jb9AxXJNzcEfO_fB8lSmp7-IoxkxJh5DrH_Drl45Pc",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "zzYFqmecpNfr2OwbiSBI_vKelsLbD12BtMwb-_uhyQU",
+      "cap_chain": [
+       {
+        "id": "zzYFqmecpNfr2OwbiSBI_vKelsLbD12BtMwb-_uhyQU",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "ygAFzUOxFHDyi88hjPQ6sFkyMC0ud1It_Dcq0UVb80Q",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "text": "ops",
+          "type": "note"
+         }
+        ],
+        "body_digest": "zzYFqmecpNfr2OwbiSBI_vKelsLbD12BtMwb-_uhyQU",
+        "sig": "Z64sVStg9DfOyu6cZv94V8Xz5XETHbjjbW3kGuzBT9bNTMXjelYK62VmfqO99ZNtOSUR6iYth6ViCe8psWQDCA"
+       }
+      ],
+      "plan": {
+       "root": "kPEmY2LnhEZrHV2e8HzgYUauaUdoRg5TFo_6BSYcFIY",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "SDTrXsZrUMPTv4Ac3ReeXMeA4NFAIPwGsGy6aVgpAyKqmT4gYCNgdJMgbiU0rlpYjTnMs8KL6qLQW9XdTFJnCg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 1,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-unknown-caveat",
+   "description": "An unknown delegated caveat type fails closed.",
+   "grant": {
+    "id": "thn_PIQWRpkY-L7KV_mYDcFdI_Cz8w8Jtm0ER6hH_Jc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "f-ozvEWAhTkoBwRCbXs8jNEMKN_lAM3FIlpMhzRDPEo",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "thn_PIQWRpkY-L7KV_mYDcFdI_Cz8w8Jtm0ER6hH_Jc",
+    "sig": "Px5I2ixXYGZkHy98O8kiCvG29B2ZXwNcQw4N0C2IprLv4GLX6siWvrgQeBS3j2Gs0THb-AkMiQtAFP9_8ifiBw"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "0Jb9AxXJNzcEfO_fB8lSmp7-IoxkxJh5DrH_Drl45Pc",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "thn_PIQWRpkY-L7KV_mYDcFdI_Cz8w8Jtm0ER6hH_Jc",
+      "cap_chain": [
+       {
+        "id": "thn_PIQWRpkY-L7KV_mYDcFdI_Cz8w8Jtm0ER6hH_Jc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "f-ozvEWAhTkoBwRCbXs8jNEMKN_lAM3FIlpMhzRDPEo",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "thn_PIQWRpkY-L7KV_mYDcFdI_Cz8w8Jtm0ER6hH_Jc",
+        "sig": "Px5I2ixXYGZkHy98O8kiCvG29B2ZXwNcQw4N0C2IprLv4GLX6siWvrgQeBS3j2Gs0THb-AkMiQtAFP9_8ifiBw"
+       },
+       {
+        "id": "JtSbXcjCcaGyieOWRzjzCDlXVKSu5rCWKPT7zTGU9Wc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "f-ozvEWAhTkoBwRCbXs8jNEMKN_lAM3FIlpMhzRDPEo",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "region": "eu",
+          "type": "geo_fence"
+         }
+        ],
+        "body_digest": "JtSbXcjCcaGyieOWRzjzCDlXVKSu5rCWKPT7zTGU9Wc",
+        "sig": "edfnZyH0ERCAxUq6EZmN8XWbfGfXurW87LdS6AO1uFsypbqpnTVZ8QvP05hyQxkiFD_Q0AdaZ9pTxlPzXV_SDA",
+        "parent": "MeGJxGPa1NRTdVNbip7K2_LlwObGW_Vk3z67u7gLCi4"
+       }
+      ],
+      "plan": {
+       "root": "kPEmY2LnhEZrHV2e8HzgYUauaUdoRg5TFo_6BSYcFIY",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "uZNev_Br8pO-Ao9WzIn7cfOCmc7qk2rirL_qhJEZWBpXo3ZthdcQVd-90JvtvU3hpek291j7sEX4oecDVgQXDw"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 1,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "delegated_caveats"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-predicates-within",
+   "description": "A delegated predicates caveat (payments/acme only): a payment to acme is allowed.",
+   "grant": {
+    "id": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "Y8hRm6EZlfw6bk7N8YNSnoor4e6Q7PYK_KMA353B944",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+    "sig": "Ruo8pHMhN0HBlvCYyZ2N3-iRDSG_7oIu3Zsm80pn_W4Bi_-Q06_AAVN_dWw7izH1Ix1v_aaFQCGfDPTpa3eOAg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "ETAtSYnV5AI_ETcU6l_zxa8HEL2q7jJPNUQV8FjIn-4",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+      "cap_chain": [
+       {
+        "id": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Y8hRm6EZlfw6bk7N8YNSnoor4e6Q7PYK_KMA353B944",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+        "sig": "Ruo8pHMhN0HBlvCYyZ2N3-iRDSG_7oIu3Zsm80pn_W4Bi_-Q06_AAVN_dWw7izH1Ix1v_aaFQCGfDPTpa3eOAg"
+       },
+       {
+        "id": "Eo_s_aUhw8Ki_bFrGNA3oILX7nQ78hOonwqI7pg5enY",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Y8hRm6EZlfw6bk7N8YNSnoor4e6Q7PYK_KMA353B944",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "allow": [
+           {
+            "resource": "payments/acme",
+            "verb": "payments.send"
+           }
+          ],
+          "type": "predicates"
+         }
+        ],
+        "body_digest": "Eo_s_aUhw8Ki_bFrGNA3oILX7nQ78hOonwqI7pg5enY",
+        "sig": "wQQZ98eMAG9wQ_2RKitwk33XU9VwUxtd6KstolZyE00fsI7t5WWm1wnZW29nMJ0w3sikgGyyj8RbCGY_MWZIDQ",
+        "parent": "MiWAqeRdxqHh3TJqJr0Quw-WfbHAmzWGhUlH9d0JYlA"
+       }
+      ],
+      "plan": {
+       "root": "qNN96ixk-vFdsnR214n3ovLVTgsFr6v13BWsjdaj1fg",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "Gqzgx0WXILIyHQ08tcE4EGsXZ47dwcZWN5pswW8N0Sh7zHJjhctiMn2Um0lJy8DBx5LZf8P15bUoDEfvPrBdBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 10,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-predicates-outside",
+   "description": "The same caveat: a payment to payments/other is refused (the envelope alone would allow it).",
+   "grant": {
+    "id": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "Y8hRm6EZlfw6bk7N8YNSnoor4e6Q7PYK_KMA353B944",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+    "sig": "Ruo8pHMhN0HBlvCYyZ2N3-iRDSG_7oIu3Zsm80pn_W4Bi_-Q06_AAVN_dWw7izH1Ix1v_aaFQCGfDPTpa3eOAg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/other",
+       "params_digest": "ETAtSYnV5AI_ETcU6l_zxa8HEL2q7jJPNUQV8FjIn-4",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+      "cap_chain": [
+       {
+        "id": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Y8hRm6EZlfw6bk7N8YNSnoor4e6Q7PYK_KMA353B944",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "VFYgXjeZ3qUdMQMVvYcfLkx0OK9x9x2owFdHDoiaNPM",
+        "sig": "Ruo8pHMhN0HBlvCYyZ2N3-iRDSG_7oIu3Zsm80pn_W4Bi_-Q06_AAVN_dWw7izH1Ix1v_aaFQCGfDPTpa3eOAg"
+       },
+       {
+        "id": "Eo_s_aUhw8Ki_bFrGNA3oILX7nQ78hOonwqI7pg5enY",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "Y8hRm6EZlfw6bk7N8YNSnoor4e6Q7PYK_KMA353B944",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "allow": [
+           {
+            "resource": "payments/acme",
+            "verb": "payments.send"
+           }
+          ],
+          "type": "predicates"
+         }
+        ],
+        "body_digest": "Eo_s_aUhw8Ki_bFrGNA3oILX7nQ78hOonwqI7pg5enY",
+        "sig": "wQQZ98eMAG9wQ_2RKitwk33XU9VwUxtd6KstolZyE00fsI7t5WWm1wnZW29nMJ0w3sikgGyyj8RbCGY_MWZIDQ",
+        "parent": "MiWAqeRdxqHh3TJqJr0Quw-WfbHAmzWGhUlH9d0JYlA"
+       }
+      ],
+      "plan": {
+       "root": "4AuR2bMm7L6uHTmQbjtmjzTgsv831mU_cu89UeZ1g28",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "FCDf4I7n-GNMFjn-3pSDKKO6pVeLYBoxWfUq3oW4RxtMXuHhNSDBrJCRPy64oPDQmL66-cCca0KwR7Y4r-AhBQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/other",
+      "params": {
+       "amount": 10,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "delegated_caveats"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-tool-schema-within",
+   "description": "A delegated tool_schema caveat (amount <= 100, currency usd): $50 allowed.",
+   "grant": {
+    "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+      "cap_chain": [
+       {
+        "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+       },
+       {
+        "id": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "binding_digest": "518RGBMMLOdRo2TbclgXwIgVwZpnmg9d6vBx69Wkzpw",
+          "schema": {
+           "props": {
+            "amount": {
+             "max": 100,
+             "min": 0,
+             "type": "number"
+            },
+            "currency": {
+             "enum": [
+              "usd"
+             ],
+             "type": "string"
+            }
+           },
+           "required": [
+            "amount"
+           ]
+          },
+          "schema_digest": "WN-DDxEqONe-7ezT0m33KDHGm29xpbbYiKiIHfMcPqM",
+          "signature_digest": "xchTnFndPU-UeLPw9ioFqK5p-KnjrwZONGver7rGDew",
+          "tool": "payments.send",
+          "type": "tool_schema"
+         }
+        ],
+        "body_digest": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "sig": "f2xcdmUmrjrZ2sdKxgTtwqX1Jwd0u-ov396jnGPuSGyZ_YS2DD4NwBkewY-SMuOEspyT1EUNOXH6d7q5aD68Bg",
+        "parent": "epBhAoXuyvM1JqWTtffNKnPHc0WSWTdiiXAmyBO_n24"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "l-o7U1Ck5IPVqjewQEeXKEtJg79kkTX-D3jJEVTvs-m5Fxpbg33tpM_sasNQTsxGGTflSkvh2eqicpGzkS1iCw"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-tool-schema-400",
+   "description": "The same caveat: $400 refused.",
+   "grant": {
+    "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "-j-IFmZnMZDMyUR-4TTIjypUjpTFv4FqOb57lGH2JEU",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+      "cap_chain": [
+       {
+        "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+       },
+       {
+        "id": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "binding_digest": "518RGBMMLOdRo2TbclgXwIgVwZpnmg9d6vBx69Wkzpw",
+          "schema": {
+           "props": {
+            "amount": {
+             "max": 100,
+             "min": 0,
+             "type": "number"
+            },
+            "currency": {
+             "enum": [
+              "usd"
+             ],
+             "type": "string"
+            }
+           },
+           "required": [
+            "amount"
+           ]
+          },
+          "schema_digest": "WN-DDxEqONe-7ezT0m33KDHGm29xpbbYiKiIHfMcPqM",
+          "signature_digest": "xchTnFndPU-UeLPw9ioFqK5p-KnjrwZONGver7rGDew",
+          "tool": "payments.send",
+          "type": "tool_schema"
+         }
+        ],
+        "body_digest": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "sig": "f2xcdmUmrjrZ2sdKxgTtwqX1Jwd0u-ov396jnGPuSGyZ_YS2DD4NwBkewY-SMuOEspyT1EUNOXH6d7q5aD68Bg",
+        "parent": "epBhAoXuyvM1JqWTtffNKnPHc0WSWTdiiXAmyBO_n24"
+       }
+      ],
+      "plan": {
+       "root": "wQ53cGotolBdKu5Xr2-EZ7ThkGehtZDOqDmEYwsZqBg",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "QnGjJnsc7BDKD6d-wJTLHGp9fBWSTMUOuhzUWUpd_7OH-qItWOjh3rC7iB1XC0mgoitP-n0xvpjz2eiRVXpaDA"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 400,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "delegated_caveats"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-tool-schema-extra-arg",
+   "description": "The same caveat: an argument the schema does not declare is refused.",
+   "grant": {
+    "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "rF_8cVItblBIJQRL3ZxzuAihFebP3RsOboKtOI8xGwQ",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+      "cap_chain": [
+       {
+        "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+       },
+       {
+        "id": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "binding_digest": "518RGBMMLOdRo2TbclgXwIgVwZpnmg9d6vBx69Wkzpw",
+          "schema": {
+           "props": {
+            "amount": {
+             "max": 100,
+             "min": 0,
+             "type": "number"
+            },
+            "currency": {
+             "enum": [
+              "usd"
+             ],
+             "type": "string"
+            }
+           },
+           "required": [
+            "amount"
+           ]
+          },
+          "schema_digest": "WN-DDxEqONe-7ezT0m33KDHGm29xpbbYiKiIHfMcPqM",
+          "signature_digest": "xchTnFndPU-UeLPw9ioFqK5p-KnjrwZONGver7rGDew",
+          "tool": "payments.send",
+          "type": "tool_schema"
+         }
+        ],
+        "body_digest": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "sig": "f2xcdmUmrjrZ2sdKxgTtwqX1Jwd0u-ov396jnGPuSGyZ_YS2DD4NwBkewY-SMuOEspyT1EUNOXH6d7q5aD68Bg",
+        "parent": "epBhAoXuyvM1JqWTtffNKnPHc0WSWTdiiXAmyBO_n24"
+       }
+      ],
+      "plan": {
+       "root": "7eijA3lHz7-cojsMJy7TR6w851Aygy4LCZyutCljSyM",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "87q7Y52sFkRoqP8eyA3sqD6Mkfx8-8chkEYmkFnXtdH8JMjvFjqOptDgK5-b6Ed7ar1r0wlmo3a16SS4dq5DAg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd",
+       "memo": "x"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "delegated_caveats"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-tool-schema-bound-tool",
+   "description": "The same caveat with a signed tool_binding equal to its signature digest: allowed.",
+   "grant": {
+    "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+      "cap_chain": [
+       {
+        "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+       },
+       {
+        "id": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "binding_digest": "518RGBMMLOdRo2TbclgXwIgVwZpnmg9d6vBx69Wkzpw",
+          "schema": {
+           "props": {
+            "amount": {
+             "max": 100,
+             "min": 0,
+             "type": "number"
+            },
+            "currency": {
+             "enum": [
+              "usd"
+             ],
+             "type": "string"
+            }
+           },
+           "required": [
+            "amount"
+           ]
+          },
+          "schema_digest": "WN-DDxEqONe-7ezT0m33KDHGm29xpbbYiKiIHfMcPqM",
+          "signature_digest": "xchTnFndPU-UeLPw9ioFqK5p-KnjrwZONGver7rGDew",
+          "tool": "payments.send",
+          "type": "tool_schema"
+         }
+        ],
+        "body_digest": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "sig": "f2xcdmUmrjrZ2sdKxgTtwqX1Jwd0u-ov396jnGPuSGyZ_YS2DD4NwBkewY-SMuOEspyT1EUNOXH6d7q5aD68Bg",
+        "parent": "epBhAoXuyvM1JqWTtffNKnPHc0WSWTdiiXAmyBO_n24"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "tool_binding": "xchTnFndPU-UeLPw9ioFqK5p-KnjrwZONGver7rGDew",
+      "sig": "gac5qNMPCm3eqgI7qMwKozQitvWkGp7MZdUZ7pTclBzO8vUoww-MFEFsxko_31q9fFJaCNlwCc0E3QIZm8dRBg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": true,
+      "status": 200,
+      "failed": []
+     },
+     "ts": {
+      "allow": true,
+      "status": 200
+     }
+    }
+   ]
+  },
+  {
+   "name": "delegated-tool-schema-other-binding",
+   "description": "The same caveat with a signed tool_binding for another tool signature: refused.",
+   "grant": {
+    "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+    "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "vn8Vr3EdasY9sS036gd5uNAxKtAUdYzhMjUnSkod9Qk",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+      "cap_chain": [
+       {
+        "id": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "cxnXIcsb86_DWuIo3z2zyyIhDJmhHYOS2mMLQw18MeI",
+        "sig": "8AAu_dLseXtNaLHu17m71c5Zu_aR1d0VWo80q7nr7oOzBwy44WWJ9BSv4iImaXSQsLKJHqBV6TtMH9Ee_wZgAQ"
+       },
+       {
+        "id": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "3gGaa8GKHT8lrFg2imW423SGD6AbPcR0poQawLSXJFQ",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         },
+         {
+          "binding_digest": "518RGBMMLOdRo2TbclgXwIgVwZpnmg9d6vBx69Wkzpw",
+          "schema": {
+           "props": {
+            "amount": {
+             "max": 100,
+             "min": 0,
+             "type": "number"
+            },
+            "currency": {
+             "enum": [
+              "usd"
+             ],
+             "type": "string"
+            }
+           },
+           "required": [
+            "amount"
+           ]
+          },
+          "schema_digest": "WN-DDxEqONe-7ezT0m33KDHGm29xpbbYiKiIHfMcPqM",
+          "signature_digest": "xchTnFndPU-UeLPw9ioFqK5p-KnjrwZONGver7rGDew",
+          "tool": "payments.send",
+          "type": "tool_schema"
+         }
+        ],
+        "body_digest": "ZL4w9EQ2_mptkX-USbiCVSpC4o_C8JhLHc6J0ZETQ-M",
+        "sig": "f2xcdmUmrjrZ2sdKxgTtwqX1Jwd0u-ov396jnGPuSGyZ_YS2DD4NwBkewY-SMuOEspyT1EUNOXH6d7q5aD68Bg",
+        "parent": "epBhAoXuyvM1JqWTtffNKnPHc0WSWTdiiXAmyBO_n24"
+       }
+      ],
+      "plan": {
+       "root": "OoTGka67ZH2FbEVa_H-k7VGoRV_EmhXNYCtOrN2xf_Q",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "tool_binding": "518RGBMMLOdRo2TbclgXwIgVwZpnmg9d6vBx69Wkzpw",
+      "sig": "edATYZb09-jw6GyawCRWKYzrefb4LKXzi_vxSoUfx74WRL-SY6vRED7H3r_GdKYCn5TRqE-1WUJTZpUuoiJ9CQ"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 50,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "delegated_caveats"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "no-envelope",
+   "description": "A grant without a policy envelope: refused (default deny).",
+   "grant": {
+    "id": "Bav2gDAg7Cvk1rWZ32AEjlmYAFFr7QCT0GrHhjY0rfA",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "type": "max_spend",
+      "usd": 100
+     }
+    ],
+    "body_digest": "Bav2gDAg7Cvk1rWZ32AEjlmYAFFr7QCT0GrHhjY0rfA",
+    "sig": "oXs-PdF-fGnEQSCSmwr7KIzB3ro1ieW83OYERe9tmnYArMbH7hb_80JSZHaiIyXw6p9vJ1njBOX8OLjFnxVQAA"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "0Jb9AxXJNzcEfO_fB8lSmp7-IoxkxJh5DrH_Drl45Pc",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "Bav2gDAg7Cvk1rWZ32AEjlmYAFFr7QCT0GrHhjY0rfA",
+      "cap_chain": [
+       {
+        "id": "Bav2gDAg7Cvk1rWZ32AEjlmYAFFr7QCT0GrHhjY0rfA",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "type": "max_spend",
+          "usd": 100
+         }
+        ],
+        "body_digest": "Bav2gDAg7Cvk1rWZ32AEjlmYAFFr7QCT0GrHhjY0rfA",
+        "sig": "oXs-PdF-fGnEQSCSmwr7KIzB3ro1ieW83OYERe9tmnYArMbH7hb_80JSZHaiIyXw6p9vJ1njBOX8OLjFnxVQAA"
+       }
+      ],
+      "plan": {
+       "root": "kPEmY2LnhEZrHV2e8HzgYUauaUdoRg5TFo_6BSYcFIY",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "losQvK0Wa_91U5A9Rqv-LR7GsAzYqimH2nDRwxeJGhwlDID6XnmoDXuYNVvadzs52REVV7tmmFi8Q6mc61s2Dw"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 1,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "envelope-predicate-verb",
+   "description": "Envelope predicates permit refunds only: a send is refused.",
+   "grant": {
+    "id": "t_fDtOcAEtyjJTiWJT7HqTTqZb25v-QAu5KSwFkdmAk",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [],
+      "goal_commit": "H3Lqu--py6tHYVUjcyA4Amu5discTnbD5avJIiFIxcA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": "payments.refund"
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "t_fDtOcAEtyjJTiWJT7HqTTqZb25v-QAu5KSwFkdmAk",
+    "sig": "zezP2fcMl7VFuZoSM0Ooy3g2HgNtYn1ScCLTanVtYTosJ2akxax4yH-KGGbDm3Xk9WurIsj9DYvrnqV4hjznCQ"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "0Jb9AxXJNzcEfO_fB8lSmp7-IoxkxJh5DrH_Drl45Pc",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "t_fDtOcAEtyjJTiWJT7HqTTqZb25v-QAu5KSwFkdmAk",
+      "cap_chain": [
+       {
+        "id": "t_fDtOcAEtyjJTiWJT7HqTTqZb25v-QAu5KSwFkdmAk",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [],
+          "goal_commit": "H3Lqu--py6tHYVUjcyA4Amu5discTnbD5avJIiFIxcA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": "payments.refund"
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "t_fDtOcAEtyjJTiWJT7HqTTqZb25v-QAu5KSwFkdmAk",
+        "sig": "zezP2fcMl7VFuZoSM0Ooy3g2HgNtYn1ScCLTanVtYTosJ2akxax4yH-KGGbDm3Xk9WurIsj9DYvrnqV4hjznCQ"
+       }
+      ],
+      "plan": {
+       "root": "kPEmY2LnhEZrHV2e8HzgYUauaUdoRg5TFo_6BSYcFIY",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "tQUS3JoHwf8pt09EcQY5I0uxXFpcBvi5gG5seb3ngV2ge8uJarm1--cEd2WjnwrGfjRsSAmCeUqbqYFMkSNyAg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 1,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "policy"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "attestation-bound",
+   "description": "A grant that pins the agent (agent_binding.operator) needs an attestation: refused without one.",
+   "grant": {
+    "id": "zUEuIyjsZolvrdNc2a_fgScAP7Z63J4Af6WR1oDK2EU",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {
+       "operator": "acme-ops"
+      },
+      "caveats": [],
+      "goal_commit": "nTej3eLA-3BudgXOjTpZY3k3zEt5wRsZ8Ze895R16Z8",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "zUEuIyjsZolvrdNc2a_fgScAP7Z63J4Af6WR1oDK2EU",
+    "sig": "B34ibN7iFV0UjLGDBE-YkyiLVlBCcElMblhSUlORQeV8tPVebO8XzuCPchkyygKMgucOy41-lj5QUxVEEUU3Cg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "0Jb9AxXJNzcEfO_fB8lSmp7-IoxkxJh5DrH_Drl45Pc",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "zUEuIyjsZolvrdNc2a_fgScAP7Z63J4Af6WR1oDK2EU",
+      "cap_chain": [
+       {
+        "id": "zUEuIyjsZolvrdNc2a_fgScAP7Z63J4Af6WR1oDK2EU",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {
+           "operator": "acme-ops"
+          },
+          "caveats": [],
+          "goal_commit": "nTej3eLA-3BudgXOjTpZY3k3zEt5wRsZ8Ze895R16Z8",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "zUEuIyjsZolvrdNc2a_fgScAP7Z63J4Af6WR1oDK2EU",
+        "sig": "B34ibN7iFV0UjLGDBE-YkyiLVlBCcElMblhSUlORQeV8tPVebO8XzuCPchkyygKMgucOy41-lj5QUxVEEUU3Cg"
+       }
+      ],
+      "plan": {
+       "root": "kPEmY2LnhEZrHV2e8HzgYUauaUdoRg5TFo_6BSYcFIY",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "payments-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "av_OCvkovdcc0yfhnWHiqTXja3aaC6MeQlffgO7e957Ll6R0cdOkoo8m_ahCOnF3-PiVQ4hqsOLwuv09Cz9zCw"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 1,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 403,
+      "failed": [
+       "attestation"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 403
+     }
+    }
+   ]
+  },
+  {
+   "name": "wrong-audience",
+   "description": "A proof for another resource server: refused as unauthenticated.",
+   "grant": {
+    "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+    "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+    "caveats": [
+     {
+      "agent_binding": {},
+      "caveats": [
+       {
+        "type": "max_spend",
+        "usd": 100
+       }
+      ],
+      "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+      "predicates": [
+       {
+        "resource": "payments/*",
+        "verb": [
+         "payments.send",
+         "payments.refund"
+        ]
+       }
+      ],
+      "risk_policy": {
+       "bMax": 1000,
+       "kappa": 1,
+       "lambda": 0,
+       "rho": 0,
+       "theta1": 0.5,
+       "theta2": 0.8,
+       "weights": {
+        "alpha": 0,
+        "beta": 0,
+        "delta": 0,
+        "epsilon": 0,
+        "gamma": 0,
+        "zeta": 0
+       }
+      },
+      "type": "envelope"
+     }
+    ],
+    "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+    "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+   },
+   "steps": [
+    {
+     "pcactn": {
+      "ver": 2,
+      "action": {
+       "verb": "payments.send",
+       "resource": "payments/acme",
+       "params_digest": "0Jb9AxXJNzcEfO_fB8lSmp7-IoxkxJh5DrH_Drl45Pc",
+       "reversibility_class": "irreversible"
+      },
+      "grant_ref": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+      "cap_chain": [
+       {
+        "id": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "issuer": "bs9w31lShUG77IukzMDucQKxMxD5ihjCZS55bi-YuOQ",
+        "holder": "a1B3uxRS6gmgkh6UvfEZ1BVfZvylYa1g7rGNSac9kZM",
+        "caveats": [
+         {
+          "agent_binding": {},
+          "caveats": [
+           {
+            "type": "max_spend",
+            "usd": 100
+           }
+          ],
+          "goal_commit": "yV__RNTWmjdINU6sCJrz6we08-JYGtdqWbgT7IQPnvA",
+          "predicates": [
+           {
+            "resource": "payments/*",
+            "verb": [
+             "payments.send",
+             "payments.refund"
+            ]
+           }
+          ],
+          "risk_policy": {
+           "bMax": 1000,
+           "kappa": 1,
+           "lambda": 0,
+           "rho": 0,
+           "theta1": 0.5,
+           "theta2": 0.8,
+           "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+           }
+          },
+          "type": "envelope"
+         }
+        ],
+        "body_digest": "yUXY0hVCuAfpfTTTqKIdBarcjFdZxZpR4acgFnZ54Xc",
+        "sig": "oxNkEIiUkVfC8T1nI-iQSTpUgE-4fDqdAdPF5kMETD9nyMTiSHe_ZiPvmIXPQsyWKlMTkdCvW195haG3DoOcDg"
+       }
+      ],
+      "plan": {
+       "root": "kPEmY2LnhEZrHV2e8HzgYUauaUdoRg5TFo_6BSYcFIY",
+       "inclusion_proof": {
+        "index": 0,
+        "size": 1,
+        "path": []
+       },
+       "node_id": "n1",
+       "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+      },
+      "attestation": {
+       "quote_digest": "",
+       "epoch": 0,
+       "model_id": "unattested",
+       "measurement": "",
+       "operator": "unattested"
+      },
+      "provenance": {
+       "causal_hash": "",
+       "taint_level": 0,
+       "trusted_refs": []
+      },
+      "freshness": {
+       "beacon_ref": "",
+       "epoch": 0,
+       "accumulator_witness": ""
+      },
+      "counter": 1,
+      "risk_claim": {
+       "r": 0,
+       "inputs": {}
+      },
+      "aud": "other-rs",
+      "iat": 1792929600000,
+      "exp": 1792930800000,
+      "sig": "VAtdm2Aj4nZ3dmXdYQC1licKz1qB6KZo40topwzDKD5AMlMkCapVTsB0lADKSdM6CdYiju_OuNUJZPTzRuNIBg"
+     },
+     "operation": {
+      "verb": "payments.send",
+      "resource": "payments/acme",
+      "params": {
+       "amount": 1,
+       "currency": "usd"
+      }
+     },
+     "revoked": false,
+     "expect": {
+      "allow": false,
+      "status": 401,
+      "failed": [
+       "audience"
+      ]
+     },
+     "ts": {
+      "allow": false,
+      "status": 401
+     }
+    }
+   ]
+  }
+ ]
+}

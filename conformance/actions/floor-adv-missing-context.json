@@ -1,0 +1,1 @@
+{"id":"floor-adv-missing-context","kind":"floor","input":{"grant":{"caveats":["amount_cap","count_cap","window"],"max_esc":3,"preauth_esc":3},"call":{"context":[]},"profile":{"risk":3,"rev":"rate_limited","blast_ppm":700000,"esc":2,"caveats":["amount_cap","count_cap","window"],"context":["idempotency"],"prules":[]}},"expect":{"decision":"escalate"}}

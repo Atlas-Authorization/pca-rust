@@ -174,11 +174,11 @@ fn collect() -> Value {
         let allowed: Option<Vec<String>> = v["context"]["allowed_suites"].as_array().map(|a| a.iter().map(|x| x.as_str().unwrap().to_string()).collect());
         let lone = has_lone(&v["pcactn"]);
         let got = if let Some(raw) = v.get("pcactn_json").and_then(Value::as_str) {
-            verify_pcactn_json_policy(raw, &v["grant"], now, aud, allowed.as_deref())
+            verify_pcactn_json_with(raw, &v["grant"], now, aud, &atlas_pca::VerifyOptions { allowed: allowed.as_deref(), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() })
         } else if lone {
             continue;
         } else {
-            verify_pcactn_core_policy(&v["pcactn"], &v["grant"], now, aud, allowed.as_deref())
+            verify_pcactn_core_with(&v["pcactn"], &v["grant"], now, aud, &atlas_pca::VerifyOptions { allowed: allowed.as_deref(), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() })
         };
         vectors.insert(name.clone(), json!([got.allow, got.checks, got.reason]));
         if lone || v.get("pcactn_json").is_some() {

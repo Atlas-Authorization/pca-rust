@@ -117,3 +117,10 @@ fn map_decisions() {
     }
     report(bad);
 }
+
+/// k05 deadline: `split` must grow k, and the RFC 9162 fold must stop shifting at fn == 0 on the right edge (index 2 of 3).
+#[test]
+fn split_and_the_path_fold_terminate() {
+    assert_eq!(crate::k042_support::within("intent_map split(3)", || split(3)), 2);
+    assert!(crate::k042_support::within("root_from_path(2, 3)", || root_from_path(2, 3, vec![0; 32], &[vec![1; 32]]).is_some()));
+}

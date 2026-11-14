@@ -1,0 +1,1 @@
+{"id":"expand-adv-empty","kind":"expand","input":{"traits":[]},"expect":{"closure":[],"floor":{"risk":0,"rev":"reversible","blast_ppm":0,"esc":0,"caveats":[],"context":[],"prules":[]}}}

@@ -1,5 +1,5 @@
 //! Reference verifier for the CORE PCActn checks (wire format v2): wire, version, audience, validity,
-//! capability chain, grant_ref binding, Merkle plan inclusion, strict Ed25519 leaf signature, counter. Byte-matches
+//! capability chain, grant_ref binding, Merkle plan inclusion, strict Ed25519 leaf signature, counter format. Byte-matches
 //! `@atlasauth/pca` (the shared conformance corpus defines the normative rules).
 
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
@@ -18,22 +18,142 @@ pub use serde_json;
 #[cfg(feature = "axum")]
 pub mod middleware;
 
+/// `explain_refusal`: what a refusal reason means and how to fix it.
+pub mod refusal_help;
+pub use refusal_help::{explain_refusal, RefusalHelp};
+
+/// `protect`: the secure defaults for an axum resource server in one call (feature `axum`).
+#[cfg(feature = "axum")]
+pub mod protect;
+
 // Intent Layer v2 (rules 13-18 and the V5 `layers` check).
 mod action_schema;
+mod caveat_lang;
+/// Action kit: ActionDef parse/digest, trait registry and floors, rule 22 integrity, pack proofs.
+pub mod actions;
+pub mod actions_registry;
+mod decision;
+mod escalation;
+mod approval;
 mod intent_acc;
+mod intent_history;
 mod intent_map;
 mod intent_strict;
 mod intent_revocation;
 mod intent_session;
+pub mod staleness;
+pub mod kv;
+pub mod risk;
+pub mod catalog_risk;
+pub mod store_conformance;
+pub mod taint;
+pub mod forbid;
+pub mod prohibitions;
+pub mod contracts;
+pub mod beacon;
+pub mod stepup;
+pub mod assurance;
+pub mod operations;
+pub mod plans;
 mod intent_suite;
 mod intent_v2;
 mod intent_wb;
+mod mesh;
+mod policy_authoring;
+// Build provenance as a K1 discharge (track K9).
+mod provenance_gate;
 mod predicates;
 mod safe_regex;
+// 0.5: wire-level verification of transparency-anchored allowlist evidence.
+mod allowlist_anchor;
+pub mod attest;
+// K9: offline Sigstore bundle verification (feeds provenance_gate).
+pub mod sigstore;
+mod passport;
+pub use passport::{verify_passport, AttestFn, PassportAttestation, PassportBinding, PassportOptions};
+pub use allowlist_anchor::{k05b_anchored_tail, verify_allowlist_anchored, AnchorEntry, AnchorOptions, AnchorResult};
+// 0.5: extension-member verifiers (transparency ledger, optimistic path); see the module docs.
+pub mod fresh_at;
+pub mod pca_grant;
+pub mod blueprint;
+pub mod k4;
+pub mod runtime_claim;
+pub mod a2a;
+pub mod workflow;
+pub mod agent;
+pub mod facade;
+pub mod signers_more;
+pub mod readside;
+pub mod read_vault;
+pub mod lease;
+pub mod break_glass;
+pub mod missing_context;
+pub mod policy_classes;
+pub mod obligations;
+/// Provenance by default: mediator-signed context receipts, per-argument labels and the decision `authorize` runs as
+/// `provenance_flow`; the recorder agents use to produce bundles.
+pub mod arg_provenance;
+/// Undo windows (pure layer): compensation digests, undo tokens, receipt chains, the record state machine, the window clamp.
+pub mod undo;
+pub mod k3;
+pub mod ledger;
+pub mod optimistic;
+// 0.5: the full authorization pipeline (`authorize`) and its replay stores.
+mod authorize;
+#[cfg(feature = "sqlite")]
+mod sqlite_store;
 #[cfg(test)]
 mod k042_support;
+#[cfg(test)]
+mod k05_deadline_test;
 
-pub use action_schema::{action_schema_digest, action_schema_shape_error, conform_action, verify_action_schema, ConformResult};
+pub use authorize::{PassportRequirement, ForbidClausesFn, ForbidGate, TemplateRegistryFn, AdaptivePolicyFn, BeaconCtx, BeaconFn, 
+    authorize, authorize_json, evaluate_agent_caveats, evaluate_tool_schema, is_authorized_for, missing_authorize_components, plan_root_check, read_envelope,
+    policy_decision, root_caveats, state_key, validate_arg_schema, AuthorizeInput, AuthorizeOptions, AuthorizeResult, AuthorizedOperation, CheckStatus, EscalationRenderFn,
+    insecure_calm_risk, pq_pin_check, PrincipalResolver, BudgetClaim, HookResult, ThresholdHookFn, ClaimResult, ContextProvider, GrantResolver, IntentV2Provider, MemoryStateStore, Operation, RevocationCheck, RiskFn, StateStore, StoreError, StoreScope,
+    WorkflowCall, WorkflowGate, DEFAULT_REQUIRED_CHECKS, SINGLE_STEP, ProvActionsFn, ProvBundleFn, ProvObservedFn, UndoAdmitFn,
+};
+#[cfg(feature = "sqlite")]
+pub use sqlite_store::{SqliteAtomicKv, SqliteStateStore};
+pub use mesh::{verify_mesh_proof, MeshVerdict};
+pub use authorize::CORE_HOOK;
+pub use assurance::{
+    assurance_report, is_awaiting_audit_scheme, multi_root_level, refresh_assurance, signature_level, unmet_assurance, AssuranceHooks, AssuranceLabel,
+    AssuranceLabelled, AssuranceReport, AssuranceRequirement, AssuranceSources, CheckAssurance, HookDecl, RootDecl,
+};
+pub use kv::{AtomicKv, MemoryAtomicKv};
+pub use operations::{
+    execute_authorized, recover_operation, recover_operations, resolve_operation, CreateOutcome, ExecutableAuthorization, ExecuteOptions, ExecuteOutcome,
+    ExecutionHandle, Executor, ExecutorOutcome, KvOperationStore, MemoryOperationStore, OperationRecord, OperationState, OperationStore, RecheckFn, RecheckFor,
+    RecoverOptions, ResolvedOutcome, OPERATION_PENDING_TIMEOUT_MS,
+};
+pub use plans::{plan_root_of, PlanApproval, PlanCheckOptions, PlanContext, PlanRecord, PlanRegistry, PlanState, PlanStatus, PlanTransition};
+pub use staleness::{
+    check_revocation_age, check_revocation_epoch, decide_gate, decide_gate_ids, effective_reversibility, verify_non_membership, EpochCheckOptions, RevocationStaleness, RevocationStalenessPolicy,
+    RevocationState, Reversibility, StalenessWindows, REVOCATION_EPOCH_REFRESH_MS, REVOCATION_EPOCH_VALIDITY_MS, REVOCATION_IRREVERSIBLE_MAX_AGE_MS,
+};
+pub use approval::{
+    approval_batch, approval_challenge, approval_render_digest, approval_render_shape_error, binding_words, minor_to_decimal, psd2_linking, render_approval, ApprovalError,
+    APPROVAL_BATCH_DOMAIN, APPROVAL_CHALLENGE_DOMAIN, APPROVAL_RENDER_DOMAIN, BINDING_WORDS,
+};
+pub use escalation::{
+    build_escalation_request, build_escalation_request_with_render, escalation_action_digest, escalation_answer_shape_error, escalation_history_head, escalation_policy_digest,
+    verify_escalation_answer, escalation_reasons_wire, restore_lone_surrogates, EscalationBinding, EscalationVerdict, PinnedSigner, DEFAULT_ESCALATION_REQUEST_TTL_MS, ESCALATION_ANSWER_DOMAIN, ESCALATION_MAX_LIFETIME_MS,
+};
+pub use caveat_lang::{
+    bound_caveats, derive_error, discharge_action_digest, discharge_digest, discharge_shape_error, evaluate_caveats_k1, evaluate_derive, evaluate_k1,
+    is_k1_caveat, max_uses_error, max_uses_slot_key, narrow_shape_error, needs_discharge_error, reserve_max_uses, spiffe_bound_error, spiffe_id_error,
+    verify_discharge, verify_narrow, BoundCaveat, DeriveInput, DischargeBinding, DischargePin, DischargeVerdict, K1Ctx, K1Input, K1Result, NarrowBinding, presented_k1, PresentedK1,
+    NarrowVerdict, UsesVerdict, CAVEAT_DERIVE, CAVEAT_MAX_USES, CAVEAT_NEEDS_DISCHARGE, CAVEAT_SEALED, CAVEAT_SPIFFE_BOUND, DISCHARGE_DOMAIN, K1_CAVEAT_TYPES,
+    K1_MAX_LIFETIME_MS, NARROW_DOMAIN,
+};
+pub use provenance_gate::{
+    provenance_caveat, provenance_facts_error, provenance_gate, provenance_policy_error, rfc9162_leaf_hash, verify_rfc9162_inclusion, ProvenanceCaveatOptions,
+    ProvenanceGateOk, INTOTO_STATEMENT_V1, SLSA_PROVENANCE_V1,
+};
+pub use policy_authoring::{forbid_certificate_consistent, instantiate_template, resolve_link, template_def_error, template_digest, template_ref_error, tighten_overlay_error, verify_linked_policy, verify_template, verify_tighten};
+pub use decision::{decide_tighten, decide_units, decision_of, fold_v2_reasons, meet, meet_all, model_paths_read, pep_decision, signal_ceiling, tighten, TightenResult, V2CheckResult};
+pub use action_schema::{action_schema_digest, action_schema_shape_error, action_schema_shape_error_unsigned, conform_action, verify_action_schema, ConformResult};
 pub use intent_acc::{
     acc_receipt_digest, pcactn_reservation_digest, sequencer_key_set_digest, DEFAULT_MAX_KEYSET_AGE_MS, DEFAULT_MAX_RECEIPT_AGE_MS, MAX_RECEIPT_LIFETIME_MS, RECEIPT_SKEW_MS,
 };
@@ -132,18 +252,25 @@ pub fn decode_b64u_strict(s: &str, len: Option<usize>) -> Option<Vec<u8>> {
 
 /// Verdict for the core checks. `checks[name]` is true when it passed. A wire failure is terminal and is
 /// the ONLY entry (`{wire: false}`); otherwise all of wire, version, audience, validity, chain,
-/// plan_inclusion, leaf_signature, counter are present.
+/// plan_inclusion, leaf_signature, counter_format are present.
 #[derive(Debug, Clone)]
 pub struct Verdict {
     pub allow: bool,
     pub checks: BTreeMap<String, bool>,
     pub reason: String,
+    /// Every reason, in order: the first failure (`reason`), then one for EACH further failing intent-v2 check (the
+    /// escalate-class ones). `decision_of` reads the whole list, so a multi-check escalation stays an escalation. Empty when
+    /// `allow`, and on a wire failure (`reason` only).
+    pub reasons: Vec<String>,
+    /// Rule 21's compatibility mode is in effect (`model_polarity` `"legacy"` and a grant reads a model-derived path in `where`):
+    /// `authorize` reports it as `degraded["tighten"]`.
+    pub legacy_model_polarity: bool,
 }
 
 fn wire_fail(why: impl Into<String>) -> Verdict {
     let mut checks = BTreeMap::new();
     checks.insert("wire".to_string(), false);
-    Verdict { allow: false, checks, reason: format!("wire: {}", why.into()) }
+    Verdict { allow: false, checks, reason: format!("wire: {}", why.into()), reasons: Vec::new(), legacy_model_polarity: false }
 }
 
 // ---- numbers ---------------------------------------------------------------------------
@@ -205,19 +332,10 @@ fn safe_int(v: &Value) -> Option<i64> {
     }
 }
 
+/// A JSON number as JavaScript's `String(JSON.parse(text))` prints it (hash.ts lenient canonical form): the nearest double, shortest
+/// round-trip digits, positional for exponents in (-7, 21) else `d.ddde+x` (so a u64 beyond 2^53 prints as its double, and `1e21` as `1e+21`).
 fn fmt_number(n: &Number) -> String {
-    if let Some(i) = n.as_i64() {
-        return i.to_string();
-    }
-    if let Some(u) = n.as_u64() {
-        return u.to_string();
-    }
-    let f = n.as_f64().unwrap_or(0.0);
-    if f == 0.0 {
-        return "0".to_string();
-    }
-    // Rust's Display for f64 is shortest round-trip and never uses exponent notation.
-    format!("{}", f)
+    intent_v2::js_number_string(n.as_f64().unwrap_or(0.0))
 }
 
 // ---- canonicalization ------------------------------------------------------------------
@@ -921,7 +1039,10 @@ mod less {
 
     /// The detached signature opens under `pk` and yields exactly `msg`. Total.
     pub(super) fn verify(pk: &[u8], msg: &[u8], sig: &[u8]) -> bool {
-        if pk.len() != PUBLIC_KEY_BYTES || !sig_len_ok(sig.len()) {
+        if pk.len() != PUBLIC_KEY_BYTES {
+            return false;
+        }
+        if !sig_len_ok(sig.len()) {
             return false;
         }
         // SAFETY: every pointer is valid for the length passed with it for the whole call; the C side reads only within
@@ -992,7 +1113,10 @@ fn b64_sig_len(v: Option<&Value>, pq: Pq) -> bool {
 /// Exact-length PQ verification over raw bytes (pure, empty context / FN-DSA DOMAIN_NONE + HASH_ID_RAW). Total.
 fn pq_verify(pq: Pq, pk: &[u8], msg: &[u8], sig: &[u8]) -> bool {
     let (pk_len, _) = pq.lens();
-    if pk.len() != pk_len || !pq.sig_len_ok(sig.len()) {
+    if pk.len() != pk_len {
+        return false;
+    }
+    if !pq.sig_len_ok(sig.len()) {
         return false;
     }
     // fips204 takes the key array by value, fips205 by reference (`$($r)?` = `&`).
@@ -1046,6 +1170,7 @@ fn pq_verify_b64u(pq: Pq, pk_b64u: &str, msg: &[u8], sig_b64u: Option<&Value>) -
         Some(b) => b,
         None => return false,
     };
+    // the length is checked here and again as pq_verify's first check (defence in depth)
     let sg = match sig_b64u.and_then(Value::as_str).and_then(|s| decode_b64u_strict(s, None)) {
         Some(b) if pq.sig_len_ok(b.len()) => b,
         _ => return false,
@@ -1520,6 +1645,41 @@ pub fn verify_chain_policy(
             }
         }
     }
+    // The leaf holds the full append-only list.
+    allocations_monotone_value(chain[chain.len() - 1].get("caveats").unwrap_or(&Value::Null))
+}
+
+/// [`allocations_monotone`] over a caveat list as it arrives in JSON: a value that is not an array (a missing member included) is
+/// refused with `malformed caveats` (it never reads as "no caveats", which would pass the single-pool path).
+pub fn allocations_monotone_value(caveats: &Value) -> Result<(), String> {
+    match caveats.as_array() {
+        Some(list) => allocations_monotone(list),
+        None => Err("malformed caveats".to_string()),
+    }
+}
+
+/// `budget_alloc` caveats are monotone non-increasing in delegation order: each `limit` is a number >= 0, never above the one
+/// before it, so a child cannot allocate more than its parent carried. No `budget_alloc` caveat passes (the single-pool path).
+/// JSON has no NaN or infinity, so a number here is finite.
+pub fn allocations_monotone(caveats: &[Value]) -> Result<(), String> {
+    let mut prev = f64::INFINITY;
+    for (i, cv) in caveats.iter().enumerate() {
+        if cv.get("type").and_then(Value::as_str) != Some("budget_alloc") {
+            continue;
+        }
+        let lim = match cv.get("limit").and_then(Value::as_f64).filter(|l| *l >= 0.0) {
+            Some(l) => l,
+            None => return Err(format!("budget_alloc caveat {i}: limit must be a finite number >= 0")),
+        };
+        if lim > prev {
+            return Err(format!(
+                "budget_alloc caveat {i}: allocation {} widens the parent's carried allocation {} (monotone: a child can only allocate <= its parent)",
+                intent_v2::js_number_string(lim),
+                intent_v2::js_number_string(prev)
+            ));
+        }
+        prev = lim;
+    }
     Ok(())
 }
 
@@ -1529,7 +1689,7 @@ const REQUIRED_FIELDS: [&str; 14] = [
     "ver", "action", "grant_ref", "cap_chain", "plan", "attestation", "provenance", "freshness", "counter",
     "risk_claim", "aud", "iat", "exp", "sig",
 ];
-const OPTIONAL_FIELDS: [&str; 14] = [
+const OPTIONAL_FIELDS: [&str; 15] = [
     "nonce", "caution", "rationale_commitment", "progress_step", "prohibition_evidence", "tool_binding",
     "threshold", "zk_compliance", "bond_ref",
     // B4 crypto-agility (additive): absent `alg` == "ed25519" and validates exactly as pre-B4.
@@ -1538,6 +1698,8 @@ const OPTIONAL_FIELDS: [&str; 14] = [
     "intent",
     // Intent Layer v2 (additive, SIGNED): the session member (rule 13; see [`validate_intent_session_wire`]).
     "intent_session",
+    // Consistency token (additive, SIGNED): the `fresh_at` member (see [`fresh_at`]).
+    "fresh_at",
 ];
 
 fn b32(v: Option<&Value>) -> bool {
@@ -1764,6 +1926,11 @@ pub fn validate_wire(pcactn: &Value) -> Result<(), String> {
     if let Some(v) = p.get("intent_session") {
         validate_intent_session_wire(v)?;
     }
+    if let Some(v) = p.get("fresh_at") {
+        if let Some(e) = fresh_at::validate_fresh_at_wire(v) {
+            return Err(e);
+        }
+    }
     if let Some(v) = p.get("prohibition_evidence") {
         if !v.is_object() && !v.is_array() {
             return Err("'prohibition_evidence' must be an object or array".into());
@@ -1809,7 +1976,7 @@ pub fn threshold_message(p: &Map<String, Value>) -> Result<Vec<u8>, String> {
 /// Recompute the signer-set hash committed by a threshold share (v2.1):
 /// `sha256("atlas-pca/signerset/v1\0" || canonical(sort_by(role, publicKey)[{publicKey, role}]))`.
 /// FAIL-CLOSED: `None` on any malformed entry.
-fn signer_set_hash(signer_set: &[Value]) -> Option<Vec<u8>> {
+pub(crate) fn signer_set_hash(signer_set: &[Value]) -> Option<Vec<u8>> {
     // `pq_pk` is carried ONLY when registered (additive: ed25519-only sets hash as before).
     let mut entries: Vec<(&str, &str, Option<&str>)> = Vec::with_capacity(signer_set.len());
     for e in signer_set {
@@ -2009,7 +2176,7 @@ pub fn verify_pcactn_json_with(text: &str, grant: &Value, now: i64, audience: &s
 }
 
 /// Checks, in the normative order: wire (terminal), version, audience, validity, chain, plan_inclusion,
-/// leaf_signature, counter (then `intent` when the PCActn carries it). `now` is epoch milliseconds; `audience` is this verifier's own audience id.
+/// leaf_signature, counter_format (then `intent` when the PCActn carries it). `now` is epoch milliseconds; `audience` is this verifier's own audience id.
 /// Later-milestone checks (attestation, threshold, revocation, ...) are out of scope.
 pub fn verify_pcactn_core(pcactn: &Value, grant: &Value, now: i64, audience: &str) -> Verdict {
     verify_pcactn_core_policy(pcactn, grant, now, audience, None)
@@ -2031,11 +2198,93 @@ pub struct VerifyOptions<'a> {
     pub intent: Option<&'a IntentPolicy>,
     /// Intent Layer v2 verifier state + policy (`None` = none). See [`IntentV2Context`].
     pub intent_v2: Option<&'a IntentV2Context>,
+    /// The plan roots the principal authorized (`plan_root_authorized`): given (even empty), the check passes iff the PCActn's
+    /// `plan.root` is listed, else it FAILS. Omitted, it FAILS, unless [`VerifyOptions::insecure_skip_plan_root_check`] is set. The list
+    /// wins over the skip flag. [`authorize`] decides the check itself from its own plan context.
+    pub authorized_plan_roots: Option<&'a [String]>,
+    /// The explicit, loudly named opt-out of `plan_root_authorized` (the check is then not reported). Never accepted by `authorize`.
+    pub insecure_skip_plan_root_check: bool,
+    /// The freshness-anchor gate (pcactn.ts `enforce.freshness`), off by default; its check is `freshness_anchor`.
+    pub freshness_gate: Option<FreshnessGate>,
+    /// Verifier-side pins `issuer -> pq_pk` (the caller's). An issuer with a pin also refuses a classical root grant (check `pq_pin`):
+    /// a pin says the issuer's grants are post-quantum protected, so a classical grant naming it is a downgrade. No pins, or pins that
+    /// do not name the root issuer: no `pq_pin` check appears. The chain check is unchanged.
+    pub pq_pins: Option<&'a std::collections::HashMap<String, String>>,
 }
 
-/// [`verify_pcactn_core`] with explicit [`VerifyOptions`]. The `intent` check runs after `counter` and is reported
+/// The M3 freshness gate: a missing, stub, future or stale signed freshness anchor (`freshness.beacon_ref` / `freshness.epoch`) denies.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct FreshnessGate {
+    /// The oldest an anchor may be, in ms (>= 0).
+    pub max_age_ms: f64,
+    /// Milliseconds per epoch (default one minute, > 0).
+    pub epoch_ms: Option<f64>,
+    /// The gate's clock (default: the verifier's `now`).
+    pub now: Option<f64>,
+    pub clock_skew_ms: Option<f64>,
+}
+
+/// pcactn.ts `enforce.freshness`: `Err` is the reason.
+pub fn freshness_gate_check(p: &Map<String, Value>, g: &FreshnessGate, now: i64) -> Result<(), String> {
+    let epoch_ms = g.epoch_ms.unwrap_or(60_000.0);
+    let fnow = g.now.unwrap_or(now as f64);
+    let skew = match g.clock_skew_ms {
+        Some(s) if s.is_finite() => if s > 0.0 { s } else { 0.0 },
+        _ => 0.0,
+    };
+    if !(epoch_ms > 0.0) || !g.max_age_ms.is_finite() || g.max_age_ms < 0.0 {
+        return Err("freshness gate misconfigured: epochMs must be > 0 and maxAgeMs >= 0 (fail closed)".into());
+    }
+    let fr = p.get("freshness");
+    let beacon_ok = fr.and_then(|f| f.get("beacon_ref")).and_then(Value::as_str).is_some_and(|b| !b.is_empty());
+    let epoch = fr.and_then(|f| f.get("epoch")).and_then(safe_int).filter(|e| *e > 0);
+    let (true, Some(epoch)) = (beacon_ok, epoch) else {
+        return Err("freshness anchor is missing (empty beacon_ref or non-positive epoch stub)".into());
+    };
+    let anchor = epoch as f64 * epoch_ms;
+    if anchor > fnow + skew {
+        Err("freshness anchor is in the future".into())
+    } else if fnow - anchor > g.max_age_ms {
+        Err(format!("freshness anchor is stale (older than {} ms)", intent_v2::js_number_string(g.max_age_ms)))
+    } else {
+        Ok(())
+    }
+}
+
+/// [`verify_pcactn_core`] with explicit [`VerifyOptions`]. The `intent` check runs after `counter_format` and is reported
 /// iff the PCActn carries `intent` or `opts.intent` is active; otherwise the verdict is the pre-M2 one.
 pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience: &str, opts: &VerifyOptions<'_>) -> Verdict {
+    verify_pcactn_core_with_fresh_at(pcactn, grant, now, audience, opts, None)
+}
+
+/// [`verify_pcactn_core_with`] plus the `fresh_at` consistency-token policy. The `fresh_at` check runs after the intent checks
+/// and is reported iff the PCActn carries the `fresh_at` member, a side-carried token is read, or the policy requires one;
+/// a PCActn that carries the member with no policy fails closed. With neither, the verdict is the one without this check.
+/// A stale verifier fails with an `escalate:` reason, which `decision_of` reads as escalate.
+pub fn verify_pcactn_core_with_fresh_at(
+    pcactn: &Value,
+    grant: &Value,
+    now: i64,
+    audience: &str,
+    opts: &VerifyOptions<'_>,
+    fresh_at_policy: Option<&fresh_at::FreshAtPolicy>,
+) -> Verdict {
+    core_verdict(pcactn, grant, now, audience, opts, fresh_at_policy, true)
+}
+
+pub(crate) const ZK_UNVERIFIED: &str =
+    "PCActn carries a zk_compliance proof but no zk verifier enforced it (fail closed): configure hooks.zk or do not present a proof";
+
+/// `zk_gate` false: the caller reports `zk_compliance` itself, in its own check order (`authorize`).
+pub(crate) fn core_verdict(
+    pcactn: &Value,
+    grant: &Value,
+    now: i64,
+    audience: &str,
+    opts: &VerifyOptions<'_>,
+    fresh_at_policy: Option<&fresh_at::FreshAtPolicy>,
+    zk_gate: bool,
+) -> Verdict {
     let allowed = opts.allowed;
     if let Err(why) = validate_wire(pcactn) {
         return wire_fail(why);
@@ -2113,6 +2362,15 @@ pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience
         }
     });
 
+    // a PQ pin for the root issuer says its grants are post-quantum protected: a classical root naming it is refused (the server
+    // `pq_pin` rule, same reason). The chain check above is not changed: it only constrains non-Ed25519 roots.
+    if let (Some(pins), Some(iss)) = (opts.pq_pins, grant.get("issuer").and_then(Value::as_str)) {
+        let classical = grant.get("alg").and_then(Value::as_str).is_none_or(|a| a == "ed25519");
+        if classical && pins.contains_key(iss) {
+            record("pq_pin", Err("the grant issuer is pinned to a post-quantum key; a classical grant is refused".into()));
+        }
+    }
+
     // grant_ref_bound (normative): the signed grant_ref MUST be a non-empty string byte-equal to the id of the
     // ROOT capability of the presented chain (cap_chain[0].id). Independent of the chain verdict; fail-closed on
     // an empty / malformed chain. Replay state is keyed on grant_ref, so it must not be attacker-chosen.
@@ -2144,6 +2402,18 @@ pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience
         "plan_inclusion",
         if ok { Ok(()) } else { Err("action is not a node of the committed plan".into()) },
     );
+    // plan_root_authorized (pcactn.ts): the plan root must be one the principal authorized
+    match opts.authorized_plan_roots {
+        None if opts.insecure_skip_plan_root_check => {}
+        None => record(
+            "plan_root_authorized",
+            Err("no authorized plan is configured for this verifier (set authorizedPlanRoots, or the explicit insecureSkipPlanRootCheck)".into()),
+        ),
+        Some(roots) => record(
+            "plan_root_authorized",
+            if plan.get("root").and_then(Value::as_str).is_some_and(|r| roots.iter().any(|x| x == r)) { Ok(()) } else { Err("the plan root has not been authorized by the principal".into()) },
+        ),
+    }
 
     // leaf signature under the PCActn's B4 suite (ed25519 / ml-dsa-65 / hybrid) over the v2 signed message
     let leaf_msg = "signature does not verify under the leaf holder key";
@@ -2166,9 +2436,9 @@ pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience
     });
     record("leaf_signature", if sig_ok { Ok(()) } else { Err(leaf_msg.into()) });
 
-    // counter: safe integer >= 0 (monotonicity vs. stored state is the resource server's job)
+    // counter_format: safe integer >= 0 (monotonicity vs. stored state is `replay`, the resource server's job)
     record(
-        "counter",
+        "counter_format",
         match p.get("counter").and_then(safe_int) {
             Some(i) if i >= 0 => Ok(()),
             _ => Err("missing or not a non-negative safe integer".into()),
@@ -2182,17 +2452,43 @@ pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience
         let sess = is.get("session").and_then(Value::as_str)?;
         Some((sess, is.get("map_form").is_some()))
     });
+    if let Some(g) = &opts.freshness_gate {
+        record("freshness_anchor", freshness_gate_check(p, g, now));
+    }
     if let Some(res) = decide_intent(p.get("intent"), grant, opts.intent, session) {
         record("intent", res);
     }
     // Intent Layer v2: schema, intent_session, layers, accumulators, facts, provenance, classes (each reported only
     // when the PCActn carries `intent_session` or a v2 policy is active; see [`decide_intent_v2`]).
-    for c in decide_intent_v2(pcactn, grant, opts.intent_v2, now).checks {
+    let mut v2: Vec<decision::V2CheckResult> = Vec::new();
+    let v2d = decide_intent_v2(pcactn, grant, opts.intent_v2, now);
+    let legacy_model_polarity = v2d.legacy_model_polarity;
+    for c in v2d.checks {
+        v2.push(decision::V2CheckResult { name: c.name.to_string(), ok: c.ok, reason: if c.ok { None } else { Some(c.reason.clone()) } });
         record(c.name, if c.ok { Ok(()) } else { Err(c.reason) });
+    }
+    // Consistency token: `fresh_at`; its failure joins the reason list so an escalate-class one stays an escalation.
+    match fresh_at::decide_fresh_at(p.get("fresh_at"), fresh_at_policy, now) {
+        fresh_at::FreshAtCheck::None => {}
+        fresh_at::FreshAtCheck::Pass => record("fresh_at", Ok(())),
+        fresh_at::FreshAtCheck::Fail(why) => {
+            v2.push(decision::V2CheckResult { name: "fresh_at".to_string(), ok: false, reason: Some(why.clone()) });
+            record("fresh_at", Err(why));
+        }
+    }
+    // No verifier here: a carried proof must never be silently accepted, at the core and at every guard on top of it.
+    if zk_gate && p.contains_key("zk_compliance") {
+        record("zk_compliance", Err(ZK_UNVERIFIED.to_string()));
     }
 
     let allow = checks.values().all(|v| *v);
-    Verdict { allow, checks, reason }
+    let reasons = if allow {
+        Vec::new()
+    } else {
+        let base: Vec<String> = if reason.is_empty() { Vec::new() } else { vec![reason.clone()] };
+        decision::fold_v2_reasons(&base, &v2)
+    };
+    Verdict { allow, checks, reason, reasons, legacy_model_polarity }
 }
 
 // ---- Intent Layer M2: envelope.intent -----------------------------------------------------
@@ -2201,6 +2497,7 @@ pub fn verify_pcactn_core_with(pcactn: &Value, grant: &Value, now: i64, audience
 const INTENT_GOAL_PREFIX: &str = "pca-intent:v1:";
 const INTENT_GOAL_V2_PREFIX: &str = "pca-intent:v2:";
 const INTENT_GOAL_V2C_PREFIX: &str = "pca-intent:v2c:";
+const INTENT_GOAL_V3_PREFIX: &str = "pca-intent:v3:";
 const INTENT_GOAL_COMMIT_DOMAIN: &str = "atlas-pca/goal/v1\0";
 const PPM_ONE: i64 = 1_000_000;
 /// UTF-8 byte cap of `intent.goal_salt`.
@@ -2218,12 +2515,57 @@ pub struct IntentPolicy {
     pub min_fidelity_ppm: Option<f64>,
     /// Deny when the claimed `residual_risk_ppm` is above this. Setting it implies `require`.
     pub max_residual_risk_ppm: Option<f64>,
+    /// Goal binding v3: the root grant must open against exactly this approved Goal IR and compiled policy (and only that:
+    /// a v1/v2 grant does not open it). Setting it implies `require`. A malformed digest is a misconfiguration and fails closed.
+    pub approved_goal: Option<ApprovedGoalRef>,
+}
+
+/// The digests a v3 goal commitment binds: canonical base64url (32 bytes) of the signed Goal IR and of the policy compiled
+/// from it.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ApprovedGoalRef {
+    pub goal_digest: String,
+    pub policy_digest: String,
+}
+
+impl ApprovedGoalRef {
+    /// Both digests are canonical base64url of exactly 32 bytes.
+    pub fn is_valid(&self) -> bool {
+        decode_b64u_strict(&self.goal_digest, Some(32)).is_some() && decode_b64u_strict(&self.policy_digest, Some(32)).is_some()
+    }
+
+    /// Lenient construction from JSON. A value that is not an object with exactly the two string members `goal_digest` and
+    /// `policy_digest` (extra member, missing member, non-string) yields a reference with empty digests, which is invalid:
+    /// the misconfiguration fails closed at verification time.
+    pub fn from_json(v: &Value) -> ApprovedGoalRef {
+        let s = |o: &Map<String, Value>, k: &str| o.get(k).and_then(Value::as_str).map(str::to_string);
+        v.as_object()
+            .filter(|o| o.len() == 2)
+            .and_then(|o| Some(ApprovedGoalRef { goal_digest: s(o, "goal_digest")?, policy_digest: s(o, "policy_digest")? }))
+            .unwrap_or_default()
+    }
+}
+
+/// The v3 goal string a minting wallet passes as the goal: `"pca-intent:v3:" + goal_digest + ":" + policy_digest`.
+/// `None` on a malformed digest (never commit to garbage).
+pub fn intent_goal_v3(r: &ApprovedGoalRef) -> Option<String> {
+    r.is_valid().then(|| format!("{INTENT_GOAL_V3_PREFIX}{}:{}", r.goal_digest, r.policy_digest))
+}
+
+/// The goal commitment of a v3 grant: `hash_canonical_strict({d: "atlas-pca/goal/v1\0", goal: intent_goal_v3(r), salt})`.
+/// `None` on a malformed digest.
+pub fn intent_goal_commit_v3(r: &ApprovedGoalRef, goal_salt: &str) -> Option<String> {
+    hash_canonical_strict(&serde_json::json!({
+        "d": INTENT_GOAL_COMMIT_DOMAIN,
+        "goal": intent_goal_v3(r)?,
+        "salt": goal_salt,
+    }))
 }
 
 impl IntentPolicy {
     /// True iff the policy is active.
     pub fn is_active(&self) -> bool {
-        self.require || self.min_fidelity_ppm.is_some() || self.max_residual_risk_ppm.is_some()
+        self.require || self.min_fidelity_ppm.is_some() || self.max_residual_risk_ppm.is_some() || self.approved_goal.is_some()
     }
 
     /// Lenient construction from a JSON object `{require?, min_fidelity_ppm?, max_residual_risk_ppm?}`: a threshold
@@ -2238,6 +2580,7 @@ impl IntentPolicy {
             require: o.get("require").and_then(Value::as_bool) == Some(true),
             min_fidelity_ppm: num("min_fidelity_ppm"),
             max_residual_risk_ppm: num("max_residual_risk_ppm"),
+            approved_goal: o.get("approved_goal").map(ApprovedGoalRef::from_json),
         })
     }
 
@@ -2339,6 +2682,9 @@ fn decide_intent(intent: Option<&Value>, grant: &Value, policy: Option<&IntentPo
             return Some(Err("intent policy misconfigured: thresholds must be non-negative safe integers (fail closed)".into()));
         }
     }
+    if policy.and_then(|p| p.approved_goal.as_ref()).is_some_and(|g| !g.is_valid()) {
+        return Some(Err("intent policy misconfigured: approved_goal digests must be canonical base64url (32 bytes) (fail closed)".into()));
+    }
     let Some(i) = intent else {
         return Some(Err("this verifier requires an intent binding but the PCActn carries none".into()));
     };
@@ -2348,13 +2694,19 @@ fn decide_intent(intent: Option<&Value>, grant: &Value, policy: Option<&IntentPo
     let r = i.get("ref").and_then(Value::as_str).unwrap_or("");
     let md = i.get("map_digest").and_then(Value::as_str).unwrap_or("");
     let salt = i.get("goal_salt").and_then(Value::as_str).unwrap_or("");
-    let opened = match session {
-        Some((sess, false)) => intent_goal_commit_v2(sess, md, salt),
-        Some((sess, true)) => intent_goal_commit_v2c(sess, md, salt),
-        None => intent_goal_commit(r, md, salt),
-    };
-    if opened.as_deref() != Some(commit) {
-        return Some(Err("intent ref / map_digest / goal_salt do not open the root grant's goal commitment".into()));
+    if let Some(g) = policy.and_then(|p| p.approved_goal.as_ref()) {
+        if intent_goal_commit_v3(g, salt).as_deref() != Some(commit) {
+            return Some(Err("the root grant's goal commitment does not open to the approved goal and compiled policy (v3)".into()));
+        }
+    } else {
+        let opened = match session {
+            Some((sess, false)) => intent_goal_commit_v2(sess, md, salt),
+            Some((sess, true)) => intent_goal_commit_v2c(sess, md, salt),
+            None => intent_goal_commit(r, md, salt),
+        };
+        if opened.as_deref() != Some(commit) {
+            return Some(Err("intent ref / map_digest / goal_salt do not open the root grant's goal commitment".into()));
+        }
     }
     let fid = i.get("fidelity_ppm").and_then(safe_int).unwrap_or(-1);
     let res = i.get("residual_risk_ppm").and_then(safe_int).unwrap_or(i64::MAX);
@@ -2487,6 +2839,7 @@ fn caveat_satisfied(cv: &Value, ctx: &Value) -> bool {
         _ => return false,
     };
     if ty == "max_spend" {
+        // a negative limit is refused here although every admitted amount is >= 0 (defence in depth)
         let lim = match fin(c.get("usd")) {
             Some(l) if l >= 0.0 => l,
             _ => return false,
@@ -2554,3 +2907,50 @@ fn caveat_satisfied(cv: &Value, ctx: &Value) -> bool {
 #[cfg(test)]
 #[path = "k042_lib_test.rs"]
 mod k042_test;
+
+#[cfg(test)]
+#[path = "goal_commit_test.rs"]
+mod goal_commit_test;
+
+#[cfg(test)]
+#[path = "staleness_test.rs"]
+mod staleness_test;
+
+/// Test seam (hidden): direct entry points to the `pub(crate)` receipt / key-set verifiers, whose shape-error arms are not
+/// reachable through the public pipeline (it shape-checks first and maps every refusal to one reason).
+#[doc(hidden)]
+pub mod k05b_g6_seam {
+    use serde_json::{Map, Value};
+
+    pub fn verify_acc_receipt_signature(r: &Value, expected_signer: &str) -> Result<bool, String> {
+        crate::intent_acc::verify_acc_receipt_signature(r, expected_signer, None)
+    }
+
+    pub fn verify_sequencer_key_set(k: &Value, root: &str) -> Result<bool, String> {
+        crate::intent_acc::verify_sequencer_key_set(k, root, None)
+    }
+
+    pub fn verify_receipt_against_holder(r: &Value, holder: &Map<String, Value>, key_sets: Option<&Value>, now: f64, max_receipt_age_ms: f64, max_keyset_age_ms: f64) -> Result<(), String> {
+        let f = crate::intent_acc::ReceiptFreshness { max_receipt_age_ms, max_keyset_age_ms, tracked: None };
+        crate::intent_acc::verify_receipt_against_holder(r, holder, key_sets, now, &f)
+    }
+}
+
+/// Test seam (hidden): direct entry points to `pub(crate)` guards that the public pipelines make unreachable (the callers
+/// have already refused the input, so these are defence-in-depth).
+#[doc(hidden)]
+pub mod k05b_g8_seam {
+    use serde_json::{Map, Value};
+
+    pub fn check_revocation_epoch(o: &Map<String, Value>, guardian: &str, now: f64, grant_ref: &str) -> Result<(), String> {
+        crate::intent_revocation::check_revocation_epoch(o, guardian, now, grant_ref, None)
+    }
+
+    pub fn set_nested(root: &mut Map<String, Value>, path: &str, value: Value) -> bool {
+        crate::intent_wb::set_nested(root, path, value)
+    }
+
+    pub fn first_overlap(paths: &[String]) -> Option<(String, String)> {
+        crate::intent_wb::first_overlap(paths).map(|(a, b)| (a.clone(), b.clone()))
+    }
+}
