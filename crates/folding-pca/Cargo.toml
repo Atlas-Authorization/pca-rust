@@ -1,6 +1,6 @@
 [package]
 name = "pca-folding-ivc"
-version = "0.4.3"
+version = "0.5.0"
 edition = "2021"
 description = "Recursive PCA action-history aggregation via a Nova folding scheme (IVC): fold N per-action steps into ONE RecursiveSNARK, then compress to a CompressedSNARK proving an agent's WHOLE action history (unforgeable hash chain + cumulative Σcost ≤ bMax)."
 license = "MIT"
@@ -43,3 +43,7 @@ opt-level = 3
 [[bin]]
 name = "longfold"
 path = "src/bin/longfold.rs"
+
+[package.metadata.pca]
+# Maturity tier: stable | production | hardened | experimental (the PCA maturity tiers page defines them)
+maturity = "hardened"

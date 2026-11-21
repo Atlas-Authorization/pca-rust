@@ -1,0 +1,50 @@
+name: FHE (BFV on Microsoft SEAL)
+
+# Feature `fhe-seal`: the homomorphic risk gate through Microsoft SEAL's own C export API (the one SEAL.NET binds), declared by hand in
+# src/fhe_seal.rs (no bindgen). libsealc is built here from the pinned SEAL tag. Wire compatibility with the TypeScript reference
+# (node-seal 5.1.7 = SEAL 4.1.2) is shown by replaying a corpus generated here by the reference: the native evaluator must reproduce the
+# reference's evaluated ciphertexts byte for byte (re-saved uncompressed).
+on:
+  push:
+    branches: [main, 'ci/**']
+    tags: ['*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SEAL_TAG: v4.1.2
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: '0'
+
+jobs:
+  fhe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source layout (full shared corpus from the flagship)
+        shell: bash
+        run: .github/scripts/fetch-flagship-corpus.sh --mono rust-pca
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ env.PCA_MONO_SDK }}
+      - name: node-seal reference corpus
+        run: .github/scripts/fhe-seal-corpus.sh "$RUNNER_TEMP/fhe-seal.json.gz"
+      - name: libsealc at the pinned SEAL tag
+        run: echo "ATLAS_PCA_SEAL_LIB=$(.github/scripts/build-libsealc.sh "$SEAL_TAG" "$RUNNER_TEMP/seal")" >> "$GITHUB_ENV"
+      - name: BFV replay and round trip
+        working-directory: ${{ env.PCA_MONO_SDK }}/crates/atlas-pca
+        env:
+          LD_LIBRARY_PATH: ${{ env.ATLAS_PCA_SEAL_LIB }}
+          PCA_FHE_SEAL_CORPUS: ${{ runner.temp }}/fhe-seal.json.gz
+        run: cargo test --release --features fhe-seal --test fhe_seal -- --nocapture

@@ -10,9 +10,13 @@ use super::{canonicalize_strict, MAX_SAFE};
 
 pub(crate) const MAX_SESSION_ACCUMULATORS: usize = 16;
 pub(crate) const MAX_SESSION_MONITORS: usize = 16;
-const MAX_MONITOR_WITHIN: i64 = 64;
-const ACC_AGGS: [&str; 4] = ["sum", "count", "distinct", "max"];
-const MONITOR_KINDS: [&str; 5] = ["requires_prior", "precedes", "never", "always", "responds_within"];
+pub(crate) const MAX_MONITOR_WITHIN: i64 = 64;
+/// Where an accumulator may aggregate: one session, or across a principal, an org or the fleet (a ledger holds those).
+pub(crate) const ACC_SCOPES: [&str; 4] = ["session", "principal", "org", "fleet"];
+/// The domain of the receipt core digest (the log leaf content of a receipt).
+pub(crate) const ACC_RECEIPT_CORE_DOMAIN: &str = "atlas-pca/acc-receipt-core/v1";
+pub(crate) const ACC_AGGS: [&str; 4] = ["sum", "count", "distinct", "max"];
+pub(crate) const MONITOR_KINDS: [&str; 5] = ["requires_prior", "precedes", "never", "always", "responds_within"];
 pub(crate) const ACC_RECEIPT_DOMAIN: &str = "atlas-pca/acc-receipt/v1\0";
 pub(crate) const ACC_RECEIPT_REF_DOMAIN: &str = "atlas-pca/acc-receipt-ref/v1";
 pub(crate) const ACC_RESERVE_DOMAIN: &str = "atlas-pca/acc-reserve/v1";
@@ -63,7 +67,7 @@ pub(crate) fn accumulator_decl_error(a: &Value) -> Option<String> {
         Some(a) => a,
         None => return Some("accumulator must be an object".into()),
     };
-    const KEYS: [&str; 10] = ["id", "agg", "val", "unit", "sel", "win", "key", "domain_max", "cap", "holder"];
+    const KEYS: [&str; 11] = ["id", "agg", "val", "unit", "sel", "win", "key", "domain_max", "cap", "holder", "scope"];
     if let Some(k) = a.keys().find(|k| !KEYS.contains(&k.as_str())) {
         return Some(format!("accumulator: unknown member '{k}'"));
     }
@@ -175,6 +179,18 @@ pub(crate) fn accumulator_decl_error(a: &Value) -> Option<String> {
             }
         }
         _ => return Some(format!("{at}: unknown holder kind")),
+    }
+    if let Some(sc) = a.get("scope") {
+        let scope = s(Some(sc)).filter(|x| ACC_SCOPES.contains(x));
+        let Some(scope) = scope else { return Some(format!("{at}: unknown scope")) };
+        if scope != "session" {
+            if hk != Some("site_local") {
+                return Some(format!("{at}: a {scope}-scoped accumulator has a site_local holder (the ledger is the holder)"));
+            }
+            if a.get("domain_max").is_none() {
+                return Some(format!("{at}: a {scope}-scoped accumulator needs domain_max (the cap the ledger enforces)"));
+            }
+        }
     }
     let wallet = hk == Some("wallet");
     if wallet != sel.get("event").is_some() {

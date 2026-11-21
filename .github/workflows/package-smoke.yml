@@ -1,0 +1,88 @@
+name: Package smoke (opt-in features from the packaged crate)
+
+# For each opt-in native feature: package atlas-pca exactly as the release does, unpack the .crate into a clean directory outside the
+# checkout, and build a fresh consumer crate against it with only that cargo feature enabled (no environment variables, no prebuilt
+# libraries). Where the feature has a cheap entry point the consumer calls into the native code, so a missing or unlinkable library
+# fails here.
+#   less               patched LESS C, compiled by build.rs (cc)
+#   fndsa-sign         fn-dsa crates from crates.io
+#   mpc-endemic        pca-mpc-lwe-ot-wasm (packaged and patched in alongside, as on a first release)
+#   zk                 pca-zk, the Groth16 engine on arkworks (packaged and patched in alongside, as on a first release)
+#   sandbox-wasm       wasmtime in process (no host binary)
+#   ed448-vendored     OpenSSL built from source (openssl-src)
+#   fhe-seal-vendored  libsealc built from the SEAL sources inside the package (Unix only)
+# BLS12-381 (blst) is a plain dependency of the default build, so the main CI already covers it.
+on:
+  push:
+    branches: [main, 'ci/**']
+    tags: ['*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: '0'
+
+jobs:
+  smoke:
+    name: ${{ matrix.feature }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { feature: less, os: ubuntu-latest, probe: '' }
+          - { feature: less, os: macos-latest, probe: '' }
+          - { feature: less, os: windows-latest, probe: '' }
+          - { feature: fndsa-sign, os: ubuntu-latest, probe: '' }
+          - { feature: mpc-endemic, os: ubuntu-latest, probe: 'atlas_pca::mpc_endemic::hash_to_ring(b"x").unwrap();' }
+          - { feature: zk, os: ubuntu-latest, probe: 'assert!(!atlas_pca::zk::verify_policy_vm_proof(&atlas_pca::serde_json::Value::Null, &Default::default()).unwrap_or(false));' }
+          - { feature: sandbox-wasm, os: ubuntu-latest, probe: 'let _ = atlas_pca::sandbox_wasm::run;' }
+          - { feature: ed448-vendored, os: ubuntu-latest, probe: 'atlas_pca::jose::ed448_public_jwk(&[7u8; 57]).unwrap();' }
+          - { feature: ed448-vendored, os: macos-latest, probe: 'atlas_pca::jose::ed448_public_jwk(&[7u8; 57]).unwrap();' }
+          - { feature: fhe-seal-vendored, os: ubuntu-latest, probe: 'atlas_pca::fhe_seal::keygen().unwrap();' }
+          - { feature: fhe-seal-vendored, os: macos-latest, probe: 'atlas_pca::fhe_seal::keygen().unwrap();' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: SEAL sources (only the SEAL feature ships them)
+        if: matrix.feature == 'fhe-seal-vendored'
+        shell: bash
+        run: .github/scripts/fetch-seal-vendor.sh crates/atlas-pca/seal-src
+      - name: Package (as the release does)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo package -p pca-mpc-lwe-ot-wasm -p pca-zk -p atlas-pca --locked --allow-dirty --no-verify
+          mkdir -p "$RUNNER_TEMP/unpacked"
+          # cd instead of tar -C: GNU tar on Windows mangles a drive-letter path
+          for f in target/package/*.crate; do (cd "$RUNNER_TEMP/unpacked" && tar -xzf "$OLDPWD/$f"); done
+          # crates.io refuses packages over 10 MiB
+          for f in target/package/*.crate; do [ "$(wc -c < "$f")" -le 10485760 ] || { echo "::error::$f is over 10 MiB"; exit 1; }; done
+          ls -l target/package/*.crate
+      - name: Clean consumer built from the unpacked package
+        shell: bash
+        env:
+          FEATURE: ${{ matrix.feature }}
+          PROBE: ${{ matrix.probe }}
+        run: |
+          set -euo pipefail
+          U="$RUNNER_TEMP/unpacked"; C="$RUNNER_TEMP/consumer"
+          mkdir -p "$C/src"; cd "$C"
+          atlas="$(ls -d "$U"/atlas-pca-*)"; lweot="$(ls -d "$U"/pca-mpc-lwe-ot-wasm-*)"; zk="$(ls -d "$U"/pca-zk-*)"
+          # TOML basic strings reject Windows backslashes: hand cargo forward-slash paths
+          atlas="${atlas//\\//}"; lweot="${lweot//\\//}"; zk="${zk//\\//}"
+          {
+            printf '[package]\nname = "smoke"\nversion = "0.0.0"\nedition = "2021"\n[dependencies]\n'
+            printf 'atlas-pca = { path = "%s", features = ["%s"] }\n' "$atlas" "$FEATURE"
+            printf '[patch.crates-io]\npca-mpc-lwe-ot-wasm = { path = "%s" }\npca-zk = { path = "%s" }\n' "$lweot" "$zk"
+          } > Cargo.toml
+          printf 'fn main() {\n    %s\n    println!("ok");\n}\n' "$PROBE" > src/main.rs
+          cargo run --release
