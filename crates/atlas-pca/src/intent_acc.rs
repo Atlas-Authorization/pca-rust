@@ -11,7 +11,7 @@ use super::{canonicalize_strict, MAX_SAFE};
 pub(crate) const MAX_SESSION_ACCUMULATORS: usize = 16;
 pub(crate) const MAX_SESSION_MONITORS: usize = 16;
 const MAX_MONITOR_WITHIN: i64 = 64;
-const ACC_AGGS: [&str; 4] = ["sum", "count", "distinct", "max"];
+pub(crate) const ACC_AGGS: [&str; 4] = ["sum", "count", "distinct", "max"];
 const MONITOR_KINDS: [&str; 5] = ["requires_prior", "precedes", "never", "always", "responds_within"];
 pub(crate) const ACC_RECEIPT_DOMAIN: &str = "atlas-pca/acc-receipt/v1\0";
 pub(crate) const ACC_RECEIPT_REF_DOMAIN: &str = "atlas-pca/acc-receipt-ref/v1";

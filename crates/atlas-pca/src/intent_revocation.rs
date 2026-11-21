@@ -91,7 +91,7 @@ pub fn revocation_epoch_shape_error(ep: &Value) -> Option<String> {
 /// `checkRevocationEpoch(ep, {guardianPublic, now, grantRef, pqPins})` on a shape-checked epoch: the signature through
 /// the suite dispatch, a PQ suite only under the PQ key PINNED for the guardian; then scope, `now <= not_after` and
 /// `issued_at <= now + 60 s`.
-fn check_revocation_epoch(o: &Map<String, Value>, guardian: &str, now: f64, grant_ref: &str, pin: Option<(&str, &Value)>) -> Result<(), String> {
+pub(crate) fn check_revocation_epoch(o: &Map<String, Value>, guardian: &str, now: f64, grant_ref: &str, pin: Option<(&str, &Value)>) -> Result<(), String> {
     if s(o.get("guardian")) != Some(guardian) {
         return Err("revocation epoch not signed by the pinned guardian".into());
     }
@@ -196,7 +196,8 @@ pub fn check_session_revocation(
         }
         let le = le.as_object().ok_or_else(malformed)?;
         let last_list = revoked_list(le, lo.get("revoked")).map_err(|_| malformed())?;
-        let (e_now, e_last) = (nonneg(o.get("epoch")).unwrap_or(-1), nonneg(le.get("epoch")).unwrap_or(-1));
+        // both epochs passed revocation_epoch_shape_error, which requires a non-negative safe integer epoch
+        let (Some(e_now), Some(e_last)) = (nonneg(o.get("epoch")), nonneg(le.get("epoch"))) else { return Err(malformed()) };
         if e_now < e_last {
             return Err("revocation epoch rollback (older than the last accepted)".into());
         }

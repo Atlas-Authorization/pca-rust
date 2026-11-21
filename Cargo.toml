@@ -35,3 +35,14 @@ opt-level = 3
 # `-p stark-pca` — passes.
 [profile.test]
 debug-assertions = false
+
+# The mutation runs' test profile (cargo mutants --profile mutants): the unoptimized suite took ~42 min per mutant (crypto and
+# the k05 oracle corpora), so no shard could finish. Dependencies are built once at full optimization; the mutated crate is
+# rebuilt per mutant, so it gets a cheaper level. Overflow checks stay on (inherited), as in every test build.
+[profile.mutants]
+inherits = "test"
+opt-level = 1
+debug = false
+
+[profile.mutants.package."*"]
+opt-level = 3

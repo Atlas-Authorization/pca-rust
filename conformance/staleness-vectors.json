@@ -1,0 +1,2943 @@
+{
+  "format": 1,
+  "generator": "packages/pca/scripts/gen-conformance-native-parity.ts",
+  "suite": "revocation-staleness",
+  "layer": "extension",
+  "description": "Revocation staleness (T9). `constants`; `max_age` (per-class window from a policy); `effective_reversibility` (stricter of server and signed class; missing or unknown = irreversible); `age` (checkRevocationAge); `epoch` (signed guardian epoch, Ed25519, check with an optional verifier-side cap; `alg` of an unregistered suite must be refused); `gate` (the whole decision for a signed epoch / a bare root / nothing under a policy and a class: `mode` epoch|root|none, `root_issued_at: null` = unknown age). Strings \"NaN\" stand for a NaN number (those cases carry `ok_only`: compare `ok` only, a NaN has no portable text). Reasons compared exactly. `revocation_set` is the sorted set (UTF-8 byte order, root bound to the size) the next two tables use; `membership` (verifyNonMembership: root, id, proof -> ok; `set` names which set the root is: main, one, empty or the wrong one); `gate_ids` (the whole checker with a signed epoch over the main set, issued `epoch_issued_at`, `ids` to prove, `proofs` keyed by id (absent = none supplied), compared on ok and reason exactly).",
+  "constants": {
+    "refresh_ms": 60000,
+    "validity_ms": 300000,
+    "irreversible_max_age_ms": 120000,
+    "skew_ms": 60000
+  },
+  "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+  "revocation_root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+  "max_age": [
+    {
+      "policy": {},
+      "class": "reversible",
+      "max_age_ms": 300000
+    },
+    {
+      "policy": {},
+      "class": "costly",
+      "max_age_ms": 300000
+    },
+    {
+      "policy": {},
+      "class": "irreversible",
+      "max_age_ms": 120000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 60000
+      },
+      "class": "reversible",
+      "max_age_ms": 60000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 60000
+      },
+      "class": "costly",
+      "max_age_ms": 60000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 60000
+      },
+      "class": "irreversible",
+      "max_age_ms": 60000
+    },
+    {
+      "policy": {
+        "staleness": {
+          "costly": 90000,
+          "irreversible": 10000
+        }
+      },
+      "class": "reversible",
+      "max_age_ms": 300000
+    },
+    {
+      "policy": {
+        "staleness": {
+          "costly": 90000,
+          "irreversible": 10000
+        }
+      },
+      "class": "costly",
+      "max_age_ms": 90000
+    },
+    {
+      "policy": {
+        "staleness": {
+          "costly": 90000,
+          "irreversible": 10000
+        }
+      },
+      "class": "irreversible",
+      "max_age_ms": 10000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 50000,
+        "staleness": {
+          "costly": 90000
+        }
+      },
+      "class": "reversible",
+      "max_age_ms": 50000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 50000,
+        "staleness": {
+          "costly": 90000
+        }
+      },
+      "class": "costly",
+      "max_age_ms": 50000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 50000,
+        "staleness": {
+          "costly": 90000
+        }
+      },
+      "class": "irreversible",
+      "max_age_ms": 50000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 500000,
+        "staleness": {
+          "irreversible": 300000
+        }
+      },
+      "class": "reversible",
+      "max_age_ms": 500000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 500000,
+        "staleness": {
+          "irreversible": 300000
+        }
+      },
+      "class": "costly",
+      "max_age_ms": 500000
+    },
+    {
+      "policy": {
+        "maxRevocationAgeMs": 500000,
+        "staleness": {
+          "irreversible": 300000
+        }
+      },
+      "class": "irreversible",
+      "max_age_ms": 300000
+    }
+  ],
+  "effective_reversibility": [
+    {
+      "server_class": null,
+      "signed_class": null,
+      "effective": "irreversible"
+    },
+    {
+      "server_class": "reversible",
+      "signed_class": null,
+      "effective": "irreversible"
+    },
+    {
+      "server_class": "reversible",
+      "signed_class": "reversible",
+      "effective": "reversible"
+    },
+    {
+      "server_class": "costly",
+      "signed_class": null,
+      "effective": "irreversible"
+    },
+    {
+      "server_class": "rate_limited",
+      "signed_class": null,
+      "effective": "irreversible"
+    },
+    {
+      "server_class": null,
+      "signed_class": "rate_limited",
+      "effective": "rate_limited"
+    },
+    {
+      "server_class": "reversible",
+      "signed_class": "costly",
+      "effective": "rate_limited"
+    },
+    {
+      "server_class": "costly",
+      "signed_class": "reversible",
+      "effective": "rate_limited"
+    },
+    {
+      "server_class": "reversible",
+      "signed_class": "irreversible",
+      "effective": "irreversible"
+    },
+    {
+      "server_class": "irreversible",
+      "signed_class": "reversible",
+      "effective": "irreversible"
+    },
+    {
+      "server_class": "bogus",
+      "signed_class": "reversible",
+      "effective": "irreversible"
+    },
+    {
+      "server_class": "reversible",
+      "signed_class": "bogus",
+      "effective": "irreversible"
+    },
+    {
+      "server_class": null,
+      "signed_class": 7,
+      "effective": "irreversible"
+    },
+    {
+      "server_class": "reversible",
+      "signed_class": null,
+      "effective": "irreversible"
+    }
+  ],
+  "age": [
+    {
+      "issued_at": 1800000000000,
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "issued_at": 1799999999000,
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "issued_at": 1799999998999,
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": false,
+        "reason": "revocation state is 1001 ms old, over the verifier's maximum of 1000 ms (stale revocation state)"
+      }
+    },
+    {
+      "issued_at": 1800000060000,
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "issued_at": 1800000060001,
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": false,
+        "reason": "revocation state issued in the future"
+      }
+    },
+    {
+      "issued_at": null,
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": false,
+        "reason": "revocation state age is unknown (unverifiable revocation state)"
+      }
+    },
+    {
+      "issued_at": "NaN",
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "what": "revocation root",
+      "result": {
+        "ok": false,
+        "reason": "revocation root age is unknown (unverifiable revocation state)"
+      }
+    },
+    {
+      "issued_at": "x",
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": false,
+        "reason": "revocation state age is unknown (unverifiable revocation state)"
+      }
+    },
+    {
+      "issued_at": null,
+      "now": 1800000000000,
+      "max_age_ms": 1000,
+      "result": {
+        "ok": false,
+        "reason": "revocation state age is unknown (unverifiable revocation state)"
+      }
+    },
+    {
+      "issued_at": 1799999999999,
+      "now": 1800000000000,
+      "max_age_ms": "NaN",
+      "ok_only": true,
+      "result": {
+        "ok": false,
+        "reason": "revocation state is 1 ms old, over the verifier's maximum of NaN ms (stale revocation state)"
+      }
+    },
+    {
+      "issued_at": 1799999999999,
+      "now": 1800000000000,
+      "max_age_ms": 0,
+      "result": {
+        "ok": false,
+        "reason": "revocation state is 1 ms old, over the verifier's maximum of 0 ms (stale revocation state)"
+      }
+    },
+    {
+      "issued_at": 1799999999999,
+      "now": 1800000000000,
+      "max_age_ms": -5,
+      "result": {
+        "ok": false,
+        "reason": "revocation state is 1 ms old, over the verifier's maximum of -5 ms (stale revocation state)"
+      }
+    },
+    {
+      "issued_at": 1800000000000,
+      "now": 1800000000000,
+      "max_age_ms": 0,
+      "what": "revocation root",
+      "result": {
+        "ok": true
+      }
+    }
+  ],
+  "epoch": [
+    {
+      "name": "valid-no-cap",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "older-than-cap",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "max_age_ms": 120000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 200000 ms old, over the verifier's maximum of 120000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "exactly-at-cap",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "max_age_ms": 200000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "one-ms-over-cap",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "max_age_ms": 199999,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 200000 ms old, over the verifier's maximum of 199999 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "nan-cap-fails-closed",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "max_age_ms": "NaN",
+      "ok_only": true,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 200000 ms old, over the verifier's maximum of NaN ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "zero-cap",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "WbMJlHJtVbUmODVnL3jH9H5X0IV2lQO4xkK4K2Mh_RIGKtpC1Ob4DfQFmHa1tCpWyS4Ib-zLJ1VN8NydTvNvDg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "max_age_ms": 0,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "expired-before-cap",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999300000,
+        "not_after": 1799999900000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "G2iW7sAEiLxAP_c8CqK0KYd-9abUWB1szDdiIqEkuzs2EV1Dr35yz83MlywxnJKXASCUe1dHwXd6ieeIqwuFDQ"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch expired (stale revocation root)"
+      }
+    },
+    {
+      "name": "not-after-boundary",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999999990,
+        "not_after": 1800000000000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "e2MVedHZXdCcSGedv6i2nLxbOP-fw5JCNjgOaseTH5C3SL2QWh-VDNbOhj2kFC3wRJHeQGfktZeZmLBvNMFaAg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "issued-in-future",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000060001,
+        "not_after": 1800000660001,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "vNR3CGJ1juZfiFrZYO3_oQgwotnnINhEP7VGbozEA1GW3qVRc6sBRz2qEHqr5g2iJ-sPldEiYQ1f-naeAQI1BQ"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch issued in the future"
+      }
+    },
+    {
+      "name": "issued-60s-ahead-ok",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000060000,
+        "not_after": 1800000660000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "IkVlvhKtaJYK8HeS7-AZr1r1VZTWM8dPowgn_1OMp29FOdQaezW_-J4Y7WWH8BJcOwjaS2c84gJ6GDRxxq_oBg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "wrong-guardian",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "C1E62bSSQBXKCQLtB5BE06xdvsIwbwaUjBDajrbjny0",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch not signed by the pinned guardian"
+      }
+    },
+    {
+      "name": "wrong-grant",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "grant_ref": "g2",
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is for a different grant"
+      }
+    },
+    {
+      "name": "right-grant",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999800000,
+        "not_after": 1800000400000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Ea7nxr44sFCYFbEHfPUoMJ-innV2S5nc3rcw8tc9avOOstKgjVCnQ_08w_6pk3MEkXP67D2bJB7BJUTondf5DA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "grant_ref": "g1",
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "rollback",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 3,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "O3u8zKBJH-ZvWcjNYE4I_Aae5g3Ir-d4-EoC7PJdb7FCjheRDmR-CAQFqHd7H-vtlcqqanFnNBMKdGcdXQ4zAA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "last_accepted_epoch": 4,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch 3 is older than the last accepted 4 (rollback)"
+      }
+    },
+    {
+      "name": "same-epoch-ok",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 4,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "6TYM1w4p0jhi0vEmB0xcsVRRbUPEYPHHIB4ZphKk7bT5e4qwc1k-PD1P_wpQOqeAqkPK6trDVqS1dWen9q4YAA"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "last_accepted_epoch": 4,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "pcactn-predates-epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 5,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "t6fnCxxtj-GU_mpqkGOO-Y_Tb8eIzkqFQIOK4uKemskTKtdDocFOGAzprfzge39XBrpWYmT6K47m9DJwKjc_Dw"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "pcactn_epoch": 4,
+      "result": {
+        "ok": false,
+        "reason": "PCActn freshness.epoch 4 predates the revocation epoch 5"
+      }
+    },
+    {
+      "name": "pcactn-epoch-ok",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 5,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "t6fnCxxtj-GU_mpqkGOO-Y_Tb8eIzkqFQIOK4uKemskTKtdDocFOGAzprfzge39XBrpWYmT6K47m9DJwKjc_Dw"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "pcactn_epoch": 5,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "tampered-root",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "WbMJlHJtVbUmODVnL3jH9H5X0IV2lQO4xkK4K2Mh_RIGKtpC1Ob4DfQFmHa1tCpWyS4Ib-zLJ1VN8NydTvNvDg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch signature invalid"
+      }
+    },
+    {
+      "name": "tampered-issued-at",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999999999,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "WbMJlHJtVbUmODVnL3jH9H5X0IV2lQO4xkK4K2Mh_RIGKtpC1Ob4DfQFmHa1tCpWyS4Ib-zLJ1VN8NydTvNvDg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch signature invalid"
+      }
+    },
+    {
+      "name": "tampered-sig",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch signature invalid"
+      }
+    },
+    {
+      "name": "unknown-suite",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "WbMJlHJtVbUmODVnL3jH9H5X0IV2lQO4xkK4K2Mh_RIGKtpC1Ob4DfQFmHa1tCpWyS4Ib-zLJ1VN8NydTvNvDg",
+        "alg": "no-such-suite"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch not signed by the pinned guardian"
+      }
+    },
+    {
+      "name": "fractional-issued-at",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000.5,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "WbMJlHJtVbUmODVnL3jH9H5X0IV2lQO4xkK4K2Mh_RIGKtpC1Ob4DfQFmHa1tCpWyS4Ib-zLJ1VN8NydTvNvDg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "malformed revocation epoch"
+      }
+    },
+    {
+      "name": "string-issued-at",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": "1800000000000",
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "WbMJlHJtVbUmODVnL3jH9H5X0IV2lQO4xkK4K2Mh_RIGKtpC1Ob4DfQFmHa1tCpWyS4Ib-zLJ1VN8NydTvNvDg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "malformed revocation epoch"
+      }
+    },
+    {
+      "name": "negative-epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": -1,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1800000000000,
+        "not_after": 1800000600000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "WbMJlHJtVbUmODVnL3jH9H5X0IV2lQO4xkK4K2Mh_RIGKtpC1Ob4DfQFmHa1tCpWyS4Ib-zLJ1VN8NydTvNvDg"
+      },
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "malformed revocation epoch"
+      }
+    },
+    {
+      "name": "null-epoch",
+      "epoch": null,
+      "guardian_public": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch not signed by the pinned guardian"
+      }
+    }
+  ],
+  "gate": [
+    {
+      "name": "epoch-reversible-fresh",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "reversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999970000,
+        "not_after": 1800000570000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "3W9Pg9emIiz79DpimsPK86W74doXU_EphVPjiBzGOfmAWGfnLmvUkxYfXbQmYYZIXBzZDddV-k7QWlu0rGUAAw"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "epoch-reversible-3min",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "reversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999820000,
+        "not_after": 1800000420000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "3OBhNpSeX0Djn_0JuVtkZ389Lke33TuC2K9mxQoTQj_uMR2MIlUPlMn0R8GSvxrvqEbMmtZQxvf_yp_T2xBXBg"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "epoch-reversible-6min",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "reversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999640000,
+        "not_after": 1800000240000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "YcCrRDTpAdXpO3tpH5gBpGTw4RGfL1-hMgz6UWa1mN0FCuB73f3cA9NYJimRoFCTA4O-97K4FjRw3KW7N-I-Cg"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 360000 ms old, over the verifier's maximum of 300000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "root-reversible-fresh",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "reversible",
+      "mode": "root",
+      "root_issued_at": 1799999970000,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "root-reversible-unknown-age",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "reversible",
+      "mode": "root",
+      "root_issued_at": null,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation root age is unknown (unverifiable revocation state)"
+      }
+    },
+    {
+      "name": "epoch-costly-fresh",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "costly",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999970000,
+        "not_after": 1800000570000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "3W9Pg9emIiz79DpimsPK86W74doXU_EphVPjiBzGOfmAWGfnLmvUkxYfXbQmYYZIXBzZDddV-k7QWlu0rGUAAw"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "epoch-costly-3min",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "costly",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999820000,
+        "not_after": 1800000420000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "3OBhNpSeX0Djn_0JuVtkZ389Lke33TuC2K9mxQoTQj_uMR2MIlUPlMn0R8GSvxrvqEbMmtZQxvf_yp_T2xBXBg"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "epoch-costly-6min",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "costly",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999640000,
+        "not_after": 1800000240000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "YcCrRDTpAdXpO3tpH5gBpGTw4RGfL1-hMgz6UWa1mN0FCuB73f3cA9NYJimRoFCTA4O-97K4FjRw3KW7N-I-Cg"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 360000 ms old, over the verifier's maximum of 300000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "root-costly-fresh",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "costly",
+      "mode": "root",
+      "root_issued_at": 1799999970000,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "root-costly-unknown-age",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "costly",
+      "mode": "root",
+      "root_issued_at": null,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation root age is unknown (unverifiable revocation state)"
+      }
+    },
+    {
+      "name": "epoch-irreversible-fresh",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "irreversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999970000,
+        "not_after": 1800000570000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "3W9Pg9emIiz79DpimsPK86W74doXU_EphVPjiBzGOfmAWGfnLmvUkxYfXbQmYYZIXBzZDddV-k7QWlu0rGUAAw"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "epoch-irreversible-3min",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "irreversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999820000,
+        "not_after": 1800000420000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "3OBhNpSeX0Djn_0JuVtkZ389Lke33TuC2K9mxQoTQj_uMR2MIlUPlMn0R8GSvxrvqEbMmtZQxvf_yp_T2xBXBg"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 180000 ms old, over the verifier's maximum of 120000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "epoch-irreversible-6min",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "irreversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999640000,
+        "not_after": 1800000240000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "YcCrRDTpAdXpO3tpH5gBpGTw4RGfL1-hMgz6UWa1mN0FCuB73f3cA9NYJimRoFCTA4O-97K4FjRw3KW7N-I-Cg"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 360000 ms old, over the verifier's maximum of 120000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "root-irreversible-fresh",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "irreversible",
+      "mode": "root",
+      "root_issued_at": 1799999970000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "unsigned revocation root refused for an irreversible action (needs a guardian-signed epoch)"
+      }
+    },
+    {
+      "name": "root-irreversible-unknown-age",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "irreversible",
+      "mode": "root",
+      "root_issued_at": null,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "unsigned revocation root refused for an irreversible action (needs a guardian-signed epoch)"
+      }
+    },
+    {
+      "name": "root-irreversible-allowed-fresh",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "allow_unsigned_root_for_irreversible": true,
+      "signed_class": "irreversible",
+      "mode": "root",
+      "root_issued_at": 1799999970000,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "root-irreversible-allowed-stale",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "allow_unsigned_root_for_irreversible": true,
+      "signed_class": "irreversible",
+      "mode": "root",
+      "root_issued_at": 1799999870000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation root is 130000 ms old, over the verifier's maximum of 120000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "no-class-is-irreversible",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999870000,
+        "not_after": 1800000470000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Gp_86ryGVInOPAaLxSdE7srEbOKf3N2QErby1oIIF-Pa281MB3bSPvYydUqnYVlkulLEPMew7zWUgpe7ke8zAw"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 130000 ms old, over the verifier's maximum of 120000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "server-class-stricter",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "server_class": "irreversible",
+      "signed_class": "reversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999870000,
+        "not_after": 1800000470000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "Gp_86ryGVInOPAaLxSdE7srEbOKf3N2QErby1oIIF-Pa281MB3bSPvYydUqnYVlkulLEPMew7zWUgpe7ke8zAw"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 130000 ms old, over the verifier's maximum of 120000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "signed-class-cannot-loosen",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "server_class": "irreversible",
+      "signed_class": "reversible",
+      "mode": "root",
+      "root_issued_at": 1799999999999,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "unsigned revocation root refused for an irreversible action (needs a guardian-signed epoch)"
+      }
+    },
+    {
+      "name": "custom-window",
+      "policy": {
+        "staleness": {
+          "irreversible": 10000
+        }
+      },
+      "signed_class": "irreversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999989999,
+        "not_after": 1800000589999,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "7KirPDtIgcs_WCSH8NR61X0qpbXVCYTPhyGRLFiggHkHNC9d5i4LMRcie1llAs0CiflNQ6rRKRjfdTC3QlNnDA"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 10001 ms old, over the verifier's maximum of 10000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "custom-window-at-limit",
+      "policy": {
+        "staleness": {
+          "irreversible": 10000
+        }
+      },
+      "signed_class": "irreversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999990000,
+        "not_after": 1800000590000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "GMOuAmNHdlnX0afZavRID9PpUdN_wNsyyMX0rEn_UXLIbWb0vM1HzUo06NRuOZ-xH26ShBHC8J2XOwYpEIMIDQ"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "costly-window",
+      "policy": {
+        "staleness": {
+          "costly": 60000
+        }
+      },
+      "signed_class": "costly",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999939000,
+        "not_after": 1800000539000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "SGBt12RBvjG7Qm4tJKEKSY-YKKNXZpMIH1l-CSloNtxzmbJhYFGuI7PJ-hlmrhYwYY9eZamwZxUuha9yrjbTBw"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 61000 ms old, over the verifier's maximum of 60000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "no-policy-old-epoch-ok",
+      "mode": "epoch",
+      "signed_class": "irreversible",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999750000,
+        "not_after": 1800000350000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "JEbswUQJA9Q_-Bt_8cKGg1CeInP8cmHryd9vRwWHXllqtCzWlFhFY3KIuhbeRxmbR2SKDuXtUtyEIzvH5kOmBQ"
+      },
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "no-policy-root-no-age",
+      "mode": "root",
+      "signed_class": "irreversible",
+      "root_issued_at": null,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "no-epoch-supplied",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "mode": "none",
+      "signed_class": "reversible",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "no signed revocation epoch"
+      }
+    },
+    {
+      "name": "root-mismatch",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "reversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999999000,
+        "not_after": 1800000599000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "g0xgQdPzj4ms079_vsJtsCU14fIAchxHQATXF0EufBPCgRuX6f7gL72X8Su7O6L--dQ6t8WWORnT4afiEr6CBg"
+      },
+      "bare_root": "BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU",
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation root does not match the signed epoch"
+      }
+    },
+    {
+      "name": "root-match",
+      "policy": {
+        "maxRevocationAgeMs": 300000
+      },
+      "signed_class": "reversible",
+      "mode": "epoch",
+      "epoch": {
+        "instance_id": "i",
+        "grant_ref": "g1",
+        "epoch": 0,
+        "set_size": 1,
+        "root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+        "issued_at": 1799999999000,
+        "not_after": 1800000599000,
+        "guardian": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+        "sig": "g0xgQdPzj4ms079_vsJtsCU14fIAchxHQATXF0EufBPCgRuX6f7gL72X8Su7O6L--dQ6t8WWORnT4afiEr6CBg"
+      },
+      "bare_root": "4zZceBFADmbJhF6OqFipDK0VMyWgdK3uNXUsLAfU-Co",
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    }
+  ],
+  "revocation_set": {
+    "ids": [
+      "cap-b",
+      "cap-d",
+      "cap-f",
+      "cap-é",
+      "cap-￿",
+      "cap-😀"
+    ],
+    "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+    "size": 6,
+    "empty_root": "JW0KqD54TdCDuAJBWPZxeGMeZji91AqTmqggkVvh8b8",
+    "single": {
+      "ids": [
+        "only"
+      ],
+      "root": "aljWFU0lcoMmtfwOqr5SdustSBzUz0M9abKIUDDsf_E"
+    }
+  },
+  "membership": [
+    {
+      "name": "valid-5-6361702d61",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-a",
+      "proof": {
+        "size": 6,
+        "hi": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-5-6361702d63",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-5-6361702d65",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-e",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-f",
+          "proof": {
+            "index": 2,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "0QzSHBXsu5jub8b6fjW05Th-zB7BBoVU8SsBhwvnYsI"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-5-6361702d67",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-g",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-f",
+          "proof": {
+            "index": 2,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "0QzSHBXsu5jub8b6fjW05Th-zB7BBoVU8SsBhwvnYsI"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-é",
+          "proof": {
+            "index": 3,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Y3UXfjNg3S5VPEb1NcARoMUIIB8cff8BUj5-1o52J5Y"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-5-6361702de8",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-è",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-f",
+          "proof": {
+            "index": 2,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "0QzSHBXsu5jub8b6fjW05Th-zB7BBoVU8SsBhwvnYsI"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-é",
+          "proof": {
+            "index": 3,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Y3UXfjNg3S5VPEb1NcARoMUIIB8cff8BUj5-1o52J5Y"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-6-6361702d1f601",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-😁",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-😀",
+          "proof": {
+            "index": 5,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "q1lNz6so5kzjzyntq2AowypanB_OJA1rf0jNZqiTrls"
+              },
+              {
+                "side": "L",
+                "hash": "R5CBv-TZ-qgKf3AODKMzVrSrVBWqKY8dbWumvIxZIYU"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-5-6361702dd7ff",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-퟿",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-é",
+          "proof": {
+            "index": 3,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Y3UXfjNg3S5VPEb1NcARoMUIIB8cff8BUj5-1o52J5Y"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-￿",
+          "proof": {
+            "index": 4,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "iakobepTjmnoQcbKKbGKM6ZtFZ_bmKt14ZTnbHzTHEI"
+              },
+              {
+                "side": "L",
+                "hash": "R5CBv-TZ-qgKf3AODKMzVrSrVBWqKY8dbWumvIxZIYU"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-4-6361702d",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-",
+      "proof": {
+        "size": 6,
+        "hi": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-3-7a7a7a",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "zzz",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-😀",
+          "proof": {
+            "index": 5,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "q1lNz6so5kzjzyntq2AowypanB_OJA1rf0jNZqiTrls"
+              },
+              {
+                "side": "L",
+                "hash": "R5CBv-TZ-qgKf3AODKMzVrSrVBWqKY8dbWumvIxZIYU"
+              }
+            ]
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-below-minimum",
+      "set": "one",
+      "root": "aljWFU0lcoMmtfwOqr5SdustSBzUz0M9abKIUDDsf_E",
+      "id": "a",
+      "proof": {
+        "size": 1,
+        "hi": {
+          "id": "only",
+          "proof": {
+            "index": 0,
+            "size": 1,
+            "path": []
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-above-maximum",
+      "set": "one",
+      "root": "aljWFU0lcoMmtfwOqr5SdustSBzUz0M9abKIUDDsf_E",
+      "id": "z",
+      "proof": {
+        "size": 1,
+        "lo": {
+          "id": "only",
+          "proof": {
+            "index": 0,
+            "size": 1,
+            "path": []
+          }
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "valid-empty-set",
+      "set": "empty",
+      "root": "JW0KqD54TdCDuAJBWPZxeGMeZji91AqTmqggkVvh8b8",
+      "id": "anything",
+      "proof": {
+        "size": 0
+      },
+      "ok": true
+    },
+    {
+      "name": "empty-set-proof-for-non-empty-root",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-a",
+      "proof": {
+        "size": 0
+      },
+      "ok": false
+    },
+    {
+      "name": "revoked-id-with-neighbour-proof",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-d",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "revoked-id-with-empty-proof",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-d",
+      "proof": {
+        "size": 6
+      },
+      "ok": false
+    },
+    {
+      "name": "proof-for-another-id",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-a",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-f",
+          "proof": {
+            "index": 2,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "0QzSHBXsu5jub8b6fjW05Th-zB7BBoVU8SsBhwvnYsI"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-é",
+          "proof": {
+            "index": 3,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "Y3UXfjNg3S5VPEb1NcARoMUIIB8cff8BUj5-1o52J5Y"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "tampered-sibling",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ApozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "lo-id-swapped",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-a",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "size-mismatch",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 7,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "wrong-root",
+      "set": "main",
+      "root": "aljWFU0lcoMmtfwOqr5SdustSBzUz0M9abKIUDDsf_E",
+      "id": "cap-c",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "lo-only-but-not-last",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "hi-only-but-not-first",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6,
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "non-adjacent-neighbours",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-f",
+          "proof": {
+            "index": 2,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "0QzSHBXsu5jub8b6fjW05Th-zB7BBoVU8SsBhwvnYsI"
+              },
+              {
+                "side": "L",
+                "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "negative-size",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": -1,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "fractional-size",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6.5,
+        "lo": {
+          "id": "cap-b",
+          "proof": {
+            "index": 0,
+            "size": 6,
+            "path": [
+              {
+                "side": "R",
+                "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        },
+        "hi": {
+          "id": "cap-d",
+          "proof": {
+            "index": 1,
+            "size": 6,
+            "path": [
+              {
+                "side": "L",
+                "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+              },
+              {
+                "side": "R",
+                "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+              },
+              {
+                "side": "R",
+                "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+              }
+            ]
+          }
+        }
+      },
+      "ok": false
+    },
+    {
+      "name": "null-proof",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": null,
+      "ok": false
+    },
+    {
+      "name": "no-neighbours",
+      "set": "main",
+      "root": "Jii-_4nPN99wUd6wteaAKHmc-v2lwrdPxi1IR2TjdPU",
+      "id": "cap-c",
+      "proof": {
+        "size": 6
+      },
+      "ok": false
+    }
+  ],
+  "gate_ids": [
+    {
+      "name": "all-clear",
+      "ids": [
+        "cap-a",
+        "cap-c"
+      ],
+      "proofs": {
+        "cap-a": {
+          "size": 6,
+          "hi": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        },
+        "cap-c": {
+          "size": 6,
+          "lo": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          },
+          "hi": {
+            "id": "cap-d",
+            "proof": {
+              "index": 1,
+              "size": 6,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "single-clear",
+      "ids": [
+        "cap-e"
+      ],
+      "proofs": {
+        "cap-e": {
+          "size": 6,
+          "lo": {
+            "id": "cap-d",
+            "proof": {
+              "index": 1,
+              "size": 6,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          },
+          "hi": {
+            "id": "cap-f",
+            "proof": {
+              "index": 2,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "0QzSHBXsu5jub8b6fjW05Th-zB7BBoVU8SsBhwvnYsI"
+                },
+                {
+                  "side": "L",
+                  "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "no-ids",
+      "ids": [],
+      "proofs": {},
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "name": "one-revoked",
+      "ids": [
+        "cap-a",
+        "cap-d"
+      ],
+      "proofs": {
+        "cap-a": {
+          "size": 6,
+          "hi": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        },
+        "cap-d": {
+          "size": 6,
+          "lo": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          },
+          "hi": {
+            "id": "cap-d",
+            "proof": {
+              "index": 1,
+              "size": 6,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "fyTEpJ7Lju1p_Ludx9rUblCqTbhU5zgqygOegVHQCnU"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "capability cap-d is revoked or proof invalid"
+      }
+    },
+    {
+      "name": "revoked-first",
+      "ids": [
+        "cap-b",
+        "cap-a"
+      ],
+      "proofs": {
+        "cap-b": {
+          "size": 6,
+          "hi": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        },
+        "cap-a": {
+          "size": 6,
+          "hi": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "capability cap-b is revoked or proof invalid"
+      }
+    },
+    {
+      "name": "proof-missing",
+      "ids": [
+        "cap-a",
+        "cap-c"
+      ],
+      "proofs": {
+        "cap-a": {
+          "size": 6,
+          "hi": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "no non-membership proof for cap-c"
+      }
+    },
+    {
+      "name": "proof-missing-first",
+      "ids": [
+        "cap-c",
+        "cap-a"
+      ],
+      "proofs": {
+        "cap-a": {
+          "size": 6,
+          "hi": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "no non-membership proof for cap-c"
+      }
+    },
+    {
+      "name": "proof-for-other-id",
+      "ids": [
+        "cap-a"
+      ],
+      "proofs": {
+        "cap-a": {
+          "size": 6,
+          "lo": {
+            "id": "cap-f",
+            "proof": {
+              "index": 2,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "0QzSHBXsu5jub8b6fjW05Th-zB7BBoVU8SsBhwvnYsI"
+                },
+                {
+                  "side": "L",
+                  "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          },
+          "hi": {
+            "id": "cap-é",
+            "proof": {
+              "index": 3,
+              "size": 6,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "Y3UXfjNg3S5VPEb1NcARoMUIIB8cff8BUj5-1o52J5Y"
+                },
+                {
+                  "side": "L",
+                  "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "capability cap-a is revoked or proof invalid"
+      }
+    },
+    {
+      "name": "stale-epoch-with-valid-proofs",
+      "ids": [
+        "cap-a"
+      ],
+      "proofs": {
+        "cap-a": {
+          "size": 6,
+          "hi": {
+            "id": "cap-b",
+            "proof": {
+              "index": 0,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "ZpozqNTTqDhWnnKcFHYKaAjomYn9LvQ1zgYi7olWxBg"
+                },
+                {
+                  "side": "R",
+                  "hash": "zqw3biI4MODFh6vbjpIjbcg0AWnzMJYcRaYmb17EAJg"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999600000,
+      "now": 1800000000000,
+      "result": {
+        "ok": false,
+        "reason": "revocation epoch is 400000 ms old, over the verifier's maximum of 300000 ms (stale revocation state)"
+      }
+    },
+    {
+      "name": "non-bmp-ordering",
+      "ids": [
+        "cap-😁",
+        "cap-퟿"
+      ],
+      "proofs": {
+        "cap-😁": {
+          "size": 6,
+          "lo": {
+            "id": "cap-😀",
+            "proof": {
+              "index": 5,
+              "size": 6,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "q1lNz6so5kzjzyntq2AowypanB_OJA1rf0jNZqiTrls"
+                },
+                {
+                  "side": "L",
+                  "hash": "R5CBv-TZ-qgKf3AODKMzVrSrVBWqKY8dbWumvIxZIYU"
+                }
+              ]
+            }
+          }
+        },
+        "cap-퟿": {
+          "size": 6,
+          "lo": {
+            "id": "cap-é",
+            "proof": {
+              "index": 3,
+              "size": 6,
+              "path": [
+                {
+                  "side": "L",
+                  "hash": "Y3UXfjNg3S5VPEb1NcARoMUIIB8cff8BUj5-1o52J5Y"
+                },
+                {
+                  "side": "L",
+                  "hash": "INfwd2DaB4q0gQ4A1ZsnrLe6Rgt2o1PIid2IqfKK2CY"
+                },
+                {
+                  "side": "R",
+                  "hash": "FPViw8URANsVP1GH5ICrUleaug6JM5ETbzbi_0oLu4Y"
+                }
+              ]
+            }
+          },
+          "hi": {
+            "id": "cap-￿",
+            "proof": {
+              "index": 4,
+              "size": 6,
+              "path": [
+                {
+                  "side": "R",
+                  "hash": "iakobepTjmnoQcbKKbGKM6ZtFZ_bmKt14ZTnbHzTHEI"
+                },
+                {
+                  "side": "L",
+                  "hash": "R5CBv-TZ-qgKf3AODKMzVrSrVBWqKY8dbWumvIxZIYU"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "epoch_issued_at": 1799999999000,
+      "now": 1800000000000,
+      "result": {
+        "ok": true
+      }
+    }
+  ]
+}

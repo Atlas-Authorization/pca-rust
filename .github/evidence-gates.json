@@ -1,0 +1,57 @@
+{
+  "about": "Gates the release evidence report looks up for a release of this repository (release-evidence.mjs). A gate is decided by the newest completed run at the release commit, else on the release-candidate branches. Gates in Atlas-Authorization/pca are looked up at that repository's tag of the same version.",
+  "release": "atlas-pca, stark-pca and pca-folding-ivc (crates.io)",
+  "rc_branches": [
+    "ci/{version}-rc",
+    "ci/{version}-rc-fix"
+  ],
+  "gates": [
+    {
+      "id": "ci",
+      "label": "CI: workspace, atlas-pca on Linux / macOS / Windows, zkVM receipt verifier",
+      "workflow": "ci.yml",
+      "required": true,
+      "jobs": true
+    },
+    {
+      "id": "mutation",
+      "label": "Mutation testing (cargo-mutants) merge",
+      "workflow": "mutation.yml",
+      "required": true,
+      "job": "merge",
+      "artifacts": [
+        {
+          "name": "mutation-summary",
+          "file": "mutation-summary.json",
+          "kind": "mutation"
+        }
+      ]
+    },
+    {
+      "id": "cross-language",
+      "label": "Cross-language gate (this verifier against the other 8)",
+      "repo": "Atlas-Authorization/pca",
+      "workflow": "cross-language.yml",
+      "required": true,
+      "jobs": true,
+      "artifacts": [
+        {
+          "name": "cross-language-matrix-Linux",
+          "file": "report.json",
+          "kind": "cross-language"
+        }
+      ]
+    },
+    {
+      "id": "formal-kani",
+      "label": "Kani bounded model checking of the Rust verifier",
+      "repo": "Atlas-Authorization/pca",
+      "workflow": "formal-kani.yml",
+      "required": true
+    }
+  ],
+  "known_exceptions": [
+    "crates.io keeps no provenance: the attested .crate files on this Release and the index checksum comparison are the record.",
+    "stark-pca is in the experimental maturity tier and pca-folding-ivc in the hardened tier (awaiting audit); the axum middleware of atlas-pca checks the proof only (no caveats, replay or revocation) (https://github.com/Atlas-Authorization/pca/blob/main/docs/maturity.md)."
+  ]
+}

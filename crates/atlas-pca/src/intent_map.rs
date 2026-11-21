@@ -300,6 +300,7 @@ fn metrics_error(m: &Value) -> Option<String> {
         return Some(format!("the metrics leaf must be exactly {{{}, log2_vs_mbits?}}", METRIC_FIELDS.join(", ")));
     }
     for k in METRIC_FIELDS.iter().copied().chain(["log2_vs_mbits"]) {
+        // an absent required member is refused here too (defence in depth: the shape check above already requires it)
         match o.get(k) {
             None if k == "log2_vs_mbits" => {}
             v => {
@@ -351,12 +352,8 @@ fn cell_of(h: &Header, resource: Option<&Value>, params: &Map<String, Value>) ->
             Dim::Cat { values, .. } => s(x).map(|xs| {
                 let exact = values.iter().position(|(k, v)| k == "exact" && v == xs);
                 exact.unwrap_or_else(|| {
-                    let mut best: Option<(usize, usize)> = None;
-                    for (k, (kind, v)) in values.iter().enumerate() {
-                        if kind == "prefix" && xs.starts_with(v.as_str()) && best.is_none_or(|(_, l)| v.len() > l) {
-                            best = Some((k, v.len()));
-                        }
-                    }
+                    // values are distinct, so two matching prefixes never share a length: the longest is unique
+                    let best = values.iter().enumerate().filter(|(_, (kind, v))| kind == "prefix" && xs.starts_with(v.as_str())).max_by_key(|(_, (_, v))| v.len());
                     best.map_or(values.len() - 1, |(k, _)| k)
                 })
             }),

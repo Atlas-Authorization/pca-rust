@@ -1,0 +1,1 @@
+{"id":"expand-adv-unknown-trait","kind":"expand","input":{"traits":["pca.nope"]},"expect":{"error":true}}

@@ -1,0 +1,4 @@
+{
+  "about": "Reviewed exceptions to the release dependency-vulnerability gate (vuln-gate.mjs). One entry per advisory and package: id (GHSA / PYSEC / RUSTSEC / CVE, or an alias), ecosystem (npm | pypi | crates), package, reason (why it does not affect the released packages, at least 20 characters), reviewed_by, reviewed_on and expires (YYYY-MM-DD, at most 180 days after reviewed_on). Expired or incomplete entries fail the release.",
+  "entries": []
+}

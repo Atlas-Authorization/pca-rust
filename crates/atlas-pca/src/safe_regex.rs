@@ -452,7 +452,7 @@ fn emit(node: &Node, prog: &mut Vec<Inst>, depth: usize) -> R<()> {
             for (i, it) in items.iter().enumerate() {
                 if i < items.len() - 1 {
                     let split = prog.len();
-                    prog.push(Inst::Split(split + 1, usize::MAX));
+                    prog.push(Inst::Split(usize::MAX, usize::MAX)); // placeholder, patched below once the arm's end is known
                     emit(it, prog, depth + 1)?;
                     jmps.push(prog.len());
                     prog.push(Inst::Jmp(usize::MAX));
@@ -474,7 +474,7 @@ fn emit(node: &Node, prog: &mut Vec<Inst>, depth: usize) -> R<()> {
             match max {
                 None => {
                     let split = prog.len();
-                    prog.push(Inst::Split(split + 1, usize::MAX));
+                    prog.push(Inst::Split(usize::MAX, usize::MAX)); // placeholder, patched below
                     emit(node, prog, depth + 1)?;
                     prog.push(Inst::Jmp(split));
                     let end = prog.len();
@@ -484,8 +484,7 @@ fn emit(node: &Node, prog: &mut Vec<Inst>, depth: usize) -> R<()> {
                     let mut splits = Vec::new();
                     for _ in *min..*mx {
                         splits.push(prog.len());
-                        let at = prog.len();
-                        prog.push(Inst::Split(at + 1, usize::MAX));
+                        prog.push(Inst::Split(usize::MAX, usize::MAX)); // placeholder, patched below
                         emit(node, prog, depth + 1)?;
                     }
                     let end = prog.len();
@@ -528,7 +527,8 @@ pub fn run(re: &Compiled, subject: &[u16]) -> Option<bool> {
         return None;
     }
     let mut mark = vec![usize::MAX; prog.len()];
-    let mut epoch = 0usize;
+    // the first stamp is 1 (`mark` starts at usize::MAX, so any stamp below it is fresh); each position then bumps it
+    let mut epoch = 1usize;
     let mut matched = false;
     let mut stack: Vec<usize> = Vec::with_capacity(prog.len() * 2 + 2);
 
@@ -568,7 +568,6 @@ pub fn run(re: &Compiled, subject: &[u16]) -> Option<bool> {
 
     let mut clist: Vec<usize> = Vec::with_capacity(prog.len());
     let mut nlist: Vec<usize> = Vec::with_capacity(prog.len());
-    epoch += 1;
     add(&mut clist, 0, 0, &mut mark, epoch, &mut matched, &mut stack);
     for pos in 0..n {
         let c = subject[pos] as u32;
@@ -592,6 +591,12 @@ pub fn run(re: &Compiled, subject: &[u16]) -> Option<bool> {
 
 /// `isSafeRegexSource` (predicates.ts): the structural guard, ALSO requiring that the source compiles.
 pub fn is_safe_regex_source(src: &[u16]) -> bool {
+    structural_guard(src) && compile(src).is_some()
+}
+
+/// The structural half of `isSafeRegexSource` (predicates.ts:480-566), before the final `compileSafeRegex` check. Kept
+/// separate so its own refusals (backreference, nothing-to-repeat, ...) are pinned even where `compile` would also refuse.
+fn structural_guard(src: &[u16]) -> bool {
     #[derive(Clone, Copy)]
     struct Frame {
         has_quant: bool,
@@ -623,10 +628,9 @@ pub fn is_safe_regex_source(src: &[u16]) -> bool {
             continue;
         }
         if ch == 0x5b {
-            let mut j = i + 1;
-            if src.get(j) == Some(&0x5e) {
-                j += 1;
-            }
+            // TS (predicates.ts:502-504) starts after `[` and an optional `^`; neither is `]` or `\`, so scanning from the
+            // `[` itself finds the same first unescaped `]`.
+            let mut j = i;
             while j < len && src[j] != 0x5d {
                 if src[j] == 0x5c {
                     j += 1;
@@ -636,7 +640,7 @@ pub fn is_safe_regex_source(src: &[u16]) -> bool {
             if j >= len {
                 return false;
             }
-            i = j + 1;
+            i = j; // the closing `]` is then consumed by the plain-atom branch (i += 1, prev = Atom), as TS's `i = j + 1`
             prev = Prev::Atom;
             continue;
         }
@@ -730,10 +734,8 @@ pub fn is_safe_regex_source(src: &[u16]) -> bool {
             bits += if qunb {
                 UNBOUNDED_QUANTIFIER_BITS
             } else {
-                match qopts {
-                    Some(o) if o > 1 => 64 - (o - 1).leading_zeros(), // ceil(log2(o))
-                    _ => 0,
-                }
+                // ceil(log2(o)); options is never 0 and ceil(log2(1)) is 0, the reference's `options > 1 ? … : 0`
+                qopts.map_or(0, |o| 64 - (o - 1).leading_zeros())
             };
             if bits > MAX_REGEX_COST_BITS {
                 return false;
@@ -749,7 +751,7 @@ pub fn is_safe_regex_source(src: &[u16]) -> bool {
         i += 1;
         prev = Prev::Atom;
     }
-    stack.len() == 1 && compile(src).is_some()
+    stack.len() == 1
 }
 
 // ---- R4-05 mirror: the per-DOCUMENT regex work budget (packages/pca/src/regex-budget.ts) --------------------------------
@@ -771,6 +773,8 @@ struct Budget {
     evaluations: u64,
     chars: u64,
     steps: u64,
+    /// Evaluations the budget refused (`regexRefusals`).
+    refused: u64,
 }
 
 thread_local! {
@@ -800,6 +804,11 @@ pub fn with_regex_budget<T>(f: impl FnOnce() -> T) -> T {
     f()
 }
 
+/// `regexRefusals`: how many evaluations the open scope's budget refused (0 outside a scope).
+pub fn regex_refusals() -> u64 {
+    BUDGET.with(|b| b.borrow().as_ref().map_or(0, |b| b.refused))
+}
+
 /// `chargeRegex`: false when this evaluation would exceed the document budget (the caller must NOT run the match).
 /// Outside any scope: unbudgeted.
 fn charge(src_units: u64, prog_len: u64, subject_units: u64) -> bool {
@@ -815,6 +824,7 @@ fn charge(src_units: u64, prog_len: u64, subject_units: u64) -> bool {
         if ev > MAX_REGEX_EVALUATIONS_PER_DOCUMENT || chars > MAX_REGEX_SOURCE_CHARS_PER_DOCUMENT || steps > MAX_REGEX_STEPS_PER_DOCUMENT {
             // poison the scope so a later, cheaper pattern cannot sneak in after an over-budget one
             b.evaluations = MAX_REGEX_EVALUATIONS_PER_DOCUMENT + 1;
+            b.refused += 1;
             return false;
         }
         b.evaluations = ev;
@@ -849,3 +859,7 @@ pub fn full_match_tri(src: &str, subject: &str) -> Option<bool> {
 #[cfg(test)]
 #[path = "k042_safe_regex_test.rs"]
 mod k042_test;
+
+#[cfg(test)]
+#[path = "k05f_safe_regex_test.rs"]
+mod k05f_safe_regex_test;

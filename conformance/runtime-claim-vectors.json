@@ -1,0 +1,135 @@
+{
+ "about": "Runtime-class claim vectors: Ed25519 over the UTF-8 bytes of the domain string atlas-pca/runtime-class-claim/v1 followed by NUL, then the strict canonical JSON of the claim without sig; signer is the attestor member. The verifier pins attestors, the passport digest and the evidence digests it has itself verified; anything that does not verify, or has any member beyond the eight, is none.",
+ "trust": {
+  "pinnedAttestors": [
+   "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ"
+  ],
+  "passportDigest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+  "verifiedEvidenceDigests": [
+   "ev1"
+  ]
+ },
+ "cases": [
+  {
+   "name": "valid",
+   "claim": {
+    "v": 1,
+    "class": "wasi_no_ambient",
+    "passport_digest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+    "evidence_digest": "ev1",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "kDFAgxPva8LF4rYBBImg48dxzIJU292AftvLyJryUc4HYdhiy5DzG1vheE6RL7SlorVglI-mYuH6eaZ5BN4ABA"
+   },
+   "now": 150,
+   "expect": "wasi_no_ambient"
+  },
+  {
+   "name": "expired",
+   "claim": {
+    "v": 1,
+    "class": "wasi_no_ambient",
+    "passport_digest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+    "evidence_digest": "ev1",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "kDFAgxPva8LF4rYBBImg48dxzIJU292AftvLyJryUc4HYdhiy5DzG1vheE6RL7SlorVglI-mYuH6eaZ5BN4ABA"
+   },
+   "now": 200,
+   "expect": "none"
+  },
+  {
+   "name": "not_yet_valid",
+   "claim": {
+    "v": 1,
+    "class": "wasi_no_ambient",
+    "passport_digest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+    "evidence_digest": "ev1",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "kDFAgxPva8LF4rYBBImg48dxzIJU292AftvLyJryUc4HYdhiy5DzG1vheE6RL7SlorVglI-mYuH6eaZ5BN4ABA"
+   },
+   "now": 99,
+   "expect": "none"
+  },
+  {
+   "name": "tampered_class",
+   "claim": {
+    "v": 1,
+    "class": "os_confined",
+    "passport_digest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+    "evidence_digest": "ev1",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "kDFAgxPva8LF4rYBBImg48dxzIJU292AftvLyJryUc4HYdhiy5DzG1vheE6RL7SlorVglI-mYuH6eaZ5BN4ABA"
+   },
+   "now": 150,
+   "expect": "none"
+  },
+  {
+   "name": "other_passport",
+   "claim": {
+    "v": 1,
+    "class": "wasi_no_ambient",
+    "passport_digest": "x",
+    "evidence_digest": "ev1",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "1iN0Czdx9zSsC8fh3qg5fWQm3FxcqoaDf7HQkcp4x4IJMZ8G468x4TfgJzX350kK5XaAn8Fgzj_Ba2PyXomRCA"
+   },
+   "now": 150,
+   "expect": "none"
+  },
+  {
+   "name": "unverified_evidence",
+   "claim": {
+    "v": 1,
+    "class": "wasi_no_ambient",
+    "passport_digest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+    "evidence_digest": "ev9",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "Dc9VMILSak2QQh4rC4pOULvTSX5JMFE_Ck-HV2PkAw7s18Bp_6Ga6JjdkNmtODN-1HZ6ooCiWmTUxnMprIzuCQ"
+   },
+   "now": 150,
+   "expect": "none"
+  },
+  {
+   "name": "extra_member",
+   "claim": {
+    "v": 1,
+    "class": "wasi_no_ambient",
+    "passport_digest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+    "evidence_digest": "ev1",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "kDFAgxPva8LF4rYBBImg48dxzIJU292AftvLyJryUc4HYdhiy5DzG1vheE6RL7SlorVglI-mYuH6eaZ5BN4ABA",
+    "extra": 1
+   },
+   "now": 150,
+   "expect": "none"
+  },
+  {
+   "name": "unknown_class",
+   "claim": {
+    "v": 1,
+    "class": "root",
+    "passport_digest": "mPJkgmL6Cj0aXkA2Skta2S67xBI5VCGcCjJ_l2PR-D8",
+    "evidence_digest": "ev1",
+    "iat": 100,
+    "exp": 200,
+    "attestor": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+    "sig": "kDFAgxPva8LF4rYBBImg48dxzIJU292AftvLyJryUc4HYdhiy5DzG1vheE6RL7SlorVglI-mYuH6eaZ5BN4ABA"
+   },
+   "now": 150,
+   "expect": "none"
+  }
+ ]
+}

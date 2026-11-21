@@ -39,7 +39,7 @@
   "file": "src/lib.rs",
   "mutant": "replace || with && in verify_ed25519_strict",
   "line": "if a.is_small_order() || r.is_small_order() || !a.is_torsion_free() || !r.is_torsion_free() {",
-  "reason": "Small-order A or R is rejected again by VerifyingKey::verify_strict later in the function (dalek rejects weak keys and small-order R), and every non-identity small-order point also trips the !is_torsion_free disjuncts; the && form changes no verdict."
+  "reason": "Only the FIRST `||` of the guard is rewritten here: `(a.is_small_order() && r.is_small_order()) || !a.is_torsion_free() || !r.is_torsion_free()`. Output-equivalent for every input. A small-order point other than the identity has order 2, 4 or 8, so it is not torsion free: any non-identity small-order A or R is still refused by a `!is_torsion_free` disjunct. The identity is the only small-order point that is torsion free, so the verdicts can differ only when A or R is the identity, the other point is not small-order, and both are torsion free. A = identity: the mutant passes the guard, then VerifyingKey::verify_strict refuses a small-order (weak) public key, so the verdict is false, as in the original. R = identity: verify_strict refuses a small-order R (ed25519-dalek 2 verify_strict checks signature_R.is_small_order()), false again. Both identity: both small, the guard still refuses. The second and third `||` are NOT equivalent (they would let a mixed-order A through: dalek's verify_strict does not check torsion-freeness) and are killed by tests/k05d_ed25519_mixed_order.rs, which signs with A = aB + T, T of order 8, and a message ground so that k = SHA-512(R||A||M) mod L is a multiple of 8 (dalek accepts it, the guard refuses it)."
  },
  {
   "crate": "rust-pca",
@@ -57,271 +57,185 @@
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_map.rs",
-  "mutant": "replace match guard k == \"log2_vs_mbits\" with true in metrics_error",
-  "line": "None if k == \"log2_vs_mbits\" => {}",
-  "reason": "The required metric fields are checked present before this loop, so the missing-member arm is only reachable for log2_vs_mbits."
+  "file": "src/prohibitions.rs",
+  "mutant": "replace match guard state.is_object() with true in state_problem_inner",
+  "line": "(Some(l), Some(t)) if state.is_object() => (l, t),",
+  "reason": "state_problem_inner has one caller, state_problem, which returns early unless state.is_object(); and on a non-object state.get(\"ledger\") is None, so the (Some(l), Some(t)) pattern cannot match either way and the guard is always true when reached."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_map.rs",
-  "mutant": "replace > with >= in cell_of",
-  "line": "if kind == \"prefix\" && xs.starts_with(v.as_str()) && best.is_none_or(|(_, l)| v.len() > l) {",
-  "reason": "Two distinct prefix values of the same length cannot both prefix one string (values are checked distinct), so > and >= pick the same cell."
+  "file": "src/prohibitions.rs",
+  "mutant": "replace if condition with false in verify_signed_inner",
+  "line": "if attests_ok {",
+  "reason": "Inside the full-recompute failure branch, verify_safety_evidence returns a reason starting with \"prohibition violated\" only after the recomputed proof and the evidence hash equal, so evidence.ok equals the recomputed ok that is not true and attests_ok is false. When attests_ok is true the reason cannot start with that text, so the second guard (!why.starts_with(...)) returns the identical Err(why)."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_revocation.rs",
-  "mutant": "delete - in check_session_revocation",
-  "line": "let (e_now, e_last) = (nonneg(o.get(\"epoch\")).unwrap_or(-1), nonneg(le.get(\"epoch\")).unwrap_or(-1));",
-  "reason": "Both unwrap_or(-1) fallbacks (current and last epoch) are dead: both epochs were validated as non-negative safe integers by the shape checks above, so neither -1 is ever read.",
-  "multiplicity": 2
+  "file": "src/contracts.rs",
+  "mutant": "replace + with - in count_clauses",
+  "line": "return MAX_CONTRACT_CLAUSES + 1;",
+  "reason": "This return is taken only at recursion depth 18, which exists only inside 17 nested and clauses; each of those ancestors adds 1 to the running count before the result is compared with MAX_CONTRACT_CLAUSES in validate_contract, so the total is at least 17 + 255 = 272 > 256 whether the value is 257 or 255, and the only consumer is that > comparison."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_suite.rs",
-  "mutant": "replace match guard !p.is_empty() with true in verify_pinned_suite",
-  "line": "Some(Value::String(p)) if !p.is_empty() => p.as_str(),",
-  "reason": "An empty artifact pq_pk fails closed anyway: PinnedPq::caller_vouched of an empty key is None, so the guard is redundant."
+  "file": "src/contracts.rs",
+  "mutant": "replace + with * in count_clauses",
+  "line": "return MAX_CONTRACT_CLAUSES + 1;",
+  "reason": "This return is taken only at recursion depth 18, which exists only inside 17 nested and clauses; each of those ancestors adds 1 to the running count before the result is compared with MAX_CONTRACT_CLAUSES in validate_contract, so the total is at least 17 + 256 = 273 > 256 whether the value is 257 or 256, and the only consumer is that > comparison."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_v2.rs",
-  "mutant": "replace < with <= in js_number_string",
-  "line": "return if f < 0.0 { \"-Infinity\".into() } else { \"Infinity\".into() };",
-  "reason": "Infinity is never negative-zero: the f == 0.0 case returned earlier, so f < 0.0 and f <= 0.0 agree on infinite values."
+  "file": "src/contracts.rs",
+  "mutant": "replace && with || in eval_inner",
+  "line": "if !r.ok && t.ok {",
+  "reason": "Transition.ok and Transition.reason of an and clause are read nowhere outside this block: check_inner and advance_inner consume only .rows, .latch_set and .deadline_set, and the only reader of t.ok is this condition (and of a nested and's ok, the enclosing one of the same kind), so no operator here can change any output."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_v2.rs",
-  "mutant": "replace < with <= in js_number_string",
-  "line": "if f < 0.0 {",
-  "reason": "f == 0.0 returned earlier, so f < 0.0 and f <= 0.0 agree."
+  "file": "src/contracts.rs",
+  "mutant": "delete ! in eval_inner",
+  "line": "if !r.ok && t.ok {",
+  "reason": "Transition.ok and Transition.reason of an and clause are read nowhere outside this block: check_inner and advance_inner consume only .rows, .latch_set and .deadline_set, and the only reader of t.ok is this condition (and of a nested and's ok, the enclosing one of the same kind), so no operator here can change any output."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_v2.rs",
-  "mutant": "replace < with <= in js_number_string",
-  "line": "let sign = if e < 0 { '-' } else { '+' };",
-  "reason": "The exponent branch is only taken for e >= 21 or e <= -7, so e == 0 (where < and <= differ) is unreachable."
+  "file": "src/contracts.rs",
+  "mutant": "delete field ok from struct ContractResult expression in refuse",
+  "line": "AdvanceContract { result: ContractResult { ok: false, ..result }, next: state.clone(), decided_by }",
+  "reason": "refuse is private and all four callers pass Some(reason); in the Some arm the result is built with ok: false explicitly, so result.ok is already false and ..result supplies the same value (the None arm that would carry an ok verdict is unreachable)."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_v2.rs",
-  "mutant": "replace - with / in session_step",
-  "line": "if i > 0 && !(b32(prior[i - 1].get(\"id\")) && same(c.and_then(|c| c.get(\"prev\")), prior[i - 1].get(\"id\"))) {",
-  "reason": "A held grant's prev must be a 32-byte digest (the caveat shape check) and equal the previous id, so b32 of the previous id is implied by the second conjunct."
+  "file": "src/contracts.rs",
+  "mutant": "replace if condition with false in ContractEnforcer::peek",
+  "line": "let state = prev.as_ref().map_or_else(|| empty_state(if wall.is_finite() { wall } else { 0.0 }), |d| d[\"state\"].clone());",
+  "reason": "This is the no-stored-document branch: the state is a genesis state with an empty ledger and no latches, and check_contract reads its now only to window ledger entries (none exist) and to date latch values that are not part of the verdict, so empty_state(0.0) and empty_state(wall) for a finite wall give the identical verdict; the true mutant (a NaN wall reaching empty_state) is killed separately."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_wb.rs",
-  "mutant": "replace match guard safe_integer_f64(skew) with true in decide_offer_set",
-  "line": "Some(n) if safe_integer_f64(skew) => n as f64,",
-  "reason": "skew is the world policy skew_ms, validated as a non-negative safe integer by validate_world_policy before the offer step runs."
+  "file": "src/staleness.rs",
+  "mutant": "replace > with >= in RevocationStaleness::check_pinned",
+  "line": "(Some(h), Some(p)) => Some(if (p as f64) > h { p as f64 } else { h }),",
+  "reason": "Both branches yield a value equal to h when p as f64 == h, and the comparison agrees with > everywhere else (NaN makes both false, selecting h in either form), so the chosen last-accepted epoch is identical for every input."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_wb.rs",
-  "mutant": "replace < with <= in decide_offer_set",
-  "line": "if offer_matches(x, &fo) && price(x) < min {",
-  "reason": "Equal prices yield the same minimum, so < and <= select the same value."
+  "file": "src/risk.rs",
+  "mutant": "replace > with >= in clamp01",
+  "line": "} else if x > 1.0 {",
+  "reason": "The two forms differ only at x == 1.0, where the mutant takes the `1.0` branch and the original falls through to `x`, which is that same 1.0; NaN is false in both. The result is identical for every input."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_wb.rs",
-  "mutant": "replace > with >= in flow_rule_for",
-  "line": "if p.ends_with(\".*\") && cls.starts_with(prefix) && best.is_none_or(|b| p.encode_utf16().count() > b.encode_utf16().count()) {",
-  "reason": "Policy keys are distinct, so two different .* prefixes of equal length cannot both prefix one class."
+  "file": "src/risk.rs",
+  "mutant": "replace > with >= in escalate_threshold",
+  "line": "let t = if min_t > rt.t { min_t } else { rt.t };",
+  "reason": "The forms differ only when min_t == rt.t, where both branches yield that same u8, so t is identical for every input."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_wb.rs",
-  "mutant": "replace != with == in prov_inner",
-  "line": "if a != b && b.starts_with(&format!(\"{a}.\")) {",
-  "reason": "prov keys are exactly action.params.<name> with no dot in the name, so one key can never be a dotted extension of another."
+  "file": "src/risk.rs",
+  "mutant": "replace < with <= in admit_of",
+  "line": "if t < 3 && !budget_covers_cost {",
+  "reason": "The forms differ only for t == 3 with an uncovered cost: the mutant takes the first branch, Admission { admit: false, need_step_up: true, t: 3, metered: false }, and the original falls through the t == 1 and t == 2 tests to the final else, which builds the identical Admission. For t < 3 and t > 3 the two conditions agree."
  },
  {
   "crate": "rust-pca",
-  "file": "src/intent_wb.rs",
-  "mutant": "replace match guard is_taint_level(Some(l)) with true in prov_inner",
-  "line": "Some(l) if is_taint_level(Some(l)) => s(Some(l)).unwrap_or(\"agent\"),",
-  "reason": "A non-taint registry value ranks 4 (unwrap_or(4)), which is the rank of 'agent', so the fallback level is indistinguishable."
+  "file": "src/risk.rs",
+  "mutant": "replace < with <= in plan_geodesic",
+  "line": "if dist[b] < 0 { 1.0 } else { clamp01(dist[b] as f64 / (n - 1) as f64) }",
+  "reason": "dist starts at -1 for every node and only dist[a] is set to 0; the search assigns dist[v] = dist[u] + 1 >= 1 to the others. So dist[b] == 0 only when b == a, and that case returned 0.0 before the search began (`if a == b`); for every other input dist[b] is -1 or >= 1 and < and <= agree."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/risk.rs",
+  "mutant": "replace | with ^ in js_to_fixed3",
+  "line": "let (m, e) = if exp == 0 { (frac, -1074) } else { (frac | (1u64 << 52), exp - 1075) };",
+  "reason": "frac is bits & ((1 << 52) - 1), so bit 52 is clear in frac; OR and XOR with 1 << 52 set that one bit and nothing else, and give the same value for every input."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/risk.rs",
+  "mutant": "replace > with >= in js_to_fixed3",
+  "line": "} else if -e > 120 {",
+  "reason": "The forms differ only at -e == 120, where e = exp - 1075 means exp == 955 and m < 2^53. The original computes ((m * 1000 + 2^119) / 2^120) with m * 1000 < 2^63, which is 0, and the mutant returns 0 directly: identical for every input."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/catalog_risk.rs",
+  "mutant": "replace > with >= in unit",
+  "line": "let lo = if 0.0 > x { 0.0 } else { x };",
+  "reason": "The forms differ only for x == 0.0 (either sign): the mutant yields +0.0 and the original yields x. The two are numerically equal; the value only reaches a JSON number that every consumer reads numerically (as_f64 / finite), and the canonical encoder prints -0 as 0, so no observable output differs."
+ },
+ {
+  "crate": "rust-pca",
+  "file": "src/catalog_risk.rs",
+  "mutant": "replace < with <= in unit",
+  "line": "if 1.0 < lo { 1.0 } else { lo }",
+  "reason": "The forms differ only at lo == 1.0, where both branches yield that same 1.0 (NaN is false in both)."
  },
  {
   "crate": "rust-pca",
   "file": "src/lib.rs",
-  "mutant": "replace match guard pq.sig_len_ok(b.len()) with true in pq_verify_b64u",
-  "line": "Some(b) if pq.sig_len_ok(b.len()) => b,",
-  "reason": "pq_verify re-checks the signature length immediately after, so the guard is redundant."
+  "mutant": "replace > with >= in freshness_gate_check",
+  "line": "Some(s) if s.is_finite() => if s > 0.0 { s } else { 0.0 },",
+  "reason": "The forms differ only for s == 0.0 (either sign): the mutant keeps s, the original yields +0.0. The skew is used once, as `fnow + skew`, and x + (-0.0) == x + 0.0 for every x (NaN included), so the check is identical for every input."
  },
  {
   "crate": "rust-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace || with && in pq_verify",
-  "line": "if pk.len() != pk_len || !pq.sig_len_ok(sig.len()) {",
-  "reason": "Every suite's decoder / fixed-size conversion (and the LESS C side) rejects a wrong key or signature length itself."
+  "file": "src/authorize.rs",
+  "mutant": "replace > with >= in <impl StateStore for MemoryStateStore>::raise_pin",
+  "line": "if value > *e {",
+  "reason": "The forms differ only when value == *e, where the branch assigns *e = value, the value it already holds: the stored pin is identical for every input."
  },
  {
   "crate": "rust-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace || with && in less::verify",
-  "line": "if pk.len() != PUBLIC_KEY_BYTES || !sig_len_ok(sig.len()) {",
-  "reason": "The LESS C verifier checks pk_len and sig_len itself and returns 0, so the Rust pre-check is redundant."
+  "file": "src/authorize.rs",
+  "mutant": "replace && with || in parse_budget",
+  "line": "Some(x) => Some(x.as_f64().filter(|f| f.is_finite() && x.is_number())?),",
+  "reason": "x.as_f64() is Some only for a JSON number, whose value serde_json::Number can never make NaN or infinite (its parser and from_f64 refuse both), so whenever the filter closure runs both operands are already true and && and || agree for every input."
  },
  {
   "crate": "rust-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace match guard l >= 0.0 with true in caveat_satisfied",
-  "line": "Some(l) if l >= 0.0 => l,",
-  "reason": "A negative limit makes amount <= lim false for every amount >= 0, which is also what the guard's refusal returns."
+  "file": "src/attest/rim.rs",
+  "mutant": "replace + with * in xml_too_deep",
+  "line": "for (k, c) in xml.iter().enumerate().skip(at + 1) {",
+  "reason": "xml[at] is the `<` that opened this tag, which is neither a quote nor `>`, so the loop body does nothing on it; skip(at * 1) starts on that byte and reaches the same quote state and the same first `>` as skip(at + 1) for every input."
  },
  {
   "crate": "rust-pca",
-  "file": "src/predicates.rs",
-  "mutant": "replace && with || in ordered",
-  "line": "if x.is_finite() && y.is_finite() {",
-  "reason": "serde_json numbers are always finite (it cannot hold NaN or Infinity), so is_finite is always true."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/predicates.rs",
-  "mutant": "replace match guard !s.is_empty() with true in tri_leaf",
-  "line": "Some(Value::String(s)) if !s.is_empty() => s.as_str(),",
-  "reason": "An empty collection path resolves to nothing, which returns the same unknown as the guard's fallthrough.",
-  "occurrence": 2
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace > with == in emit",
-  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS || depth > MAX_PARSE_DEPTH * 2 {",
-  "reason": "The size half of the check is redundant with the top-of-emit check on the next call and compile's final length check, since the program only grows."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace > with >= in emit",
-  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS || depth > MAX_PARSE_DEPTH * 2 {",
-  "reason": "The size half of the check is redundant with the top-of-emit check on the next call and compile's final length check, since the program only grows."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace > with == in emit",
-  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS {",
-  "reason": "Rep-tail size check: redundant with the entry check of the next emit call and compile's final length check (the program only grows and Match is always appended; at exactly the cap the appended Match overflows it anyway). The depth half of the cap is a separate site, killed by emit_depth_cap_is_exactly_twice_the_parse_depth.",
+  "file": "src/prohibitions.rs",
+  "mutant": "delete return Err in verify_signed_inner",
+  "line": "return Err(why);",
+  "reason": "The deleted return sits under `attests_ok`, i.e. ev.ok == true, and runs only when verify_safety_evidence failed. The only failure text starting with `prohibition violated` is the final one, reached only after hash_canonical(fresh) == hash_canonical(evidence); equal canonical forms make fresh.ok equal ev.ok, so fresh.ok == true and that failure cannot occur when attests_ok. Every other failure text (unsupported evidence version, constitution / action digest / state digest mismatch, evidence does not reproduce, verification error) does not start with `prohibition violated`, so after the deletion the next statement `if !why.starts_with(\"prohibition violated\") { return Err(why) }` returns the identical Err for every input; nothing that was refused verifies.",
   "occurrence": 1
  },
  {
   "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace > with >= in emit",
-  "line": "if prog.len() > MAX_NFA_INSTRUCTIONS {",
-  "reason": "Rep-tail size check: redundant with the entry check of the next emit call and compile's final length check (the program only grows and Match is always appended; at exactly the cap the appended Match overflows it anyway). The depth half of the cap is a separate site, killed by emit_depth_cap_is_exactly_twice_the_parse_depth.",
-  "occurrence": 1
+  "file": "src/facade.rs",
+  "mutant": "delete match arm \"reversible\" in sev",
+  "line": "\"reversible\" => 0,",
+  "reason": "sev is used only by the strictest-class fold in compile_policy, whose accumulator starts at \"reversible\" and is replaced only when sev(s) > sev(acc). With the arm deleted, \"reversible\" ranks -1 like every unknown class. Per input class c of the granted actions: \"rate_limited\" (1) and \"irreversible\" (2) still exceed both -1 and 0, so they replace the accumulator exactly as before, and once the accumulator is one of them its rank (1 or 2) is unchanged; \"reversible\" and any unknown class rank 0 / -1 in the original and -1 / -1 in the mutant, and in both programs neither exceeds the rank of the starting \"reversible\" (0 > 0 and -1 > 0 are false originally, -1 > -1 is false in the mutant), so the accumulator stays the identical string \"reversible\". The fold therefore returns the same class for every action list, and nothing else reads sev. Kept to match the reference REVERSIBILITY_ORDER.indexOf (facade.ts sev)."
  },
  {
   "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace += with *= in run",
-  "line": "epoch += 1;",
-  "reason": "The first epoch only has to differ from the marks' initial usize::MAX and from later epochs; 0 does.",
-  "occurrence": 1
+  "file": "src/facade.rs",
+  "mutant": "replace > with >= in compile_policy",
+  "line": "let strictest = actions.iter().fold(\"reversible\".to_string(), |acc, s| if sev(&s.reversibility) > sev(&acc) { s.reversibility.clone() } else { acc });",
+  "reason": "The forms differ only on a tie sev(s.reversibility) == sev(acc), where >= replaces acc by s.reversibility. sev is injective on the three known classes (0, 1, 2) and maps every other string to -1. The accumulator starts as \"reversible\" (rank 0) and only ever becomes a string of higher rank, so its rank is always >= 0 and it is always one of the three known classes; a tie therefore needs s.reversibility to have the same non-negative rank, i.e. to be the identical known class string, and replacing acc with an equal string changes nothing. Every action list yields the same strictest class."
  },
  {
   "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace + with * in is_safe_regex_source",
-  "line": "let n = match src.get(i + 1) {",
-  "reason": "A backreference escape is also refused by the parser (compile is required by the guard), so the verdict is unchanged."
+  "file": "src/facade.rs",
+  "mutant": "replace > with >= in AgentHandle::risk_for",
+  "line": "if amt.is_finite() && self.rp.kappa > 0.0 {",
+  "reason": "The forms differ only when self.rp.kappa == 0. An AgentHandle is built only by make (private), from RiskPolicy::from_value(&policy.risk_policy), which returns Err unless validate_risk_policy passes; that requires kappa to be a finite JSON number (risk.rs finite) and refuses kappa <= 0 (\"risk_policy.kappa must be > 0\"), and from_value then stores that same number. rp is a private field, so every reachable handle has a finite kappa > 0, where > 0.0 and >= 0.0 are both true. Kept to match facade.ts riskFor (policy.riskPolicy.kappa > 0)."
  },
  {
   "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace || with && in is_safe_regex_source",
-  "line": "if (0x31..=0x39).contains(&n) || n == 0x6b {",
-  "reason": "A backreference escape is also refused by the parser (compile is required by the guard), so the verdict is unchanged."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace + with * in is_safe_regex_source",
-  "line": "let mut j = i + 1;",
-  "reason": "Starting the class scan one code unit earlier at '[' reaches the same closing bracket."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace += with -= in is_safe_regex_source",
-  "line": "j += 1;",
-  "reason": "This is the skip of an optional '^' right after '['. The unskipped start (the '^' itself, or the '[' for -=) is neither ']' nor '\\\\', so the class scan advances and ends at the same closing bracket either way.",
-  "occurrence": 1
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace += with *= in is_safe_regex_source",
-  "line": "j += 1;",
-  "reason": "This is the skip of an optional '^' right after '['. The unskipped start (the '^' itself, or the '[' for -=) is neither ']' nor '\\\\', so the class scan advances and ends at the same closing bracket either way.",
-  "occurrence": 1
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace + with * in is_safe_regex_source",
-  "line": "i = j + 1;",
-  "reason": "Resuming at the closing ']' treats it as one plain atom, with the same prev state and cost as resuming after it."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "delete match arm Prev::None in is_safe_regex_source",
-  "line": "Prev::None => return false,",
-  "reason": "A quantifier with nothing to repeat is also refused by the parser (compile is required by the guard)."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "delete ! in is_safe_regex_source",
-  "line": "if !qunb {",
-  "reason": "A bounded repeat above 64 is also refused by the parser (compile is required by the guard)."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace match guard o > 1 with true in is_safe_regex_source",
-  "line": "Some(o) if o > 1 => 64 - (o - 1).leading_zeros(), // ceil(log2(o))",
-  "reason": "ceil(log2(o)) is 0 for o == 1 and o >= 1 always, so o > 1, o >= 1 and true give the same cost."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace > with >= in is_safe_regex_source",
-  "line": "Some(o) if o > 1 => 64 - (o - 1).leading_zeros(), // ceil(log2(o))",
-  "reason": "ceil(log2(o)) is 0 for o == 1 and o >= 1 always, so o > 1, o >= 1 and true give the same cost."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace + with * in emit",
-  "line": "prog.push(Inst::Split(split + 1, usize::MAX));",
-  "occurrence": 1,
-  "reason": "The Split target is a placeholder: every Split pushed here is overwritten with its real targets (split+1, end) before emit returns, nothing executes the program in between, and an error path drops the whole program, so split*1 vs split+1 never reaches the matcher or the size count."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace + with * in emit",
-  "line": "prog.push(Inst::Split(split + 1, usize::MAX));",
-  "occurrence": 2,
-  "reason": "The Split target is a placeholder: every Split pushed here is overwritten with its real targets (split+1, end) before emit returns, nothing executes the program in between, and an error path drops the whole program, so split*1 vs split+1 never reaches the matcher or the size count."
- },
- {
-  "crate": "rust-pca",
-  "file": "src/safe_regex.rs",
-  "mutant": "replace + with * in emit",
-  "line": "prog.push(Inst::Split(at + 1, usize::MAX));",
-  "occurrence": 1,
-  "reason": "The Split target is a placeholder: every Split pushed here is overwritten with its real targets (sp+1, end) before emit returns, nothing executes the program in between, and an error path drops the whole program, so split*1 vs split+1 never reaches the matcher or the size count."
+  "file": "src/catalog_risk.rs",
+  "mutant": "replace > with >= in catalog_risk",
+  "line": "let kappa = read_envelope(grant).and_then(|e| e.get(\"risk_policy\").and_then(|p| p.get(\"kappa\")).and_then(Value::as_f64)).filter(|k| *k > 0.0);",
+  "reason": "The forms differ only when the read kappa is exactly 0 (either sign). read_envelope returns Some only when authorize::risk_policy_error(risk_policy) is None, which requires risk_policy to be an object (an array has no named members, so its kappa check fails), kappa to be a finite JSON number (lib.rs fin) and refuses kappa <= 0. Value::as_f64 on that same member returns that same number, so every kappa that reaches the filter is > 0, where > 0.0 and >= 0.0 are both true; with no envelope the chain is None in both forms. Kept to match catalog-risk.ts (kappa > 0)."
  }
 ]
