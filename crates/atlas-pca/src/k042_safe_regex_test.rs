@@ -382,3 +382,100 @@ fn emit_depth_cap_is_exactly_twice_the_parse_depth() {
     assert_eq!(run(&ok, &"a".encode_utf16().collect::<Vec<_>>()), Some(true));
     assert!(compile(&over).is_none(), "depth 513 is refused");
 }
+
+/// The instruction cap inside `emit` (a work bound: `compile`'s final check alone would give the same verdict, so the
+/// boundary is pinned through emit directly): entering with 4096 instructions is allowed, 4097 refuses; a repetition that
+/// ends at exactly 4096 is allowed, past it refuses.
+#[test]
+fn emit_instruction_cap_boundaries() {
+    let set = || Node::Set(CharSet { ranges: vec![(0x61, 0x61)], negated: false });
+    let filled = |n: usize| vec![Inst::Bol; n];
+    let mut p = filled(MAX_NFA_INSTRUCTIONS);
+    assert!(emit(&set(), &mut p, 0).is_ok());
+    let mut p = filled(MAX_NFA_INSTRUCTIONS + 1);
+    assert!(emit(&set(), &mut p, 0).is_err());
+    let rep = || Node::Rep { node: Box::new(set()), min: 1, max: Some(1) };
+    let mut p = filled(MAX_NFA_INSTRUCTIONS - 1);
+    assert!(emit(&rep(), &mut p, 0).is_ok() && p.len() == MAX_NFA_INSTRUCTIONS);
+    let mut p = filled(MAX_NFA_INSTRUCTIONS);
+    assert!(emit(&rep(), &mut p, 0).is_err());
+}
+
+fn u(s: &str) -> Vec<u16> {
+    s.encode_utf16().collect()
+}
+
+/// The structural guard's own refusals, pinned even though `compile` would also refuse these sources:
+/// predicates.ts:493 refuses a backreference (`\1`-`\9`, `\k`) wherever the backslash sits, and :553 refuses a
+/// quantifier with nothing to repeat (at the start, after `(`, after `|`, or after another quantifier).
+#[test]
+fn structural_guard_refuses_backreferences_and_bare_quantifiers() {
+    for s in ["\\1", "a\\2", "ab\\9", "\\k<a>", "(a)\\k"] {
+        assert!(!structural_guard(&u(s)), "backreference {s:?}");
+        assert!(!is_safe_regex_source(&u(s)), "{s:?}");
+    }
+    for s in ["\\d", "a\\.", "\\0", "x\\w"] {
+        assert!(structural_guard(&u(s)), "plain escape {s:?}");
+    }
+    for s in ["*", "+a", "?", "{2}", "(*)", "(?:+)", "a|*", "a*+", "a?{2}"] {
+        assert!(!structural_guard(&u(s)), "nothing to repeat {s:?}");
+    }
+    for s in ["a*", "(a)+", "a|b?", "a*?", "[^]]*"] {
+        assert!(structural_guard(&u(s)), "{s:?}");
+    }
+    // the guard is load-bearing on its own: `compile` accepts a nested quantifier the guard refuses
+    assert!(compile(&u("(?:aa*)*")).is_some() && !is_safe_regex_source(&u("(?:aa*)*")));
+}
+
+/// predicates.ts:555 refuses a bounded repeat whose max passes MAX_BOUNDED_REPEAT (64) whatever its width, and :557
+/// costs `{m,n}` ceil(log2(n-m+1)) bits against the 22-bit budget (`{n}` costs 0).
+#[test]
+fn structural_guard_bounded_repeat_max_and_width_cost() {
+    for s in ["a{64}", "a{0,64}", "a{64,64}", "a{1,2}"] {
+        assert!(structural_guard(&u(s)), "{s:?}");
+    }
+    for s in ["a{65}", "a{65,65}", "a{0,65}", "a{60,65}"] {
+        assert!(!structural_guard(&u(s)), "max past 64 {s:?}");
+    }
+    // three {0,64} cost 7 bits each (21); a fourth `?` adds 1 (22, at the budget), a fifth passes it
+    assert!(structural_guard(&u("a{0,64}b{0,64}c{0,64}d?")));
+    assert!(!structural_guard(&u("a{0,64}b{0,64}c{0,64}d?e?")));
+    // exact repeats are free: many {64} stay inside the budget
+    assert!(structural_guard(&u("a{64}b{64}c{64}d{64}e{64}f{64}")));
+}
+
+/// k05 timeouts (BRIEF "Timeouts are not kills"): a parser or guard cursor that stops advancing (`i += 1` to `*=` / `-=`,
+/// `at` answering a constant), or a CharSet binary search that stops narrowing, loops forever on ORDINARY input. Each
+/// pattern below must reach a verdict within a deadline so such a mutant FAILS this test instead of timing out the run
+/// (the mutation run terminates the other, still spinning tests at their slow-timeout). 2 s is ~1000x the real cost.
+#[test]
+fn ordinary_patterns_decide_within_a_deadline() {
+    use std::sync::mpsc;
+    use std::time::Duration;
+    let cases: &[(&str, &[&str])] = &[
+        ("a|b|c", &["a", "c", "d"]),          // alt `|` loop
+        ("a{2}", &["aa", "a"]),               // brace_quantifier digits
+        ("a{2,}", &["aaa"]),
+        ("a{2,3}b{10,1000}", &["aab"]),       // both digit runs, multi-digit
+        ("a*b+c?", &["bb", "abc"]),           // quantified * + ?
+        ("(a)(?:b)", &["ab"]),                // groups (atom)
+        (".^$", &[""]),                       // . ^ $ (atom)
+        ("\\d\\D\\w\\W\\s\\S", &["1a_ !x"]),  // class escapes (escape_inner)
+        ("\\t\\n\\x41\\u0041\\0", &["\t\nAA\u{0}"]), // single escapes, \x and \u digit loops
+        ("[a-z0-9_]", &["q", " ", "~"]),      // class read_atom; below / above every range
+        ("[^\\d]", &["5", "x"]),
+        ("\\w+", &[" ", "~", "a", "\u{0}", "\u{ffff}"]), // CharSet::has both binary-search directions
+        ("(a|b)*c{1,3}[x-z]?\\.", &["abacc."]), // structural_guard: groups, alt, repeat, class, escape
+    ];
+    for &(p, subjects) in cases {
+        for &s in subjects {
+            let (tx, rx) = mpsc::channel();
+            let (p2, s2) = (p.to_string(), s.to_string());
+            std::thread::spawn(move || {
+                let src: Vec<u16> = p2.encode_utf16().collect();
+                let _ = tx.send((is_safe_regex_source(&src), full_match_tri(&p2, &s2)));
+            });
+            rx.recv_timeout(Duration::from_secs(2)).unwrap_or_else(|_| panic!("{p:?} on {s:?} did not decide within 2 s"));
+        }
+    }
+}

@@ -1,0 +1,1702 @@
+{
+  "keys": {
+    "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+    "rs": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+    "other": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk"
+  },
+  "sampler": {
+    "uniform": [
+      {
+        "seed": "seed-a",
+        "bounds": [
+          1,
+          2,
+          7,
+          1000,
+          1000000,
+          1099511627776,
+          140737488355328
+        ],
+        "draws": [
+          0,
+          1,
+          2,
+          780,
+          341275,
+          216196233231,
+          41245303718798
+        ]
+      },
+      {
+        "seed": "seed-b",
+        "bounds": [
+          1,
+          2,
+          7,
+          1000,
+          1000000,
+          1099511627776,
+          140737488355328
+        ],
+        "draws": [
+          0,
+          0,
+          1,
+          680,
+          730534,
+          675862596100,
+          54135984733941
+        ]
+      }
+    ],
+    "laplace": [
+      {
+        "seed": "seed-a",
+        "s": 500000,
+        "t": 1000000,
+        "values": [
+          1,
+          6,
+          1,
+          -4,
+          3,
+          1,
+          -2,
+          3,
+          -5,
+          1,
+          -1,
+          1,
+          -1,
+          -13,
+          0,
+          2
+        ]
+      },
+      {
+        "seed": "seed-b",
+        "s": 1000000,
+        "t": 2000000,
+        "values": [
+          -2,
+          -5,
+          0,
+          -1,
+          -2,
+          2,
+          -4,
+          0,
+          0,
+          1,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -3
+        ]
+      },
+      {
+        "seed": "seed-c",
+        "s": 1,
+        "t": 1,
+        "values": [
+          -2,
+          0,
+          1,
+          1,
+          -1,
+          -1,
+          1,
+          -1,
+          1,
+          2,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "seed": "seed-d",
+        "s": 123457,
+        "t": 7000000,
+        "values": [
+          -163,
+          -2,
+          -1,
+          21,
+          20,
+          -9,
+          98,
+          28,
+          32,
+          15,
+          -3,
+          14,
+          -31,
+          -62,
+          -45,
+          35
+        ]
+      }
+    ]
+  },
+  "grants": {
+    "vault": {
+      "main": {
+        "body": {
+          "v": 1,
+          "id": "rg-vault",
+          "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+          "issued_at": 1799999999000,
+          "expires_at": 1800000001000,
+          "reads": [
+            {
+              "verb": "customers.get",
+              "resource_prefix": "customers/",
+              "purposes": [
+                "support"
+              ],
+              "modes": {
+                "ref": "token",
+                "ssn": "token"
+              },
+              "default_mode": "drop"
+            }
+          ],
+          "caps": {},
+          "sinks": {
+            "payments": {
+              "allow": [
+                "ref"
+              ],
+              "escalate": [
+                "ssn"
+              ]
+            },
+            "email": {
+              "allow": [],
+              "escalate": []
+            }
+          }
+        },
+        "sig": "uEFXldBB6Q1roillYD0-Uq0MRY79co6WeKV5d1YpP0_pQXm6a1iFOQezslU62-F6J4hpSTSe6THfrR-SYKflAQ"
+      },
+      "other": {
+        "body": {
+          "v": 1,
+          "id": "rg-vault-2",
+          "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+          "issued_at": 1799999999000,
+          "expires_at": 1800000001000,
+          "reads": [
+            {
+              "verb": "customers.get",
+              "resource_prefix": "customers/",
+              "purposes": [
+                "support"
+              ],
+              "modes": {
+                "ref": "token",
+                "ssn": "token"
+              },
+              "default_mode": "drop"
+            }
+          ],
+          "caps": {},
+          "sinks": {
+            "payments": {
+              "allow": [
+                "ref"
+              ],
+              "escalate": [
+                "ssn"
+              ]
+            },
+            "email": {
+              "allow": [],
+              "escalate": []
+            }
+          }
+        },
+        "sig": "XuXljUNa6-6AqH3Jvo6lkXesWku-3M-qUyhtkCXy4eao-ak9NPk_0dSSy0gsHgwI-ntOl4OMcSyq0dEXwl_BAA"
+      },
+      "tampered": {
+        "body": {
+          "v": 1,
+          "id": "x",
+          "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+          "issued_at": 1799999999000,
+          "expires_at": 1800000001000,
+          "reads": [
+            {
+              "verb": "customers.get",
+              "resource_prefix": "customers/",
+              "purposes": [
+                "support"
+              ],
+              "modes": {
+                "ref": "token",
+                "ssn": "token"
+              },
+              "default_mode": "drop"
+            }
+          ],
+          "caps": {},
+          "sinks": {
+            "payments": {
+              "allow": [
+                "ref"
+              ],
+              "escalate": [
+                "ssn"
+              ]
+            },
+            "email": {
+              "allow": [],
+              "escalate": []
+            }
+          }
+        },
+        "sig": "uEFXldBB6Q1roillYD0-Uq0MRY79co6WeKV5d1YpP0_pQXm6a1iFOQezslU62-F6J4hpSTSe6THfrR-SYKflAQ"
+      }
+    },
+    "aggregate": {
+      "main": {
+        "body": {
+          "v": 1,
+          "id": "ag",
+          "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+          "issued_at": 1799999999000,
+          "expires_at": 1800000001000,
+          "rules": [
+            {
+              "verb": "orders.stats",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count",
+                "sum"
+              ],
+              "min_group": 3,
+              "clamp": 100,
+              "epsilon_micro": 500000,
+              "dp": true
+            },
+            {
+              "verb": "orders.exact",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count"
+              ],
+              "min_group": 5,
+              "clamp": 0,
+              "epsilon_micro": 0,
+              "dp": false
+            }
+          ],
+          "epsilon_budget_micro": 1000000,
+          "max_queries": 3
+        },
+        "sig": "lBdq5fv5XtJaNFz7KkJ24CnRWkBArNayq1SqiX2C4oHCnbohGNCIyOYP4NzYULT5RJNmpvHObv2yJYoZJ_2rBw"
+      },
+      "tampered": {
+        "body": {
+          "v": 1,
+          "id": "ag",
+          "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+          "issued_at": 1799999999000,
+          "expires_at": 1800000001000,
+          "rules": [
+            {
+              "verb": "orders.stats",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count",
+                "sum"
+              ],
+              "min_group": 3,
+              "clamp": 100,
+              "epsilon_micro": 500000,
+              "dp": true
+            },
+            {
+              "verb": "orders.exact",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count"
+              ],
+              "min_group": 5,
+              "clamp": 0,
+              "epsilon_micro": 0,
+              "dp": false
+            }
+          ],
+          "epsilon_budget_micro": 1000000,
+          "max_queries": 99
+        },
+        "sig": "lBdq5fv5XtJaNFz7KkJ24CnRWkBArNayq1SqiX2C4oHCnbohGNCIyOYP4NzYULT5RJNmpvHObv2yJYoZJ_2rBw"
+      },
+      "wrong_domain": {
+        "body": {
+          "v": 1,
+          "id": "ag",
+          "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+          "issued_at": 1799999999000,
+          "expires_at": 1800000001000,
+          "rules": [
+            {
+              "verb": "orders.stats",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count",
+                "sum"
+              ],
+              "min_group": 3,
+              "clamp": 100,
+              "epsilon_micro": 500000,
+              "dp": true
+            },
+            {
+              "verb": "orders.exact",
+              "resource_prefix": "orders/",
+              "purposes": [
+                "analytics"
+              ],
+              "fns": [
+                "count"
+              ],
+              "min_group": 5,
+              "clamp": 0,
+              "epsilon_micro": 0,
+              "dp": false
+            }
+          ],
+          "epsilon_budget_micro": 1000000,
+          "max_queries": 3
+        },
+        "sig": "-uZUmcSdJk2TA-xdPhGl7tVoN13MwKNGgA3nXAqP5Lh2FUL5iGI3aSztzsMhhszKo2tOb5zX2Y1NJdmO59EyDg"
+      }
+    }
+  },
+  "vault": [
+    {
+      "name": "allowed-class-to-allowed-sink",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "payments",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "value": "c_77"
+      }
+    },
+    {
+      "name": "ask-class-escalates",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "tax",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "payments",
+        "token": "tok_ChUEAl8aeVgpEdRAE3gtL7"
+      },
+      "expect": {
+        "decision": "escalate",
+        "code": "label_escalate",
+        "value": null
+      }
+    },
+    {
+      "name": "class-outside-both-lists-denies",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "tax",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "email",
+        "token": "tok_ChUEAl8aeVgpEdRAE3gtL7"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "label_flow",
+        "value": null
+      }
+    },
+    {
+      "name": "allowed-class-to-sink-without-it",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "email",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "label_flow",
+        "value": null
+      }
+    },
+    {
+      "name": "unknown-sink",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "billing",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "unknown_sink",
+        "value": null
+      }
+    },
+    {
+      "name": "proto-sink",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "__proto__",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "unknown_sink",
+        "value": null
+      }
+    },
+    {
+      "name": "unknown-token",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": null,
+      "token": "tok_neverMinted0000000000",
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "payments",
+        "token": "tok_neverMinted0000000000"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "unknown_token",
+        "value": null
+      }
+    },
+    {
+      "name": "token-of-another-grant",
+      "redact_grant": "main",
+      "detok_grant": "other",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "payments",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "unknown_token",
+        "value": null
+      }
+    },
+    {
+      "name": "unpinned-principal",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+        "now": 1800000000000,
+        "sink": "payments",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "value": null
+      }
+    },
+    {
+      "name": "expired-grant",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000001000,
+        "sink": "payments",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "expired",
+        "value": null
+      }
+    },
+    {
+      "name": "grant-not-yet",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1799999998999,
+        "sink": "payments",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "not_yet",
+        "value": null
+      }
+    },
+    {
+      "name": "now-missing",
+      "redact_grant": "main",
+      "detok_grant": "main",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": null,
+        "sink": "payments",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "value": null
+      }
+    },
+    {
+      "name": "tampered-grant",
+      "redact_grant": "main",
+      "detok_grant": "tampered",
+      "redact": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/1",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "cust": "ref",
+            "tax": "ssn"
+          },
+          "required": []
+        },
+        "record": {
+          "cust": "c_77",
+          "tax": "123-45"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "field": "cust",
+      "token": null,
+      "detok": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "sink": "payments",
+        "token": "tok_Eawjl-vINRTpRtMssyGWnz"
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "value": null
+      }
+    }
+  ],
+  "aggregate": [
+    {
+      "name": "epsilon-budget-met-then-exceeded",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1,
+              2
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 3,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "WRh5wb2io53-pfpF_w4B4uqEqH3X4QbulhYevFcIHAU": 3
+              }
+            },
+            "charged_micro": 500000
+          }
+        },
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 4,
+            "state": {
+              "spent_micro": 1000000,
+              "queries": 2,
+              "answered": {
+                "WRh5wb2io53-pfpF_w4B4uqEqH3X4QbulhYevFcIHAU": 3,
+                "5LrbybLa2Gr3UKvBI6KjyqT7eGx4YHl3N2W3gn2rxOQ": 4
+              }
+            },
+            "charged_micro": 500000
+          }
+        },
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "epsilon_exhausted",
+            "value": null,
+            "state": {
+              "spent_micro": 1000000,
+              "queries": 2,
+              "answered": {
+                "WRh5wb2io53-pfpF_w4B4uqEqH3X4QbulhYevFcIHAU": 3,
+                "5LrbybLa2Gr3UKvBI6KjyqT7eGx4YHl3N2W3gn2rxOQ": 4
+              }
+            },
+            "charged_micro": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "repeat-query-is-free-and-identical",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 88,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "iMFjflYFwxTdFsD3SMmz_RXTcD60aEWzVD_HwNpbQrs": 88
+              }
+            },
+            "charged_micro": 500000
+          }
+        },
+        {
+          "input": {
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 88,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "iMFjflYFwxTdFsD3SMmz_RXTcD60aEWzVD_HwNpbQrs": 88
+              }
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 88,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "iMFjflYFwxTdFsD3SMmz_RXTcD60aEWzVD_HwNpbQrs": 88
+              }
+            },
+            "charged_micro": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "values-are-clamped-before-summing",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "values": [
+              1000,
+              1000,
+              1000
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 236,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "nBlgYRw9eyAlEYSMPlHpn2WgKBoLWz79pPfkNbbQp34": 236
+              }
+            },
+            "charged_micro": 500000
+          }
+        },
+        {
+          "input": {
+            "values": [
+              100,
+              100,
+              100
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 236,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "nBlgYRw9eyAlEYSMPlHpn2WgKBoLWz79pPfkNbbQp34": 236
+              }
+            },
+            "charged_micro": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "group-size-boundary",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "group_too_small",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1,
+              2
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 3,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "WRh5wb2io53-pfpF_w4B4uqEqH3X4QbulhYevFcIHAU": 3
+              }
+            },
+            "charged_micro": 500000
+          }
+        }
+      ]
+    },
+    {
+      "name": "exact-rule-counts-without-noise-or-epsilon",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "verb": "orders.exact",
+            "fn": "count",
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 6,
+            "state": {
+              "spent_micro": 0,
+              "queries": 1,
+              "answered": {
+                "bvIX_cSzCJNhPrW_BUxcgAOstXeKziGW5JnFHE6mXZQ": 6
+              }
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "verb": "orders.exact",
+            "fn": "sum",
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "no_read_scope",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 1,
+              "answered": {
+                "bvIX_cSzCJNhPrW_BUxcgAOstXeKziGW5JnFHE6mXZQ": 6
+              }
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "verb": "orders.exact",
+            "fn": "count",
+            "values": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "group_too_small",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 1,
+              "answered": {
+                "bvIX_cSzCJNhPrW_BUxcgAOstXeKziGW5JnFHE6mXZQ": 6
+              }
+            },
+            "charged_micro": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "query-cap-without-epsilon",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "verb": "orders.exact",
+            "fn": "count",
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 5,
+            "state": {
+              "spent_micro": 0,
+              "queries": 1,
+              "answered": {
+                "mY03_R0zgbutptx-OdgqSBI1E4r5PVsbHp8CU6YeuQk": 5
+              }
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "verb": "orders.exact",
+            "fn": "count",
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 6,
+            "state": {
+              "spent_micro": 0,
+              "queries": 2,
+              "answered": {
+                "mY03_R0zgbutptx-OdgqSBI1E4r5PVsbHp8CU6YeuQk": 5,
+                "bvIX_cSzCJNhPrW_BUxcgAOstXeKziGW5JnFHE6mXZQ": 6
+              }
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "verb": "orders.exact",
+            "fn": "count",
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 7,
+            "state": {
+              "spent_micro": 0,
+              "queries": 3,
+              "answered": {
+                "mY03_R0zgbutptx-OdgqSBI1E4r5PVsbHp8CU6YeuQk": 5,
+                "bvIX_cSzCJNhPrW_BUxcgAOstXeKziGW5JnFHE6mXZQ": 6,
+                "pxt8M46GWTcEiMMS0H184Jgcl-hdJSrQP6TzGC-hgak": 7
+              }
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "verb": "orders.exact",
+            "fn": "count",
+            "values": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "query_cap",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 3,
+              "answered": {
+                "mY03_R0zgbutptx-OdgqSBI1E4r5PVsbHp8CU6YeuQk": 5,
+                "bvIX_cSzCJNhPrW_BUxcgAOstXeKziGW5JnFHE6mXZQ": 6,
+                "pxt8M46GWTcEiMMS0H184Jgcl-hdJSrQP6TzGC-hgak": 7
+              }
+            },
+            "charged_micro": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "different-salts-different-noise",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "salt": "salt-number-one-xxxx",
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 88,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "iMFjflYFwxTdFsD3SMmz_RXTcD60aEWzVD_HwNpbQrs": 88
+              }
+            },
+            "charged_micro": 500000
+          }
+        },
+        {
+          "input": {
+            "salt": "salt-number-two-xxxx",
+            "values": [
+              10,
+              20,
+              500,
+              -901
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 88,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "iMFjflYFwxTdFsD3SMmz_RXTcD60aEWzVD_HwNpbQrs": 88
+              }
+            },
+            "charged_micro": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "refusals-leave-state-alone",
+      "initial_state": {
+        "spent_micro": 0,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "principal": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "bad_signature",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "now": 1800000001000,
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "expired",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "now": 1799999998999,
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "not_yet",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "salt": "short",
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "bad_request",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "noise": "loud",
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "bad_request",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "values": [
+              1.5,
+              2,
+              3
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "bad_request",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "purpose": "marketing",
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "no_read_scope",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "grant": "tampered"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "bad_signature",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "grant": "wrong_domain"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "bad_signature",
+            "value": null,
+            "state": {
+              "spent_micro": 0,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        },
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1,
+              2
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 3,
+            "state": {
+              "spent_micro": 500000,
+              "queries": 1,
+              "answered": {
+                "WRh5wb2io53-pfpF_w4B4uqEqH3X4QbulhYevFcIHAU": 3
+              }
+            },
+            "charged_micro": 500000
+          }
+        }
+      ]
+    },
+    {
+      "name": "epsilon-exactly-at-budget-then-one-micro-over",
+      "initial_state": {
+        "spent_micro": 500000,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1,
+              2
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "allow",
+            "code": null,
+            "value": 3,
+            "state": {
+              "spent_micro": 1000000,
+              "queries": 1,
+              "answered": {
+                "WRh5wb2io53-pfpF_w4B4uqEqH3X4QbulhYevFcIHAU": 3
+              }
+            },
+            "charged_micro": 500000
+          }
+        }
+      ]
+    },
+    {
+      "name": "spent-already-at-budget",
+      "initial_state": {
+        "spent_micro": 750000,
+        "queries": 0,
+        "answered": {}
+      },
+      "steps": [
+        {
+          "input": {
+            "fn": "count",
+            "values": [
+              0,
+              1,
+              2
+            ],
+            "grant": "main"
+          },
+          "expect": {
+            "decision": "deny",
+            "code": "epsilon_exhausted",
+            "value": null,
+            "state": {
+              "spent_micro": 750000,
+              "queries": 0,
+              "answered": {}
+            },
+            "charged_micro": 0
+          }
+        }
+      ]
+    }
+  ]
+}

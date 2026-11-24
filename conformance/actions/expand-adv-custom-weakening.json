@@ -1,0 +1,1 @@
+{"id":"expand-adv-custom-weakening","kind":"expand","input":{"custom_traits":[{"id":"acme.weak","implies":["pca.money_moving"],"floor":{"risk":1,"rev":"reversible","blast_ppm":0,"esc":0,"caveats":[],"context":[],"prules":[]},"card_phrase":"acme.weak"}],"traits":["acme.weak"]},"expect":{"error":true}}

@@ -260,3 +260,23 @@ fn kill_predicates_and_lists() {
     assert!(bad.is_empty(), "{} differ:\n{}", bad.len(), bad.iter().take(20).cloned().collect::<Vec<_>>().join("\n"));
     });
 }
+
+/// showValue's plain-string test (predicates.ts:622, /[\u0000-\u001f"\\\ud800-\udfff]/ plus at most 64 UTF-16 units): a space
+/// (U+0020) and U+FFFF are spelled out; U+001F and an astral character (a surrogate pair in UTF-16) are not.
+#[test]
+fn show_value_spells_out_a_string_at_both_edges_of_the_plain_range() {
+    for (s, want) in [(" ", "\" \""), ("\u{FFFF}", "\"\u{FFFF}\""), ("\u{1F}", "\"...\""), ("\u{10000}", "\"...\""), ("\u{7F}", "\"\u{7F}\"")] {
+        assert_eq!(show_value(&Value::String(s.into()), 0), want, "{s:?}");
+    }
+}
+
+/// k05 deadline: the glob parser and matcher advance on escapes, stars (leading, inner, trailing) and literals.
+#[test]
+fn glob_parse_and_match_terminate() {
+    let u = |s: &str| s.encode_utf16().collect::<Vec<u16>>();
+    for (g, s, want) in [("a*", "a", true), ("*b", "ab", true), ("a\\*?c*", "a*xcyy", true), ("ab", "ab", true), ("a?", "a", false)] {
+        let (g16, s16) = (u(g), u(s));
+        let got = crate::k042_support::within("glob_match", move || glob_match(&g16, &s16));
+        assert_eq!(got, Some(want), "{g} on {s}");
+    }
+}

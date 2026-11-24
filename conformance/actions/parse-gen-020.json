@@ -1,0 +1,1 @@
+{"id":"parse-gen-020","kind":"parse","input":{"def":{"v":1,"kind":"pca-action-def","verb":"gen20.item.act1","title":"Generated action 20","effects":["read","update","send"],"resource":{"type":"gen.item","id":"*","scope":"global"},"params":{},"review":{"state":"suggested"},"reversibility":"rate_limited","blast":{"radius":"tenant","ppm":539938}}},"expect":{"ok":true}}

@@ -1,0 +1,23 @@
+{
+  "about": "Reviewed exceptions to the release dependency-vulnerability gate (vuln-gate.mjs). One entry per advisory and package: id (GHSA / PYSEC / RUSTSEC / CVE, or an alias), ecosystem (npm | pypi | crates), package, reason (why it does not affect the released packages, at least 20 characters), reviewed_by, reviewed_on and expires (YYYY-MM-DD, at most 180 days after reviewed_on). Expired or incomplete entries fail the release.",
+  "entries": [
+    {
+      "id": "RUSTSEC-2023-0071",
+      "ecosystem": "crates",
+      "package": "rsa",
+      "reason": "The Marvin attack leaks an RSA private key through the timing of private-key operations (decryption and signing). atlas-pca uses the rsa crate only to verify RSA signatures against public keys in attestation and certificate chains; no released code path holds an RSA private key (key construction appears only in #[cfg(test)] code). No fixed 0.9 release exists; the fix is the 0.10 series. Re-review when moving to rsa 0.10.",
+      "reviewed_by": "Claude (0.5.1 release gate); owner to confirm before tagging",
+      "reviewed_on": "2026-11-24",
+      "expires": "2027-02-22"
+    },
+    {
+      "id": "RUSTSEC-2026-0387",
+      "ecosystem": "crates",
+      "package": "crypto-bigint",
+      "reason": "Timing variability in crypto-bigint arithmetic leaks information about SECRET integers. crypto-bigint 0.5 reaches atlas-pca only through p256 / p384 (elliptic-curve), which atlas-pca uses solely for ECDSA signature verification: every operand (public key, signature, message digest) is public, and no released code path handles an ECDSA or ECDH secret scalar (signing keys appear only in #[cfg(test)] code). The fix is crypto-bigint 0.7.6, which needs the elliptic-curve 0.14 series. Re-review when moving to p256 / p384 0.14.",
+      "reviewed_by": "Claude (0.5.1 release gate); owner to confirm before tagging",
+      "reviewed_on": "2026-11-24",
+      "expires": "2027-02-22"
+    }
+  ]
+}

@@ -1,0 +1,4482 @@
+{
+ "about": "PCA K3 operational-plane conformance vectors (fixed Ed25519 seeds: byte value N repeated 32 times; seeds 1-3 log/bundle/token signers, 10 principal, 11 holder, 12 stranger). Regenerated and drift-checked by packages/pca-grants vectors.test.ts.",
+ "format": 1,
+ "primitives": {
+  "fresh_at_verify": [
+   {
+    "name": "valid",
+    "input": {
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     }
+    },
+    "expect": {
+     "valid": true
+    }
+   },
+   {
+    "name": "other signer",
+    "input": {
+     "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     }
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "tampered counter",
+    "input": {
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 4,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     }
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "tampered scope",
+    "input": {
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "token": {
+      "v": 1,
+      "scope": "inst_2",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     }
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "not an object",
+    "input": {
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "token": "x"
+    },
+    "expect": {
+     "valid": false
+    }
+   }
+  ],
+  "fresh_at_digest": [
+   {
+    "name": "digest",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     }
+    },
+    "expect": {
+     "digest": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE"
+    }
+   },
+   {
+    "name": "digest differs by issued_at",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1001,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     }
+    },
+    "expect": {
+     "digest": "SjL5YKvVOYB8erkevc8WwDw1kLsAbqTIRkCFYPh1D7o"
+    }
+   }
+  ],
+  "fresh_at_check": [
+   {
+    "name": "equal state is ok",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "ok"
+    }
+   },
+   {
+    "name": "newer state is ok",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 101,
+      "budget_version": 9,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "ok"
+    }
+   },
+   {
+    "name": "stale revocation epoch escalates",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 4,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "escalate",
+     "code": "stale_state",
+     "behind": [
+      "revocation_epoch"
+     ]
+    }
+   },
+   {
+    "name": "two counters behind",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 4,
+      "ledger_tree_size": 100,
+      "budget_version": 6,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "escalate",
+     "code": "stale_state",
+     "behind": [
+      "revocation_epoch",
+      "budget_version"
+     ]
+    }
+   },
+   {
+    "name": "lower policy revision is stale",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 2,
+      "policy_digest": "pd2"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "escalate",
+     "code": "stale_state",
+     "behind": [
+      "policy_revision"
+     ]
+    }
+   },
+   {
+    "name": "wrong scope denied",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_2",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "deny",
+     "code": "wrong_scope"
+    }
+   },
+   {
+    "name": "policy fork denied",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "other"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "deny",
+     "code": "policy_fork"
+    }
+   },
+   {
+    "name": "token from the future denied",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": -59001
+     }
+    },
+    "expect": {
+     "decision": "deny",
+     "code": "token_from_the_future"
+    }
+   },
+   {
+    "name": "future skew boundary is ok",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": -59000
+     }
+    },
+    "expect": {
+     "decision": "ok"
+    }
+   },
+   {
+    "name": "token too old denied",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 11001,
+      "maxTokenAgeMs": 10000
+     }
+    },
+    "expect": {
+     "decision": "deny",
+     "code": "token_too_old"
+    }
+   },
+   {
+    "name": "age boundary is ok",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 11000,
+      "maxTokenAgeMs": 10000
+     }
+    },
+    "expect": {
+     "decision": "ok"
+    }
+   },
+   {
+    "name": "wrong signer denied",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "jTgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCw"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "deny",
+     "code": "bad_token"
+    }
+   },
+   {
+    "name": "forged signature denied",
+    "input": {
+     "token": {
+      "v": 1,
+      "scope": "inst_1",
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "Tgwfxkod4yu3EXmMk2gFYASjlDJSdsFfdHt0RAF-A0UwWJsVasRtixWTl7MOdLZKZoY9BsDdTM-jjUYdylKCwA"
+     },
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "deny",
+     "code": "bad_token"
+    }
+   },
+   {
+    "name": "missing token denied",
+    "input": {
+     "token": null,
+     "local": {
+      "revocation_epoch": 5,
+      "ledger_tree_size": 100,
+      "budget_version": 7,
+      "policy_revision": 3,
+      "policy_digest": "pd3"
+     },
+     "options": {
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "scope": "inst_1",
+      "now": 1000
+     }
+    },
+    "expect": {
+     "decision": "deny",
+     "code": "bad_token"
+    }
+   }
+  ],
+  "bundle_digest": [
+   {
+    "name": "revision 1",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     }
+    },
+    "expect": {
+     "digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs"
+    }
+   },
+   {
+    "name": "revision 2 (the digest ignores the signatures)",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 2,
+      "grants": [
+       "g1",
+       "g2"
+      ],
+      "template_digests": [
+       "t1",
+       "t2"
+      ],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "prev": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "schema_digest": "sd",
+      "sigs": []
+     }
+    },
+    "expect": {
+     "digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4"
+    }
+   }
+  ],
+  "bundle_verify": [
+   {
+    "name": "2-of-3 accepted",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": true,
+     "revision": 1,
+     "digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+     "signers": [
+      "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q"
+     ]
+    }
+   },
+   {
+    "name": "below threshold",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 3,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "below_threshold",
+     "reason": "2 valid pinned signature(s), need 3"
+    }
+   },
+   {
+    "name": "signers not pinned",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "below_threshold",
+     "reason": "0 valid pinned signature(s), need 2"
+    }
+   },
+   {
+    "name": "same signer twice does not count",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "below_threshold",
+     "reason": "1 valid pinned signature(s), need 2"
+    }
+   },
+   {
+    "name": "a signature over other content does not count",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "xf7_MIyHB2HbQTaaKLaNFcRo_Fx6rLRRoGjatlyR0mULvlmHwCjcx9_B8JcjCLls1Lk7vELUYFfF6JGprk7PAg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "below_threshold",
+     "reason": "1 valid pinned signature(s), need 2"
+    }
+   },
+   {
+    "name": "chains to the previous revision",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 2,
+      "grants": [
+       "g1",
+       "g2"
+      ],
+      "template_digests": [
+       "t1",
+       "t2"
+      ],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "prev": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "schema_digest": "sd",
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "_kG6zJR7dpj0x7aIsxtM7rzEjqB1z76smKGMeCzEFpyUdiFd7ia9PkWOUwwhi25sH8yOdLP6gtU74ZUUGkizBQ"
+       },
+       {
+        "signer": "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E",
+        "sig": "ckORx4RnpBrc4471K3OGnBSZQ2FGFgXj2NQtzfUS_Lo7PUjvKuX-ngJIoxrh0CqNjLhx9nVxybHReSh4bhKAAA"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0",
+      "last": {
+       "revision": 1,
+       "digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs"
+      }
+     }
+    },
+    "expect": {
+     "ok": true,
+     "revision": 2,
+     "digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+     "signers": [
+      "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+     ]
+    }
+   },
+   {
+    "name": "rollback",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0",
+      "last": {
+       "revision": 2,
+       "digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4"
+      }
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "rollback",
+     "reason": "revision 1 < accepted 2"
+    }
+   },
+   {
+    "name": "broken chain",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 2,
+      "grants": [
+       "g1",
+       "g2"
+      ],
+      "template_digests": [
+       "t1",
+       "t2"
+      ],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "prev": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "schema_digest": "sd",
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "_kG6zJR7dpj0x7aIsxtM7rzEjqB1z76smKGMeCzEFpyUdiFd7ia9PkWOUwwhi25sH8yOdLP6gtU74ZUUGkizBQ"
+       },
+       {
+        "signer": "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E",
+        "sig": "ckORx4RnpBrc4471K3OGnBSZQ2FGFgXj2NQtzfUS_Lo7PUjvKuX-ngJIoxrh0CqNjLhx9nVxybHReSh4bhKAAA"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0",
+      "last": {
+       "revision": 1,
+       "digest": "not-the-digest"
+      }
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "broken_chain",
+     "reason": "prev does not chain to the accepted revision"
+    }
+   },
+   {
+    "name": "same revision different content",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0",
+      "last": {
+       "revision": 1,
+       "digest": "other"
+      }
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "broken_chain",
+     "reason": "same revision, different content"
+    }
+   },
+   {
+    "name": "verifier too old",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.6.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "4QdN6YeNoQ9NmC2TK9GY73tCTq11Vw5tM9LgvVHsaeEIzHVdNr7QfoBdqBIMTAKUY0UgvgvA5vS2OLlhfO_JBA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "QVrRfenuSyrPniVo_183lBSXw-zW1izJ939hTr-QQArwhw_sR21SZoKr2vE1t6h0s4SREO3OqZIRinAA2M18AQ"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "verifier_too_old",
+     "reason": "needs verifier >= 0.6.0"
+    }
+   },
+   {
+    "name": "verifier version boundary is ok",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.6.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "4QdN6YeNoQ9NmC2TK9GY73tCTq11Vw5tM9LgvVHsaeEIzHVdNr7QfoBdqBIMTAKUY0UgvgvA5vS2OLlhfO_JBA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "QVrRfenuSyrPniVo_183lBSXw-zW1izJ939hTr-QQArwhw_sR21SZoKr2vE1t6h0s4SREO3OqZIRinAA2M18AQ"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.6.0"
+     }
+    },
+    "expect": {
+     "ok": true,
+     "revision": 1,
+     "digest": "Mduo8La7N3t3C3QljZiEz8rK4bgA1Ok18UHjCe2DCJg",
+     "signers": [
+      "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q"
+     ]
+    }
+   },
+   {
+    "name": "an unparseable verifier version is too old (fail closed)",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "v1"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "verifier_too_old",
+     "reason": "needs verifier >= 0.5.0"
+    }
+   },
+   {
+    "name": "malformed: revision 2 without prev",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 2,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "0.5.0",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "malformed",
+     "reason": "prev must be absent at revision 1 and present after"
+    }
+   },
+   {
+    "name": "malformed: not an object",
+    "input": {
+     "bundle": null,
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "malformed",
+     "reason": "not a policy bundle"
+    }
+   },
+   {
+    "name": "malformed: bad min_verifier_version",
+    "input": {
+     "bundle": {
+      "v": 1,
+      "kind": "pca-policy-bundle",
+      "revision": 1,
+      "grants": [
+       "g1"
+      ],
+      "template_digests": [],
+      "min_verifier_version": "v1",
+      "issued_at": 1,
+      "sigs": [
+       {
+        "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+        "sig": "8ox9RhHiPFP9SKsR6W44Yns1S2WNSPi3d0XjYbi008-nNyJapDFqtZgndXtIQkcAAbr9qfCU-PsAssFzMhRwDA"
+       },
+       {
+        "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+        "sig": "mwNnn3yj2Koo22Jv6ZfHSnzHBj4h2AuUmJuZGc7yQH0njC-q0hw1jQxegA8LFgDXWFosl-NbS0zpunJhewc4Cg"
+       }
+      ]
+     },
+     "options": {
+      "signers": [
+       "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q",
+       "7UkoxijRwsbq6QM4kFmVYSlZJzpcY_k2NsFGFKyHN9E"
+      ],
+      "threshold": 2,
+      "verifierVersion": "0.5.0"
+     }
+    },
+    "expect": {
+     "ok": false,
+     "code": "malformed",
+     "reason": "bad min_verifier_version"
+    }
+   }
+  ],
+  "log_commit": [
+   {
+    "name": "record 0",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 1,
+      "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "action_digest": "a1",
+      "decision": "deny",
+      "witness": "clause:7",
+      "at": 5,
+      "seq": 0,
+      "prev": ""
+     }
+    },
+    "expect": {
+     "commit": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+    }
+   },
+   {
+    "name": "record 1",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 1,
+      "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "action_digest": "a2",
+      "decision": "allow",
+      "at": 6,
+      "detail": {
+       "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+       "n": 1
+      },
+      "classes": {
+       "email": "pii"
+      },
+      "seq": 1,
+      "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+     }
+    },
+    "expect": {
+     "commit": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+    }
+   },
+   {
+    "name": "record 2",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 2,
+      "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+      "action_digest": "a3",
+      "decision": "escalate",
+      "at": 7,
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "assurance": "high",
+      "seq": 2,
+      "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+     }
+    },
+    "expect": {
+     "commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM"
+    }
+   }
+  ],
+  "log_head_verify": [
+   {
+    "name": "valid head",
+    "input": {
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": true
+    }
+   },
+   {
+    "name": "other signer",
+    "input": {
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q"
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "tampered size",
+    "input": {
+     "head": {
+      "v": 1,
+      "size": 2,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "tampered root",
+    "input": {
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": false
+    }
+   }
+  ],
+  "log_inclusion": [
+   {
+    "name": "record 0 is in the log",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 1,
+      "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "action_digest": "a1",
+      "decision": "deny",
+      "witness": "clause:7",
+      "at": 5,
+      "seq": 0,
+      "prev": ""
+     },
+     "proof": {
+      "index": 0,
+      "size": 3,
+      "path": [
+       {
+        "side": "R",
+        "hash": "KNzqhfqUWE3JB086S2YGILGpADmPbrez-x1V-8fsd2Y"
+       },
+       {
+        "side": "R",
+        "hash": "iLImVx7E9_10mIMlyII4sgCs0odRa_DB71Smxw0q8ng"
+       }
+      ]
+     },
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": true
+    }
+   },
+   {
+    "name": "record 1 is in the log",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 1,
+      "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "action_digest": "a2",
+      "decision": "allow",
+      "at": 6,
+      "detail": {
+       "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+       "n": 1
+      },
+      "classes": {
+       "email": "pii"
+      },
+      "seq": 1,
+      "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+     },
+     "proof": {
+      "index": 1,
+      "size": 3,
+      "path": [
+       {
+        "side": "L",
+        "hash": "XvYH29zfbKu5UVc1REvMSKx-LD8SENjR48eBOtD4LL4"
+       },
+       {
+        "side": "R",
+        "hash": "iLImVx7E9_10mIMlyII4sgCs0odRa_DB71Smxw0q8ng"
+       }
+      ]
+     },
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": true
+    }
+   },
+   {
+    "name": "record 2 is in the log",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 2,
+      "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+      "action_digest": "a3",
+      "decision": "escalate",
+      "at": 7,
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "assurance": "high",
+      "seq": 2,
+      "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+     },
+     "proof": {
+      "index": 2,
+      "size": 3,
+      "path": [
+       {
+        "side": "L",
+        "hash": "DD12I-ZKuxx_pUdHpGFNgcGd7fAOhud-Fzn0fuYSkmc"
+       }
+      ]
+     },
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": true
+    }
+   },
+   {
+    "name": "an edited record is not",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 1,
+      "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "action_digest": "a1",
+      "decision": "allow",
+      "witness": "clause:7",
+      "at": 5,
+      "seq": 0,
+      "prev": ""
+     },
+     "proof": {
+      "index": 0,
+      "size": 3,
+      "path": [
+       {
+        "side": "R",
+        "hash": "KNzqhfqUWE3JB086S2YGILGpADmPbrez-x1V-8fsd2Y"
+       },
+       {
+        "side": "R",
+        "hash": "iLImVx7E9_10mIMlyII4sgCs0odRa_DB71Smxw0q8ng"
+       }
+      ]
+     },
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "a proof for another record is not",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 1,
+      "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "action_digest": "a1",
+      "decision": "deny",
+      "witness": "clause:7",
+      "at": 5,
+      "seq": 0,
+      "prev": ""
+     },
+     "proof": {
+      "index": 1,
+      "size": 3,
+      "path": [
+       {
+        "side": "L",
+        "hash": "XvYH29zfbKu5UVc1REvMSKx-LD8SENjR48eBOtD4LL4"
+       },
+       {
+        "side": "R",
+        "hash": "iLImVx7E9_10mIMlyII4sgCs0odRa_DB71Smxw0q8ng"
+       }
+      ]
+     },
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "a head by another signer is not",
+    "input": {
+     "record": {
+      "v": 1,
+      "bundle_revision": 1,
+      "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+      "action_digest": "a1",
+      "decision": "deny",
+      "witness": "clause:7",
+      "at": 5,
+      "seq": 0,
+      "prev": ""
+     },
+     "proof": {
+      "index": 0,
+      "size": 3,
+      "path": [
+       {
+        "side": "R",
+        "hash": "KNzqhfqUWE3JB086S2YGILGpADmPbrez-x1V-8fsd2Y"
+       },
+       {
+        "side": "R",
+        "hash": "iLImVx7E9_10mIMlyII4sgCs0odRa_DB71Smxw0q8ng"
+       }
+      ]
+     },
+     "head": {
+      "v": 1,
+      "size": 3,
+      "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+      "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+      "issued_at": 9,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "hNnAkHlnXsbRUMLAJesIpkbhYLCPn0897y65mywXuEpAHsWQ7-eM6f3kJWhrgTsRaArbMPli5QUC6c95tSQ4AQ"
+     },
+     "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q"
+    },
+    "expect": {
+     "valid": false
+    }
+   }
+  ],
+  "log_batch_verify": [
+   {
+    "name": "first two records",
+    "input": {
+     "batch": {
+      "from": 0,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a1",
+        "decision": "deny",
+        "witness": "clause:7",
+        "at": 5,
+        "seq": 0,
+        "prev": ""
+       },
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a2",
+        "decision": "allow",
+        "at": 6,
+        "detail": {
+         "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+         "n": 1
+        },
+        "classes": {
+         "email": "pii"
+        },
+        "seq": 1,
+        "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 11,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "u5jcvQubee4ooJhXt6AF6Q_MO8EvSM1iOrbfQZNaZqRAW4xyT2VvQUmHc0zNXv5N3CvtyCDTWHSR7vb9rPfkAg"
+      }
+     },
+     "state": {
+      "next": 0,
+      "lastCommit": ""
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": true,
+     "next": 2,
+     "lastCommit": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+    }
+   },
+   {
+    "name": "the whole log",
+    "input": {
+     "batch": {
+      "from": 0,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a1",
+        "decision": "deny",
+        "witness": "clause:7",
+        "at": 5,
+        "seq": 0,
+        "prev": ""
+       },
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a2",
+        "decision": "allow",
+        "at": 6,
+        "detail": {
+         "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+         "n": 1
+        },
+        "classes": {
+         "email": "pii"
+        },
+        "seq": 1,
+        "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+       },
+       {
+        "v": 1,
+        "bundle_revision": 2,
+        "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+        "action_digest": "a3",
+        "decision": "escalate",
+        "at": 7,
+        "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+        "assurance": "high",
+        "seq": 2,
+        "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 12,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "4lCErfGjGu5oGcFbKGGBhnHOeA-4qqAR3AIerhgSsqZ1hegWYOvihOA60hmyfQFfoiMqAO7ATIifb66pT6AJAw"
+      }
+     },
+     "state": {
+      "next": 0,
+      "lastCommit": ""
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": true,
+     "next": 3,
+     "lastCommit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM"
+    }
+   },
+   {
+    "name": "the tail continues from the receiver state",
+    "input": {
+     "batch": {
+      "from": 2,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 2,
+        "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+        "action_digest": "a3",
+        "decision": "escalate",
+        "at": 7,
+        "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+        "assurance": "high",
+        "seq": 2,
+        "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 13,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "GNQXWLucv-F_Ll9zbqhWeKOBstoQ7FcYVOLPsD0VioOq4mAnznkwR3TMSdzsnGwrBUP0oshlbIUOlBjVS66bAw"
+      }
+     },
+     "state": {
+      "next": 2,
+      "lastCommit": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": true,
+     "next": 3,
+     "lastCommit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM"
+    }
+   },
+   {
+    "name": "a replayed batch (gap or replay)",
+    "input": {
+     "batch": {
+      "from": 0,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a1",
+        "decision": "deny",
+        "witness": "clause:7",
+        "at": 5,
+        "seq": 0,
+        "prev": ""
+       },
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a2",
+        "decision": "allow",
+        "at": 6,
+        "detail": {
+         "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+         "n": 1
+        },
+        "classes": {
+         "email": "pii"
+        },
+        "seq": 1,
+        "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 11,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "u5jcvQubee4ooJhXt6AF6Q_MO8EvSM1iOrbfQZNaZqRAW4xyT2VvQUmHc0zNXv5N3CvtyCDTWHSR7vb9rPfkAg"
+      }
+     },
+     "state": {
+      "next": 2,
+      "lastCommit": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "gap or replay: batch starts at 0, expected 2"
+    }
+   },
+   {
+    "name": "a gap",
+    "input": {
+     "batch": {
+      "from": 2,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 2,
+        "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+        "action_digest": "a3",
+        "decision": "escalate",
+        "at": 7,
+        "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+        "assurance": "high",
+        "seq": 2,
+        "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 13,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "GNQXWLucv-F_Ll9zbqhWeKOBstoQ7FcYVOLPsD0VioOq4mAnznkwR3TMSdzsnGwrBUP0oshlbIUOlBjVS66bAw"
+      }
+     },
+     "state": {
+      "next": 0,
+      "lastCommit": ""
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "gap or replay: batch starts at 2, expected 0"
+    }
+   },
+   {
+    "name": "a head by another signer",
+    "input": {
+     "batch": {
+      "from": 0,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a1",
+        "decision": "deny",
+        "witness": "clause:7",
+        "at": 5,
+        "seq": 0,
+        "prev": ""
+       },
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a2",
+        "decision": "allow",
+        "at": 6,
+        "detail": {
+         "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+         "n": 1
+        },
+        "classes": {
+         "email": "pii"
+        },
+        "seq": 1,
+        "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+       },
+       {
+        "v": 1,
+        "bundle_revision": 2,
+        "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+        "action_digest": "a3",
+        "decision": "escalate",
+        "at": 7,
+        "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+        "assurance": "high",
+        "seq": 2,
+        "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 12,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "4lCErfGjGu5oGcFbKGGBhnHOeA-4qqAR3AIerhgSsqZ1hegWYOvihOA60hmyfQFfoiMqAO7ATIifb66pT6AJAw"
+      }
+     },
+     "state": {
+      "next": 0,
+      "lastCommit": ""
+     },
+     "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "head not signed by the pinned log signer"
+    }
+   },
+   {
+    "name": "an edited record breaks the chain",
+    "input": {
+     "batch": {
+      "from": 0,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a1",
+        "decision": "deny",
+        "witness": "clause:7",
+        "at": 5,
+        "seq": 0,
+        "prev": ""
+       },
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a2",
+        "decision": "deny",
+        "at": 6,
+        "detail": {
+         "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+         "n": 1
+        },
+        "classes": {
+         "email": "pii"
+        },
+        "seq": 1,
+        "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+       },
+       {
+        "v": 1,
+        "bundle_revision": 2,
+        "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+        "action_digest": "a3",
+        "decision": "escalate",
+        "at": 7,
+        "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+        "assurance": "high",
+        "seq": 2,
+        "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 12,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "4lCErfGjGu5oGcFbKGGBhnHOeA-4qqAR3AIerhgSsqZ1hegWYOvihOA60hmyfQFfoiMqAO7ATIifb66pT6AJAw"
+      }
+     },
+     "state": {
+      "next": 0,
+      "lastCommit": ""
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "chain broken at seq 2"
+    }
+   },
+   {
+    "name": "a truncated tail against the head",
+    "input": {
+     "batch": {
+      "from": 0,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a1",
+        "decision": "deny",
+        "witness": "clause:7",
+        "at": 5,
+        "seq": 0,
+        "prev": ""
+       },
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a2",
+        "decision": "allow",
+        "at": 6,
+        "detail": {
+         "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+         "n": 1
+        },
+        "classes": {
+         "email": "pii"
+        },
+        "seq": 1,
+        "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 3,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 10,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "BUUpO3l38ey1tmKh1xV8eSj-EgmC69bXJVhYhM9SWQFrsjfOSQ_2pJ3rIf_PYFecyIxxRFbF4CTxODcPB1ChCw"
+      }
+     },
+     "state": {
+      "next": 0,
+      "lastCommit": ""
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": true,
+     "next": 2,
+     "lastCommit": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+    }
+   },
+   {
+    "name": "a batch longer than the head",
+    "input": {
+     "batch": {
+      "from": 0,
+      "records": [
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a1",
+        "decision": "deny",
+        "witness": "clause:7",
+        "at": 5,
+        "seq": 0,
+        "prev": ""
+       },
+       {
+        "v": 1,
+        "bundle_revision": 1,
+        "bundle_digest": "I3UbBo1GAVVviqP8JqMqdRH-skqyopnb3qfh31jSnzs",
+        "action_digest": "a2",
+        "decision": "allow",
+        "at": 6,
+        "detail": {
+         "email": "masked:pii:QVCALPoIC1zj8_L1OdU-1E_zdVnOfjbJpuNr8oqjWAg",
+         "n": 1
+        },
+        "classes": {
+         "email": "pii"
+        },
+        "seq": 1,
+        "prev": "fiB0UD4tPzXmvt5bs3w5xjsJshJpJ86loyb3rhDHDT4"
+       },
+       {
+        "v": 1,
+        "bundle_revision": 2,
+        "bundle_digest": "iMABibvXS4fkgbSsqXqTGBNyRI1_3RbHLK7JkOxRyh4",
+        "action_digest": "a3",
+        "decision": "escalate",
+        "at": 7,
+        "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+        "assurance": "high",
+        "seq": 2,
+        "prev": "0p7UfKVLjXnGnKUCnrBah00ZFvZ003-WgsOtvK6pVpc"
+       }
+      ],
+      "head": {
+       "v": 1,
+       "size": 2,
+       "root": "twV_qCApbMKZGYDE_GOcxpMa0ZovAaZY_5IM08eKb3M",
+       "last_commit": "uqkikonHNc6uUaR1B-fVTVi1TI9wvoMyBluzg82etdM",
+       "issued_at": 10,
+       "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+       "sig": "BUUpO3l38ey1tmKh1xV8eSj-EgmC69bXJVhYhM9SWQFrsjfOSQ_2pJ3rIf_PYFecyIxxRFbF4CTxODcPB1ChCw"
+      }
+     },
+     "state": {
+      "next": 0,
+      "lastCommit": ""
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "head not signed by the pinned log signer"
+    }
+   }
+  ],
+  "list_objects_digest": [
+   {
+    "name": "digest of the returned ids",
+    "input": {
+     "objects": [
+      "doc:0",
+      "doc:2",
+      "doc:4"
+     ]
+    },
+    "expect": {
+     "digest": "-KV5x7QBaqsaxL09nEgrkgG7xs_kBoN_dp9NWtQihdk"
+    }
+   }
+  ],
+  "list_receipt_verify": [
+   {
+    "name": "valid with objects",
+    "input": {
+     "receipt": {
+      "v": 1,
+      "subject": "agent:a",
+      "resource_type": "doc",
+      "policy_digest": "pd",
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "filter_digest": "f1",
+      "count": 3,
+      "objects_digest": "-KV5x7QBaqsaxL09nEgrkgG7xs_kBoN_dp9NWtQihdk",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "iXyPwtH1NKtbI27fDlFQ_ppJczhm94iCq5T5vxwHUpefyi4IQIP8c0fId_K92BTI9WScH7071m_wHfeFsNlwCg"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "objects": [
+      "doc:0",
+      "doc:2",
+      "doc:4"
+     ]
+    },
+    "expect": {
+     "valid": true
+    }
+   },
+   {
+    "name": "valid without objects",
+    "input": {
+     "receipt": {
+      "v": 1,
+      "subject": "agent:a",
+      "resource_type": "doc",
+      "policy_digest": "pd",
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "filter_digest": "f1",
+      "count": 3,
+      "objects_digest": "-KV5x7QBaqsaxL09nEgrkgG7xs_kBoN_dp9NWtQihdk",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "iXyPwtH1NKtbI27fDlFQ_ppJczhm94iCq5T5vxwHUpefyi4IQIP8c0fId_K92BTI9WScH7071m_wHfeFsNlwCg"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": true
+    }
+   },
+   {
+    "name": "different objects",
+    "input": {
+     "receipt": {
+      "v": 1,
+      "subject": "agent:a",
+      "resource_type": "doc",
+      "policy_digest": "pd",
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "filter_digest": "f1",
+      "count": 3,
+      "objects_digest": "-KV5x7QBaqsaxL09nEgrkgG7xs_kBoN_dp9NWtQihdk",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "iXyPwtH1NKtbI27fDlFQ_ppJczhm94iCq5T5vxwHUpefyi4IQIP8c0fId_K92BTI9WScH7071m_wHfeFsNlwCg"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "objects": [
+      "doc:2",
+      "doc:4",
+      "doc:99"
+     ]
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "fewer objects",
+    "input": {
+     "receipt": {
+      "v": 1,
+      "subject": "agent:a",
+      "resource_type": "doc",
+      "policy_digest": "pd",
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "filter_digest": "f1",
+      "count": 3,
+      "objects_digest": "-KV5x7QBaqsaxL09nEgrkgG7xs_kBoN_dp9NWtQihdk",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "iXyPwtH1NKtbI27fDlFQ_ppJczhm94iCq5T5vxwHUpefyi4IQIP8c0fId_K92BTI9WScH7071m_wHfeFsNlwCg"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "objects": [
+      "doc:2",
+      "doc:4"
+     ]
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "tampered policy digest",
+    "input": {
+     "receipt": {
+      "v": 1,
+      "subject": "agent:a",
+      "resource_type": "doc",
+      "policy_digest": "x",
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "filter_digest": "f1",
+      "count": 3,
+      "objects_digest": "-KV5x7QBaqsaxL09nEgrkgG7xs_kBoN_dp9NWtQihdk",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "iXyPwtH1NKtbI27fDlFQ_ppJczhm94iCq5T5vxwHUpefyi4IQIP8c0fId_K92BTI9WScH7071m_wHfeFsNlwCg"
+     },
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "valid": false
+    }
+   },
+   {
+    "name": "other signer",
+    "input": {
+     "receipt": {
+      "v": 1,
+      "subject": "agent:a",
+      "resource_type": "doc",
+      "policy_digest": "pd",
+      "fresh_at": "ClRIUkpxLZczkk9C6zJRqJf5qmF2t7jGVQ2Oxx9L_IE",
+      "filter_digest": "f1",
+      "count": 3,
+      "objects_digest": "-KV5x7QBaqsaxL09nEgrkgG7xs_kBoN_dp9NWtQihdk",
+      "issued_at": 1000,
+      "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+      "sig": "iXyPwtH1NKtbI27fDlFQ_ppJczhm94iCq5T5vxwHUpefyi4IQIP8c0fId_K92BTI9WScH7071m_wHfeFsNlwCg"
+     },
+     "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q"
+    },
+    "expect": {
+     "valid": false
+    }
+   }
+  ],
+  "list_bind": [
+   {
+    "name": "bind digest",
+    "input": {
+     "bind": {
+      "subject": "agent:a",
+      "resourceType": "doc",
+      "filterId": "f1",
+      "policyDigest": "pd",
+      "limit": 2
+     }
+    },
+    "expect": {
+     "digest": "waN_ybfP-B1ofEid35VWDtuRf6qcxh8sqDVhH7iSKBg"
+    }
+   },
+   {
+    "name": "with a relation",
+    "input": {
+     "bind": {
+      "subject": "agent:a",
+      "resourceType": "doc",
+      "filterId": "f1",
+      "policyDigest": "pd",
+      "limit": 2,
+      "relation": {
+       "relation": "viewer"
+      }
+     }
+    },
+    "expect": {
+     "digest": "khtXoT3TePpJsoM9PrkRyiUg3QDxqB5G_flaxy3JGxs"
+    }
+   }
+  ],
+  "list_cursor_verify": [
+   {
+    "name": "valid, no bind check",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": true,
+     "inner": "2",
+     "skip": 1
+    }
+   },
+   {
+    "name": "valid and bound to its inputs",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "bind": {
+      "subject": "agent:a",
+      "resourceType": "doc",
+      "filterId": "f1",
+      "policyDigest": "pd",
+      "limit": 2
+     }
+    },
+    "expect": {
+     "ok": true,
+     "inner": "2",
+     "skip": 1
+    }
+   },
+   {
+    "name": "another subject",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "bind": {
+      "subject": "agent:b",
+      "resourceType": "doc",
+      "filterId": "f1",
+      "policyDigest": "pd",
+      "limit": 2
+     }
+    },
+    "expect": {
+     "ok": false,
+     "reason": "bind"
+    }
+   },
+   {
+    "name": "another filter",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "bind": {
+      "subject": "agent:a",
+      "resourceType": "doc",
+      "filterId": "f2",
+      "policyDigest": "pd",
+      "limit": 2
+     }
+    },
+    "expect": {
+     "ok": false,
+     "reason": "bind"
+    }
+   },
+   {
+    "name": "another policy",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "bind": {
+      "subject": "agent:a",
+      "resourceType": "doc",
+      "filterId": "f1",
+      "policyDigest": "p2",
+      "limit": 2
+     }
+    },
+    "expect": {
+     "ok": false,
+     "reason": "bind"
+    }
+   },
+   {
+    "name": "another type",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "bind": {
+      "subject": "agent:a",
+      "resourceType": "img",
+      "filterId": "f1",
+      "policyDigest": "pd",
+      "limit": 2
+     }
+    },
+    "expect": {
+     "ok": false,
+     "reason": "bind"
+    }
+   },
+   {
+    "name": "another limit",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w",
+     "bind": {
+      "subject": "agent:a",
+      "resourceType": "doc",
+      "filterId": "f1",
+      "policyDigest": "pd",
+      "limit": 3
+     }
+    },
+    "expect": {
+     "ok": false,
+     "reason": "bind"
+    }
+   },
+   {
+    "name": "another signer",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBA",
+     "signer": "gTl3Dqh9F19Wo1Rmw0x-zMuNipG07jeiXfYPW4_Js5Q"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "signature"
+    }
+   },
+   {
+    "name": "forged signature",
+    "input": {
+     "cursor": "eyJ2IjoxLCJpbm5lciI6IjIiLCJza2lwIjoxLCJiaW5kIjoid2FOX3liZlAtQjFvZkVpZDM1VldEdHVSZjZxY3hoOHNxRFZoSDdpU0tCZyIsInNpZ25lciI6ImlvamozWFFKOFpYOVV0c3RQTHBkY3NwbkNiOGRsQkliODNTSUFiUVBiMXcifQ.zVuIJxCNoAf5PHUjfT7lSwpF_EGhC3Lq6nWL2CDYW2mRUCG64ikdMUfXrscaxADN-Sva8SIDrBMqU8wfVemuBB",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "signature"
+    }
+   },
+   {
+    "name": "garbage",
+    "input": {
+     "cursor": "garbage",
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "malformed"
+    }
+   },
+   {
+    "name": "not a string",
+    "input": {
+     "cursor": 7,
+     "signer": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w"
+    },
+    "expect": {
+     "ok": false,
+     "reason": "malformed"
+    }
+   }
+  ],
+  "authority_digest": [
+   {
+    "name": "digest",
+    "input": {
+     "authority": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "digest": "8_5yKX9y1M0rc7YmPr94JOIDCvrdznNaDO_eNMFuf3E"
+    }
+   },
+   {
+    "name": "verb and resource order do not matter",
+    "input": {
+     "authority": {
+      "verbs": [
+       "pay",
+       "read"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "digest": "8_5yKX9y1M0rc7YmPr94JOIDCvrdznNaDO_eNMFuf3E"
+    }
+   }
+  ],
+  "authority_compare": [
+   {
+    "name": "equal",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "equal"
+    }
+   },
+   {
+    "name": "narrower verbs",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "narrower"
+    }
+   },
+   {
+    "name": "wider verbs",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay",
+       "delete"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "wider"
+    }
+   },
+   {
+    "name": "lower ceiling",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 50
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "narrower"
+    }
+   },
+   {
+    "name": "higher ceiling",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 500
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "wider"
+    }
+   },
+   {
+    "name": "dropped ceiling",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {},
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "wider"
+    }
+   },
+   {
+    "name": "dropped expiry",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      }
+     }
+    },
+    "expect": {
+     "order": "wider"
+    }
+   },
+   {
+    "name": "sooner expiry",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 5000
+     }
+    },
+    "expect": {
+     "order": "narrower"
+    }
+   },
+   {
+    "name": "narrower resource",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/x"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "narrower"
+    }
+   },
+   {
+    "name": "wider resource",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "wider"
+    }
+   },
+   {
+    "name": "incomparable",
+    "input": {
+     "old": {
+      "verbs": [
+       "read",
+       "pay"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 100
+      },
+      "expires_at": 10000
+     },
+     "new": {
+      "verbs": [
+       "read",
+       "x"
+      ],
+      "resources": [
+       "acct/1/*"
+      ],
+      "limits": {
+       "money.usd": 1
+      },
+      "expires_at": 10000
+     }
+    },
+    "expect": {
+     "order": "incomparable"
+    }
+   }
+  ],
+  "amend_verify": [
+   {
+    "name": "narrow by the holder",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "4i843qgzcJ7_-CgNCcSUl9cFLVMUbev8-0_tBcCKndspSs2sCtciMRI1ZiDfcwwe8IIj299sndYkFDwA1OMEAg",
+      "signed_by": "holder"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": true,
+     "widens": false,
+     "next_digest": "DUPeBYR_U-FdbHDDth-0XYwQVQJynbhyy2mhbsjN20k"
+    }
+   },
+   {
+    "name": "narrow by the principal",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "lN0fFk0SU_taIDDnOq9kfJCHnsGTV_65SAQLu33Fh2_9dydlRJwSEw-9r3p5bl9FJPhW4bzjBpjPQ0v0SfJvDA",
+      "signed_by": "principal"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": true,
+     "widens": false,
+     "next_digest": "DUPeBYR_U-FdbHDDth-0XYwQVQJynbhyy2mhbsjN20k"
+    }
+   },
+   {
+    "name": "narrow that changes nothing",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "tNEtBVjh7r7uOjv-UhUWHIZAyrenvsYjUj_37EhkDn0MB1Cl77u6ooYjgD3t27NNNZFnHsxls6z7PVbL9vcOCA",
+      "signed_by": "holder"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "not_narrower"
+    }
+   },
+   {
+    "name": "narrow that widens",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay",
+        "delete"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "lV9sa9sMVegV3seMojeCrPofp_SrZuhTEwe0aXFyIHjZvrak6nsxP08U6aucJ4mq4prVt0AcM79MRMu8ZtNfCw",
+      "signed_by": "principal"
+     },
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "not_narrower"
+    }
+   },
+   {
+    "name": "unsigned",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "signature_required"
+    }
+   },
+   {
+    "name": "signed by a stranger",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "0oJphgrItioUNaC4tjneYLLnTIJ-7gsOU6Yb5Zc0PgCThWVD-gbUV9aronv9HKU4rXw6T6ijac9QKl-Lr7GOAw",
+      "signed_by": "holder"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "a signature for the previous revision cannot be replayed",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 2,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "4i843qgzcJ7_-CgNCcSUl9cFLVMUbev8-0_tBcCKndspSs2sCtciMRI1ZiDfcwwe8IIj299sndYkFDwA1OMEAg",
+      "signed_by": "holder"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "a signature for another action",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "replace",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "4i843qgzcJ7_-CgNCcSUl9cFLVMUbev8-0_tBcCKndspSs2sCtciMRI1ZiDfcwwe8IIj299sndYkFDwA1OMEAg",
+      "signed_by": "holder"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "replace that widens, holder signature",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "replace",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay",
+        "delete"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "WzFknj42g2QNCeS6StuvheJ-GgqNOUGClu0gjRo9OKgqiL-w88AKzj9zeV-NNhJq3rRGYw5CEnj0zWmqAkLJDA",
+      "signed_by": "holder",
+      "step_up_ref": "s"
+     },
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "signature_required"
+    }
+   },
+   {
+    "name": "replace that widens, principal signature, no step-up",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "replace",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay",
+        "delete"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "zr-Qagf2Asx9KjgQ3fPWZvrCqrOPgh72mJi28ZT3FxAp1uFB4mcmcO8MKRP7bXYh1vvYv1_FppGM5OsMvFTcBg",
+      "signed_by": "principal"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "step_up_required"
+    }
+   },
+   {
+    "name": "replace that widens, principal signature and step-up",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "replace",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay",
+        "delete"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "zr-Qagf2Asx9KjgQ3fPWZvrCqrOPgh72mJi28ZT3FxAp1uFB4mcmcO8MKRP7bXYh1vvYv1_FppGM5OsMvFTcBg",
+      "signed_by": "principal",
+      "step_up_ref": "s"
+     },
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": true,
+     "widens": true,
+     "next_digest": "rUX-NaD5_CtsNJk2UvfK_vz9vSaLzyk4EcY8HiUR29w"
+    }
+   },
+   {
+    "name": "merge unions authority and keeps omitted ceilings",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "merge",
+      "authority": {
+       "verbs": [
+        "delete"
+       ],
+       "resources": [
+        "acct/2/*"
+       ],
+       "limits": {
+        "money.usd": 300
+       },
+       "expires_at": 20000
+      },
+      "sig": "wGcIGKIHOgtjo5keFqb7MR-48I8LC6q58bsHw4E_ZJ6BY0e1m0TEVrx_CSjdnvhvWVVe1QpgMew-11lZxVAEDw",
+      "signed_by": "principal",
+      "step_up_ref": "s"
+     },
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": true,
+     "widens": true,
+     "next_digest": "9Nz3jx8JTQ3wxPoXD-tpYP0afmiPiCMHdnw5qLTc0Hw"
+    }
+   },
+   {
+    "name": "replace to something narrower is in place",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "replace",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "eS63cnf9MV_bulLnYW9p9nTFDqo91g1jdqGAO0LL6yjuuaZKUenRmF3e6QKgXF4j7OvdWQN4tboFOZWeiQdzAw",
+      "signed_by": "holder"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": true,
+     "widens": false,
+     "next_digest": "DUPeBYR_U-FdbHDDth-0XYwQVQJynbhyy2mhbsjN20k"
+    }
+   },
+   {
+    "name": "grant not active",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "revoked",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      },
+      "sig": "4i843qgzcJ7_-CgNCcSUl9cFLVMUbev8-0_tBcCKndspSs2sCtciMRI1ZiDfcwwe8IIj299sndYkFDwA1OMEAg",
+      "signed_by": "holder"
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "not_active"
+    }
+   },
+   {
+    "name": "unknown action",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "bogus",
+      "authority": {
+       "verbs": [
+        "read"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_request"
+    }
+   },
+   {
+    "name": "malformed authority",
+    "input": {
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "request": {
+      "action": "narrow",
+      "authority": {
+       "verbs": "read",
+       "resources": []
+      }
+     },
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_request"
+    }
+   }
+  ],
+  "revoke_verify": [
+   {
+    "name": "grant scope",
+    "input": {
+     "root": {
+      "id": "g_0",
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw"
+     },
+     "scope": "grant",
+     "sig": "c4Imv_Oi4EFBhZ7X66fG65Nlse42O78YqoDiuc2ZXtQqtuO7Uks1orGyak5qSEWhSfN3_ZlutGNBvzngiCS7DQ"
+    },
+    "expect": {
+     "ok": true,
+     "scope": "grant"
+    }
+   },
+   {
+    "name": "subtree scope",
+    "input": {
+     "root": {
+      "id": "g_0",
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw"
+     },
+     "scope": "subtree",
+     "sig": "6haYm7MuyXfprogt1vnXTd2uaqUVJr5at29B6ooYZLjyMeCNNyFh5csoDbEe_dUwCn1hqjgsiL-ASMntzFFaAA"
+    },
+    "expect": {
+     "ok": true,
+     "scope": "subtree"
+    }
+   },
+   {
+    "name": "a grant-scope signature does not authorise subtree",
+    "input": {
+     "root": {
+      "id": "g_0",
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw"
+     },
+     "scope": "subtree",
+     "sig": "c4Imv_Oi4EFBhZ7X66fG65Nlse42O78YqoDiuc2ZXtQqtuO7Uks1orGyak5qSEWhSfN3_ZlutGNBvzngiCS7DQ"
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "a stranger",
+    "input": {
+     "root": {
+      "id": "g_0",
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw"
+     },
+     "scope": "grant",
+     "sig": "jefxfy0WVb6Fc2xfuMkQ7iS8-hpFFsF1faUcVXOx1QdeGTUc2Rosnh7hU9UnPZtsVxkT51TnLLqMNcTZm8lHBQ"
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "another grant id",
+    "input": {
+     "root": {
+      "id": "g_9",
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw"
+     },
+     "scope": "grant",
+     "sig": "c4Imv_Oi4EFBhZ7X66fG65Nlse42O78YqoDiuc2ZXtQqtuO7Uks1orGyak5qSEWhSfN3_ZlutGNBvzngiCS7DQ"
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "unknown scope",
+    "input": {
+     "root": {
+      "id": "g_0",
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw"
+     },
+     "scope": "galaxy",
+     "sig": "c4Imv_Oi4EFBhZ7X66fG65Nlse42O78YqoDiuc2ZXtQqtuO7Uks1orGyak5qSEWhSfN3_ZlutGNBvzngiCS7DQ"
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_request"
+    }
+   },
+   {
+    "name": "no signature",
+    "input": {
+     "root": {
+      "id": "g_0",
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw"
+     },
+     "scope": "grant"
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   }
+  ],
+  "need_approve_verify": [
+   {
+    "name": "approve as asked",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "PRjte80RbS7sscxAghkTiEjqDD7wYFTkfJzwUfT5rJTmeIvdYl3BnuwoEsOGiVTYOHwt9lWgXi338XCHGyRIBw",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": true,
+     "authority_digest": "16hCJIAy_IZOJNE9hhaIX1SJHgnyHab38PTuTz92cgI"
+    }
+   },
+   {
+    "name": "approve a lowered amount of an adjustable need",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 250
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "h9kw8oU15x2RgRgBv6iepsm35OnGkdz-VQBRn1pWD8g3TcS0YwOZ3Us5w5p25Odh7DWpFjW1y0UG3gk_U8FtDQ",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": true,
+     "authority_digest": "mhz8zktUi1DzaUxuOM4xc_8SGwA_tLpF8Ym0e4bAg4U"
+    }
+   },
+   {
+    "name": "a raised amount",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 401
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "rtzxrFF3sNQsxquu1VBAyBXMrHOHebcsJigGTTQgdMGV2JFe4ybzgp1DMG5T9njyjCIzhON8hDkPchDe_PlYBg",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "need_not_lowered_only"
+    }
+   },
+   {
+    "name": "a changed target",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "5FAQ5d76rOTrUFfo62v1of77W3H8Ah-wZVaF-RI-ym1QXDuZQjfrltxx37plhixDNcQrWH_Vgh7oMRKHf0qfAw",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "need_not_lowered_only"
+    }
+   },
+   {
+    "name": "lowering a non-adjustable need",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": false
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 250
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "h9kw8oU15x2RgRgBv6iepsm35OnGkdz-VQBRn1pWD8g3TcS0YwOZ3Us5w5p25Odh7DWpFjW1y0UG3gk_U8FtDQ",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "need_not_adjustable"
+    }
+   },
+   {
+    "name": "wrong count",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      },
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "ckK6Y4kr0hwBU-mT9pZVdGpb8eU2w4b1IpQlIhrZfh6BXPu4fVwNx3cYURTaIQL0GXBYYII7uJyqKCuWin6MDg",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "need_not_lowered_only"
+    }
+   },
+   {
+    "name": "signed by a stranger",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "8uLflRwy1FwzyAiguRVXL49Gs5ePeRVBfQGe9LhaNpv4Xx-8YRIf6dN9XGnw-5IN1StOknjqDVBLUypjt2VVBA",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "signed for another revision",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "RKS3otNky0dZc9DCOPeh2BiY60oxhBmOuu7GuvA4S6y0_Yr80Dd6LYQncOkMtjTFJZH5lSjUiovzXY9Ld9PhCw",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "bad_signature"
+    }
+   },
+   {
+    "name": "no step-up",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "PRjte80RbS7sscxAghkTiEjqDD7wYFTkfJzwUfT5rJTmeIvdYl3BnuwoEsOGiVTYOHwt9lWgXi338XCHGyRIBw",
+     "step_up_ok": false
+    },
+    "expect": {
+     "ok": false,
+     "code": "step_up_required"
+    }
+   },
+   {
+    "name": "already approved",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "approved"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "money.usd": 400
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "PRjte80RbS7sscxAghkTiEjqDD7wYFTkfJzwUfT5rJTmeIvdYl3BnuwoEsOGiVTYOHwt9lWgXi338XCHGyRIBw",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "conflict"
+    }
+   },
+   {
+    "name": "a limit that was not asked for",
+    "input": {
+     "need_request": {
+      "id": "n_1",
+      "grant_id": "g_0",
+      "needs": [
+       {
+        "verb": "pay",
+        "resource": "acct/9/*",
+        "limits": {
+         "money.usd": 400
+        },
+        "adjustable": true
+       }
+      ],
+      "status": "pending"
+     },
+     "grant": {
+      "id": "g_0",
+      "rev": 1,
+      "principal": "Q6cucUQBdi32a2jCbfvfJoKq7J8kdOykYT5CSg-6_Tw",
+      "agent": "Zr5-Myx6RTMyvZ0Kf32wVfXF7xoGraZtmLOftoEMRzo",
+      "status": "active",
+      "authority": {
+       "verbs": [
+        "read",
+        "pay"
+       ],
+       "resources": [
+        "acct/1/*"
+       ],
+       "limits": {
+        "money.usd": 100
+       },
+       "expires_at": 10000
+      }
+     },
+     "approved": [
+      {
+       "verb": "pay",
+       "resource": "acct/9/*",
+       "limits": {
+        "gold.oz": 1
+       },
+       "adjustable": true
+      }
+     ],
+     "sig": "k9cW528X_zHpk-g4WF7PeRpHW-8NBOViLTMYUIJGjOYVOVgva-xoy7cuM9KENq2p7Kt4mEeLS2mlByj77IW_DQ",
+     "step_up_ok": true
+    },
+    "expect": {
+     "ok": false,
+     "code": "need_not_lowered_only"
+    }
+   }
+  ]
+ }
+}

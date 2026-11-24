@@ -31,11 +31,21 @@ for i in $(seq 1 40); do
   [ "$i" = 40 ] && { echo "::error::the flagship repo has no ref '$REF' (push it at the same ref)"; exit 1; }
   echo "waiting for the flagship ref '$REF' ($i/40)"; sleep 30
 done
-rm -rf "$DEST"
-git clone -q --depth 1 --filter=blob:none --sparse --branch "$REF" "$URL" "$DEST"
+# The clone is partial (blobs are fetched on demand), so a dropped connection can fail the clone's own checkout or the sparse-checkout
+# below ("could not fetch ... from promisor remote"): retry the whole fetch a few times rather than failing the job on one network blip.
+fetch_flagship() {
+  rm -rf "$DEST"
+  git clone -q --depth 1 --filter=blob:none --sparse --branch "$REF" "$URL" "$DEST" || return 1
 # tools/pca-diff-fuzz/counterexamples: the conformance runners of the mutation layouts ($MONO/sdks/<crate>) reach them at
 # ../../tools/pca-diff-fuzz/counterexamples and silently SKIP them when absent (fewer oracle inputs for the mutants)
-git -C "$DEST" sparse-checkout set conformance packages/pca/conformance packages/pca-conformance tools/pca-audit sdks/pca-less-c tools/pca-diff-fuzz/counterexamples
+# packages/pca/src: the SDK catalog tests compare their built-in action catalog with the reference (catalog-builtin.generated.ts)
+  git -C "$DEST" sparse-checkout set conformance packages/pca/conformance packages/pca-conformance tools/pca-audit sdks/pca-less-c tools/pca-diff-fuzz/counterexamples packages/pca/src
+}
+for i in 1 2 3 4 5; do
+  fetch_flagship && break
+  [ "$i" = 5 ] && { echo "::error::could not fetch the flagship corpus from $URL after 5 attempts"; exit 1; }
+  echo "flagship fetch failed (attempt $i/5); retrying"; sleep $((i * 20))
+done
 echo "flagship $REF @ $(git -C "$DEST" rev-parse HEAD)"
 cp "$DEST/conformance/vectors-adversarial.json.gz" conformance/
 
@@ -53,6 +63,7 @@ if [ "$MODE" = mono ]; then
   cp -R "$DEST/packages/pca/conformance" "$M/packages/pca/"
   cp -R "$DEST/packages/pca-conformance" "$M/packages/"
   cp -R "$DEST/tools/pca-audit" "$M/tools/"
+  mkdir -p "$M/packages/pca/src" && cp "$DEST/packages/pca/src/catalog-builtin.generated.ts" "$M/packages/pca/src/"
   cp -R "$DEST/sdks/pca-less-c" "$M/sdks/" 2>/dev/null || true
   cp -R . "$SDK/"; rm -rf "$SDK/.git"
   echo "PCA_MONO_SDK=$SDK" >> "${GITHUB_ENV:-/dev/null}"
@@ -63,4 +74,5 @@ elif [ "$MODE" = layout ]; then
   cp -R "$DEST/packages/pca/conformance" packages/pca/
   cp -R "$DEST/packages/pca-conformance" packages/
   cp -R "$DEST/tools/pca-audit" tools/
+  mkdir -p packages/pca/src && cp "$DEST/packages/pca/src/catalog-builtin.generated.ts" packages/pca/src/
 fi

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1
+
+First 0.5 release. 0.5.0 was never published; its changes, below, ship in 0.5.1.
+
+- Lockstep release. Tier: hardened, awaiting independent audit. No wire change.
+
 ## 0.4.1 - 2026-10-12
 
 - Lockstep release with the PCA 0.4.1 security fix (root caveats enforced in the policy layer). No change in this crate.

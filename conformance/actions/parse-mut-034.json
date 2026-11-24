@@ -1,0 +1,1 @@
+{"id":"parse-mut-034","kind":"parse","input":{"def":{"v":1,"kind":"pca-action-def","verb":"gen34.item.act2","title":"Generated action 34","effects":[],"resource":{"type":"gen.item","id":{"exact":"only"},"scope":"one"},"params":{},"review":{"state":"suggested"},"traits":["pca.money_moving","pca.data_export","pca.pii_access"]}},"expect":{"ok":false}}

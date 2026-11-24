@@ -170,8 +170,8 @@ fn r6_zk06_the_journal_carries_the_guest_version_and_an_older_one_is_refused() {
 #[test]
 fn a_legacy_receipt_does_not_verify_under_the_current_image_id() {
     let cur = image_id("image_id.json");
-    for rel in ["legacy/receipt_succinct.bin", "legacy/dcf198fc/receipt_succinct.bin", "legacy/receipt_groth16.bin", "legacy/dcf198fc/receipt_groth16.bin", "legacy/6b0ac893/receipt_succinct.bin", "legacy/6b0ac893/receipt_groth16.bin", "legacy/ce0b5423/receipt_succinct.bin", "legacy/ce0b5423/receipt_groth16.bin", "legacy/1c1b8bbd/receipt_succinct.bin", "legacy/1c1b8bbd/receipt_groth16.bin", "legacy/e922536c/receipt_succinct.bin", "legacy/e922536c/receipt_groth16.bin", "legacy/3b1eebb5/receipt_succinct.bin", "legacy/3b1eebb5/receipt_groth16.bin", "legacy/0c97a02b/receipt_succinct.bin", "legacy/0c97a02b/receipt_groth16.bin", "legacy/c5107456/receipt_succinct.bin", "legacy/c5107456/receipt_groth16.bin"] {
-        if rel.contains("1c1b8bbd") || rel.contains("e922536c") || rel.contains("3b1eebb5") || rel.contains("0c97a02b") || rel.contains("c5107456") {
+    for rel in ["legacy/receipt_succinct.bin", "legacy/dcf198fc/receipt_succinct.bin", "legacy/receipt_groth16.bin", "legacy/dcf198fc/receipt_groth16.bin", "legacy/6b0ac893/receipt_succinct.bin", "legacy/6b0ac893/receipt_groth16.bin", "legacy/ce0b5423/receipt_succinct.bin", "legacy/ce0b5423/receipt_groth16.bin", "legacy/1c1b8bbd/receipt_succinct.bin", "legacy/1c1b8bbd/receipt_groth16.bin", "legacy/e922536c/receipt_succinct.bin", "legacy/e922536c/receipt_groth16.bin", "legacy/3b1eebb5/receipt_succinct.bin", "legacy/3b1eebb5/receipt_groth16.bin", "legacy/0c97a02b/receipt_succinct.bin", "legacy/0c97a02b/receipt_groth16.bin", "legacy/c5107456/receipt_succinct.bin", "legacy/c5107456/receipt_groth16.bin", "legacy/432b4713/receipt_succinct.bin", "legacy/432b4713/receipt_groth16.bin"] {
+        if rel.contains("1c1b8bbd") || rel.contains("e922536c") || rel.contains("3b1eebb5") || rel.contains("0c97a02b") || rel.contains("c5107456") || rel.contains("432b4713") {
             let r: Receipt = bincode::deserialize(&read(rel)).unwrap();
             assert!(r.verify(cur).is_err(), "{rel} must not verify under the current id");
             continue;
@@ -254,7 +254,7 @@ fn a_guest_version_7_receipt_is_refused() {
 fn a_guest_version_8_receipt_is_refused() {
     // R3-01: the 0.4.2 guest (0c97a02b, guest version 8) verified a pure-PQ / hybrid session root under the PQ key named in the
     // root's own principals[] entry, so its receipt does not prove the root was signed by the principal. Its journal has the
-    // current layout and decodes, but MIN_GUEST_VERSION (now 10) refuses it, and its image id is on the deny-list.
+    // current layout and decodes, but MIN_GUEST_VERSION (now 11) refuses it, and its image id is on the deny-list.
     let old = image_id("legacy/0c97a02b/image_id.json");
     for f in ["receipt_succinct.bin", "receipt_groth16.bin"] {
         let rel = format!("legacy/0c97a02b/{f}");
@@ -270,7 +270,7 @@ fn a_guest_version_8_receipt_is_refused() {
 #[test]
 fn a_guest_version_9_receipt_is_refused() {
     // 0.4.2 re-pin: the guest-version-9 build (c5107456) did not report `intent_v2_active` for a present malformed v2 context.
-    // Its journal has the current layout and decodes, but MIN_GUEST_VERSION (10) refuses it, and its image id is on the deny-list.
+    // Its journal has the current layout and decodes, but MIN_GUEST_VERSION (11) refuses it, and its image id is on the deny-list.
     let old = image_id("legacy/c5107456/image_id.json");
     for f in ["receipt_succinct.bin", "receipt_groth16.bin"] {
         let rel = format!("legacy/c5107456/{f}");
@@ -279,6 +279,22 @@ fn a_guest_version_9_receipt_is_refused() {
         let d: Decision = r.journal.decode().unwrap_or_else(|e| panic!("{rel}: a version-9 journal decodes: {e}"));
         assert_eq!(d.guest_version, 9, "{rel}");
         assert_eq!(check_context(&d, &expected(&input(), 0.0)), Err(ContextMismatch::GuestVersion { proven: 9, minimum: pca_zkvm_core::MIN_GUEST_VERSION }), "{rel}");
+        assert!(matches!(verify_with_context(&r, old, &expected(&input(), 0.0)), Err(VerifyError::Superseded(_))), "{rel}");
+    }
+}
+
+#[test]
+fn a_guest_version_10_receipt_is_refused() {
+    // Guest version 11 (rule 22): the guest-version-10 build (432b4713) refuses every version 2 action schema, so its receipt says
+    // nothing about one. Its journal decodes, but MIN_GUEST_VERSION (11) refuses it, and its image id is on the deny-list.
+    let old = image_id("legacy/432b4713/image_id.json");
+    for f in ["receipt_succinct.bin", "receipt_groth16.bin"] {
+        let rel = format!("legacy/432b4713/{f}");
+        let r: Receipt = bincode::deserialize(&read(&rel)).unwrap();
+        r.verify(old).unwrap_or_else(|e| panic!("{rel} verifies under its own id: {e}"));
+        let d: Decision = r.journal.decode().unwrap_or_else(|e| panic!("{rel}: a version-10 journal decodes: {e}"));
+        assert_eq!(d.guest_version, 10, "{rel}");
+        assert_eq!(check_context(&d, &expected(&input(), 0.0)), Err(ContextMismatch::GuestVersion { proven: 10, minimum: pca_zkvm_core::MIN_GUEST_VERSION }), "{rel}");
         assert!(matches!(verify_with_context(&r, old, &expected(&input(), 0.0)), Err(VerifyError::Superseded(_))), "{rel}");
     }
 }

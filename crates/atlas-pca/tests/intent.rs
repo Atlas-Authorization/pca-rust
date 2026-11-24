@@ -78,18 +78,18 @@ fn pcactn(grant: &Value, intent: Option<Value>) -> Value {
 }
 
 fn verify(p: &Value, grant: &Value, pol: Option<&IntentPolicy>) -> Verdict {
-    verify_pcactn_core_with(p, grant, NOW, AUD, &VerifyOptions { allowed: None, intent: pol, intent_v2: None })
+    verify_pcactn_core_with(p, grant, NOW, AUD, &VerifyOptions { allowed: None, intent: pol, intent_v2: None, authorized_plan_roots: None, insecure_skip_plan_root_check: true, freshness_gate: None, pq_pins: None })
 }
 
 fn pol(require: bool, min: Option<f64>, max: Option<f64>) -> IntentPolicy {
-    IntentPolicy { require, min_fidelity_ppm: min, max_residual_risk_ppm: max }
+    IntentPolicy { require, min_fidelity_ppm: min, max_residual_risk_ppm: max, ..Default::default() }
 }
 
 #[test]
 fn absent_slot_and_inactive_policy_is_the_pre_m2_verdict() {
     let g = root_grant(json!([envelope(json!(bound_commit(SALT)))]));
     let p = pcactn(&g, None);
-    let base = verify_pcactn_core(&p, &g, NOW, AUD);
+    let base = verify_pcactn_core_with(&p, &g, NOW, AUD, &atlas_pca::VerifyOptions { insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() });
     assert!(base.allow, "{}", base.reason);
     for policy in [None, Some(IntentPolicy::default())] {
         let v = verify(&p, &g, policy.as_ref());
@@ -189,7 +189,7 @@ fn policy_from_json_is_lenient() {
 
 // ---- mutation-kill: every intent boundary pinned on both sides --------------------------------------------------
 
-const PRIOR: [&str; 9] = ["wire", "version", "audience", "validity", "chain", "grant_ref_bound", "plan_inclusion", "leaf_signature", "counter"];
+const PRIOR: [&str; 9] = ["wire", "version", "audience", "validity", "chain", "grant_ref_bound", "plan_inclusion", "leaf_signature", "counter_format"];
 
 fn bound() -> Value {
     root_grant(json!([envelope(json!(bound_commit(SALT)))]))
@@ -387,7 +387,7 @@ fn kill_root_grant_binding() {
 #[test]
 fn kill_verdict_shape_and_order() {
     let g = bound();
-    // counter is evaluated before intent: both fail, counter is the reason
+    // counter_format is evaluated before intent: both fail, counter_format is the reason
     let mut p = pcactn(&g, Some(patched("goal_salt", json!("wrong"))));
     p["counter"] = json!(-1);
     let m = p.as_object_mut().unwrap();
@@ -395,15 +395,15 @@ fn kill_verdict_shape_and_order() {
     let msg = threshold_message(m).unwrap();
     m.insert("sig".into(), json!(b64(&key("agent").sign(&msg).to_bytes())));
     let v = verify(&p, &g, None);
-    assert!(!v.allow && v.checks.len() == 10 && v.checks.get("counter") == Some(&false) && v.checks.get("intent") == Some(&false), "{v:?}");
-    assert!(v.reason.starts_with("counter: "), "{}", v.reason);
+    assert!(!v.allow && v.checks.len() == 10 && v.checks.get("counter_format") == Some(&false) && v.checks.get("intent") == Some(&false), "{v:?}");
+    assert!(v.reason.starts_with("counter_format: "), "{}", v.reason);
     // a wire failure never reports intent, even under an active policy
     must_wire("wire beats policy", &verify(&pcactn(&g, Some(patched("fidelity_ppm", json!(-1)))), &g, Some(&pol(true, None, None))));
     // the JSON entry point threads the policy too
     let text = serde_json::to_string(&pcactn(&g, None)).unwrap();
-    let v = verify_pcactn_json_with(&text, &g, NOW, AUD, &VerifyOptions { allowed: None, intent: Some(&pol(true, None, None)), intent_v2: None });
+    let v = verify_pcactn_json_with(&text, &g, NOW, AUD, &VerifyOptions { allowed: None, intent: Some(&pol(true, None, None)), intent_v2: None, authorized_plan_roots: None, insecure_skip_plan_root_check: true, freshness_gate: None, pq_pins: None });
     must_fail("json entry", "requires an intent binding", &v);
-    let v = verify_pcactn_json_policy(&text, &g, NOW, AUD, None);
+    let v = verify_pcactn_json_with(&text, &g, NOW, AUD, &atlas_pca::VerifyOptions { allowed: None, insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() });
     assert!(v.allow && !v.checks.contains_key("intent"));
 }
 
