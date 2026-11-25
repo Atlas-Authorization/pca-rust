@@ -20,18 +20,18 @@ fn admitted() -> (Value, Value, i64, String) {
 fn the_suite_policy_applies_on_the_raw_text_entry_point() {
     let (p, grant, now, aud) = admitted();
     let text = canonicalize(&p);
-    assert!(verify_pcactn_json(&text, &grant, now, &aud).allow);
-    assert!(verify_pcactn_json_policy(&text, &grant, now, &aud, None).allow);
+    assert!(verify_pcactn_json_with(&text, &grant, now, &aud, &atlas_pca::VerifyOptions { insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() }).allow);
+    assert!(verify_pcactn_json_with(&text, &grant, now, &aud, &atlas_pca::VerifyOptions { allowed: None, insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() }).allow);
     // the leaf suite of this vector is ed25519: a policy that lists it admits, one that does not refuses
     let alg = p.get("alg").and_then(Value::as_str).unwrap_or("ed25519").to_string();
-    assert!(verify_pcactn_json_policy(&text, &grant, now, &aud, Some(&[alg.clone()])).allow);
+    assert!(verify_pcactn_json_with(&text, &grant, now, &aud, &atlas_pca::VerifyOptions { allowed: Some(&[alg.clone()]), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() }).allow);
     let other = vec!["slh-dsa-sha2-128f".to_string()];
-    let v = verify_pcactn_json_policy(&text, &grant, now, &aud, Some(&other));
+    let v = verify_pcactn_json_with(&text, &grant, now, &aud, &atlas_pca::VerifyOptions { allowed: Some(&other), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() });
     assert!(!v.allow, "{:?}", v.checks);
     let empty: Vec<String> = Vec::new();
-    assert!(!verify_pcactn_json_policy(&text, &grant, now, &aud, Some(&empty)).allow);
+    assert!(!verify_pcactn_json_with(&text, &grant, now, &aud, &atlas_pca::VerifyOptions { allowed: Some(&empty), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() }).allow);
     // the same policy through the parsed entry point
-    assert!(!verify_pcactn_core_policy(&p, &grant, now, &aud, Some(&other)).allow);
+    assert!(!verify_pcactn_core_with(&p, &grant, now, &aud, &atlas_pca::VerifyOptions { allowed: Some(&other), insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() }).allow);
 }
 
 #[test]

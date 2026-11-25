@@ -1,0 +1,1 @@
+{"id":"conform-fmt-datetime-offset","kind":"conform","input":{"schema":{"verbs":[{"verb":"fmt.item.check","kind":"write","params":{"action.params.x":{"semantic":"generic.string","sensitivity":"free","type":"datetime"}},"effects":["update"]}]},"verb":"fmt.item.check","params":{"x":"2026-10-26T12:30:45+00:00"}},"expect":{"ok":false,"code":"out_of_domain"}}

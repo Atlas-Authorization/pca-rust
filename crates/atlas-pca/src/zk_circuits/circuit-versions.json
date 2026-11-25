@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "circom": "2.2.2",
+  "circomlib": "2.0.5",
+  "circuits": {
+    "pca-compliance-v1": {
+      "main": "compliance.circom",
+      "source_sha256": "c640a690f434dee3c97a43613d19e3d0456db9100824470b545152c64f17cce6",
+      "sources": {
+        "circomlib/aliascheck.circom": "7df7542461a68c1564a55be8f01d75571c0e2555a08a078abeba43e1ea032eb4",
+        "circomlib/binsum.circom": "8aa153baf5791d96d06dce837c1e19b9ecc3a7dc65054132d5dd189b60bfcfc2",
+        "circomlib/bitify.circom": "688f121303a2dd0154ceeda8d2f53a9d2d26789d10a69a46acd534642725683e",
+        "circomlib/comparators.circom": "fd0c7723ee56e1467df1861131157cbb108e156fe2d9ec64895c8e68de14db20",
+        "circomlib/compconstant.circom": "94c5cc93b589a940acbfecdb98babc2efc253ad4298814399fb41109faa3b50d",
+        "circomlib/poseidon.circom": "2582464669b69827164bd08ee0337997e1957f2ab4f00cdd86d533ca5e9d9234",
+        "circomlib/poseidon_constants.circom": "94c9e4b5ea891ab4d1ba626f1d719f8c661014d9b628f6096c803f75f39e3eee",
+        "compliance.circom": "6ca3e79b956934716961b3d84d211b34eae836199cb26407e04f3bfd40c24d1d"
+      }
+    },
+    "pca-policyvm-v1": {
+      "main": "policyvm.circom",
+      "source_sha256": "befd054f5e1fbfa5e4ab060bbd1b8e95b3e516922e6978a9ed0d1638f3be5831",
+      "sources": {
+        "circomlib/aliascheck.circom": "7df7542461a68c1564a55be8f01d75571c0e2555a08a078abeba43e1ea032eb4",
+        "circomlib/binsum.circom": "8aa153baf5791d96d06dce837c1e19b9ecc3a7dc65054132d5dd189b60bfcfc2",
+        "circomlib/bitify.circom": "688f121303a2dd0154ceeda8d2f53a9d2d26789d10a69a46acd534642725683e",
+        "circomlib/comparators.circom": "fd0c7723ee56e1467df1861131157cbb108e156fe2d9ec64895c8e68de14db20",
+        "circomlib/compconstant.circom": "94c5cc93b589a940acbfecdb98babc2efc253ad4298814399fb41109faa3b50d",
+        "circomlib/gates.circom": "890e2514ddcbce77e0a5f6867749401fc182664a4b901d6d7bf6856197e0d87c",
+        "circomlib/sha256/ch.circom": "facb33f8ed5dfcd3590eaaf8921c37c27839564d61d565597de1412b78e42cf8",
+        "circomlib/sha256/constants.circom": "90f910027d360162896b81a4a1654fae16b74d90d43521d172f72c6deb52104e",
+        "circomlib/sha256/maj.circom": "64f2483ac7db29099bc5d241f5870dec0b5172599d40c56084565ebd589247ff",
+        "circomlib/sha256/rotate.circom": "a20bc425cd4b516696c374da461b2f1c046b5782c18741ecea4a0a45e29ba7ab",
+        "circomlib/sha256/sha256.circom": "6aa5f2907798187ab41d1e5d44439498d27523691b611736b3b68362759d1b1e",
+        "circomlib/sha256/sha256compression.circom": "aec6674cee5d0b775d7b27279a98b7fbabf5258885d56e01dec9a4a356dbc69c",
+        "circomlib/sha256/sha256compression_function.circom": "1418439e9609ff086f6cce56341eb3add999c875bd48e2dc9f84a252781bc9e5",
+        "circomlib/sha256/shift.circom": "874990de968719b50e7f0d6e713926f016c53f3f1ce33ee354b5b1984f2aa4de",
+        "circomlib/sha256/sigma.circom": "0af88a750958ecabbb6e4c17b3d5d4f8efdd8841b98a1e5186ba1092a74d2024",
+        "circomlib/sha256/sigmaplus.circom": "43d34fce0160ac9fa8d03425f2349bf8a29dd0448226774a8030f853642c9760",
+        "circomlib/sha256/t1.circom": "0488b16db02b2dd43429d964096aedf261c31ab6a2484a67b91bf3ccfc6bf38b",
+        "circomlib/sha256/t2.circom": "58c7e16ae5144ad72a900e1d470eb7d9d317f2a033f1ea85090e56548fa5d431",
+        "circomlib/sha256/xor3.circom": "d2d65d9ef40a37c1b46e4fae0dd1e7f9084ab917c870153dbb6303c6e4e378f1",
+        "policyvm.circom": "497bd45987ef4da6fc74a0f3e389bccf148ec97f13c932efb01921adfa6fbd67",
+        "policyvm_lib.circom": "c2eb4eb86b9ee9f3e2dd90a237693cc3c9dc73f6ab55554d32c3c4759c5a5d5c"
+      }
+    },
+    "pca-policyvm-v2": {
+      "main": "policyvm_bound.circom",
+      "source_sha256": "d11a68345e9c38705c14ddaafda5eb8e2e1499aed77e255cd91dd2b1558d1a4e",
+      "sources": {
+        "circomlib/aliascheck.circom": "7df7542461a68c1564a55be8f01d75571c0e2555a08a078abeba43e1ea032eb4",
+        "circomlib/binsum.circom": "8aa153baf5791d96d06dce837c1e19b9ecc3a7dc65054132d5dd189b60bfcfc2",
+        "circomlib/bitify.circom": "688f121303a2dd0154ceeda8d2f53a9d2d26789d10a69a46acd534642725683e",
+        "circomlib/comparators.circom": "fd0c7723ee56e1467df1861131157cbb108e156fe2d9ec64895c8e68de14db20",
+        "circomlib/compconstant.circom": "94c5cc93b589a940acbfecdb98babc2efc253ad4298814399fb41109faa3b50d",
+        "circomlib/gates.circom": "890e2514ddcbce77e0a5f6867749401fc182664a4b901d6d7bf6856197e0d87c",
+        "circomlib/sha256/ch.circom": "facb33f8ed5dfcd3590eaaf8921c37c27839564d61d565597de1412b78e42cf8",
+        "circomlib/sha256/constants.circom": "90f910027d360162896b81a4a1654fae16b74d90d43521d172f72c6deb52104e",
+        "circomlib/sha256/maj.circom": "64f2483ac7db29099bc5d241f5870dec0b5172599d40c56084565ebd589247ff",
+        "circomlib/sha256/rotate.circom": "a20bc425cd4b516696c374da461b2f1c046b5782c18741ecea4a0a45e29ba7ab",
+        "circomlib/sha256/sha256.circom": "6aa5f2907798187ab41d1e5d44439498d27523691b611736b3b68362759d1b1e",
+        "circomlib/sha256/sha256compression.circom": "aec6674cee5d0b775d7b27279a98b7fbabf5258885d56e01dec9a4a356dbc69c",
+        "circomlib/sha256/sha256compression_function.circom": "1418439e9609ff086f6cce56341eb3add999c875bd48e2dc9f84a252781bc9e5",
+        "circomlib/sha256/shift.circom": "874990de968719b50e7f0d6e713926f016c53f3f1ce33ee354b5b1984f2aa4de",
+        "circomlib/sha256/sigma.circom": "0af88a750958ecabbb6e4c17b3d5d4f8efdd8841b98a1e5186ba1092a74d2024",
+        "circomlib/sha256/sigmaplus.circom": "43d34fce0160ac9fa8d03425f2349bf8a29dd0448226774a8030f853642c9760",
+        "circomlib/sha256/t1.circom": "0488b16db02b2dd43429d964096aedf261c31ab6a2484a67b91bf3ccfc6bf38b",
+        "circomlib/sha256/t2.circom": "58c7e16ae5144ad72a900e1d470eb7d9d317f2a033f1ea85090e56548fa5d431",
+        "circomlib/sha256/xor3.circom": "d2d65d9ef40a37c1b46e4fae0dd1e7f9084ab917c870153dbb6303c6e4e378f1",
+        "policyvm_bound.circom": "84ad0df251808f2c648bf00669c1ca6260b28755ac8dd5c036dd20fb06db4bed",
+        "policyvm_lib.circom": "c2eb4eb86b9ee9f3e2dd90a237693cc3c9dc73f6ab55554d32c3c4759c5a5d5c"
+      }
+    }
+  }
+}

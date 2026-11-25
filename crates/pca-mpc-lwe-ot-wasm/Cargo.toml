@@ -1,0 +1,61 @@
+[package]
+name = "pca-mpc-lwe-ot-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "Post-quantum maliciously-secure endemic (Masny-Rindal) base-OT lattice core: Kyber-768 K-PKE (IND-CPA) from the vetted pqc_kyber crate, plus the ring arithmetic the additive endemic construction needs, compiled to WebAssembly for @atlasauth/pca-mpc's endemic-ot.ts."
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+# The CRYPTO CORE is NOT hand-rolled: every Module-LWE / Kyber operation (K-PKE keygen, CPA
+# encrypt, CPA decrypt — i.e. NTT, matrix generation from the seed, CBD noise sampling, Montgomery
+# base-multiply, compression, Barrett/Montgomery reduction) runs through `pqc_kyber`'s audited
+# reference implementation, reached via its `hazmat` feature, which re-exports the `indcpa` module
+# (the FO transform is bypassed — exactly what an endemic OT needs). On wasm32 the reference backend
+# is selected automatically (the crate gates AVX2 on `target_arch = "x86_64"`), so no AVX2/C/assembly
+# is pulled in and the build is pure Rust. `default-features = false` drops `std` -> no_std, no allocator.
+[dependencies]
+pqc_kyber = { version = "0.7.1", default-features = false, features = ["kyber768", "hazmat"] }
+
+# rand_core 0.6.4 is the SAME version pqc_kyber depends on, so the RngCore/CryptoRng traits unify.
+# It is used only for the zero-valued RNG stub handed to the DETERMINISTIC seeded keygen path
+# (`indcpa_keypair(.., Some(seed), rng)`), where the RNG is never actually read.
+rand_core = { version = "0.6.4", default-features = false }
+
+# SHA-3 (RustCrypto, audited) for the random oracle that derives the "uniform ring element" the
+# endemic construction needs for the non-chosen branch: SHAKE128 + the standard FIPS-203/Kyber
+# `SampleNTT` rejection sampler (same XOF + sampler Kyber uses to expand the public matrix A).
+# no_std, no allocator.
+sha3 = { version = "0.10.8", default-features = false }
+
+# `hoststd` is used ONLY to run the native KAT tests on the host (`cargo test --features hoststd`),
+# where the std-less `pqc_kyber` cdylib cannot link under the unwinding test profile. The WASM build
+# never enables it, so the shipped artifact stays no_std.
+# RustCrypto ML-KEM (FIPS 203), host builds only: K-PKE.KeyGen(d) exactly as FIPS 203 Algorithm 13 derives it, the key derivation the TypeScript
+# reference takes from @noble/post-quantum. pqc_kyber's hazmat surface starts below G(d) (it hashes the seed without the FIPS 203 `k` byte), so it
+# cannot express that derivation; the wasm build never enables this.
+ml-kem = { version = "0.2", default-features = false, features = ["deterministic"], optional = true }
+
+[features]
+default = []
+hoststd = ["pqc_kyber/std", "dep:ml-kem"]
+# Host C ABI (liblweot): std build, caller-owned buffers, no global state. See pca_lwe_ot.h.
+capi = ["hoststd"]
+
+# A small, dependency-free WASM: no std, no allocator, no imports — all I/O is through fixed static
+# buffers in linear memory, so the module instantiates with an empty import object (mirrors
+# @atlasauth/pca-mpc-wasm).
+[profile.release]
+panic = "abort"
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+
+# The vetted pqc_kyber 0.7.1 is pinned from crates.io, but its upstream manifest declares a `cdylib`
+# crate-type that cargo tries (and fails) to build std-less for wasm32-unknown-unknown (no panic
+# handler). The patch points at a vendored copy whose ONLY difference is `crate-type = ["rlib"]` —
+# the Kyber algorithm source is byte-identical to the crates.io release.
+[patch.crates-io]
+pqc_kyber = { path = "vendor/pqc_kyber" }

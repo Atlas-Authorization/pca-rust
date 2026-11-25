@@ -15,6 +15,7 @@ pub mod intent;
 pub mod jsnum;
 pub mod pq_suites;
 pub mod action_schema;
+pub mod rule22;
 pub mod intent_session;
 pub mod intent_acc;
 pub mod oracle_facts;
@@ -101,13 +102,15 @@ fn present<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<Value>, D::E
 /// 8 = PCA 0.4.1/0.4.2: root caveats outside the envelope are enforced and `max_spend` is implemented; 9 = PCA 0.4.2 R3-01:
 /// a PQ / hybrid session root verifies only under the verifier's pin (`intent_v2.session.pq_pins`); 10 = PCA 0.4.2 re-pin:
 /// `intent_v2_active` is also true for a present malformed v2 context (fail closed, as the reference), a guest rebuild with
-/// the same decision semantics.
-pub const GUEST_VERSION: u32 = 10;
+/// the same decision semantics; 11 = rule 22 / version 2 action schemas (floors and traits recomputed, the `traits` check,
+/// unconfirmed means maximally dangerous): a version-10 image refuses every version 2 schema.
+pub const GUEST_VERSION: u32 = 11;
 /// The oldest guest semantics a verifier accepts. 9: a version-8 receipt may have admitted a pure-PQ / hybrid session root
 /// under the PQ key named in the root's own `principals[]` (anyone naming a principal could sign it), so it is refused; a
 /// version-7 receipt does not prove that the root grant's own caveats held (the 0.4.1 security fix). 10: the guest rebuilt at
-/// the 0.4.2 re-pin (`intent_v2_active` fail-closed); the version-9 image (`c5107456...`) is on the deny-list.
-pub const MIN_GUEST_VERSION: u32 = 10;
+/// the 0.4.2 re-pin (`intent_v2_active` fail-closed); the version-9 image (`c5107456...`) is on the deny-list. 11: the guest that
+/// enforces rule 22; a version-10 receipt says nothing about a version 2 action schema, so it is refused (`432b4713...` is on the deny-list).
+pub const MIN_GUEST_VERSION: u32 = 11;
 
 /// The public statement the guest commits to the receipt journal.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]

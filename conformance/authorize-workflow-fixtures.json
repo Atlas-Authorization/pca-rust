@@ -1,0 +1,3929 @@
+{
+  "format": "pca-authorize-workflow-fixtures/1",
+  "description": "workflow admission inside authorize(): each case threads its steps through ONE replay store",
+  "now": 1792929600000,
+  "audience": "workflow-rs",
+  "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+  "rs_signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+  "plan": [
+    {
+      "id": "quote",
+      "verb": "orders.quote",
+      "resource": "orders/42",
+      "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+      "reversibility_class": "reversible"
+    },
+    {
+      "id": "pay",
+      "verb": "payments.refund",
+      "resource": "payments/42",
+      "params_digest": "QxZB3Cy_5JrGxbrHZcdVCDRNp7J6kubldYdnmJd-le0",
+      "reversibility_class": "reversible"
+    },
+    {
+      "id": "payHigh",
+      "verb": "payments.refund",
+      "resource": "payments/42",
+      "params_digest": "86aQ7G-nxmstgYC1_z6tDWpAMiz3iTiVOeoxWCn7jJk",
+      "reversibility_class": "reversible"
+    },
+    {
+      "id": "notify",
+      "verb": "mail.send",
+      "resource": "mail/out",
+      "params_digest": "ZRxNOx3xmc1DCP506BwX_6KhevXs8RlqpLXcsFho9wU",
+      "reversibility_class": "reversible"
+    },
+    {
+      "id": "wire",
+      "verb": "payments.wire",
+      "resource": "payments/9",
+      "params_digest": "wrEeZX4S_RdzWWJ8qJQSAY4idNCHPPv88fxQ9oVYLp4",
+      "reversibility_class": "reversible"
+    }
+  ],
+  "grant": {
+    "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+    "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+    "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+    "caveats": [
+      {
+        "agent_binding": {},
+        "caveats": [],
+        "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+        "predicates": [
+          {
+            "resource": "*",
+            "verb": "*",
+            "where": []
+          }
+        ],
+        "risk_policy": {
+          "bMax": 1000,
+          "kappa": 1,
+          "lambda": 0,
+          "rho": 0,
+          "theta1": 0.5,
+          "theta2": 0.8,
+          "weights": {
+            "alpha": 0,
+            "beta": 0,
+            "delta": 0,
+            "epsilon": 0,
+            "gamma": 0,
+            "zeta": 0
+          }
+        },
+        "type": "envelope"
+      }
+    ],
+    "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+    "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+  },
+  "cases": [
+    {
+      "name": "pay-after-quote",
+      "description": "quote, then pay with the quote receipt: both allowed.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 2,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "4RsttiXqnlMmY92cIXrdXyFNqUIWh81KgI1783J6v9NCAvJaGlngYNU2EKIWCSfoKg-qs1cwbFV9HU5p4swhAQ"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": true,
+            "decision": "allow",
+            "status": 200,
+            "failed": []
+          }
+        },
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "payments.refund",
+              "resource": "payments/42",
+              "params_digest": "QxZB3Cy_5JrGxbrHZcdVCDRNp7J6kubldYdnmJd-le0",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 1,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "L",
+                    "hash": "EaCtBXwuFY92MkaAkqFMKAI_NiDVH0Lc10fmWEIGPvY"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "pay",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 3,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "1r1DCw8Only-tH53ocnJuU-9a4Bf2vCjgJwmMUXsKBnOilNylHjL64LnEJR8Cd5l4_udj-RFlg4JXF9NOYOBAg"
+          },
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params": {
+              "order": "o42",
+              "amount": 30
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "quote",
+                "seq": 0,
+                "prev": null,
+                "outcome": "ok",
+                "params_digest": "C3FaOYwQPa7efNyj9wYEVfHH08cRJ8sDqiTofmO7TbM",
+                "outputs": {
+                  "total": {
+                    "digest": "SkEL4ezgghlKnrNLhU2FxVZgcDIMZLQqzVEz0Rfm0Ao",
+                    "num": 30,
+                    "unit": null,
+                    "labels": []
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+                "sig": "V3OTGtIhyj01gIP4ap5SUNRI9ReIs73_KVEaTdPE51rs1tkV5j2dx8tiHK1AX9iZ4758Ma1eLLO1CaDIwtORDQ"
+              }
+            ],
+            "step": "pay",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": true,
+            "decision": "allow",
+            "status": 200,
+            "failed": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "pay-before-quote-escalates-and-keeps-the-counter",
+      "description": "pay with no quote receipt escalates (an unpromised dependency); the SAME PCActn is allowed once the receipt exists (the counter was not spent).",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "payments.refund",
+              "resource": "payments/42",
+              "params_digest": "QxZB3Cy_5JrGxbrHZcdVCDRNp7J6kubldYdnmJd-le0",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 1,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "L",
+                    "hash": "EaCtBXwuFY92MkaAkqFMKAI_NiDVH0Lc10fmWEIGPvY"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "pay",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 4,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "7nrW58XjaIGcEw_VKZTG8etSdXoxPrk8shtYUQqA7BoN3sFaS9KRexoTIecBR3kV5pAtIHtTCCsOOI-3is6KCA"
+          },
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params": {
+              "order": "o42",
+              "amount": 30
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [],
+            "step": "pay",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "escalate",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: pipeline_unconstrained (step pay)"
+          }
+        },
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "payments.refund",
+              "resource": "payments/42",
+              "params_digest": "QxZB3Cy_5JrGxbrHZcdVCDRNp7J6kubldYdnmJd-le0",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 1,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "L",
+                    "hash": "EaCtBXwuFY92MkaAkqFMKAI_NiDVH0Lc10fmWEIGPvY"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "pay",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 4,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "7nrW58XjaIGcEw_VKZTG8etSdXoxPrk8shtYUQqA7BoN3sFaS9KRexoTIecBR3kV5pAtIHtTCCsOOI-3is6KCA"
+          },
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params": {
+              "order": "o42",
+              "amount": 30
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "quote",
+                "seq": 0,
+                "prev": null,
+                "outcome": "ok",
+                "params_digest": "C3FaOYwQPa7efNyj9wYEVfHH08cRJ8sDqiTofmO7TbM",
+                "outputs": {
+                  "total": {
+                    "digest": "SkEL4ezgghlKnrNLhU2FxVZgcDIMZLQqzVEz0Rfm0Ao",
+                    "num": 30,
+                    "unit": null,
+                    "labels": []
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+                "sig": "V3OTGtIhyj01gIP4ap5SUNRI9ReIs73_KVEaTdPE51rs1tkV5j2dx8tiHK1AX9iZ4758Ma1eLLO1CaDIwtORDQ"
+              }
+            ],
+            "step": "pay",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": true,
+            "decision": "allow",
+            "status": 200,
+            "failed": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "amount-over-the-quote",
+      "description": "refunding 31 against a quoted 30 is refused by the edge relation.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "payments.refund",
+              "resource": "payments/42",
+              "params_digest": "86aQ7G-nxmstgYC1_z6tDWpAMiz3iTiVOeoxWCn7jJk",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 2,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "boYT6IAxAARq8KQXG9h5DUrp46eXvNZNKoZACJjW548"
+                  },
+                  {
+                    "side": "L",
+                    "hash": "lfHbnGurQMqx51lHPRn5NfKEvcYC-OH3hnNmJ-uKUxM"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "payHigh",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 5,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "KYgJdmma8qnz0RVPt-imtLvj89sjdft9s2jVc16Q4BuNa9Y0tMpN-fuvL4jjeO0-7iaGMxQAlaaiZxLZTb-NCA"
+          },
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params": {
+              "order": "o42",
+              "amount": 31
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "quote",
+                "seq": 0,
+                "prev": null,
+                "outcome": "ok",
+                "params_digest": "C3FaOYwQPa7efNyj9wYEVfHH08cRJ8sDqiTofmO7TbM",
+                "outputs": {
+                  "total": {
+                    "digest": "SkEL4ezgghlKnrNLhU2FxVZgcDIMZLQqzVEz0Rfm0Ao",
+                    "num": 30,
+                    "unit": null,
+                    "labels": []
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+                "sig": "V3OTGtIhyj01gIP4ap5SUNRI9ReIs73_KVEaTdPE51rs1tkV5j2dx8tiHK1AX9iZ4758Ma1eLLO1CaDIwtORDQ"
+              }
+            ],
+            "step": "pay",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: edge_relation (step pay)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "step-not-in-the-workflow",
+      "description": "a payment wire the principal never committed is refused although the plan root is the committed one.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "payments.wire",
+              "resource": "payments/9",
+              "params_digest": "wrEeZX4S_RdzWWJ8qJQSAY4idNCHPPv88fxQ9oVYLp4",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 4,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "L",
+                    "hash": "J_2q4ql8qA8g0HS6P4QeZ7AJ53MMy1bZndywZ8Is2VA"
+                  }
+                ]
+              },
+              "node_id": "wire",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 6,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "KsdHSWXrjI4-u8E19xOmNGVfceGT5sqmcZFecYn20LOVOn2jWPBMlzkNMYjXlhlC1zBmFiLyZMB6TsaTxHpRDw"
+          },
+          "operation": {
+            "verb": "payments.wire",
+            "resource": "payments/9",
+            "params": {
+              "amount": 1
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "quote",
+                "seq": 0,
+                "prev": null,
+                "outcome": "ok",
+                "params_digest": "C3FaOYwQPa7efNyj9wYEVfHH08cRJ8sDqiTofmO7TbM",
+                "outputs": {
+                  "total": {
+                    "digest": "SkEL4ezgghlKnrNLhU2FxVZgcDIMZLQqzVEz0Rfm0Ao",
+                    "num": 30,
+                    "unit": null,
+                    "labels": []
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+                "sig": "V3OTGtIhyj01gIP4ap5SUNRI9ReIs73_KVEaTdPE51rs1tkV5j2dx8tiHK1AX9iZ4758Ma1eLLO1CaDIwtORDQ"
+              }
+            ],
+            "step": "wire",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: unplanned_step (step wire)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "step-with-other-verb",
+      "description": "the operation differs from the committed verb for that step.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "payments.wire",
+              "resource": "payments/9",
+              "params_digest": "wrEeZX4S_RdzWWJ8qJQSAY4idNCHPPv88fxQ9oVYLp4",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 4,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "L",
+                    "hash": "J_2q4ql8qA8g0HS6P4QeZ7AJ53MMy1bZndywZ8Is2VA"
+                  }
+                ]
+              },
+              "node_id": "wire",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 7,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "jc9aRnIXXCE4uVApPZnq14b-GXc5XhoiAg6UhOeyLYthH_b9aAbnN950riNZH0-UWTVJMtw-STEciRt8frR1Aw"
+          },
+          "operation": {
+            "verb": "payments.wire",
+            "resource": "payments/9",
+            "params": {
+              "amount": 1
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "quote",
+                "seq": 0,
+                "prev": null,
+                "outcome": "ok",
+                "params_digest": "C3FaOYwQPa7efNyj9wYEVfHH08cRJ8sDqiTofmO7TbM",
+                "outputs": {
+                  "total": {
+                    "digest": "SkEL4ezgghlKnrNLhU2FxVZgcDIMZLQqzVEz0Rfm0Ao",
+                    "num": 30,
+                    "unit": null,
+                    "labels": []
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+                "sig": "V3OTGtIhyj01gIP4ap5SUNRI9ReIs73_KVEaTdPE51rs1tkV5j2dx8tiHK1AX9iZ4758Ma1eLLO1CaDIwtORDQ"
+              }
+            ],
+            "step": "pay",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: step_mismatch (step pay)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "plan-root-not-the-committed-one",
+      "description": "the PCActn plan root is not the one the workflow commits.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 8,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "o3Wi25NFN_ZgPpkvuiuqrJqa0rKV6g0ff8kcLuUtYqC360GMDV1vTF_cQMFSeGef6VRu59csYGRVpwf67A2IBg"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "XuEaOmQfeb1pYh1lzSBpQW66gGwoLol_01rWRwpl7E0",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "iKcB8ahbAZXTJeQqWR1HTERaV0U8cQ5JgYDGc01Jxh36ikvYYEu2cMt0ZxyGIzYJF6NciKgI9WQcPWwq_3_9AQ"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: plan_root_mismatch (step quote)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "tampered-commitment",
+      "description": "the commitment body was edited after signing.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 9,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "2iFI8LrxWU48P-ZAUyHwJmyM8lnm3-7yxqBlzRKMHxqzbrw6nPg6z94YJGlRl_gGsuXSvrK_zc_hFqoXSkMjBA"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 99,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: bad_signature (step quote)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "commitment-signed-under-another-domain",
+      "description": "a signature over the same body under another domain does not verify.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 10,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "Q7qHh2n9e0u9SuO6gXnNHIRtDIu3XBuUbw2U4o5WIY9xwsWG7baN85Miq6s_u-_mzRigdGStiQTcVe0nxtAHBw"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "3XeXqZPejB4MZDlrlaUzIDDxOlt6K1hmL6FABjQJzTCqwG9OUYocHw4xkQXj_Fk8vHGSaeX3yqtXov8DxKETCg"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: bad_signature (step quote)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "expired-commitment",
+      "description": "the commitment is past its expiry.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 11,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "px9XvWBynoj76GBgijDw0ANqa02gfNuTyix_RSjV4onQblTwaLpxhjls-3AUELZ5_1hh-JV5BCgO7AF5KuUsCQ"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929599999,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "VFuT9mr4kEelA0KDDxxSBthZYX9FI4LoUFl6vjxceWFsjjLJCaiOV3B9XRLJQfxzHtkjqQTRjStivmFg1X27Bg"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: expired (step quote)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "receipt-from-an-unpinned-key",
+      "description": "a quote receipt signed by a key the server did not pin.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "payments.refund",
+              "resource": "payments/42",
+              "params_digest": "QxZB3Cy_5JrGxbrHZcdVCDRNp7J6kubldYdnmJd-le0",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 1,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "L",
+                    "hash": "EaCtBXwuFY92MkaAkqFMKAI_NiDVH0Lc10fmWEIGPvY"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "pay",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 12,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "oMiHZ9SNNCE4knMHm2iGmnJiU9Jlk2KD-8ITUpM682I6wSPsRN3EbOQxYkdgvL03AQLgV5uwifrGwXa3snJBDg"
+          },
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "payments/42",
+            "params": {
+              "order": "o42",
+              "amount": 30
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "quote",
+                "seq": 0,
+                "prev": null,
+                "outcome": "ok",
+                "params_digest": "C3FaOYwQPa7efNyj9wYEVfHH08cRJ8sDqiTofmO7TbM",
+                "outputs": {
+                  "total": {
+                    "digest": "SkEL4ezgghlKnrNLhU2FxVZgcDIMZLQqzVEz0Rfm0Ao",
+                    "num": 30,
+                    "unit": null,
+                    "labels": []
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "6kpsY-KcUgq-9VB7Ey7F-ZVHdq6-vnuSQh7qaRRG0iw",
+                "sig": "C2naYnFVHxSEfb7fHwTar7O6PQWMcDqTfYSq9hNsSwk2AzQwM8Y7MZOocUKh723bXk6cm_Me9mqJF1mQlbEjDQ"
+              }
+            ],
+            "step": "pay",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: bad_receipt (step pay)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "secret-label-reaches-a-guarded-step",
+      "description": "a secret label produced by pay may not reach notify.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "mail.send",
+              "resource": "mail/out",
+              "params_digest": "ZRxNOx3xmc1DCP506BwX_6KhevXs8RlqpLXcsFho9wU",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 3,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "L",
+                    "hash": "IDdrh0Yev5rkOXVJF3yrh9Mu14lX7ZvopbADsuKhaIU"
+                  },
+                  {
+                    "side": "L",
+                    "hash": "lfHbnGurQMqx51lHPRn5NfKEvcYC-OH3hnNmJ-uKUxM"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "notify",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 13,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "uaLQRsyt9G5lks1e6if4AxkJx6TMOSSt7REdR8Snit48cySEArMbua7XKMzLCO7eiolBtVjh_rL7C7Gqqv_dDw"
+          },
+          "operation": {
+            "verb": "mail.send",
+            "resource": "mail/out",
+            "params": {
+              "ref": "r1"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "quote",
+                "seq": 0,
+                "prev": null,
+                "outcome": "ok",
+                "params_digest": "C3FaOYwQPa7efNyj9wYEVfHH08cRJ8sDqiTofmO7TbM",
+                "outputs": {
+                  "total": {
+                    "digest": "SkEL4ezgghlKnrNLhU2FxVZgcDIMZLQqzVEz0Rfm0Ao",
+                    "num": 30,
+                    "unit": null,
+                    "labels": []
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+                "sig": "V3OTGtIhyj01gIP4ap5SUNRI9ReIs73_KVEaTdPE51rs1tkV5j2dx8tiHK1AX9iZ4758Ma1eLLO1CaDIwtORDQ"
+              },
+              {
+                "v": 1,
+                "wf": "6AKov4VXz_3FYQByvMar43W7qvDuxlNQdhQK7sh4-sw",
+                "step": "pay",
+                "seq": 1,
+                "prev": "E3WBVgomAOs1TOOGRRYUFFix_Y6-W3E2EY_91A77fEo",
+                "outcome": "ok",
+                "params_digest": "3HpIL59p5iObUBAV4V5UAMjbynm2PFxSqF69IoCpCA4",
+                "outputs": {
+                  "ref": {
+                    "digest": "FQV8tCZd95o2-eWaDHHdOXqaRJqtvKEYPwqJXucv2OE",
+                    "num": null,
+                    "unit": null,
+                    "labels": [
+                      "secret"
+                    ]
+                  }
+                },
+                "issued_at": 1792929599000,
+                "signer": "7WpHo52oabVEYVXkCy2T8ePwFnviZzK656PvnY46P9M",
+                "sig": "q7DMoxCaraDxHsAmkR8-LKtMYBkvk-Zwsh_di4LB_e34w-ZXTn_51s4u6ZhcSUfNWi6duZNTKtfaXFw618HkAw"
+              }
+            ],
+            "step": "notify",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: taint_flow (step notify)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "workflow-required-but-absent",
+      "description": "with `required` set, a call that carries no workflow step is refused.",
+      "required": true,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 14,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "mVgq8pPr0R7gBmOM7UI14eWwJUVeJyafHGhVilgChPOzZeXqv6sMKaB7AucWZZWKJ_nBwneB4kjAkkKVjUg_DA"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: this call carries no workflow step (fail closed)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "workflow-optional-and-absent",
+      "description": "without `required`, a standalone action proceeds as before.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 15,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "RJpIX9AX3cDmTYjZSUnBmdAcqjV7E_st_ou1aCSVNg5X8UvraMtJby-d43DG2XQSiG3J6IpK9dXK-xsuIb54Cg"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "expect": {
+            "allow": true,
+            "decision": "allow",
+            "status": 200,
+            "failed": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "replay-after-an-allowed-step",
+      "description": "an allowed PCActn cannot be presented again: the workflow admits it, the replay counter refuses it.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 16,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "_IpZRISfEGDNmLJJDBF79-mTmIsXfx7cNNe9Ja3WUBCPeLqFlstDpkepjzdJH-MqvAysjHMxuX1g96MzN1hiAw"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": true,
+            "decision": "allow",
+            "status": 200,
+            "failed": []
+          }
+        },
+        {
+          "pcactn": {
+            "ver": 2,
+            "action": {
+              "verb": "orders.quote",
+              "resource": "orders/42",
+              "params_digest": "rAKeKKhllU71Sj-qTbAg-qx7KGorjrZfviA42uK4l8s",
+              "reversibility_class": "reversible"
+            },
+            "grant_ref": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+            "cap_chain": [
+              {
+                "id": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "issuer": "1i8Bah79Hk_feT60LNhEceG6nwzwTRKHtcxx9hYofLg",
+                "holder": "NLTZBDFWy23PC-sKKUm3VZyUDSvLbb6MU6mzAnjjp0Y",
+                "caveats": [
+                  {
+                    "agent_binding": {},
+                    "caveats": [],
+                    "goal_commit": "IoN80o1FQbCFlPeEQAVtW891m6eipi3NgmPugmC-4qo",
+                    "predicates": [
+                      {
+                        "resource": "*",
+                        "verb": "*",
+                        "where": []
+                      }
+                    ],
+                    "risk_policy": {
+                      "bMax": 1000,
+                      "kappa": 1,
+                      "lambda": 0,
+                      "rho": 0,
+                      "theta1": 0.5,
+                      "theta2": 0.8,
+                      "weights": {
+                        "alpha": 0,
+                        "beta": 0,
+                        "delta": 0,
+                        "epsilon": 0,
+                        "gamma": 0,
+                        "zeta": 0
+                      }
+                    },
+                    "type": "envelope"
+                  }
+                ],
+                "body_digest": "UELZ4VeRmk_P0UmkF_bZ1r8bJJ_2ilnZ62ua_lIrlS0",
+                "sig": "yXreQEUlUerf2b8tqPZ55m2LT0Ets2xsCmeFLzRCxF2OalW3IOV3bf0KW3vN8MXThekLi7H5NA80dRdmtjIEAw"
+              }
+            ],
+            "plan": {
+              "root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+              "inclusion_proof": {
+                "index": 0,
+                "size": 5,
+                "path": [
+                  {
+                    "side": "R",
+                    "hash": "munIq4Ma6V1cZo_iOTaBvQ9XDXWV4uaYST9RIM5tFhQ"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "hHTQbli8Ab924CdsxxAOScoJJbjf2hcl1OrS4VxXOUI"
+                  },
+                  {
+                    "side": "R",
+                    "hash": "ydlIUk0SlEzkpei1R4RLWyoocSh6UGSNL2kRMUZtrqQ"
+                  }
+                ]
+              },
+              "node_id": "quote",
+              "conditions_digest": "YM87EgmmvAr4WYQDm1wkrB7pFoHs4esi8tOmv9_DUxY"
+            },
+            "attestation": {
+              "quote_digest": "",
+              "epoch": 0,
+              "model_id": "unattested",
+              "measurement": "",
+              "operator": "unattested"
+            },
+            "provenance": {
+              "causal_hash": "",
+              "taint_level": 0,
+              "trusted_refs": []
+            },
+            "freshness": {
+              "beacon_ref": "",
+              "epoch": 0,
+              "accumulator_witness": ""
+            },
+            "counter": 16,
+            "risk_claim": {
+              "r": 0,
+              "inputs": {}
+            },
+            "aud": "workflow-rs",
+            "iat": 1792929600000,
+            "exp": 1792930800000,
+            "sig": "_IpZRISfEGDNmLJJDBF79-mTmIsXfx7cNNe9Ja3WUBCPeLqFlstDpkepjzdJH-MqvAysjHMxuX1g96MzN1hiAw"
+          },
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "replay"
+            ],
+            "reason": "replay:"
+          }
+        }
+      ]
+    },
+    {
+      "name": "undecodable-pcactn-with-a-workflow",
+      "description": "a PCActn that cannot be decoded is refused as a wire error even when it carries a workflow step.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": "not-a-pcactn",
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "workflow": {
+            "commitment": {
+              "body": {
+                "v": 1,
+                "id": "wf-refund",
+                "principal": "a3NKjv8kb-c0s41ARsFI7uXwT-h7OgpCOVWneVbeBms",
+                "goal_digest": null,
+                "plan_root": "71uib4wLmzFZvVQbLxOTO2KCrJDC8Gt-xQCq7XN-64U",
+                "issued_at": 1792929500000,
+                "expires_at": 1792929700000,
+                "steps": [
+                  {
+                    "id": "quote",
+                    "verb": "orders.quote",
+                    "resource": "orders/42",
+                    "params_digest": null,
+                    "deps": [],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "pay",
+                    "verb": "payments.refund",
+                    "resource": "payments/42",
+                    "params_digest": null,
+                    "deps": [
+                      "quote"
+                    ],
+                    "sink": null,
+                    "deny_labels": [],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  },
+                  {
+                    "id": "notify",
+                    "verb": "mail.send",
+                    "resource": "mail/out",
+                    "params_digest": null,
+                    "deps": [
+                      "pay"
+                    ],
+                    "sink": null,
+                    "deny_labels": [
+                      "secret"
+                    ],
+                    "escalate_labels": [],
+                    "fresh_ms": null,
+                    "cost": {}
+                  }
+                ],
+                "edges": [
+                  {
+                    "from": {
+                      "step": "quote",
+                      "field": "total"
+                    },
+                    "to": {
+                      "step": "pay",
+                      "param": "amount"
+                    },
+                    "op": "le",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  },
+                  {
+                    "from": {
+                      "step": "pay",
+                      "field": "ref"
+                    },
+                    "to": {
+                      "step": "notify",
+                      "param": "ref"
+                    },
+                    "op": "eq",
+                    "unit": null,
+                    "deny_labels": [],
+                    "promise": null
+                  }
+                ],
+                "budget": {
+                  "max_steps": 5,
+                  "caps": {}
+                }
+              },
+              "sig": "a4B7_MgnS33voD2yg5t3-m0rYTbFpYmcLMiv7r_KI-9EDjH50h2pUV_glBT444_a4aBzKpd6lf9Cya8z-QUzDg"
+            },
+            "receipts": [],
+            "step": "quote",
+            "units": {},
+            "goal_digest": null
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 401,
+            "failed": [
+              "pcactn"
+            ],
+            "reason": "undecodable PCActn"
+          }
+        }
+      ]
+    },
+    {
+      "name": "undecodable-pcactn-without-a-workflow",
+      "description": "the same undecodable PCActn with no workflow and none required: the same wire refusal.",
+      "required": false,
+      "steps": [
+        {
+          "pcactn": "not-a-pcactn",
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 401,
+            "failed": [
+              "pcactn"
+            ],
+            "reason": "undecodable PCActn"
+          }
+        }
+      ]
+    },
+    {
+      "name": "undecodable-pcactn-workflow-required-and-absent",
+      "description": "with `required` set and no workflow step, the workflow refusal comes first (it needs no PCActn).",
+      "required": true,
+      "steps": [
+        {
+          "pcactn": "not-a-pcactn",
+          "operation": {
+            "verb": "orders.quote",
+            "resource": "orders/42",
+            "params": {
+              "order": "o42"
+            }
+          },
+          "expect": {
+            "allow": false,
+            "decision": "deny",
+            "status": 403,
+            "failed": [
+              "workflow"
+            ],
+            "reason": "workflow: this call carries no workflow step (fail closed)"
+          }
+        }
+      ]
+    }
+  ]
+}

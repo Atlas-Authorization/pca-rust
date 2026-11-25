@@ -1,0 +1,51 @@
+name: Root Cargo.lock
+
+# The CI workflow's "Cargo.lock covers every dependency" step reads the repository-root Cargo.lock (the workspace lock). This workflow
+# resolves that lock on every push to a ci/** branch and prints the result to the job log between BEGIN and END markers, so it can be
+# copied out of the log and committed as the root Cargo.lock (in the monorepo: scripts/pca-rust-mirror-assets/Cargo.lock, which the
+# mirror sync lays at the root). It never fails: whatever happens is only reported.
+on:
+  push:
+    branches: ['ci/**']
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: resolve the root Cargo.lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        continue-on-error: true
+      - name: Resolve and print
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          echo "root lock path: $(pwd)/Cargo.lock ($( [ -f Cargo.lock ] && echo committed || echo absent ))"
+          [ -f Cargo.lock ] && cp Cargo.lock "$RUNNER_TEMP/Cargo.lock.before"
+          # keep every pin that is still valid; add what the manifests need (p521 and anything else missing)
+          if [ -f Cargo.lock ]; then cargo update -p p521 || cargo generate-lockfile; else cargo generate-lockfile; fi
+          cargo metadata --locked --format-version 1 >/dev/null 2>&1 && echo "locked metadata: ok" || echo "locked metadata: DRIFT"
+          echo "=== BEGIN Cargo.lock git diff --stat ==="
+          git add -N Cargo.lock 2>/dev/null
+          git --no-pager diff --stat -- Cargo.lock
+          echo "=== END Cargo.lock git diff --stat ==="
+          echo "=== BEGIN Cargo.lock unified diff ==="
+          git --no-pager diff --no-color -- Cargo.lock
+          echo "=== END Cargo.lock unified diff ==="
+          echo "=== BEGIN Cargo.lock full ==="
+          cat Cargo.lock
+          echo "=== END Cargo.lock full ==="
+          exit 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: root-Cargo.lock
+          path: Cargo.lock
+          if-no-files-found: ignore
