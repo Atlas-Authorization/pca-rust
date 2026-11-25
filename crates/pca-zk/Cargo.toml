@@ -1,0 +1,50 @@
+[package]
+name = "pca-zk"
+version = "0.1.0"
+edition = "2021"
+description = "Groth16 verification and proving for snarkjs / circom artifacts (BN254 and BLS12-381) on arkworks, with a C ABI (libpcazk) for the native PCA lanes."
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+# The crypto is not hand-rolled: pairing, subgroup checks, multi-scalar multiplication and the Groth16 verification equation
+# are arkworks. The witness calculator (circom's wasm) runs on the pure-Rust wasmi interpreter. All versions are pinned
+# exactly, as in the stand-alone verifier under tools/pca-zk-arkworks, whose strict mode this crate generalises.
+[dependencies]
+ark-ff = "=0.4.2"
+ark-ec = "=0.4.2"
+ark-std = "=0.4.0"
+ark-groth16 = "=0.4.0"
+ark-snark = "=0.4.0"
+ark-bn254 = "=0.4.0"
+ark-bls12-381 = "=0.4.0"
+num-bigint = "0.4"
+serde_json = "1"
+wasmi = "=0.31.2"
+rand_chacha = "=0.3.1"
+rand_core = { version = "=0.6.4", features = ["getrandom"] }
+
+[dev-dependencies]
+flate2 = "1"
+
+[features]
+default = []
+# Host C ABI (libpcazk): caller-owned input buffers, library-owned output buffers released with pca_zk_free, no global state.
+capi = []
+# The pca-zk command line (verify / prove), used by the CI cross-checks against snarkjs.
+cli = []
+# Multi-threaded multi-scalar multiplication and FFTs in the prover (rayon). Off by default: the C library does not spawn threads.
+parallel = ["ark-ec/parallel", "ark-ff/parallel", "ark-groth16/parallel"]
+
+[[bin]]
+name = "pca-zk"
+path = "src/bin/pca-zk.rs"
+required-features = ["cli"]
+
+# No `panic = "abort"` (unlike the wasm crates): the C ABI turns a panic into an error code with catch_unwind, which needs unwinding.
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

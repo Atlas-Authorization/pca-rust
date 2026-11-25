@@ -2,7 +2,8 @@
 # Reproducible proving run ON an exclusive x86_64 Linux box (repo synced to /work/pca, fixtures pushed alongside):
 # installs the RISC Zero toolchain (rzup: rust 1.97.0, r0vm 3.0.6), docker.io and docker-buildx when missing, builds the guest,
 # prints its image id (path-independent: the guest is built in risc0's docker guest builder), then runs prove_run (succinct receipt, Groth16 wrap via the docker prover, negative matrix).
-#   bash sdks/zkvm-pca/host/box-prove.sh <out-dir>          (PCA_ONLY_BUILD=1: build + image id only)
+#   bash sdks/zkvm-pca/host/box-prove.sh <out-dir>          (PCA_ONLY_BUILD=1: build + image id only; PCA_TARGET_DIR, PCA_TMPDIR override the /work paths;
+#                                                            PCA_SKIP_NEGATIVE=1 / PCA_ONLY_NEGATIVE=1 split the proving from the negative matrix)
 set -euo pipefail
 OUT="${1:?usage: box-prove.sh <out-dir>}"
 export PATH="$HOME/.risc0/bin:$HOME/.cargo/bin:$PATH"
@@ -20,7 +21,7 @@ fi
 id -nG | grep -qw docker || sudo usermod -aG docker "$USER"
 # the docker guest build uses `docker build --output` (BuildKit)
 docker buildx version >/dev/null 2>&1 || sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q docker-buildx
-export CARGO_TARGET_DIR=/work/target/zkvm-pca-prove
+export CARGO_TARGET_DIR="${PCA_TARGET_DIR:-/work/target/zkvm-pca-prove}"
 # the docker stark-to-snark prover bind-mounts host temp files: a private /tmp (systemd PrivateTmp, job units) is invisible to
 # the docker daemon, so keep temp files on a shared path
 export TMPDIR="${PCA_TMPDIR:-/work/zkvm-pca-tmp}"; mkdir -p "$TMPDIR"
@@ -28,7 +29,7 @@ export TMPDIR="${PCA_TMPDIR:-/work/zkvm-pca-tmp}"; mkdir -p "$TMPDIR"
 sg docker -c "cargo build --release -p pca-zkvm-host --bin prove_run" 2>&1 | grep -v '^ *Compiling' | tail -5
 mkdir -p "$OUT"
 if [ -n "${PCA_ONLY_BUILD:-}" ]; then
-  PCA_ONLY_NEGATIVE=1 timeout 1 "$CARGO_TARGET_DIR/release/prove_run" "$OUT" 2>&1 | grep -m1 'image id' || true
+  PCA_ONLY_NEGATIVE=1 timeout 30 "$CARGO_TARGET_DIR/release/prove_run" "$OUT" 2>&1 | grep -m1 'image id' || true
   exit 0
 fi
 # docker group membership takes effect in a new login group: run the prover under `sg docker`

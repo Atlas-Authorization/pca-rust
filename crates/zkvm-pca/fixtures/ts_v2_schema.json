@@ -1098,9 +1098,9 @@
    "err": "unknown member 'constructor'"
   },
   {
-   "name": "v=2",
+   "name": "v=3",
    "doc": {
-    "v": 2,
+    "v": 3,
     "kind": "pca-action-schema",
     "site": "https://shop.example",
     "aud": "shop.example",

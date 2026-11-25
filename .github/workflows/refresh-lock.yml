@@ -1,0 +1,51 @@
+name: Refresh Cargo.lock
+
+# The monorepo keeps a Cargo.lock next to the standalone verifier crate (it is what `cargo test --locked` and `cargo clippy --locked` read
+# there). It goes stale whenever a dependency is added to the crate's manifest. This job re-resolves it without touching the pinned versions
+# that are still valid and uploads the result as an artifact; nothing is pushed and no release or tag build is affected (those stay --locked).
+#
+# Run it on demand (Actions > Refresh Cargo.lock > Run workflow) or by pushing a branch named ci/lock-<anything>. Then, in the monorepo:
+#   gh run download <run-id> -R <this repo> -n atlas-pca-Cargo.lock -D /tmp/lock
+#   cp /tmp/lock/Cargo.lock sdks/rust-pca/Cargo.lock
+#   git add sdks/rust-pca/Cargo.lock && git commit
+# The job fails if the refreshed lock does not satisfy `cargo metadata --locked`, so a downloaded artifact is always consistent.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['ci/lock-**']
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    name: refresh the standalone crate's lockfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Re-resolve the crate in the layout its manifest paths expect
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The monorepo crate paths to ../../packages/<crate>/crate; here those crates sit beside it, so lay the original arrangement
+          # back down in a scratch directory (a lockfile does not record paths) and resolve there, starting from the committed lock.
+          W="$RUNNER_TEMP/mono"
+          mkdir -p "$W/sdks" "$W/packages/pca-zk" "$W/packages/pca-mpc-lwe-ot-wasm"
+          cp -R crates/atlas-pca "$W/sdks/rust-pca"
+          cp -R crates/pca-zk "$W/packages/pca-zk/crate"
+          cp -R crates/pca-mpc-lwe-ot-wasm "$W/packages/pca-mpc-lwe-ot-wasm/crate"
+          perl -pi -e 's{\Q../pca-mpc-lwe-ot-wasm\E}{../../packages/pca-mpc-lwe-ot-wasm/crate}g; s{\Q../pca-zk\E}{../../packages/pca-zk/crate}g' "$W/sdks/rust-pca/Cargo.toml"
+          cd "$W/sdks/rust-pca"
+          cp Cargo.lock "$RUNNER_TEMP/Cargo.lock.before" 2>/dev/null || true
+          cargo metadata --format-version 1 >/dev/null   # resolves, adding the missing entries and keeping valid pins
+          cargo metadata --locked --format-version 1 >/dev/null
+          mkdir -p "$RUNNER_TEMP/out"
+          cp Cargo.lock "$RUNNER_TEMP/out/Cargo.lock"
+          diff -u "$RUNNER_TEMP/Cargo.lock.before" Cargo.lock | head -200 || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: atlas-pca-Cargo.lock
+          path: ${{ runner.temp }}/out/Cargo.lock
+          if-no-files-found: error

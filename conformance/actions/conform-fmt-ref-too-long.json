@@ -1,0 +1,1 @@
+{"id":"conform-fmt-ref-too-long","kind":"conform","input":{"schema":{"verbs":[{"verb":"fmt.item.check","kind":"write","params":{"action.params.x":{"semantic":"generic.string","sensitivity":"free","type":"object_ref","max_len":4}},"effects":["update"]}]},"verb":"fmt.item.check","params":{"x":"abcde"}},"expect":{"ok":false,"code":"out_of_domain"}}

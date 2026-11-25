@@ -11,6 +11,8 @@
 
 use serde_json::{Map, Value};
 
+use super::actions::schema_floor_error;
+use super::actions_registry::{action_pin_error, decide_pin, rule22_decide};
 use super::action_schema::{action_schema_digest, canon_projection, conform_action, schema_verb, verify_action_schema};
 use super::intent_acc::*;
 use super::intent_strict::*;
@@ -117,6 +119,12 @@ pub struct IntentV2Check {
 pub struct IntentV2Decision {
     pub checks: Vec<IntentV2Check>,
     pub env: Map<String, Value>,
+    /// The action schema the action was checked against (when `schema` passed).
+    pub schema: Option<Value>,
+    /// Worlds decided by a single oracle (their `env.world.<name>` is model-derived, rule 21).
+    pub single_source: Vec<String>,
+    /// Rule 21's compatibility mode is in effect and a grant reads a model-derived path (reported degraded).
+    pub legacy_model_polarity: bool,
 }
 
 type Step = Result<(), String>;
@@ -142,8 +150,11 @@ pub fn intent_v2_context_error(ctx: &Value) -> Option<String> {
             None => return Some("policy must be an object".into()),
         };
         // closed member sets; every flag a JSON boolean, the age a non-negative safe integer (absent = default)
-        if let Some(k) = pol.keys().find(|k| !["session", "schema", "acc", "map"].contains(&k.as_str())) {
+        if let Some(k) = pol.keys().find(|k| !["session", "schema", "acc", "map", "model_polarity"].contains(&k.as_str())) {
             return Some(format!("policy: unknown member '{k}'"));
+        }
+        if pol.get("model_polarity").is_some_and(|m| m != "strict" && m != "legacy") {
+            return Some("policy.model_polarity must be 'strict' or 'legacy'".into());
         }
         if let Some(ps) = pol.get("session") {
             let o = match ps.as_object() {
@@ -202,8 +213,27 @@ pub fn intent_v2_context_error(ctx: &Value) -> Option<String> {
             }
         }
     }
+    if !opt_obj(c.get("reviewers")) || c.get("reviewers").is_some_and(|r| !r.get("keys").is_some_and(Value::is_array)) {
+        return Some("reviewers must be {keys: [...]}".into());
+    }
+    if c.get("call_context").is_some_and(|x| !x.as_array().is_some_and(|a| a.iter().all(Value::is_string))) {
+        return Some("call_context must be an array of strings".into());
+    }
+    if !opt_obj(c.get("actions")) {
+        return Some("actions must be an object".into());
+    }
+    if let Some(ac) = c.get("actions") {
+        for k in ["records", "keys", "reapprovals"] {
+            if !opt_arr(ac.get(k)) {
+                return Some(format!("actions.{k} must be an array"));
+            }
+        }
+    }
     if !opt_obj(c.get("params")) {
         return Some("params must be an object".into());
+    }
+    if !opt_obj(c.get("env")) {
+        return Some("env must be an object".into());
     }
     for k in ["schema", "session", "acc"] {
         if !opt_obj(c.get(k)) {
@@ -365,9 +395,9 @@ pub(crate) fn js_number_string(f: f64) -> String {
         return "0".into();
     }
     if f.is_infinite() {
-        return if f < 0.0 { "-Infinity".into() } else { "Infinity".into() };
+        return if f.is_sign_negative() { "-Infinity".into() } else { "Infinity".into() };
     }
-    if f < 0.0 {
+    if f.is_sign_negative() {
         return format!("-{}", js_number_string(-f));
     }
     // `{:e}` prints the shortest round-trip digits as `d[.ddd]e<exp>`: value = 0.digits x 10^n with n = exp + 1
@@ -384,11 +414,10 @@ pub(crate) fn js_number_string(f: f64) -> String {
         format!("0.{}{digits}", "0".repeat((-n) as usize))
     } else {
         let e = n - 1;
-        let sign = if e < 0 { '-' } else { '+' };
         if k == 1 {
-            format!("{digits}e{sign}{}", e.abs())
+            format!("{digits}e{e:+}")
         } else {
-            format!("{}.{}e{sign}{}", &digits[..1], &digits[1..], e.abs())
+            format!("{}.{}e{e:+}", &digits[..1], &digits[1..])
         }
     }
 }
@@ -409,6 +438,12 @@ fn schema_step<'a>(p: &Map<String, Value>, ctx: Option<&'a IntentV2Context>) -> 
     verify_action_schema(doc, &keys).map_err(|e| format!("schema does not verify: {e}"))?;
     if !same(doc.get("aud"), p.get("aud")) {
         return Err("schema aud does not match the PCActn aud".into());
+    }
+    // rule 22, integrity half: the document's materialized floors and traits are recomputed, never trusted
+    if same(doc.get("v"), Some(&Value::from(2))) {
+        if let Some(fe) = schema_floor_error(doc, member(ctx, &["reviewers"])?) {
+            return Err(format!("schema_floor_forged: {fe}"));
+        }
     }
     let params = params.ok_or("no plaintext params to check against the schema (closed world needs them)")?;
     let pv = Value::Object(params.clone());
@@ -504,7 +539,8 @@ fn session_step(p: &Map<String, Value>, grant: &Value, ctx: Option<&IntentV2Cont
         if !is_principal(g) {
             return Err(format!("session grant {i} is not signed by a session principal"));
         }
-        if i > 0 && !(b32(prior[i - 1].get("id")) && same(c.and_then(|c| c.get("prev")), prior[i - 1].get("id"))) {
+        // `ok` proved c.prev canonical 32-byte base64url (seq i > 0), so a matching prior id is too
+        if i > 0 && !same(c.and_then(|c| c.get("prev")), prior[i - 1].get("id")) {
             return Err(format!("session grant {i} does not chain to grant {}", i - 1));
         }
     }
@@ -784,12 +820,16 @@ pub fn decide_intent_v2(pcactn: &Value, grant: &Value, ctx: Option<&IntentV2Cont
         run(out, name, || if clock_ok { f() } else { Err("the verifier clock is not a safe integer (fail closed)".into()) })
     };
     let mut canon: Option<Map<String, Value>> = None;
+    let mut schema_doc: Option<Value> = None;
     if present || flag_on(ctx, &["policy", "schema", "closed_world"]) {
         run(&mut out, "schema", &mut || {
-            canon = Some(schema_step(p, ctx)?.1);
+            let (doc, c) = schema_step(p, ctx)?;
+            schema_doc = Some(doc.clone());
+            canon = Some(c);
             Ok(())
         });
     }
+    out.schema = schema_doc;
     if let Some(c) = &canon {
         out.env.insert("canon".into(), Value::Object(c.clone()));
     }
@@ -820,6 +860,7 @@ pub fn decide_intent_v2(pcactn: &Value, grant: &Value, ctx: Option<&IntentV2Cont
         if map_active {
             run(&mut out, "map", &mut || map_step(p, ctx));
         }
+        model_rules(&mut out, p, grant, ctx, &action, clock_ok);
         return out;
     }
     let mut acc_env = None;
@@ -834,34 +875,164 @@ pub fn decide_intent_v2(pcactn: &Value, grant: &Value, ctx: Option<&IntentV2Cont
     if map_active {
         run(&mut out, "map", &mut || map_step(p, ctx));
     }
-    let wi = match wb_input(p, ctx, now, action) {
-        Ok(wi) => wi,
-        Err(e) => {
-            out.checks.push(IntentV2Check { name: "facts", ok: false, reason: format!("W-B: {e}") });
-            return out;
-        }
-    };
-    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| decide_intent_wb(&wi))) {
-        Err(_) => out.checks.push(IntentV2Check { name: "facts", ok: false, reason: "W-B error (fail closed)".into() }),
-        Ok(wb) => {
-            for (name, c) in &wb.checks {
-                let (ok, reason) = match c {
-                    WbCheck::Pass => (true, String::new()),
-                    WbCheck::Question => (false, format!("intent_required: {}", if wb.reason.is_empty() { "a question is required" } else { &wb.reason })),
-                    WbCheck::Fail => (false, if wb.reason.is_empty() { "rejected".to_string() } else { wb.reason.clone() }),
-                };
-                out.checks.push(IntentV2Check { name, ok, reason });
-            }
-            if wb.outcome != "deny" {
-                for k in ["world", "prov", "class"] {
-                    if let Some(v) = wb.env.get(k) {
-                        out.env.insert(k.into(), v.clone());
+    let action_for_rules = action.clone();
+    match wb_input(p, ctx, now, action) {
+        Err(e) => out.checks.push(IntentV2Check { name: "facts", ok: false, reason: format!("W-B: {e}") }),
+        Ok(wi) => match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| decide_intent_wb(&wi))) {
+            Err(_) => out.checks.push(IntentV2Check { name: "facts", ok: false, reason: "W-B error (fail closed)".into() }),
+            Ok(wb) => {
+                for (name, c) in &wb.checks {
+                    let (ok, reason) = match c {
+                        WbCheck::Pass => (true, String::new()),
+                        WbCheck::Question => (false, format!("intent_required: {}", if wb.reason.is_empty() { "a question is required" } else { &wb.reason })),
+                        WbCheck::Fail => (false, if wb.reason.is_empty() { "rejected".to_string() } else { wb.reason.clone() }),
+                    };
+                    out.checks.push(IntentV2Check { name, ok, reason });
+                }
+                out.single_source = wb.single_source.clone();
+                if wb.outcome != "deny" {
+                    for k in ["world", "prov", "class"] {
+                        if let Some(v) = wb.env.get(k) {
+                            out.env.insert(k.into(), v.clone());
+                        }
                     }
                 }
             }
+        },
+    }
+    model_rules(&mut out, p, grant, ctx, &action_for_rules, clock_ok);
+    out
+}
+
+/// The predicate lists a model-derived path could widen: the grant's allow-list and the ceilings (V5 layers).
+fn allow_side_predicates(env: Option<&Map<String, Value>>, ctx: Option<&IntentV2Context>) -> Vec<Value> {
+    let mut lists = vec![env.and_then(|e| e.get("predicates")).cloned().unwrap_or(Value::Null)];
+    if let Ok(Some(Value::Object(l))) = member(ctx, &["layers"]) {
+        for k in ["org", "site", "std"] {
+            lists.push(l.get(k).and_then(|e| e.get("predicates")).cloned().unwrap_or(Value::Null));
         }
     }
-    out
+    lists
+}
+
+/// `MAX_ESC_TIER` (action-pin.ts:29): the grant's escalation ceiling when no valid pin names one.
+const MAX_ESC_TIER: i64 = 3;
+
+/// Rules 22 (`pin`, `traits`), 20 and 21 (intent-v2.ts `modelRules`), evaluated last so the verifier-computed `env` is complete. Both read the signed
+/// ENVELOPE of the stored grant: `units` (20) is reported iff `envelope.units` is present; `tighten` (21) iff `envelope.tighten`
+/// or a `model_polarity` (envelope or policy) is present, or a grant-side `where` reads a model-derived env path (so that case
+/// is refused, never silently skipped). A PCActn with none of these verifies byte-identically to a verifier without them.
+fn model_rules(out: &mut IntentV2Decision, p: &Map<String, Value>, grant: &Value, ctx: Option<&IntentV2Context>, action: &Value, clock_ok: bool) {
+    let env = crate::read_envelope(grant);
+    let preds = allow_side_predicates(env.as_ref(), ctx);
+    let verb = action["verb"].as_str().unwrap_or_default().to_string();
+    let gated = |f: &mut dyn FnMut() -> Step| -> Step {
+        if clock_ok {
+            f()
+        } else {
+            Err("the verifier clock is not a safe integer (fail closed)".into())
+        }
+    };
+    let schema_doc = out.schema.clone();
+    let mut schema_memo: Option<Result<Value, String>> = None;
+    let mut schema_for = || -> Result<Value, String> {
+        schema_memo
+            .get_or_insert_with(|| match &schema_doc {
+                Some(d) => Ok(d.clone()),
+                None => schema_step(p, ctx).map(|(d, _)| d.clone()),
+            })
+            .clone()
+    };
+    let is_v2 = |d: &Value| same(d.get("v"), Some(&Value::from(2)));
+    let pin_member = env.as_ref().and_then(|e| e.get("actions"));
+    if let Some(pin) = pin_member {
+        run(out, "pin", || {
+            gated(&mut || {
+                let doc = schema_for()?;
+                let list = |k: &str| member(ctx, &["actions", k]).ok().flatten().cloned().unwrap_or_else(|| Value::Array(Vec::new()));
+                let d = decide_pin(&serde_json::json!({
+                    "pin": pin, "doc": doc, "verb": verb, "records": list("records"), "keys": list("keys"), "reapprovals": list("reapprovals"),
+                    "grant": {"id": grant.get("id"), "issuer": grant.get("issuer")},
+                }));
+                if d["ok"] == Value::Bool(true) {
+                    return Ok(());
+                }
+                let escalate = if d["escalate"] == Value::Bool(true) { "escalate: " } else { "" };
+                let diff = d.get("needs_reapproval").and_then(Value::as_str).map_or(String::new(), |n| format!(" (re-approve diff {n})"));
+                Err(format!("{escalate}{}: {}{diff}", d["code"].as_str().unwrap_or_default(), d["reason"].as_str().unwrap_or_default()))
+            })
+        });
+    }
+    if schema_doc.as_ref().is_some_and(is_v2) || (pin_member.is_some() && schema_for().is_ok_and(|d| is_v2(&d))) {
+        run(out, "traits", || {
+            gated(&mut || {
+                let doc = schema_for()?;
+                let pin = pin_member.filter(|x| action_pin_error(x).is_none());
+                let types = env.as_ref().and_then(|e| e.get("caveats")).and_then(Value::as_array).into_iter().flatten().filter_map(|c| c.get("type"));
+                let pinned = pin.and_then(|x| x.get("caveats")).and_then(Value::as_array).into_iter().flatten();
+                let caveats: Vec<&Value> = types.chain(pinned).filter(|t| t.is_string()).collect();
+                let tier = |k: &str, default: i64| pin.and_then(|x| x.get(k)).cloned().unwrap_or_else(|| Value::from(default));
+                let facts = serde_json::json!({"caveats": caveats, "max_esc": tier("max_esc", MAX_ESC_TIER), "preauth_esc": tier("preauth_esc", 0)});
+                let context = member(ctx, &["call_context"]).ok().flatten().cloned().unwrap_or_else(|| Value::Array(Vec::new()));
+                match rule22_decide(&doc, &verb, &facts, &context) {
+                    "allow" => Ok(()),
+                    "escalate" => Err("escalate: the action floors need a caveat, context or confirmation the grant does not provide (rule 22)".into()),
+                    _ => Err("the action floors exceed what the grant authorizes (rule 22)".into()),
+                }
+            })
+        });
+    }
+    if let Some(units) = env.as_ref().and_then(|e| e.get("units")) {
+        run(out, "units", || {
+            gated(&mut || {
+                let doc = schema_for()?;
+                let mut input = serde_json::json!({"units": units, "verb": verb, "predicates": preds});
+                if let Some(su) = doc.get("units") {
+                    input["schema_units"] = su.clone();
+                }
+                if let Some(vp) = schema_verb(&doc, &verb)?.and_then(|v| v.get("params")) {
+                    input["verb_params"] = vp.clone();
+                }
+                crate::decision::decide_units(&input)
+            })
+        });
+    }
+    let pol_ctx = member(ctx, &["policy", "model_polarity"]).ok().flatten().cloned();
+    let polarity: Option<Value> = match &pol_ctx {
+        Some(v) if v == "strict" => None,
+        Some(v) => Some(v.clone()),
+        None => env.as_ref().and_then(|e| e.get("model_polarity")).cloned(),
+    };
+    let has_tighten = env.as_ref().is_some_and(|e| e.contains_key("tighten"));
+    let single = out.single_source.clone();
+    if has_tighten || polarity.is_some() || pol_ctx.is_some() || !crate::decision::model_paths_read(&preds, &single).is_empty() {
+        let mut host_env = member(ctx, &["env"]).ok().flatten().and_then(Value::as_object).cloned().unwrap_or_default();
+        for (k, v) in &out.env {
+            host_env.insert(k.clone(), v.clone());
+        }
+        let mut input = serde_json::json!({"predicates": preds, "single_source": single, "context": {"action": action, "env": host_env}});
+        if let Some(t) = env.as_ref().and_then(|e| e.get("tighten")) {
+            input["tighten"] = t.clone();
+        }
+        if let Some(pv) = &polarity {
+            input["polarity"] = pv.clone();
+        }
+        let mut legacy = false;
+        run(out, "tighten", || {
+            gated(&mut || {
+                let r = crate::decision::decide_tighten(&input);
+                legacy = r.legacy;
+                if r.outcome == "ok" {
+                    Ok(())
+                } else {
+                    Err(r.reason.unwrap_or_else(|| "refused".into()))
+                }
+            })
+        });
+        if legacy {
+            out.legacy_model_polarity = true;
+        }
+    }
 }
 
 /// True iff any v2 check would be reported (the PCActn carries `intent_session`, a v2 policy flag is set, or the

@@ -20,7 +20,8 @@ const crate = opt('crate'), shards = Number(opt('shards')), reports = opt('repor
 if (!crate || !(shards >= 1) || !reports || !checker || !src) { console.error('usage: mutation-merge.mjs --crate= --shards= --reports= --checker= --src='); process.exit(2); }
 
 const found = new Map();
-const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (/^shard-\d+\.json$/.test(e.name)) found.set(p, JSON.parse(fs.readFileSync(p, 'utf8'))); } };
+const win = []; // winshard-<n>.json: a windows-latest run of files with Windows-only branches (see the cross-OS rule below)
+const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (/^shard-\d+\.json$/.test(e.name)) found.set(p, JSON.parse(fs.readFileSync(p, 'utf8'))); else if (/^winshard-\d+\.json$/.test(e.name)) win.push([p, JSON.parse(fs.readFileSync(p, 'utf8'))]); } };
 if (fs.existsSync(reports)) walk(reports);
 const errors = [];
 const byShard = new Map();
@@ -38,9 +39,27 @@ for (let k = 1; k <= shards; k++) {
   for (const [s, n] of Object.entries(r.counts ?? {})) totals[s] = (totals[s] ?? 0) + n;
   survivors.push(...r.survivors);
 }
+// Cross-OS rule: a file named in a Windows report's `scope` is mutated on Linux AND on Windows, and a mutant counts as a survivor only
+// when it survived on every OS that ran it (Linux cannot execute the Windows branches, Windows cannot execute the POSIX ones). A
+// Windows report that failed, or of another run, fails the merge like a missing shard.
+const idOf = (s) => [s.file, s.mutant, String(s.line ?? '').trim(), s.occurrence ?? 1].join('\u0000');
+const winScope = new Set();
+const winSurv = new Set();
+for (const [p, r] of win) {
+  if (r.of !== shards || r.crate !== crate) { errors.push(`${p}: report of another run (crate ${r.crate}, of ${r.of})`); continue; }
+  if (r.ok !== true) { errors.push(`${p}: tool error (${r.error ?? 'ok != true'})`); continue; }
+  for (const f of r.scope ?? []) winScope.add(f);
+  for (const s of r.survivors) winSurv.add(idOf(s));
+}
+if (win.length) {
+  const before = survivors.length;
+  const keep = survivors.filter((s) => !winScope.has(s.file) || winSurv.has(idOf(s)));
+  survivors.length = 0; survivors.push(...keep);
+  console.log(`windows reports: ${win.length}, scope ${[...winScope].join(', ')}; ${before - survivors.length} Linux survivor(s) killed on Windows`);
+}
 const tool = [...byShard.values()][0]?.tool ?? '?';
 console.log(`${crate}: ${tool}, ${byShard.size}/${shards} shard reports, counts ${JSON.stringify(totals)}, ${survivors.length} survivor(s)`);
-if (errors.length) { console.error(errors.join('\n')); console.error('FAIL: incomplete run'); summary('FAIL (incomplete run)'); process.exitCode = 1; }
+if (errors.length) { console.error(errors.join('\n')); console.error('FAIL: incomplete run'); summary('FAIL (incomplete run)'); evidence('fail', null); process.exitCode = 1; }
 else merge();
 
 function merge() {
@@ -69,6 +88,7 @@ const unlisted = (r.stderr ?? '').split('\n').filter((l) => l.startsWith('UNLIST
 const stale = (r.stderr ?? '').split('\n').filter((l) => l.startsWith('STALE')).length;
 console.log(`ledger entries for ${crate}: ${merged}; unlisted survivors: ${unlisted}; stale entries: ${stale}`);
 summary(rc === 0 ? 'PASS' : `FAIL (${unlisted} unlisted survivor(s), ${stale} stale entr${stale === 1 ? 'y' : 'ies'})`);
+evidence(rc === 0 ? 'pass' : 'fail', merged, { unlisted, stale });
 // exitCode, not process.exit(): exit() right after a large stderr write to a pipe drops the unflushed tail of the list
 process.exitCode = rc;
 }
@@ -78,4 +98,16 @@ function summary(verdict) {
   if (!f) return;
   const rows = Object.entries(totals).map(([s, n]) => `| ${s} | ${n} |`).join('\n');
   fs.appendFileSync(f, `### Mutation: ${crate} (${tool})\n\n**${verdict}**: ${survivors.length} survivor(s) over ${shards} shard(s)\n\n| status | mutants |\n|---|---|\n${rows}\n\n`);
+}
+
+// reports/mutation-summary.json: the merge result for the release evidence report (uploaded as the mutation-summary artifact).
+// score = detected / (detected + undetected) over the tool's counts (killed / caught / timeout vs survived / missed / no
+// tests); every undetected mutant of a passing merge is a listed equivalent.
+function evidence(verdict, listed, extra = {}) {
+  const sum = (re) => Object.entries(totals).filter(([k]) => re.test(k)).reduce((a, [, n]) => a + n, 0);
+  const det = sum(/^(killed|killed\((deadline|crash)\)|caught|timeout)$/i), und = sum(/^(survived|missed|no[ _-]?tests?|no[ _-]?coverage|nocov)$/i);
+  const score = det + und ? `${((100 * det) / (det + und)).toFixed(1)} %` : null;
+  fs.mkdirSync(reports, { recursive: true });
+  fs.writeFileSync(path.join(reports, 'mutation-summary.json'), JSON.stringify({ crate, tool, shards, shard_reports: byShard.size, verdict, score,
+    counts: totals, survivors: survivors.length, listed_equivalents: listed, ...extra }, null, 1) + '\n');
 }

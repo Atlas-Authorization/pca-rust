@@ -9,7 +9,13 @@
 set -euo pipefail
 CRATE="${1:?crate}"; SUB="${2:-.}"
 ref="${GITHUB_REF_NAME:-main}"
-if ! git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY_OWNER:-Atlas-Authorization}/pca.git" "refs/heads/$ref" "refs/tags/$ref" >/dev/null 2>&1; then
+has_ref() { git ls-remote --exit-code "https://github.com/${GITHUB_REPOSITORY_OWNER:-Atlas-Authorization}/pca.git" "refs/heads/$ref" "refs/tags/$ref" >/dev/null 2>&1; }
+# a push names its monorepo commit ("source <sha>") and the flagship is pushed LAST: a run that starts before the flagship ref
+# exists must wait for it (falling back to main then waits 20 min for a source main never gets, and fails every shard)
+if ! has_ref && git -c safe.directory='*' log -1 --format=%B 2>/dev/null | grep -qE '^source [0-9a-f]{40}$'; then
+  for i in $(seq 1 40); do has_ref && break; echo "waiting for the flagship ref '$ref' ($i/40)"; sleep 30; done
+fi
+if ! has_ref; then
   echo "::warning::the flagship repo has no ref '$ref': using the mutation tooling and ledger from its main"
   ref=main
 fi

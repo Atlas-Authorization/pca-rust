@@ -1,0 +1,1 @@
+{"id":"conform-fmt-https-http","kind":"conform","input":{"schema":{"verbs":[{"verb":"fmt.item.check","kind":"write","params":{"action.params.x":{"semantic":"generic.string","sensitivity":"free","type":"string","format":"uri_https"}},"effects":["update"]}]},"verb":"fmt.item.check","params":{"x":"http://example.com"}},"expect":{"ok":false,"code":"out_of_domain"}}
