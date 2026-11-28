@@ -30,12 +30,12 @@ fn unsupported_suite_reason() {
     for alg in ["less-cat1", "hybrid-ed25519-less-cat1"] {
         let mut p = v["pcactn"].clone();
         p["alg"] = json!(alg);
-        let got = atlas_pca::verify_pcactn_core_policy(&p, &v["grant"], v["context"]["now"].as_i64().unwrap(), v["context"]["aud"].as_str().unwrap(), None);
+        let got = atlas_pca::verify_pcactn_core_with(&p, &v["grant"], v["context"]["now"].as_i64().unwrap(), v["context"]["aud"].as_str().unwrap(), &atlas_pca::VerifyOptions { allowed: None, insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() });
         assert!(!got.allow && got.reason.contains(&format!("{UNSUPPORTED_SUITE_REASON}: {alg}")), "{alg}: {}", got.reason);
     }
     let mut p = v["pcactn"].clone();
     p["alg"] = json!("ml-dsa-999");
-    let got = atlas_pca::verify_pcactn_core_policy(&p, &v["grant"], 0, "x", None);
+    let got = atlas_pca::verify_pcactn_core_with(&p, &v["grant"], 0, "x", &atlas_pca::VerifyOptions { allowed: None, insecure_skip_plan_root_check: true, ..atlas_pca::VerifyOptions::default() });
     assert!(!got.allow && !got.reason.contains(UNSUPPORTED_SUITE_REASON), "{}", got.reason);
 }
 

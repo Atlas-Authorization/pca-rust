@@ -2,121 +2,72 @@
  {
   "crate": "stark-pca",
   "file": "src/lib.rs",
-  "mutant": "replace || with && in verify_release (guard operator before info.num_aux_segments())",
+  "mutant": "replace || with && in verify_release",
   "line": "|| info.num_aux_segments() != 0",
-  "reason": "winter-air TraceInfo::num_aux_segments() is 1 iff aux_segment_width() > 0, so the two operands are logically identical; with && binding tighter than || the mutant rewrites `a || n` as `a && n` over identical operands, which is the same predicate",
   "occurrence": 1,
-  "lineno": 957,
-  "fn": "verify_release"
+  "fn": "verify_release",
+  "lineno": 963,
+  "reason": "The mutated chain is `A || B || (C && D) || E` (`&&` binds tighter than `||`), where C = `info.aux_segment_width() != 0` and D = `info.num_aux_segments() != 0`. In winter-air 0.13.x TraceInfo::num_aux_segments() returns 1 if is_multi_segment() and 0 otherwise, and is_multi_segment() is `aux_segment_width > 0`, so D == C for every TraceInfo and `C && D` == C. The mutant predicate is therefore identical to the original `A || B || C || D || E`. The guard itself stays: the C operand (line before) is killed by tests/shape_pin.rs."
  },
  {
   "crate": "stark-pca",
   "file": "src/lib.rs",
-  "mutant": "replace += with -= in <impl Air for ReleaseAir>::evaluate_transition (final i += 1, line 575)",
+  "mutant": "replace += with -= in <impl Air for ReleaseAir>::evaluate_transition",
   "line": "i += 1;",
-  "reason": "The final `i += 1` of evaluate_transition: `i` is read afterwards only by `debug_assert_eq!(i, result.len())`, which is compiled out ([profile.test] debug-assertions = false, and in release). No constraint value changes.",
   "occurrence": 11,
-  "lineno": 575,
-  "fn": "<impl Air for ReleaseAir>::evaluate_transition"
+  "fn": "<impl Air for ReleaseAir>::evaluate_transition",
+  "lineno": 581,
+  "reason": "The 11th `i += 1;` of the file is the last statement of evaluate_transition (every earlier increment is another occurrence). After it `i` is read only by `debug_assert_eq!(i, result.len())`, which expands to `if cfg!(debug_assertions) {..}` and is compiled out in the profile the mutation job builds: the shard runs `cargo mutants --profile mutants`, and `[profile.mutants]` inherits `[profile.test]`, which sets `debug-assertions = false` (set in sdks/stark-pca/Cargo.toml for the crate and hoisted by scripts/sync-pca-rust-mirror.sh into the generated pca-rust workspace root Cargo.toml, the one Cargo actually reads there, because Cargo ignores [profile.*] in member manifests). Overflow checks stay on in that profile but cannot fire: `i` is a local usize that is >= 88 here, so `i -= 1` does not underflow and `i *= 1` leaves it unchanged. `i` feeds no constraint value, so the transition result is identical. In a build with debug assertions ON (a plain `cargo test` of the member in the monorepo is the test profile too, so off; a `dev`-profile build is on) the mutant fails that assertion and is killed, so the equivalence is profile-dependent by construction and rests on this profile only; release builds, the shipped artifact, have the assertion compiled out for the original as well."
  },
  {
   "crate": "stark-pca",
   "file": "src/lib.rs",
-  "mutant": "replace += with *= in <impl Air for ReleaseAir>::evaluate_transition (final i += 1, line 575)",
+  "mutant": "replace += with *= in <impl Air for ReleaseAir>::evaluate_transition",
   "line": "i += 1;",
-  "reason": "The final `i += 1` of evaluate_transition: `i` is read afterwards only by `debug_assert_eq!(i, result.len())`, which is compiled out ([profile.test] debug-assertions = false, and in release). No constraint value changes.",
   "occurrence": 11,
-  "lineno": 575,
-  "fn": "<impl Air for ReleaseAir>::evaluate_transition"
+  "fn": "<impl Air for ReleaseAir>::evaluate_transition",
+  "lineno": 581,
+  "reason": "The 11th `i += 1;` of the file is the last statement of evaluate_transition (every earlier increment is another occurrence). After it `i` is read only by `debug_assert_eq!(i, result.len())`, which expands to `if cfg!(debug_assertions) {..}` and is compiled out in the profile the mutation job builds: the shard runs `cargo mutants --profile mutants`, and `[profile.mutants]` inherits `[profile.test]`, which sets `debug-assertions = false` (set in sdks/stark-pca/Cargo.toml for the crate and hoisted by scripts/sync-pca-rust-mirror.sh into the generated pca-rust workspace root Cargo.toml, the one Cargo actually reads there, because Cargo ignores [profile.*] in member manifests). Overflow checks stay on in that profile but cannot fire: `i` is a local usize that is >= 88 here, so `i -= 1` does not underflow and `i *= 1` leaves it unchanged. `i` feeds no constraint value, so the transition result is identical. In a build with debug assertions ON (a plain `cargo test` of the member in the monorepo is the test profile too, so off; a `dev`-profile build is on) the mutant fails that assertion and is killed, so the equivalence is profile-dependent by construction and rests on this profile only; release builds, the shipped artifact, have the assertion compiled out for the original as well."
  },
  {
   "crate": "stark-pca",
   "file": "src/lib.rs",
-  "mutant": "replace * with / in build_trace (pm * co)",
+  "mutant": "replace * with / in build_trace",
   "line": "let allow = pm * co * tgate * bgate;",
-  "reason": "pm and co are 0/1 field elements and tgate = bgate = ONE: x / ONE == x, and for pm / co winterfell's FieldElement::inv(ZERO) is ZERO, so pm / co == pm * co on all four (pm, co) pairs. allow is unchanged.",
   "occurrence": 1,
-  "lineno": 639,
-  "fn": "build_trace"
+  "fn": "build_trace",
+  "lineno": 645,
+  "multiplicity": 3,
+  "reason": "Three raw survivors share this string, one per `*` of ((pm * co) * tgate) * bgate. pm and co are BaseElement::ONE or ZERO (lines 641-642), tgate = bgate = ONE (lines 643-644). winter-math 0.13.1 f128: `a / b` is `mul(a, inv(b))` and inv(0) = 0, inv(1) = 1. (1) `pm / co`: co = ONE gives pm * 1 = pm = pm * co; co = ZERO gives pm * 0 = 0 = pm * co; all four (pm, co) pairs agree. (2) `(pm*co) / tgate` = x * inv(ONE) = x. (3) `(..) / bgate` likewise. So `allow` is unchanged for every witness."
  },
  {
   "crate": "stark-pca",
   "file": "src/lib.rs",
-  "mutant": "replace * with / in build_trace (* tgate)",
-  "line": "let allow = pm * co * tgate * bgate;",
-  "reason": "pm and co are 0/1 field elements and tgate = bgate = ONE: x / ONE == x, and for pm / co winterfell's FieldElement::inv(ZERO) is ZERO, so pm / co == pm * co on all four (pm, co) pairs. allow is unchanged.",
-  "occurrence": 1,
-  "lineno": 639,
-  "fn": "build_trace"
- },
- {
-  "crate": "stark-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace * with / in build_trace (* bgate)",
-  "line": "let allow = pm * co * tgate * bgate;",
-  "reason": "pm and co are 0/1 field elements and tgate = bgate = ONE: x / ONE == x, and for pm / co winterfell's FieldElement::inv(ZERO) is ZERO, so pm / co == pm * co on all four (pm, co) pairs. allow is unchanged.",
-  "occurrence": 1,
-  "lineno": 639,
-  "fn": "build_trace"
- },
- {
-  "crate": "stark-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace < with <= in build_trace (bit row bound)",
-  "line": "let bit = if row < TRACE_LEN - 1 { ((v >> row) & 1) as u128 } else { 0 };",
-  "reason": "Only changes the bit column at the LAST row (row = TRACE_LEN-1): bit = (v >> 63) & 1 instead of 0. For every target the honest prover can prove (< 2^63) that bit is 0 anyway, and the last row is never the `cur` row of a transition constraint, so it is unconstrained; out-of-range targets fail the acc[last] == 0 assertion either way.",
-  "occurrence": 1,
-  "lineno": 664,
-  "fn": "build_trace"
- },
- {
-  "crate": "stark-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace - with + in build_trace (bit row bound TRACE_LEN - 1)",
-  "line": "let bit = if row < TRACE_LEN - 1 { ((v >> row) & 1) as u128 } else { 0 };",
-  "reason": "Only changes the bit column at the LAST row (row = TRACE_LEN-1): bit = (v >> 63) & 1 instead of 0. For every target the honest prover can prove (< 2^63) that bit is 0 anyway, and the last row is never the `cur` row of a transition constraint, so it is unconstrained; out-of-range targets fail the acc[last] == 0 assertion either way.",
-  "occurrence": 1,
-  "lineno": 664,
-  "fn": "build_trace"
- },
- {
-  "crate": "stark-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace - with / in build_trace (bit row bound TRACE_LEN - 1)",
-  "line": "let bit = if row < TRACE_LEN - 1 { ((v >> row) & 1) as u128 } else { 0 };",
-  "reason": "Only changes the bit column at the LAST row (row = TRACE_LEN-1): bit = (v >> 63) & 1 instead of 0. For every target the honest prover can prove (< 2^63) that bit is 0 anyway, and the last row is never the `cur` row of a transition constraint, so it is unconstrained; out-of-range targets fail the acc[last] == 0 assertion either way.",
-  "occurrence": 1,
-  "lineno": 664,
-  "fn": "build_trace"
- },
- {
-  "crate": "stark-pca",
-  "file": "src/lib.rs",
-  "mutant": "replace < with <= in build_trace (acc update row bound)",
+  "mutant": "replace < with <= in build_trace",
   "line": "if row < TRACE_LEN - 1 {",
-  "reason": "Only affects the update of `acc` after the last row has been written (cols[acol][row] is stored before the subtraction and `acc` is not read again), i.e. a dead store; the trace is identical.",
   "occurrence": 1,
-  "lineno": 666,
-  "fn": "build_trace"
+  "fn": "build_trace",
+  "lineno": 672,
+  "reason": "`row < TRACE_LEN - 1` becomes `row <= TRACE_LEN - 1`: the update additionally runs at row 63. `acc` is the per-check local (`let mut acc = target;`); its last read is `cols[acol][row] = acc;` at the top of the same iteration, the loop ends after row 63 and the next check re-initialises it, so the extra `acc -= bit * pow` is a dead store (field arithmetic, cannot panic). The trace is byte-identical for every witness (and bit is 0 at row 63 anyway, line 670)."
  },
  {
   "crate": "stark-pca",
   "file": "src/lib.rs",
-  "mutant": "replace - with + in build_trace (acc update row bound TRACE_LEN - 1)",
+  "mutant": "replace - with + in build_trace",
   "line": "if row < TRACE_LEN - 1 {",
-  "reason": "Only affects the update of `acc` after the last row has been written (cols[acol][row] is stored before the subtraction and `acc` is not read again), i.e. a dead store; the trace is identical.",
   "occurrence": 1,
-  "lineno": 666,
-  "fn": "build_trace"
+  "fn": "build_trace",
+  "lineno": 672,
+  "reason": "`TRACE_LEN - 1` becomes `TRACE_LEN + 1` = 65: `row < 65` holds for every row 0..=63, so the update additionally runs at row 63. `acc` is the per-check local (`let mut acc = target;`); its last read is `cols[acol][row] = acc;` at the top of the same iteration, the loop ends after row 63 and the next check re-initialises it, so the extra `acc -= bit * pow` is a dead store (field arithmetic, cannot panic). The trace is byte-identical for every witness (and bit is 0 at row 63 anyway, line 670)."
  },
  {
   "crate": "stark-pca",
   "file": "src/lib.rs",
-  "mutant": "replace - with / in build_trace (acc update row bound TRACE_LEN - 1)",
+  "mutant": "replace - with / in build_trace",
   "line": "if row < TRACE_LEN - 1 {",
-  "reason": "Only affects the update of `acc` after the last row has been written (cols[acol][row] is stored before the subtraction and `acc` is not read again), i.e. a dead store; the trace is identical.",
   "occurrence": 1,
-  "lineno": 666,
-  "fn": "build_trace"
+  "fn": "build_trace",
+  "lineno": 672,
+  "reason": "`TRACE_LEN - 1` becomes `TRACE_LEN / 1` = 64: `row < 64` holds for every row 0..=63, so the update additionally runs at row 63. `acc` is the per-check local (`let mut acc = target;`); its last read is `cols[acol][row] = acc;` at the top of the same iteration, the loop ends after row 63 and the next check re-initialises it, so the extra `acc -= bit * pow` is a dead store (field arithmetic, cannot panic). The trace is byte-identical for every witness (and bit is 0 at row 63 anyway, line 670)."
  }
 ]

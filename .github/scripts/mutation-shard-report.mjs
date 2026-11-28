@@ -16,6 +16,8 @@ for (const s of survivors) {
   }
 }
 const total = Object.values(counts).reduce((a, b) => a + b, 0);
-if (total === 0) { console.error('shard ran 0 mutants: refusing to report an empty shard as a pass'); process.exit(1); }
-fs.writeFileSync(out, JSON.stringify({ shard, of, crate, tool, ok: true, counts, survivors }, null, 1));
+// --empty=no-mutant-in-scope: the tool's own report holds no mutant in the shard's lines (a span of declarations only; dotnet stryker-report.py)
+if (total === 0 && opt('empty') !== 'no-mutant-in-scope') { console.error('shard ran 0 mutants: refusing to report an empty shard as a pass'); process.exit(1); }
+const scope = opt('scope')?.split(',').filter(Boolean); // windows reports: the files this run is the authority for (see mutation-merge.mjs)
+fs.writeFileSync(out, JSON.stringify({ shard, of, crate, tool, ok: true, counts, survivors, ...(scope ? { scope, os: 'windows' } : {}) }, null, 1));
 console.log(`${crate} shard ${shard}/${of} (${tool}): ${JSON.stringify(counts)}, ${survivors.length} survivor(s)`);

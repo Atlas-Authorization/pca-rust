@@ -1,0 +1,2389 @@
+{
+  "format": 1,
+  "generator": "packages/pca/scripts/gen-conformance-native-parity.ts",
+  "suite": "plan-lifecycle",
+  "layer": "extension",
+  "description": "Plan lifecycle (T10): draft -> validated -> committed -> authorized -> revoked. One fresh registry per scenario; `at` is the clock of each step; `expect[i]` answers `steps[i]` (transition results, statuses, contexts). Roots are Merkle roots of the plan node leaves (planNodeLeaf), so a native must reproduce the commitment. `validator` is the server validator the registry is built with.",
+  "scenarios": [
+    {
+      "name": "happy-path",
+      "description": "draft, validate, commit, authorize: executable until the approval expires",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            },
+            {
+              "id": "n2",
+              "verb": "orders.read",
+              "resource": "/orders/1"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "commit",
+          "at": 1800000000001,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000002,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "approval": {
+            "by": "principal-key",
+            "expiresAt": 1800000100000
+          }
+        },
+        {
+          "op": "status",
+          "at": 1800000050000,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "status",
+          "at": 1800000100001,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "status",
+          "at": 1800000100002,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "is_plan_authorized",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "is_plan_authorized",
+          "at": 1800000200000,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "context",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g: the principal's approval expired at 1800000100000",
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g: the principal's approval expired at 1800000100000",
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        true,
+        false,
+        {
+          "plan": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            },
+            {
+              "id": "n2",
+              "verb": "orders.read",
+              "resource": "/orders/1"
+            }
+          ],
+          "planAuthorized": true,
+          "status": {
+            "state": "authorized",
+            "executable": true,
+            "record": {
+              "grantRef": "g1",
+              "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+              "nodes": [
+                {
+                  "id": "n1",
+                  "verb": "payments.refund",
+                  "resource": "/orders/1",
+                  "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                  "reversibility_class": "costly"
+                },
+                {
+                  "id": "n2",
+                  "verb": "orders.read",
+                  "resource": "/orders/1"
+                }
+              ],
+              "state": "authorized",
+              "createdAt": 1800000000000,
+              "validatedAt": 1800000000000,
+              "committedAt": 1800000000001,
+              "authorizedAt": 1800000000002,
+              "approval": {
+                "by": "principal-key",
+                "expiresAt": 1800000100000
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "committed-is-not-executable",
+      "description": "a committed plan still needs the principal",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "commit",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "status",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "context",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000
+          }
+        },
+        {
+          "state": "committed",
+          "executable": false,
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is committed but not authorized by the principal",
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000
+          }
+        },
+        {
+          "plan": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ],
+          "planAuthorized": false,
+          "status": {
+            "state": "committed",
+            "executable": false,
+            "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is committed but not authorized by the principal",
+            "record": {
+              "grantRef": "g1",
+              "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+              "nodes": [
+                {
+                  "id": "n1",
+                  "verb": "payments.refund",
+                  "resource": "/orders/1",
+                  "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                  "reversibility_class": "costly"
+                }
+              ],
+              "state": "committed",
+              "createdAt": 1800000000000,
+              "validatedAt": 1800000000000,
+              "committedAt": 1800000000000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transitions-are-ordered",
+      "description": "no step may be skipped or repeated",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "commit",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "p"
+          }
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "commit",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "commit",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "p"
+          }
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "p"
+          }
+        },
+        {
+          "op": "status",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "draft",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is draft: cannot commit"
+        },
+        {
+          "ok": false,
+          "state": "draft",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is draft: cannot authorize"
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "validated",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is validated: cannot validate"
+        },
+        {
+          "ok": false,
+          "state": "validated",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ already exists (validated)"
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "committed",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is committed: cannot commit"
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000,
+            "authorizedAt": 1800000000000,
+            "approval": {
+              "by": "p"
+            }
+          }
+        },
+        {
+          "ok": false,
+          "state": "authorized",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is authorized: cannot authorize"
+        },
+        {
+          "state": "authorized",
+          "executable": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000,
+            "authorizedAt": 1800000000000,
+            "approval": {
+              "by": "p"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "unknown-plan-and-grant-scoping",
+      "description": "a root is scoped to its grant; unknown roots are not executable",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "commit",
+          "at": 1800000000001,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000002,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "principal-key",
+            "expiresAt": 1800000100000
+          }
+        },
+        {
+          "op": "status",
+          "at": 1800000000003,
+          "grant": "g2",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "status",
+          "at": 1800000000003,
+          "grant": "g1",
+          "root": "nope"
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g2",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "revoke",
+          "at": 1800000000000,
+          "grant": "g2",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "reason": "x"
+        },
+        {
+          "op": "context",
+          "at": 1800000000000,
+          "grant": "g2",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "is_plan_authorized",
+          "at": 1800000000000,
+          "grant": "g2",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "unknown",
+          "executable": false,
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is unknown for this grant"
+        },
+        {
+          "state": "unknown",
+          "executable": false,
+          "reason": "plan nope is unknown for this grant"
+        },
+        {
+          "ok": false,
+          "state": "unknown",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is unknown for this grant"
+        },
+        {
+          "ok": false,
+          "state": "unknown",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is unknown for this grant"
+        },
+        null,
+        false
+      ]
+    },
+    {
+      "name": "revoke-is-terminal",
+      "description": "revoke from any live state; a revoked plan never executes again and cannot be revived",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "commit",
+          "at": 1800000000001,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000002,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "principal-key",
+            "expiresAt": 1800000100000
+          }
+        },
+        {
+          "op": "revoke",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "reason": "principal changed their mind"
+        },
+        {
+          "op": "status",
+          "at": 1800000000011,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "revoke",
+          "at": 1800000000012,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "reason": "again"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000013,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "p"
+          }
+        },
+        {
+          "op": "draft",
+          "at": 1800000000014,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "is_plan_authorized",
+          "at": 1800000000015,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "revoked",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            },
+            "revokedAt": 1800000000010,
+            "revokedReason": "principal changed their mind"
+          }
+        },
+        {
+          "state": "revoked",
+          "executable": false,
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is revoked (principal changed their mind)",
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "revoked",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            },
+            "revokedAt": 1800000000010,
+            "revokedReason": "principal changed their mind"
+          }
+        },
+        {
+          "ok": false,
+          "state": "revoked",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is revoked: cannot revoke"
+        },
+        {
+          "ok": false,
+          "state": "revoked",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is revoked: cannot authorize"
+        },
+        {
+          "ok": false,
+          "state": "revoked",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ already exists (revoked)"
+        },
+        false
+      ]
+    },
+    {
+      "name": "revoke-a-draft",
+      "description": "a draft can be revoked",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "revoke",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "reason": "abandoned"
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "revoked",
+            "createdAt": 1800000000000,
+            "revokedAt": 1800000000000,
+            "revokedReason": "abandoned"
+          }
+        },
+        {
+          "ok": false,
+          "state": "revoked",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is revoked: cannot validate"
+        }
+      ]
+    },
+    {
+      "name": "structural-validation",
+      "description": "validate refuses duplicate ids, missing verb or resource, unknown classes, empty plans",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            },
+            {
+              "id": "n1",
+              "verb": "orders.read",
+              "resource": "/orders/1"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "EWrWA4lHpdLbgCRCql9n1KP-NXppEto30xCAMHr5hXk"
+        },
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "x",
+              "verb": "",
+              "resource": "/r"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "AjTkRmcHHp7bpZx85RDc6ypq37Bdx40G-VnDhzAa2QE"
+        },
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "y",
+              "verb": "v",
+              "resource": "/r",
+              "reversibility_class": "bogus"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "nzC3hm11eLYgSfi1QHPFCnstBQqGrxI_Xy4HQdLuxwQ"
+        },
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": []
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "no-such-root"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "EWrWA4lHpdLbgCRCql9n1KP-NXppEto30xCAMHr5hXk",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n1",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "draft",
+          "reason": "plan EWrWA4lHpdLbgCRCql9n1KP-NXppEto30xCAMHr5hXk is invalid: duplicate node id 'n1'"
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "AjTkRmcHHp7bpZx85RDc6ypq37Bdx40G-VnDhzAa2QE",
+            "nodes": [
+              {
+                "id": "x",
+                "verb": "",
+                "resource": "/r"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "draft",
+          "reason": "plan AjTkRmcHHp7bpZx85RDc6ypq37Bdx40G-VnDhzAa2QE is invalid: node 'x' needs a verb and a resource"
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "nzC3hm11eLYgSfi1QHPFCnstBQqGrxI_Xy4HQdLuxwQ",
+            "nodes": [
+              {
+                "id": "y",
+                "verb": "v",
+                "resource": "/r",
+                "reversibility_class": "bogus"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "draft",
+          "reason": "plan nzC3hm11eLYgSfi1QHPFCnstBQqGrxI_Xy4HQdLuxwQ is invalid: node 'y' has an unknown reversibility class 'bogus'"
+        },
+        {
+          "ok": false,
+          "state": "unknown",
+          "reason": "a plan needs a grant"
+        },
+        {
+          "ok": false,
+          "state": "unknown",
+          "reason": "the plan cannot be committed: merkleRoot: empty leaf set"
+        },
+        {
+          "ok": false,
+          "state": "unknown",
+          "reason": "plan no-such-root is unknown for this grant"
+        }
+      ]
+    },
+    {
+      "name": "validator-accepts",
+      "description": "the server validator runs after the structural checks",
+      "validator": "accept",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "validator-refuses",
+      "description": "a refusing validator leaves the plan a draft",
+      "validator": "refuse",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "status",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "draft",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is invalid: node outside the grant"
+        },
+        {
+          "state": "draft",
+          "executable": false,
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is draft, not authorized",
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        }
+      ]
+    },
+    {
+      "name": "validator-throws-fails-closed",
+      "description": "a throwing validator refuses",
+      "validator": "throw",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "draft",
+          "reason": "plan wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ is invalid: validator error (fail closed): policy down"
+        }
+      ]
+    },
+    {
+      "name": "approval-validation",
+      "description": "an approval names who approved and an optional finite expiry",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "commit",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": ""
+          }
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": null
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "p",
+            "expiresAt": null
+          }
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+          "approval": {
+            "by": "p"
+          }
+        },
+        {
+          "op": "status",
+          "at": 2800000000000,
+          "grant": "g1",
+          "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000
+          }
+        },
+        {
+          "ok": false,
+          "state": "committed",
+          "reason": "an approval names who approved (`by`)"
+        },
+        {
+          "ok": false,
+          "state": "committed",
+          "reason": "an approval names who approved (`by`)"
+        },
+        {
+          "ok": false,
+          "state": "committed",
+          "reason": "approval.expiresAt must be a time (epoch ms)"
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000,
+            "authorizedAt": 1800000000000,
+            "approval": {
+              "by": "p"
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "wm5UhDPVYFCStYKnG_AEcyvudTv1VjMj7sfM7I5KqmQ",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000000,
+            "authorizedAt": 1800000000000,
+            "approval": {
+              "by": "p"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "check-node-and-operation",
+      "description": "check adds the per-action staleness rules: the node exists, the operation matches what was approved",
+      "steps": [
+        {
+          "op": "draft",
+          "at": 1800000000000,
+          "grant": "g1",
+          "nodes": [
+            {
+              "id": "n1",
+              "verb": "payments.refund",
+              "resource": "/orders/1",
+              "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+              "reversibility_class": "costly"
+            },
+            {
+              "id": "n2",
+              "verb": "orders.read",
+              "resource": "/orders/1"
+            }
+          ]
+        },
+        {
+          "op": "validate",
+          "at": 1800000000000,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "commit",
+          "at": 1800000000001,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "authorize",
+          "at": 1800000000002,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "approval": {
+            "by": "principal-key",
+            "expiresAt": 1800000100000
+          }
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g"
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "node_id": "n1"
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "node_id": "missing"
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "node_id": "n1",
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params": {
+              "amount": 5
+            }
+          }
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "node_id": "n1",
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "/orders/1",
+            "params": {
+              "amount": 6
+            }
+          }
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "node_id": "n1",
+          "operation": {
+            "verb": "payments.refund",
+            "resource": "/orders/2",
+            "params": {
+              "amount": 5
+            }
+          }
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "node_id": "n1",
+          "operation": {
+            "verb": "orders.read",
+            "resource": "/orders/1"
+          }
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "operation": {
+            "verb": "orders.read",
+            "resource": "/orders/1"
+          }
+        },
+        {
+          "op": "check",
+          "at": 1800000000010,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "operation": {
+            "verb": "orders.read",
+            "resource": "/orders/1",
+            "params": {
+              "x": 1
+            }
+          }
+        },
+        {
+          "op": "check",
+          "at": 1800000100002,
+          "grant": "g1",
+          "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+          "node_id": "n1"
+        }
+      ],
+      "expect": [
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "draft",
+            "createdAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "validated",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "committed",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001
+          }
+        },
+        {
+          "ok": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          },
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g has no node 'missing'"
+        },
+        {
+          "state": "authorized",
+          "executable": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          },
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g: the operation (payments.refund on /orders/1 with these params) is not what the principal approved"
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          },
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g: the operation (payments.refund on /orders/2 with these params) is not what the principal approved"
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          },
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g: the operation (orders.read on /orders/1 with these params) is not what the principal approved"
+        },
+        {
+          "state": "authorized",
+          "executable": true,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          },
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g: the operation (orders.read on /orders/1 with these params) is not what the principal approved"
+        },
+        {
+          "state": "authorized",
+          "executable": false,
+          "reason": "plan evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g: the principal's approval expired at 1800000100000",
+          "record": {
+            "grantRef": "g1",
+            "root": "evQqhkeevJYjDfCB9cI5J9bHY2bGxLy6hMWeCZS0h1g",
+            "nodes": [
+              {
+                "id": "n1",
+                "verb": "payments.refund",
+                "resource": "/orders/1",
+                "params_digest": "foTL8PenySwDcFhmXWYVL464WAqyU05SyHe8zOucx78",
+                "reversibility_class": "costly"
+              },
+              {
+                "id": "n2",
+                "verb": "orders.read",
+                "resource": "/orders/1"
+              }
+            ],
+            "state": "authorized",
+            "createdAt": 1800000000000,
+            "validatedAt": 1800000000000,
+            "committedAt": 1800000000001,
+            "authorizedAt": 1800000000002,
+            "approval": {
+              "by": "principal-key",
+              "expiresAt": 1800000100000
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

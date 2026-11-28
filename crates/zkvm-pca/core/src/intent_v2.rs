@@ -144,6 +144,22 @@ pub fn intent_v2_context_error(ctx: Option<&Value>) -> Option<String> {
             }
         }
     }
+    if c.get("call_context").is_some_and(|v| !v.as_array().is_some_and(|a| a.iter().all(Value::is_string))) {
+        return Some("call_context must be an array of strings".into());
+    }
+    if !opt_obj(c.get("actions")) {
+        return Some("actions must be an object".into());
+    }
+    if let Some(Value::Object(ac)) = c.get("actions") {
+        for k in ["records", "keys", "reapprovals"] {
+            if !opt_arr(ac.get(k)) {
+                return Some(format!("actions.{k} must be an array"));
+            }
+        }
+    }
+    if !opt_obj(c.get("reviewers")) || c.get("reviewers").is_some_and(|r| !r.get("keys").is_some_and(Value::is_array)) {
+        return Some("reviewers must be {keys: [...]}".into());
+    }
     if !opt_obj(c.get("params")) {
         return Some("params must be an object".into());
     }
@@ -247,6 +263,13 @@ fn schema_step<'a>(p: &Value, ctx: Option<&'a Value>) -> Result<&'a Value, Strin
     if doc.get("aud") != p.get("aud") {
         return Err("schema aud does not match the PCActn aud".into());
     }
+    // rule 22, integrity half: the materialized floors and traits of a v2 schema are recomputed from the embedded core table and
+    // the document's own custom traits, never trusted (the guest always carries the engine)
+    if doc.get("v").and_then(crate::jsnum::safe_int) == Some(2) {
+        if let Some(fe) = crate::rule22::schema_floor_error(doc, get(ctx, &["reviewers"])) {
+            return Err(format!("schema_floor_forged: {fe}"));
+        }
+    }
     let params = get(ctx, &["params"]);
     if !is_obj(params) {
         return Err("no plaintext params to check against the schema (closed world needs them)".into());
@@ -292,10 +315,12 @@ pub fn decide_intent_v2(p: &Value, grant: &Value, ctx: Option<&Value>, now: f64)
     let params_v = get(ctx, &["params"]);
 
     // 1. schema
+    let mut schema_ok_doc: Option<&Value> = None;
     if present || get(policy, &["schema", "closed_world"]) == Some(&Value::Bool(true)) {
         // a bad clock fails every run check WITHOUT evaluating it (TS `run`): no env member is computed
         match if clock { schema_step(p, ctx) } else { Err(String::new()) } {
             Ok(doc) => {
+                schema_ok_doc = Some(doc);
                 let canon = crate::action_schema::canon_projection(doc, &verb, params_v.unwrap_or(&Value::Null));
                 out.env = Map::new();
                 out.env.insert("canon".into(), Value::Object(canon));
@@ -391,7 +416,96 @@ pub fn decide_intent_v2(p: &Value, grant: &Value, ctx: Option<&Value>, now: f64)
     } else if map_active {
         push(&mut out, "map", map_step(p, ctx));
     }
+    // 8. traits (rule 22): reported iff the accepted schema is version 2; evaluated last (TS `modelRules`)
+    if let Some(doc) = schema_ok_doc.filter(|d| d.get("v").and_then(crate::jsnum::safe_int) == Some(2)) {
+        push(&mut out, "traits", traits_step(doc, &verb, grant, ctx));
+    }
     out
+}
+
+const ACTION_CAVEAT_KINDS: [&str; 8] = crate::rule22::CAVEAT_KINDS;
+
+fn b64u43(v: Option<&Value>) -> bool {
+    v.and_then(Value::as_str).is_some_and(|s| s.len() == 43 && s.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_'))
+}
+fn dotted_ok(s: &str, min: usize, max: usize) -> bool {
+    let segs: Vec<&str> = s.split('.').collect();
+    (min..=max).contains(&segs.len()) && segs.iter().all(|g| !g.is_empty() && g.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_'))
+}
+/// `actionPinError(x)` (packages/pca/src/action-pin.ts): is `envelope.actions` well formed? Only the members rule 22 reads
+/// (`max_esc`, `preauth_esc`, `caveats`) matter to the guest; the pin check itself is host-side.
+fn action_pin_ok(x: &Value) -> bool {
+    let Some(o) = x.as_object() else { return false };
+    if o.keys().any(|k| !["pack", "defs", "on_new_action", "max_esc", "preauth_esc", "caveats"].contains(&k.as_str())) {
+        return false;
+    }
+    let pack_ok = o.get("pack").and_then(Value::as_object).is_some_and(|p| {
+        p.len() == 2 && p.get("ns").and_then(Value::as_str).is_some_and(|n| dotted_ok(n, 1, 6)) && b64u43(p.get("root"))
+    });
+    if !pack_ok || !matches!(o.get("on_new_action").and_then(Value::as_str), Some("deny") | Some("escalate")) {
+        return false;
+    }
+    let tier = |k: &str| o.get(k).map(|v| crate::jsnum::safe_int(v).filter(|t| (0..=3).contains(t)));
+    if matches!(tier("max_esc"), Some(None)) || matches!(tier("preauth_esc"), Some(None)) {
+        return false;
+    }
+    if let (Some(Some(m)), Some(Some(p))) = (tier("max_esc"), tier("preauth_esc")) {
+        if p > m {
+            return false;
+        }
+    }
+    if let Some(c) = o.get("caveats") {
+        let ok = c.as_array().is_some_and(|a| {
+            let names: Vec<&str> = a.iter().filter_map(Value::as_str).collect();
+            names.len() == a.len() && names.iter().all(|k| ACTION_CAVEAT_KINDS.contains(k)) && names.iter().collect::<std::collections::BTreeSet<_>>().len() == names.len()
+        });
+        if !ok {
+            return false;
+        }
+    }
+    if let Some(d) = o.get("defs") {
+        let ok = d.as_object().is_some_and(|m| m.iter().all(|(k, v)| dotted_ok(k, 2, 6) && b64u43(Some(v))));
+        if !ok {
+            return false;
+        }
+    }
+    true
+}
+
+/// Rule 22 (`traits`): FloorDecision of the verb's materialized floors against what the stored grant provides (the caveat kinds
+/// of its envelope and of `envelope.actions.caveats`, `actions.max_esc` default 3, `actions.preauth_esc` default 0) and the call
+/// context the VERIFIER observed (`ctx.call_context`, never the agent's claims). A missing caveat or context key, or a tier above
+/// the pre-authorized one, is an `escalate:` failure; a tier above the authorized one denies.
+fn traits_step(doc: &Value, verb: &str, grant: &Value, ctx: Option<&Value>) -> Result<(), String> {
+    use std::collections::BTreeSet;
+    let env = grant
+        .get("caveats")
+        .and_then(Value::as_array)
+        .and_then(|cs| cs.iter().find(|c| c.get("type").and_then(Value::as_str) == Some("envelope")))
+        .filter(|e| crate::envelope_well_formed(e));
+    let mut caveats: BTreeSet<String> = BTreeSet::new();
+    let (mut max_esc, mut preauth) = (3, 0);
+    if let Some(e) = env {
+        for c in e.get("caveats").and_then(Value::as_array).into_iter().flatten() {
+            if let Some(t) = c.get("type").and_then(Value::as_str) {
+                caveats.insert(t.to_string());
+            }
+        }
+        if let Some(a) = e.get("actions").filter(|a| action_pin_ok(a)) {
+            max_esc = a.get("max_esc").and_then(crate::jsnum::safe_int).unwrap_or(3);
+            preauth = a.get("preauth_esc").and_then(crate::jsnum::safe_int).unwrap_or(0);
+            for k in a.get("caveats").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_str) {
+                caveats.insert(k.to_string());
+            }
+        }
+    }
+    let context: Vec<String> = get(ctx, &["call_context"]).and_then(Value::as_array).map(|a| a.iter().filter_map(|x| x.as_str().map(String::from)).collect()).unwrap_or_default();
+    let g = crate::rule22::GrantFacts { caveats, max_esc, preauth_esc: preauth };
+    match crate::rule22::decide(doc, verb, &g, &context) {
+        2 => Ok(()),
+        1 => Err("escalate: the action floors need a caveat, context or confirmation the grant does not provide (rule 22)".into()),
+        _ => Err("the action floors exceed what the grant authorizes (rule 22)".into()),
+    }
 }
 
 /// Rule 19 (`map`, V15 Z0 / Z1): the action's cell is inside the committed grant and the committed residual risk is at

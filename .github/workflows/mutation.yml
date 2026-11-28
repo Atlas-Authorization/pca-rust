@@ -1,12 +1,37 @@
 name: Mutation
 
-# Mutation testing of the atlas-pca verifier crate with cargo-mutants (--shard k/N), split into 63 shards on separate
+# Mutation testing of the verifier crates with cargo-mutants: atlas-pca, and the published proof crates stark-pca (lib.rs; its
+# src/bin/gen_fixtures.rs only regenerates committed fixtures) and pca-folding-ivc (lib.rs; src/bin/demo.rs and longfold.rs are
+# example programs). zkvm-pca is not published and not mutated here. Each crate has its own shards, ledger key and merge.
+# History of the atlas-pca split: (--shard k/N), split into 144 shards on separate
 # runners (14 shards ran 3.5-5.5 h each on the 0.4.2 crate and 8 of them hit the 6 h limit; 42 shards then ran 0.9-4.8 h with
-# two still cut at the 300 min cap, so 63 shards keep each near 1-3 h and the cap is 345 min). The merge job checks the missed mutants against the equivalent-mutant ledger (flagship
+# two still cut at the 300 min cap; on 0.5 the unoptimized suite took ~42 min per mutant and every one of 63 shards hit the
+# 345 min cap). Now: the optimized `mutants` profile (root Cargo.toml), nextest (fail-fast: a caught mutant stops at its first
+# failing test) and 144 shards. The merge job checks the missed mutants against the equivalent-mutant ledger (flagship
 # tools/pca-audit/native-check-equivalents.mjs): it passes when every survivor is a ledgered equivalent and no ledger entry
-# is stale. --all-features: the middleware (axum) and its tests are feature-gated. Runs on demand and on ci/** branches
-# (the release-candidate check), never on main pushes. The proof crates
-# (stark-pca, folding-pca, zkvm-pca) are not mutated here.
+# is stale. 175 + 64 shards of atlas-pca (+ 4+1 and 5+1 of the proof crates = 250 jobs, the 256 limit of one matrix; stark-pca shard 1 of 2 ran 42 min) (the per-mutant build, not the shard count, decides the cost: see CARGO_INCREMENTAL below; the
+# proof crates 2 + 5). --all-features: the middleware (axum) and its tests are feature-gated. Runs on demand and on ci/** branches
+# (the release-candidate check), never on main pushes.
+#
+# SCHEMA RUNS (atlas-pca; CRATES `schema`): a per-mutant build costs minutes and the suite seconds, so the real build per mutant made
+# every shard hours long. tools/pca-audit/rust-mutate/schema-gen writes a whole group of mutants (the SAME cargo-mutants and
+# statement mutants, by name, as listed by the snapshot job) into one source tree behind a runtime switch (PCA_MUTANT=id); each is
+# kept only when its text, with every switch collapsed for it, equals the real mutant's (round trip). The `schema` job builds a
+# group ONCE (a mutant whose schema text does not compile is taken out by rustc's error spans and goes to a real build), proves the
+# unmutated schema binaries pass the full suite, records which test reaches which mutant, and archives the binaries. A `run` shard
+# then decides its slice at full strength: each mutant first against its reaching tests (a plain FAIL there is a real failing test:
+# caught); anything else runs the FULL suite before it is recorded, with cargo-mutants' timeout rule. Mutants the schema cannot
+# hold (const / async fns, `impl Trait` returns, struct fields, overlapping regions, schema text that does not compile) are FALLBACK:
+# `fbplan` packs them into real per-mutant shards (cargo-mutants / stmt-run --names) in the shard matrix, plus one SAMPLE per run
+# shard that the real tools also decide; `collect` requires exactly one decision per planned mutant and the samples identical both
+# ways, then writes atlas-pca's two report shards (1: cargo-mutants, 2: statement) for the unchanged merge.
+#
+# STATEMENT SHARDS (after the cargo-mutants ones): cargo-mutants never forces a plain boolean `if`, an `if let` or a
+# `let ... else`, nor deletes continue / break, a bare `x?;` or an early `return Err`. tools/pca-audit/rust-mutate/stmt-mut
+# (syn) lists those mutants, minus any on a line cargo-mutants already mutates, and stmt-run.mjs builds and tests each one as
+# cargo-mutants does (same profile, nextest, timeouts, memory scope). They report into the same shard reports, ledger and
+# run-error gate; they always run in full (never carried). The merge also checks that every planned mutant was reported
+# (plan-check.mjs, with a negative control).
 #
 # TARGETED mode (the default whenever a usable baseline exists; the pca-ruby scheme, tools/pca-audit/mut-carry +
 # rust-mutate/carry.mjs): every shard uploads mut-results-<k> (each mutant's result, carried ones included) and the run uploads
@@ -32,7 +57,7 @@ on:
         type: boolean
         default: false
   push:
-    branches: ['ci/**']
+    branches: ['ci/**', '!ci/build-**']
 
 permissions:
   contents: read
@@ -45,15 +70,50 @@ concurrency:
 
 env:
   CRATE: rust-pca
-  SHARDS: '63'
+  # per crate: ledger key, cargo package, directory, excluded files (proven, listed in the status file), cargo-mutants shards,
+  # then statement shards (a crate's report shards are 1..cm+stmt, the statement ones last); schema: the crate runs as schema groups
+  # (its report shards are then the collect job's two: cm 1 + stmt 1) with that many run shards over all groups; win: the files only Windows compiles
+  # (the file guard checks the list against the tree's cfg(windows) / cfg(not(unix)) module declarations), left out of the Linux
+  # plan and mutated by both tools in the windows job, whose reports the merge counts instead
+  CRATES: >-
+    [{"key":"rust-pca","pkg":"atlas-pca","dir":"crates/atlas-pca","exclude":"","cm":1,"stmt":1,"schema":{"groups":16,"runs":240},"win":"src/private_file_windows.rs,src/durable_rename_windows.rs,src/durable_state_stub.rs,src/store_conformance_not_unix.rs"},
+     {"key":"stark-pca","pkg":"stark-pca","dir":"crates/stark-pca","exclude":"src/bin","cm":4,"stmt":1},
+     {"key":"folding-pca","pkg":"pca-folding-ivc","dir":"crates/folding-pca","exclude":"src/bin","cm":5,"stmt":1}]
   # part of the baseline identity (with the cargo-mutants version): a run with other flags is no baseline
-  MUT_CFG: 'cargo-mutants -j2 min-timeout60 x3 all-features'
+  MUT_CFG: 'cargo-mutants -j2 min-timeout60 x5 timeouts-ledgered nextest-slow-terminate all-features profile-mutants nextest memscope13G-env-oomcontinue runerr-gate round-robin stmt-mut-v1 proof-crates optin-natives incremental stmt-carry-v1 survivor-carry agg-tests mold schema-v1'
   CARGO_TERM_COLOR: never
   CARGO_INCREMENTAL: '0'
+  SEAL_TAG: v4.1.2
 
 jobs:
+  reuse:
+    name: reuse check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      skip: ${{ steps.reuse.outputs.skip }}
+      hash: ${{ steps.reuse.outputs.hash }}
+      source: ${{ steps.reuse.outputs.source }}
+    steps:
+      - uses: actions/checkout@v4
+      # input-hash reuse (ci-reuse.mjs): when an earlier run recorded the same input hash, every other job of this run is skipped.
+      # continue-on-error: a failing check can only mean "no reuse"; FORCE_FULL / force_full / [force-full] bypass it.
+      - id: reuse
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE_FULL: ${{ inputs.force_full || inputs.full || vars.FORCE_FULL == '1' || contains(github.event.head_commit.message, '[force-full]') }}
+          GATE_FULL: ${{ inputs.full || (startsWith(github.ref_name, 'ci/') && endsWith(github.ref_name, '-rc') || startsWith(github.ref_name, 'ci/gate-')) || contains(github.event.head_commit.message, '[force-full]') }}
+          PARTIAL: ${{ false }}
+          EXTRA: ''
+        run: node .github/scripts/ci-reuse.mjs check --workflow=mutation --self=.github/workflows/mutation.yml --external=flagship --extra="$EXTRA"
   # the tests + corpus this run mutates against (the next run's baseline check); small, runs alongside the shards
   snapshot:
+    if: ${{ needs.reuse.outputs.skip != 'true' }}
+    needs: reuse
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -69,68 +129,209 @@ jobs:
         run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
         env:
           IN_REPO: '1'
+      - name: mpc-endemic path dependency (cargo resolves every feature's dependencies when it lists the mutants)
+        run: |
+          mkdir -p packages/pca-mpc-lwe-ot-wasm
+          cp -R "$MONO/packages/pca-mpc-lwe-ot-wasm/crate" packages/pca-mpc-lwe-ot-wasm/
+          # zk: the Groth16 crate, the same way
+          mkdir -p packages/pca-zk
+          cp -R "$MONO/packages/pca-zk/crate" packages/pca-zk/
+      - name: Every shipped source file is in the mutation plan and holds a mutant
+        run: |
+          node "$MONO/tools/pca-audit/rust-mutate/file-guard.mjs" --self-test
+          node -e 'for (const c of JSON.parse(process.env.CRATES)) console.log([c.pkg, c.dir, c.exclude || "-", c.win || "-"].join(" "))' |
+            while read -r pkg dir ex win; do
+              [ "$ex" = - ] && ex=; [ "$win" = - ] && win=
+              node "$MONO/tools/pca-audit/rust-mutate/file-guard.mjs" --pkg="$pkg" --dir="$dir" ${ex:+--exclude-dir="$ex"} ${win:+--win-only="$win"}
+            done
+      - name: Mutation plan (cargo-mutants + statement mutants per crate), for the merge's every-mutant-reported check
+        run: |
+          M="$MONO/tools/pca-audit/rust-mutate/stmt-mut/Cargo.toml"
+          cargo test -q --manifest-path "$M" --target-dir "$RUNNER_TEMP/stmt-mut-target"
+          cargo build -q --release --manifest-path "$M" --target-dir "$RUNNER_TEMP/stmt-mut-target"
+          mkdir -p mut-plan
+          node -e 'for (const c of JSON.parse(process.env.CRATES)) console.log([c.key, c.pkg, c.dir, c.exclude || "-", c.cm, c.stmt, c.win || "-"].join(" "))' |
+            while read -r key pkg dir ex cm st win; do
+              ex="$(node -e 'const [d, e, w] = process.argv.slice(1); console.log([...(e === "-" ? [] : [`${d}/${e}/**`]), ...(w === "-" ? [] : w.split(",").map((f) => `${d}/${f}`))].join(","))' "$dir" "$ex" "$win")"
+              node "$MONO/tools/pca-audit/rust-mutate/stmt-run.mjs" list --tool="$RUNNER_TEMP/stmt-mut-target/release/stmt-mut" --pkg="$pkg" --exclude="$ex" --cm-out="$RUNNER_TEMP/cm-$key.json" > "$RUNNER_TEMP/stmt-$key.json"
+              node -e '
+                const [f, key, cm, st, dir, win] = process.argv.slice(1), p = require(f);
+                // the Windows-only files are in no Linux plan, of either tool
+                const wf = win === "-" ? [] : win.split(",").map((w) => `${dir}/${w}`);
+                const leak = [...p.files_list, ...p.mutants.map((m) => m.file)].filter((x) => wf.includes(x));
+                if (leak.length) { console.error(`::error::Windows-only file(s) in the Linux plan: ${[...new Set(leak)].join(", ")}`); process.exit(1); }
+                const plan = { cargo_mutants: p.cargo_mutants, cm_shards: +cm, stmt: p.count, stmt_shards: +st };
+                require("fs").writeFileSync(`mut-plan/${key}.json`, JSON.stringify(plan));
+                const g = {}; for (const m of p.mutants) g[m.genre] = (g[m.genre] || 0) + 1;
+                console.log(key, JSON.stringify(plan), "statement mutants by form", JSON.stringify(g), "skipped (line has a cargo-mutants mutant)", p.skipped_lines_with_a_cargo_mutant);
+              ' "$RUNNER_TEMP/stmt-$key.json" "$key" "$cm" "$st" "$dir" "$win"
+            done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mut-plan
+          path: mut-plan/
+      # the schema crate's mutant lists (the same listing as its plan above) and its groups, for the schema / run / fbplan /
+      # collect jobs; the generator's and the drivers' self-tests first (each mutation form round-trips to the real replacement)
+      - name: Schema groups (generator self-tests, lists, groups)
+        run: |
+          cargo test -q --manifest-path "$MONO/tools/pca-audit/rust-mutate/schema-gen/Cargo.toml" --target-dir "$RUNNER_TEMP/schema-gen-target"
+          node "$MONO/tools/pca-audit/rust-mutate/schema-plan.mjs" --self-test
+          node "$MONO/tools/pca-audit/rust-mutate/schema-collect.mjs" --self-test
+          mkdir -p mut-list
+          node -e '
+            const fs = require("fs"), T = process.env.RUNNER_TEMP, cs = JSON.parse(process.env.CRATES).filter((c) => c.schema);
+            if (cs.length !== 1) { console.error("::error::exactly one schema crate is supported, CRATES has " + cs.length); process.exit(1); }
+            const c = cs[0];
+            fs.copyFileSync(`${T}/cm-${c.key}.json`, "mut-list/cm.json");
+            fs.writeFileSync("mut-list/stmt.json", JSON.stringify(JSON.parse(fs.readFileSync(`${T}/stmt-${c.key}.json`, "utf8")).mutants));
+            fs.writeFileSync(`${T}/schema-gr`, `${c.schema.groups} ${c.schema.runs}\n`); // read needs the newline, or it returns 1 and -e ends the step
+          '
+          read -r G R < "$RUNNER_TEMP/schema-gr"
+          node "$MONO/tools/pca-audit/rust-mutate/schema-plan.mjs" --cm=mut-list/cm.json --stmt=mut-list/stmt.json --groups="$G" --runs="$R" --out=mut-list/groups.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mut-list
+          path: mut-list/
       - name: Snapshot
         run: |
           node "$MONO/tools/pca-audit/rust-mutate/carry.mjs" files --pkg=atlas-pca > "$RUNNER_TEMP/src.txt"
           node "$MONO/tools/pca-audit/mut-carry/snapshot.mjs" make --root="$GITHUB_WORKSPACE" --exclude-list="$RUNNER_TEMP/src.txt" \
             --corpus-root="$MONO" --out=mut-snapshot --cfg="$MUT_CFG $(cargo mutants --version)" \
-            --tool-files="$MONO/tools/pca-audit/rust-mutate/carry.mjs,$MONO/tools/pca-audit/mut-carry/lib.mjs"
+            --tool-files="$MONO/tools/pca-audit/rust-mutate/carry.mjs,$MONO/tools/pca-audit/rust-mutate/stmt-run.mjs,$MONO/tools/pca-audit/mut-carry/lib.mjs,$MONO/tools/pca-audit/rust-mutate/schema-run.mjs,$MONO/tools/pca-audit/rust-mutate/schema-gen/src/main.rs"
       - uses: actions/upload-artifact@v4
         with:
           name: mut-snapshot
           path: mut-snapshot/
           retention-days: 30
 
-  # splits the shard list between the GitHub-hosted runners and the self-hosted GCP box (3 runners labelled pca-box, 12 vCPU):
-  # every BOX_EVERY-th shard goes to the box (63 shards -> 9 = 3 waves of 3), the rest (54) to hosted runners, which run
-  # ~17-20 at a time under the org cap (~3 waves), so both halves finish about together. Only this workflow (push to ci/** or
-  # workflow_dispatch, never pull_request) requests the pca-box label.
   plan:
+    if: ${{ needs.reuse.outputs.skip != 'true' && needs.snapshot.result == 'success' }}
+    needs: [reuse, snapshot]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      matrix: ${{ steps.m.outputs.matrix }}
+      crates: ${{ steps.m.outputs.crates }}
+      schema: ${{ steps.m.outputs.schema }}
+      runs: ${{ steps.m.outputs.runs }}
+      scrate: ${{ steps.m.outputs.scrate }}
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: mut-list
+          path: mut-list
       - id: m
-        env:
-          BOX_EVERY: '7'
         run: |
           node -e '
-            const n = +process.env.SHARDS, every = +process.env.BOX_EVERY;
-            const include = Array.from({ length: n }, (_, i) => i + 1).map((shard) =>
-              ({ shard, runner: JSON.stringify(shard % every === 0 ? ["self-hosted", "pca-box"] : "ubuntu-latest") }));
-            console.log("matrix=" + JSON.stringify({ include }));
+            const cs = JSON.parse(process.env.CRATES), gs = require("./mut-list/groups.json").groups, c = cs.find((x) => x.schema);
+            const id = { key: c.key, pkg: c.pkg, dir: c.dir };
+            const runs = gs.flatMap((g, i) => Array.from({ length: g.runs }, (_, r) => ({ ...id, g: i, r, runs: g.runs })));
+            if (runs.length > 256) { console.error(`::error::${runs.length} run shards exceed one matrix (256)`); process.exit(1); }
+            console.log("schema=" + JSON.stringify({ include: gs.map((_, g) => ({ ...id, g })) }));
+            console.log("scrate=" + JSON.stringify(id));
+            console.log("runs=" + JSON.stringify({ include: runs }));
+            console.log("crates=" + JSON.stringify({ include: cs.map((c) => ({ key: c.key, dir: c.dir, of: c.cm + c.stmt, win: c.win || "" })) }));
           ' >> "$GITHUB_OUTPUT"
 
+  # ONE job fetches the baseline (the pool of the newest usable earlier run) and hands it to every shard as one small artifact. Every shard
+  # used to list the runs and download ~200 artifacts itself: the job token's API rate limit (403) then dropped most of the 174 shards
+  # to a full run of their slice (run 44264958785: 163 of 175 atlas-pca shards ran 130-216 min instead of carrying). The pool is
+  # fetched with retries; a pinned baseline_run that cannot be used fails the run instead of degrading to a full one.
+  pool:
+    name: baseline pool
+    needs: snapshot
+    if: ${{ !cancelled() && needs.snapshot.result == 'success' && !(inputs.full || (startsWith(github.ref_name, 'ci/') && endsWith(github.ref_name, '-rc') || startsWith(github.ref_name, 'ci/gate-')) || contains(github.event.head_commit.message, '[force-full]')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      have: ${{ steps.pool.outputs.have }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship tooling
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - uses: actions/download-artifact@v4
+        with:
+          name: mut-snapshot
+          path: ${{ runner.temp }}/snap
+      - id: pool
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASELINE: ${{ inputs.baseline_run }}
+        run: |
+          out="$(node "$MONO/tools/pca-audit/mut-carry/baseline.mjs" --repo="$GITHUB_REPOSITORY" --branch="$GITHUB_REF_NAME" \
+            --exclude-run="$GITHUB_RUN_ID" --explicit="$BASELINE" --snapshot="$RUNNER_TEMP/snap" --out="$RUNNER_TEMP/base")"
+          if [ -n "$out" ]; then
+            mkdir -p "$RUNNER_TEMP/pool"; cp "$RUNNER_TEMP/base/pool.json" "$RUNNER_TEMP/pool/pool.json"
+            echo "have=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.pool.outputs.have == 'true' }}
+        with:
+          name: mut-pool
+          path: ${{ runner.temp }}/pool/
+          retention-days: 2
+
+  # the native libraries of the opt-in modules, built once for all shards (not per shard): libsealc, the node-seal corpus and
+  # the wasmtime host binary travel as one artifact
+  natives:
+    if: ${{ needs.reuse.outputs.skip != 'true' }}
+    needs: reuse
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship layout
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          n="$RUNNER_TEMP/natives"; mkdir -p "$n"
+          lib="$(.github/scripts/build-libsealc.sh "$SEAL_TAG" "$RUNNER_TEMP/seal")"
+          mkdir "$n/seal"; cp -a "$lib"/. "$n/seal/"
+          .github/scripts/fhe-seal-corpus.sh "$n/fhe-seal.json.gz" "$MONO/tools/pca-audit/oracles/fhe-seal.mts"
+          .github/scripts/build-wasmtime-host.sh "$RUNNER_TEMP/wasmtime-host" "$MONO/packages/pca-sandbox/wasmtime-host"
+          cp "$RUNNER_TEMP/wasmtime-host/pca-wasmtime-host" "$n/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: natives
+          path: ${{ runner.temp }}/natives
+          retention-days: 3
+
   shard:
-    name: shard ${{ matrix.shard }}/63
-    needs: plan
-    runs-on: ${{ fromJSON(matrix.runner) }}
-    timeout-minutes: 345
+    if: ${{ !cancelled() && needs.fbplan.result == 'success' && needs.natives.result == 'success' && needs.pool.result != 'failure' }}
+    name: ${{ matrix.key }} ${{ matrix.shard }}/${{ matrix.of }} ${{ matrix.kind }}${{ matrix.sample && ' sample' || '' }}
+    # the proof crates' shards, and a schema crate's fallback and sample mutants (real per-mutant builds; fbplan)
+    needs: [reuse, fbplan, natives, pool]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+      # 20 of the org's 60 slots at most: 8 other languages run their CI and mutation alongside
+      max-parallel: 12 # fair share: about 24 runners per PCA repo (10 repos, about 180 shared runners); one repo must never starve the rest
+      matrix: ${{ fromJSON(needs.fbplan.outputs.matrix) }}
     steps:
       # cargo-mutants' scratch copies (each with its own target dir) live under this runner's own temp, never in a shared /tmp
       # (runner.* is not available in job-level env, so it is exported here)
       - name: Per-runner TMPDIR
         run: echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
-      - name: Clean the self-hosted workspace (non-ephemeral runner)
-        if: ${{ runner.environment == 'self-hosted' }}
-        run: |
-          find "$RUNNER_TEMP" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
-          find "$GITHUB_WORKSPACE" -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      # the box runners share one CARGO_HOME: concurrent installs there corrupt each other's download (checksum
-      # mismatch), so cargo-mutants is preinstalled on the box at the same pinned version and only hosted runners install it
       - uses: taiki-e/install-action@v2
-        if: ${{ runner.environment != 'self-hosted' }}
         with:
-          tool: cargo-mutants@27.1.0
-      - name: cargo-mutants on the box is the pinned version
-        if: ${{ runner.environment == 'self-hosted' }}
-        run: cargo mutants --version | grep -qx 'cargo-mutants 27.1.0'
+          tool: cargo-mutants@27.1.0,cargo-nextest
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -138,69 +339,757 @@ jobs:
         run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
         env:
           IN_REPO: '1'
-      - name: Baseline results (targeted mode)
-        if: ${{ !inputs.full }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BASELINE: ${{ inputs.baseline_run }}
+      - name: RSA DPoP corpus (generated by the TypeScript reference; never committed)
+        shell: bash
+        run: .github/scripts/dpop-rsa-corpus.sh "$GITHUB_WORKSPACE/crates/atlas-pca/test-data/ref-dpop-rsa.json.gz"
+      - name: Secret-key oracle corpora (generated by the TypeScript reference; never committed)
+        shell: bash
+        run: .github/scripts/gen-secret-corpus.sh "$GITHUB_WORKSPACE/crates/atlas-pca/test-data" oprf:oprf mpc-ot:mpc-ot attest-eat:attest-eat abe-go:abe-go core-frost-java:core-frost-java frost-dkg:frost-dkg
+      # ONE test target for atlas-pca's 290 integration test files (mutation layout only; regular CI is unchanged): every mutant used to
+      # rebuild and relink 290 test binaries. aggregate-tests.py generates tests/all_mutation.rs (#[path] modules) and switches the
+      # manifest to it; its --check proves every tests/*.rs is included exactly once and no [[test]] entry is left out.
+      - name: One aggregate test target (atlas-pca)
+        if: ${{ matrix.key == 'rust-pca' }}
         run: |
-          node "$MONO/tools/pca-audit/rust-mutate/carry.mjs" files --pkg=atlas-pca > "$RUNNER_TEMP/src.txt"
-          node "$MONO/tools/pca-audit/mut-carry/snapshot.mjs" make --root="$GITHUB_WORKSPACE" --exclude-list="$RUNNER_TEMP/src.txt" \
-            --corpus-root="$MONO" --out="$RUNNER_TEMP/snap" --cfg="$MUT_CFG $(cargo mutants --version)" \
-            --tool-files="$MONO/tools/pca-audit/rust-mutate/carry.mjs,$MONO/tools/pca-audit/mut-carry/lib.mjs"
-          node "$MONO/tools/pca-audit/mut-carry/baseline.mjs" --repo="$GITHUB_REPOSITORY" --branch="$GITHUB_REF_NAME" \
-            --exclude-run="$GITHUB_RUN_ID" --explicit="$BASELINE" --snapshot="$RUNNER_TEMP/snap" --out="$RUNNER_TEMP/base" >> "$GITHUB_ENV"
-      - name: Mutate
+          python3 -I "$MONO/tools/pca-audit/rust-mutate/aggregate-tests.py" crates/atlas-pca
+          python3 -I "$MONO/tools/pca-audit/rust-mutate/aggregate-tests.py" crates/atlas-pca --check
+      # a faster linker for the per-mutant relink (the mutants profile keeps its opt-level 1 / debug off; only the linker changes)
+      - name: mold
+        run: sudo apt-get install -y mold || true
+      # --all-features compiles the opt-in modules into the mutated crate (fhe-seal, mpc-endemic, actix, sandbox-wasm), so their
+      # tests need the same native setup as their own workflows (fhe.yml, sandbox-wasm.yml), or their mutants would be judged
+      # by tests that skip or by a build that cannot link. Every atlas-pca shard (cargo-mutants and statement) carries it.
+      - uses: actions/download-artifact@v4
+        if: ${{ matrix.key == 'rust-pca' }}
+        with:
+          name: natives
+          path: ${{ runner.temp }}/natives
+      - name: Opt-in module natives (mpc-endemic crate; libsealc, corpus and wasmtime host from the natives job)
+        if: ${{ matrix.key == 'rust-pca' }}
+        shell: bash
         run: |
+          set -euo pipefail
+          # mpc-endemic: the optional path dependency (../../packages/pca-mpc-lwe-ot-wasm/crate from the crate directory)
+          mkdir -p "$GITHUB_WORKSPACE/packages/pca-mpc-lwe-ot-wasm"
+          cp -R "$MONO/packages/pca-mpc-lwe-ot-wasm/crate" "$GITHUB_WORKSPACE/packages/pca-mpc-lwe-ot-wasm/"
+          # zk: the Groth16 crate, the same way (the zk corpus replay then runs on the real pairing engine)
+          mkdir -p "$GITHUB_WORKSPACE/packages/pca-zk"
+          cp -R "$MONO/packages/pca-zk/crate" "$GITHUB_WORKSPACE/packages/pca-zk/"
+          # fhe-seal and sandbox-wasm: built ONCE by the natives job (libsealc at the pinned tag, the node-seal reference corpus, the
+          # wasmtime host binary); every shard only downloads them
+          n="$RUNNER_TEMP/natives"
+          chmod +x "$n/pca-wasmtime-host"
+          echo "ATLAS_PCA_SEAL_LIB=$n/seal" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$n/seal${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "PCA_FHE_SEAL_CORPUS=$n/fhe-seal.json.gz" >> "$GITHUB_ENV"
+          echo "PCA_WASMTIME_HOST_BIN=$n/pca-wasmtime-host" >> "$GITHUB_ENV"
+          echo "PCA_WASMTIME_HOST_SHA256=$(sha256sum "$n/pca-wasmtime-host" | cut -d' ' -f1)" >> "$GITHUB_ENV"
+      - name: Statement mutator (stmt-mut)
+        if: ${{ matrix.kind == 'stmt' }}
+        run: |
+          cargo build -q --release --manifest-path "$MONO/tools/pca-audit/rust-mutate/stmt-mut/Cargo.toml" --target-dir "$RUNNER_TEMP/stmt-mut-target"
+          echo "STMT_TOOL=$RUNNER_TEMP/stmt-mut-target/release/stmt-mut" >> "$GITHUB_ENV"
+      - name: Baseline pool (targeted mode)
+        if: ${{ needs.pool.outputs.have == 'true' && matrix.key == 'rust-pca' && matrix.names == '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: mut-pool
+          path: ${{ runner.temp }}/pool
+      - name: Baseline pool (point the carry at it)
+        if: ${{ needs.pool.outputs.have == 'true' && matrix.key == 'rust-pca' && matrix.names == '' }}
+        run: echo "BASE_POOL=$RUNNER_TEMP/pool/pool.json" >> "$GITHUB_ENV"
+      # the memory scope and the nextest profile every mutation driver runs under (shared by the shard, schema and run jobs)
+      - name: Memory scope and nextest profile
+        run: |
+          df -h "$RUNNER_TEMP" | tail -1
+          if command -v mold >/dev/null; then export RUSTFLAGS="${RUSTFLAGS:-} -C link-arg=-fuse-ld=mold"; echo "linker: mold"; else echo "linker: default (no mold)"; fi
           # a mutant that allocates without bound must die alone (caught), not exhaust the runner: 6 GiB address space per
           # process (applied to the mutants' processes by carry.mjs, not to node), 2 mutants at a time. carry.mjs runs
           # cargo-mutants (exit 0 / 2 missed / 3 timeouts are results, anything else fails) on this shard's mutants that no
           # earlier result vouches for and writes the COMPLETE shard (carried results included) to $RUNNER_TEMP/mut/mutants.out.
+          # the 6 GiB cap is per process, and nextest runs several test processes per mutant: a runaway in shared code can sum
+          # past the hosted runner's 16 GiB and starve the runner agent ("lost communication", run 41891707650 shards 66/68).
+          # A cgroup holds the whole tree to 13 GiB with no swap, so the kernel kills the biggest test and the runner lives.
+          # Used only where sudo + systemd-run work (hosted runners); elsewhere the per-process cap alone. A test killed this way
+          # (or aborted by the per-process cap) decides nothing: see "run errors" below.
+          # OOMPolicy=continue: systemd's default (stop) answers one OOM kill by sending SIGTERM to the whole scope, which ends the shard.
+          scope=(); props=(); export MEMEV="" CARRY_ULIMIT_KB=6291456
+          try=(-p MemoryMax=13G -p MemorySwapMax=0 -p OOMPolicy=continue)
+          if sudo -n systemd-run --scope -q "${try[@]}" --uid="$(id -u)" --gid="$(id -g)" -- true 2>/dev/null; then
+            props=("${try[@]}")
+            MEMEV="$RUNNER_TEMP/mut-memory.events"; rm -f "$MEMEV"
+            # sudo resets the environment (sudo-rs on ubuntu-26.04 ignores -E), so the scope gets all of it as arguments
+            mapfile -d '' -t envs < <(env -0)
+            scope=(sudo -n env "${envs[@]}" systemd-run --scope -q "${props[@]}" --uid="$(id -u)" --gid="$(id -g)" --)
+            # fail in seconds, not at the end of a shard, if the cap or the attribution file cannot work in the scope
+            "${scope[@]}" bash -c '[ "$CARRY_ULIMIT_KB" = 6291456 ] && [ "$MEMEV" = "$1" ] && [ -r "/sys/fs/cgroup$(cut -d: -f3- /proc/self/cgroup | head -1)/memory.events" ]' bash "$MEMEV" \
+              || { echo "::error::the memory scope did not get its environment or memory.events"; exit 1; }
+          fi
+          echo "memory scope: ${props[*]:-none}"
+          # the mutation drivers run under inscope.sh, which re-enters this scope (SCOPE_PROPS) per invocation
+          # a mutant that stops a loop advancing hangs every test that reaches it; a deadline test then FAILS in seconds, but
+          # nextest's fail-fast waits for the tests still running, so the run would end as a timeout anyway. nextest terminates
+          # a test that runs past its slow-timeout (reported TIMEOUT, a failure): each limit sits well under the mutant's
+          # cargo-mutants timeout (5x the baseline suite, min 60 s) and far over the crate's slowest real test. A mutant whose
+          # only failures are these terminations has no plain FAIL line, so it is a run error (gate below), never a kill.
+          # The proof crates' fuzz_decoder tests are wall-clock tests (an abort hunt over child processes, a 20 s fuzz budget that
+          # asserts a minimum execution count): they run alone (all test threads), or the unmutated baseline fails under load
+          # (run 42434682442: stark hostile_counts timed out at 40 s, folding fuzz got 173 executions). Stark's limit is 3 x 90 s.
+          NXC="$RUNNER_TEMP/nextest-mutants.toml"
+          printf '%s\n' '[profile.default]' 'slow-timeout = { period = "40s", terminate-after = 2 }' \
+            '[[profile.default.overrides]]' "filter = 'package(stark-pca)'" 'slow-timeout = { period = "90s", terminate-after = 3 }' \
+            '[[profile.default.overrides]]' "filter = 'package(pca-folding-ivc)'" 'slow-timeout = { period = "600s", terminate-after = 3 }' \
+            '[[profile.default.overrides]]' "filter = 'binary(fuzz_decoder) | (package(atlas-pca) & test(/^fuzz_decoder::/))'" 'threads-required = "num-test-threads"' > "$NXC"
+          cat "$NXC"
+          { echo "MEMEV=$MEMEV"; echo "CARRY_ULIMIT_KB=$CARRY_ULIMIT_KB"; echo "NXC=$NXC"; echo "SCOPE_PROPS=${props[*]}"; echo "RUSTFLAGS=${RUSTFLAGS:-}"; } >> "$GITHUB_ENV"
+      - name: Fallback / sample mutant names (fbplan)
+        if: ${{ matrix.names != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: fb-names
+          path: ${{ runner.temp }}/fb-names
+      - name: Mutate
+        env:
+          # a mutant edits one function: the incremental cache re-uses every other codegen unit and every unchanged test crate
+          CARGO_INCREMENTAL: '1'
+        run: |
+          df -h "$RUNNER_TEMP" | tail -1
           carry=()
           [ -z "${BASE_POOL:-}" ] || carry=(--carry="$BASE_POOL")
-          CARRY_ULIMIT_KB=6291456 node "$MONO/tools/pca-audit/rust-mutate/carry.mjs" run --pkg=atlas-pca \
-            --shard="$(( ${{ matrix.shard }} - 1 ))" --of="$SHARDS" --out="$RUNNER_TEMP/mut" "${carry[@]}" -- \
-            -j 2 --minimum-test-timeout 60 --timeout-multiplier 3
+          export KIND="${{ matrix.kind }}" DIR="${{ matrix.dir }}"
+          # fallback / sample shards of a schema crate: exactly the mutants fbplan listed (never carried)
+          names=()
+          [ -z "${{ matrix.names }}" ] || names=(--names="$RUNNER_TEMP/fb-names/${{ matrix.names }}.json")
+          # --caught --unviable (output only): every outcome is logged with its build + test seconds, so the per-mutant cost is measurable
+          # inside the scope, after carry.mjs: the scope's own memory.events (its oom_kill count) for the attribution check
+          if [ "$KIND" = cm ]; then
+            drv=("$MONO/tools/pca-audit/rust-mutate/carry.mjs" run --pkg="${{ matrix.pkg }}" --exclude="${{ matrix.exclude }}" \
+              --shard="${{ matrix.k0 }}" --of="${{ matrix.kof }}" --out="$RUNNER_TEMP/mut" "${carry[@]}" "${names[@]}" -- \
+              -j 2 --minimum-test-timeout 60 --timeout-multiplier 5 --profile mutants --test-tool nextest --cargo-test-arg="--config-file=$NXC" --caught --unviable)
+          else
+            drv=("$MONO/tools/pca-audit/rust-mutate/stmt-run.mjs" run --tool="$STMT_TOOL" --pkg="${{ matrix.pkg }}" --exclude="${{ matrix.exclude }}" \
+              --shard="${{ matrix.k0 }}" --of="${{ matrix.kof }}" --out="$RUNNER_TEMP/mut" \
+              --run-errors="$RUNNER_TEMP/run-errors.json" -j=2 --min-timeout=60 --multiplier=5 "${carry[@]}" "${names[@]}" -- --cargo-profile mutants --config-file "$NXC")
+          fi
+          "$MONO/tools/pca-audit/rust-mutate/inscope.sh" node "${drv[@]}"
           tail -5 "$RUNNER_TEMP/mut/mutants.out/missed.txt" 2>/dev/null || true
+          # run errors (gate honesty, as PIT's MEMORY_ERROR / RUN_ERROR): cargo-mutants counts a mutant caught when nextest
+          # fails, but a test killed by a signal (SIGKILL from the cgroup OOM killer, SIGABRT from the per-process cap's failed
+          # allocation or a stack overflow) decided nothing. A caught mutant with no plain FAIL in its log is listed in
+          # run-errors.json (the merge fails on each one not proven mutant-caused) and marked run_error in results.json (never
+          # carried). Every cgroup OOM kill must show as a SIGKILLed test in some outcome log, or the shard fails.
+          node -e '
+            const fs = require("fs"), path = require("path"); const T = process.env.RUNNER_TEMP, cm = T + "/mut/cm/mutants.out", pre = process.env.DIR + "/";
+            const caught = new Set(fs.readFileSync(T + "/mut/mutants.out/caught.txt", "utf8").split("\n").filter(Boolean));
+            const oc = fs.existsSync(cm + "/outcomes.json") ? JSON.parse(fs.readFileSync(cm + "/outcomes.json", "utf8")).outcomes : [];
+            const src = new Map(); const line = (f, n) => { if (!src.has(f)) src.set(f, fs.readFileSync(f, "utf8").split("\n")); return (src.get(f)[n - 1] || "").trim(); };
+            const errs = []; let sigkilled = 0;
+            // the function cargo-mutants reports for each mutant (the same source as the run-error records below), by mutant name
+            const fnOf = new Map(oc.map((o) => [o.scenario && o.scenario.Mutant && o.scenario.Mutant.name, (o.scenario && o.scenario.Mutant && o.scenario.Mutant.function && o.scenario.Mutant.function.function_name) || ""]));
+            // statement shards: stmt-run.mjs already wrote run-errors.json and marked results.json; only the OOM attribution here
+            if (process.env.KIND === "stmt") oc.length = 0, sigkilled = Number(fs.readFileSync(T + "/mut/sigkilled.txt", "utf8"));
+            for (const o of oc) {
+              const m = o.scenario && o.scenario.Mutant; if (!m) continue;
+              if (!o.log_path) { console.error("::error::outcome without a log: " + m.name); process.exit(1); }
+              const log = fs.readFileSync(path.join(cm, o.log_path), "utf8");
+              const sig = [...new Set([...log.matchAll(/^\s*(?:TRY \d+ )?(SIG[A-Z0-9]+|ABORT)\s+\[/gm)].map((x) => x[1]))];
+              if (sig.includes("SIGKILL")) sigkilled++;
+              if (o.summary !== "CaughtMutant" || !caught.has(m.name) || /^\s*(?:TRY \d+ )?FAIL\s+\[/m.test(log)) continue;
+              const p = /^(.+?):(\d+):(\d+): (.*)$/.exec(m.name); if (!p || !p[1].startsWith(pre)) throw new Error("unparsed: " + m.name);
+              const ev = log.match(/memory allocation of \d+ bytes failed|has overflowed its stack/);
+              errs.push({ file: p[1].slice(pre.length), fn: (m.function && m.function.function_name) || "", text: line(p[1], +p[2]), mutant: p[4], lineno: +p[2],
+                kind: sig.length ? sig.join("+") : "no FAIL line", evidence: ev ? ev[0] : "", name: m.name });
+            }
+            if (process.env.MEMEV) {
+              if (!fs.existsSync(process.env.MEMEV)) { console.error("::error::the memory scope left no memory.events"); process.exit(1); }
+              const k = Number((/^oom_kill (\d+)$/m.exec(fs.readFileSync(process.env.MEMEV, "utf8")) || [])[1] || 0);
+              console.log(`cgroup oom_kill ${k}, ${sigkilled} outcome(s) with a SIGKILLed test`);
+              if (k > 0 && sigkilled === 0) { console.error("::error::" + k + " OOM kill(s) in the memory scope that no outcome shows as a SIGKILLed test (a build or the tool itself?)"); process.exit(1); }
+            }
+            // timeouts are not kills by themselves (BRIEF, as Java): each goes to the run-error list and needs a ledger entry with a
+            // proof that the mutant itself does not terminate; fn is the function cargo-mutants reports for it (statement shards: "")
+            const tos = (fs.existsSync(T + "/mut/mutants.out/timeout.txt") ? fs.readFileSync(T + "/mut/mutants.out/timeout.txt", "utf8").split("\n").filter(Boolean) : []).map((n) => {
+              const p = /^(.+?):(\d+):(\d+): (.*)$/.exec(n); if (!p || !p[1].startsWith(pre)) throw new Error("unparsed timeout: " + n);
+              console.log(`::warning::timeout: ${n}`);
+              return { file: p[1].slice(pre.length), fn: fnOf.get(n) || "", text: line(p[1], +p[2]), mutant: p[4], lineno: +p[2], kind: "timeout", evidence: "" };
+            });
+            if (process.env.KIND === "stmt") {
+              const rf = T + "/run-errors.json";
+              fs.writeFileSync(rf, JSON.stringify([...JSON.parse(fs.readFileSync(rf, "utf8")), ...tos], null, 1));
+              process.exit(0);
+            }
+            const bad = new Set(errs.map((e) => e.name)), rf = T + "/mut/results.json";
+            fs.writeFileSync(rf, JSON.stringify(JSON.parse(fs.readFileSync(rf, "utf8")).map((r) => bad.has(r.name) ? { ...r, status: "run_error" } : r)));
+            fs.writeFileSync(T + "/run-errors.json", JSON.stringify([...errs.map(({ name, ...e }) => e), ...tos], null, 1));
+            for (const e of errs) console.log(`::warning::run error (${e.kind}${e.evidence ? ", " + e.evidence : ""}): ${e.file}:${e.lineno} ${e.mutant}`);
+          '
           # the next run's baseline: this slice's results (carried ones included)
           mkdir -p "$RUNNER_TEMP/mut-results"; cp "$RUNNER_TEMP/mut/results.json" "$RUNNER_TEMP/mut-results/results.json"
+      - name: Fallback / sample results (collect)
+        if: ${{ matrix.names != '' }}
+        run: |
+          d="$RUNNER_TEMP/fres"; mkdir -p "$d"
+          cp "$RUNNER_TEMP/mut/results.json" "$RUNNER_TEMP/run-errors.json" "$d/"
+          [ "${{ matrix.sample }}" != true ] || echo "the real per-mutant outcome of schema-decided mutants" > "$d/SAMPLE"
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.names != '' }}
+        with:
+          name: fres-${{ matrix.key }}-${{ matrix.shard }}
+          path: ${{ runner.temp }}/fres/
       - name: Report
+        if: ${{ matrix.names == '' }}
+        env:
+          DIR: ${{ matrix.dir }}
+          KEY: ${{ matrix.key }}
         run: |
           node -e '
-            const fs = require("fs"), path = require("path"); const d = process.argv[1], pre = "crates/atlas-pca/";
+            const fs = require("fs"), path = require("path"); const d = process.argv[1], pre = process.env.DIR + "/";
             const rd = (f) => fs.existsSync(path.join(d, f)) ? fs.readFileSync(path.join(d, f), "utf8").split("\n").filter(Boolean) : [];
             const counts = { caught: rd("caught.txt").length, missed: rd("missed.txt").length, timeout: rd("timeout.txt").length, unviable: rd("unviable.txt").length };
             const src = new Map(); const line = (f, n) => { if (!src.has(f)) src.set(f, fs.readFileSync(f, "utf8").split("\n")); return (src.get(f)[n - 1] || "").trim(); };
             const surv = rd("missed.txt").map((l) => {
               const m = /^(.+?):(\d+):(\d+): (.*)$/.exec(l); if (!m) throw new Error("unparsed: " + l);
               if (!m[1].startsWith(pre)) throw new Error("mutant outside the crate: " + l);
-              return { crate: "rust-pca", file: m[1].slice(pre.length), mutant: m[4], line: line(m[1], +m[2]), lineno: +m[2] };
+              return { crate: process.env.KEY, file: m[1].slice(pre.length), mutant: m[4], line: line(m[1], +m[2]), lineno: +m[2] };
             });
             fs.writeFileSync("counts.json", JSON.stringify(counts)); fs.writeFileSync("survivors.json", JSON.stringify(surv));
           ' "$RUNNER_TEMP/mut/mutants.out"
-          node .github/scripts/mutation-shard-report.mjs --crate="$CRATE" --shard=${{ matrix.shard }} --of="$SHARDS" --tool=cargo-mutants \
+          node .github/scripts/mutation-shard-report.mjs --crate="${{ matrix.key }}" --shard=${{ matrix.shard }} --of=${{ matrix.of }} --tool=cargo-mutants \
             --counts=counts.json --survivors=survivors.json --out=shard-${{ matrix.shard }}.json
+          cp "$RUNNER_TEMP/run-errors.json" run-errors-${{ matrix.shard }}.json
       - uses: actions/upload-artifact@v4
+        if: ${{ matrix.names == '' }}
         with:
-          name: shard-${{ matrix.shard }}
-          path: shard-${{ matrix.shard }}.json
+          name: shard-${{ matrix.key }}-${{ matrix.shard }}
+          path: |
+            shard-${{ matrix.shard }}.json
+            run-errors-${{ matrix.shard }}.json
       - uses: actions/upload-artifact@v4
+        if: ${{ matrix.names == '' }}
         with:
-          name: mut-results-${{ matrix.shard }}
+          name: mut-results-${{ matrix.key }}-${{ matrix.shard }}
           path: ${{ runner.temp }}/mut-results/
           retention-days: 30
-      - name: Clean up (self-hosted)
-        if: ${{ always() && runner.environment == 'self-hosted' }}
-        run: |
-          find "$RUNNER_TEMP" -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
-          find "$GITHUB_WORKSPACE" -mindepth 1 -maxdepth 1 -exec rm -rf {} + || true
 
-  merge:
-    needs: shard
-    if: always()
+
+  # one schema build per group (schema-gen + schema-build.mjs): the group's mutants behind the runtime switch, built ONCE; the
+  # unmutated schema binaries must pass the full suite; the reach map and the binaries (nextest archive) go to the run shards
+  schema:
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.natives.result == 'success' }}
+    name: schema ${{ matrix.key }} group ${{ matrix.g }}
+    needs: [reuse, plan, natives]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.schema) }}
+    steps:
+      - name: Per-runner TMPDIR
+        run: echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants@27.1.0,cargo-nextest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Full shared corpus from the flagship
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - name: RSA DPoP corpus (generated by the TypeScript reference; never committed)
+        shell: bash
+        run: .github/scripts/dpop-rsa-corpus.sh "$GITHUB_WORKSPACE/crates/atlas-pca/test-data/ref-dpop-rsa.json.gz"
+      - name: Secret-key oracle corpora (generated by the TypeScript reference; never committed)
+        shell: bash
+        run: .github/scripts/gen-secret-corpus.sh "$GITHUB_WORKSPACE/crates/atlas-pca/test-data" oprf:oprf mpc-ot:mpc-ot attest-eat:attest-eat abe-go:abe-go core-frost-java:core-frost-java frost-dkg:frost-dkg
+      - name: One aggregate test target (atlas-pca)
+        if: ${{ matrix.key == 'rust-pca' }}
+        run: |
+          python3 -I "$MONO/tools/pca-audit/rust-mutate/aggregate-tests.py" crates/atlas-pca
+          python3 -I "$MONO/tools/pca-audit/rust-mutate/aggregate-tests.py" crates/atlas-pca --check
+      - name: mold
+        run: sudo apt-get install -y mold || true
+      - uses: actions/download-artifact@v4
+        if: ${{ matrix.key == 'rust-pca' }}
+        with:
+          name: natives
+          path: ${{ runner.temp }}/natives
+      - name: Opt-in module natives (mpc-endemic crate; libsealc, corpus and wasmtime host from the natives job)
+        if: ${{ matrix.key == 'rust-pca' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # mpc-endemic: the optional path dependency (../../packages/pca-mpc-lwe-ot-wasm/crate from the crate directory)
+          mkdir -p "$GITHUB_WORKSPACE/packages/pca-mpc-lwe-ot-wasm"
+          cp -R "$MONO/packages/pca-mpc-lwe-ot-wasm/crate" "$GITHUB_WORKSPACE/packages/pca-mpc-lwe-ot-wasm/"
+          # zk: the Groth16 crate, the same way (the zk corpus replay then runs on the real pairing engine)
+          mkdir -p "$GITHUB_WORKSPACE/packages/pca-zk"
+          cp -R "$MONO/packages/pca-zk/crate" "$GITHUB_WORKSPACE/packages/pca-zk/"
+          # fhe-seal and sandbox-wasm: built ONCE by the natives job (libsealc at the pinned tag, the node-seal reference corpus, the
+          # wasmtime host binary); every shard only downloads them
+          n="$RUNNER_TEMP/natives"
+          chmod +x "$n/pca-wasmtime-host"
+          echo "ATLAS_PCA_SEAL_LIB=$n/seal" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$n/seal${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "PCA_FHE_SEAL_CORPUS=$n/fhe-seal.json.gz" >> "$GITHUB_ENV"
+          echo "PCA_WASMTIME_HOST_BIN=$n/pca-wasmtime-host" >> "$GITHUB_ENV"
+          echo "PCA_WASMTIME_HOST_SHA256=$(sha256sum "$n/pca-wasmtime-host" | cut -d' ' -f1)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: mut-list
+          path: ${{ runner.temp }}/mut-list
+      - name: Memory scope and nextest profile
+        run: |
+          df -h "$RUNNER_TEMP" | tail -1
+          if command -v mold >/dev/null; then export RUSTFLAGS="${RUSTFLAGS:-} -C link-arg=-fuse-ld=mold"; echo "linker: mold"; else echo "linker: default (no mold)"; fi
+          # a mutant that allocates without bound must die alone (caught), not exhaust the runner: 6 GiB address space per
+          # process (applied to the mutants' processes by carry.mjs, not to node), 2 mutants at a time. carry.mjs runs
+          # cargo-mutants (exit 0 / 2 missed / 3 timeouts are results, anything else fails) on this shard's mutants that no
+          # earlier result vouches for and writes the COMPLETE shard (carried results included) to $RUNNER_TEMP/mut/mutants.out.
+          # the 6 GiB cap is per process, and nextest runs several test processes per mutant: a runaway in shared code can sum
+          # past the hosted runner's 16 GiB and starve the runner agent ("lost communication", run 41891707650 shards 66/68).
+          # A cgroup holds the whole tree to 13 GiB with no swap, so the kernel kills the biggest test and the runner lives.
+          # Used only where sudo + systemd-run work (hosted runners); elsewhere the per-process cap alone. A test killed this way
+          # (or aborted by the per-process cap) decides nothing: see "run errors" below.
+          # OOMPolicy=continue: systemd's default (stop) answers one OOM kill by sending SIGTERM to the whole scope, which ends the shard.
+          scope=(); props=(); export MEMEV="" CARRY_ULIMIT_KB=6291456
+          try=(-p MemoryMax=13G -p MemorySwapMax=0 -p OOMPolicy=continue)
+          if sudo -n systemd-run --scope -q "${try[@]}" --uid="$(id -u)" --gid="$(id -g)" -- true 2>/dev/null; then
+            props=("${try[@]}")
+            MEMEV="$RUNNER_TEMP/mut-memory.events"; rm -f "$MEMEV"
+            # sudo resets the environment (sudo-rs on ubuntu-26.04 ignores -E), so the scope gets all of it as arguments
+            mapfile -d '' -t envs < <(env -0)
+            scope=(sudo -n env "${envs[@]}" systemd-run --scope -q "${props[@]}" --uid="$(id -u)" --gid="$(id -g)" --)
+            # fail in seconds, not at the end of a shard, if the cap or the attribution file cannot work in the scope
+            "${scope[@]}" bash -c '[ "$CARRY_ULIMIT_KB" = 6291456 ] && [ "$MEMEV" = "$1" ] && [ -r "/sys/fs/cgroup$(cut -d: -f3- /proc/self/cgroup | head -1)/memory.events" ]' bash "$MEMEV" \
+              || { echo "::error::the memory scope did not get its environment or memory.events"; exit 1; }
+          fi
+          echo "memory scope: ${props[*]:-none}"
+          # the mutation drivers run under inscope.sh, which re-enters this scope (SCOPE_PROPS) per invocation
+          # a mutant that stops a loop advancing hangs every test that reaches it; a deadline test then FAILS in seconds, but
+          # nextest's fail-fast waits for the tests still running, so the run would end as a timeout anyway. nextest terminates
+          # a test that runs past its slow-timeout (reported TIMEOUT, a failure): each limit sits well under the mutant's
+          # cargo-mutants timeout (5x the baseline suite, min 60 s) and far over the crate's slowest real test. A mutant whose
+          # only failures are these terminations has no plain FAIL line, so it is a run error (gate below), never a kill.
+          # The proof crates' fuzz_decoder tests are wall-clock tests (an abort hunt over child processes, a 20 s fuzz budget that
+          # asserts a minimum execution count): they run alone (all test threads), or the unmutated baseline fails under load
+          # (run 42434682442: stark hostile_counts timed out at 40 s, folding fuzz got 173 executions). Stark's limit is 3 x 90 s.
+          NXC="$RUNNER_TEMP/nextest-mutants.toml"
+          printf '%s\n' '[profile.default]' 'slow-timeout = { period = "40s", terminate-after = 2 }' \
+            '[[profile.default.overrides]]' "filter = 'package(stark-pca)'" 'slow-timeout = { period = "90s", terminate-after = 3 }' \
+            '[[profile.default.overrides]]' "filter = 'package(pca-folding-ivc)'" 'slow-timeout = { period = "600s", terminate-after = 3 }' \
+            '[[profile.default.overrides]]' "filter = 'binary(fuzz_decoder) | (package(atlas-pca) & test(/^fuzz_decoder::/))'" 'threads-required = "num-test-threads"' > "$NXC"
+          cat "$NXC"
+          { echo "MEMEV=$MEMEV"; echo "CARRY_ULIMIT_KB=$CARRY_ULIMIT_KB"; echo "NXC=$NXC"; echo "SCOPE_PROPS=${props[*]}"; echo "RUSTFLAGS=${RUSTFLAGS:-}"; } >> "$GITHUB_ENV"
+      - name: Schema build, baseline and reach map
+        run: |
+          df -h "$RUNNER_TEMP" | tail -1
+          cargo build -q --release --manifest-path "$MONO/tools/pca-audit/rust-mutate/schema-gen/Cargo.toml" --target-dir "$RUNNER_TEMP/schema-gen-target"
+          "$MONO/tools/pca-audit/rust-mutate/inscope.sh" node "$MONO/tools/pca-audit/rust-mutate/schema-build.mjs" --list="$RUNNER_TEMP/mut-list" --group=${{ matrix.g }} \
+            --pkg="${{ matrix.pkg }}" --crate="$(echo "${{ matrix.pkg }}" | tr - _)" --root="${{ matrix.dir }}/src/lib.rs" \
+            --gen="$RUNNER_TEMP/schema-gen-target/release/schema-gen" --out="$RUNNER_TEMP/schema" -- --config-file "$NXC"
+          mkdir -p "$RUNNER_TEMP/dec"; mv "$RUNNER_TEMP/schema/dec.json" "$RUNNER_TEMP/dec/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schema-${{ matrix.key }}-${{ matrix.g }}
+          path: ${{ runner.temp }}/schema/
+          compression-level: 0
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dec-${{ matrix.key }}-${{ matrix.g }}
+          path: ${{ runner.temp }}/dec/
+
+  # a run shard: its slice of one group's schema mutants, each decided at full strength on the prebuilt binaries (schema-run.mjs)
+  run:
+    if: ${{ !cancelled() && needs.schema.result == 'success' }}
+    name: run ${{ matrix.key }} group ${{ matrix.g }} ${{ matrix.r }}/${{ matrix.runs }}
+    needs: [reuse, plan, natives, schema]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 12 # fair share: about 24 runners per PCA repo (10 repos, about 180 shared runners); one repo must never starve the rest
+      matrix: ${{ fromJSON(needs.plan.outputs.runs) }}
+    steps:
+      - name: Per-runner TMPDIR
+        run: echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants@27.1.0,cargo-nextest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Full shared corpus from the flagship
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - name: RSA DPoP corpus (generated by the TypeScript reference; never committed)
+        shell: bash
+        run: .github/scripts/dpop-rsa-corpus.sh "$GITHUB_WORKSPACE/crates/atlas-pca/test-data/ref-dpop-rsa.json.gz"
+      - name: Secret-key oracle corpora (generated by the TypeScript reference; never committed)
+        shell: bash
+        run: .github/scripts/gen-secret-corpus.sh "$GITHUB_WORKSPACE/crates/atlas-pca/test-data" oprf:oprf mpc-ot:mpc-ot attest-eat:attest-eat abe-go:abe-go core-frost-java:core-frost-java frost-dkg:frost-dkg
+      - name: One aggregate test target (atlas-pca)
+        if: ${{ matrix.key == 'rust-pca' }}
+        run: |
+          python3 -I "$MONO/tools/pca-audit/rust-mutate/aggregate-tests.py" crates/atlas-pca
+          python3 -I "$MONO/tools/pca-audit/rust-mutate/aggregate-tests.py" crates/atlas-pca --check
+      - uses: actions/download-artifact@v4
+        if: ${{ matrix.key == 'rust-pca' }}
+        with:
+          name: natives
+          path: ${{ runner.temp }}/natives
+      - name: Opt-in module natives (mpc-endemic crate; libsealc, corpus and wasmtime host from the natives job)
+        if: ${{ matrix.key == 'rust-pca' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # mpc-endemic: the optional path dependency (../../packages/pca-mpc-lwe-ot-wasm/crate from the crate directory)
+          mkdir -p "$GITHUB_WORKSPACE/packages/pca-mpc-lwe-ot-wasm"
+          cp -R "$MONO/packages/pca-mpc-lwe-ot-wasm/crate" "$GITHUB_WORKSPACE/packages/pca-mpc-lwe-ot-wasm/"
+          # zk: the Groth16 crate, the same way (the zk corpus replay then runs on the real pairing engine)
+          mkdir -p "$GITHUB_WORKSPACE/packages/pca-zk"
+          cp -R "$MONO/packages/pca-zk/crate" "$GITHUB_WORKSPACE/packages/pca-zk/"
+          # fhe-seal and sandbox-wasm: built ONCE by the natives job (libsealc at the pinned tag, the node-seal reference corpus, the
+          # wasmtime host binary); every shard only downloads them
+          n="$RUNNER_TEMP/natives"
+          chmod +x "$n/pca-wasmtime-host"
+          echo "ATLAS_PCA_SEAL_LIB=$n/seal" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$n/seal${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "PCA_FHE_SEAL_CORPUS=$n/fhe-seal.json.gz" >> "$GITHUB_ENV"
+          echo "PCA_WASMTIME_HOST_BIN=$n/pca-wasmtime-host" >> "$GITHUB_ENV"
+          echo "PCA_WASMTIME_HOST_SHA256=$(sha256sum "$n/pca-wasmtime-host" | cut -d' ' -f1)" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: schema-${{ matrix.key }}-${{ matrix.g }}
+          path: ${{ runner.temp }}/bundle
+      - name: Memory scope and nextest profile
+        run: |
+          df -h "$RUNNER_TEMP" | tail -1
+          if command -v mold >/dev/null; then export RUSTFLAGS="${RUSTFLAGS:-} -C link-arg=-fuse-ld=mold"; echo "linker: mold"; else echo "linker: default (no mold)"; fi
+          # a mutant that allocates without bound must die alone (caught), not exhaust the runner: 6 GiB address space per
+          # process (applied to the mutants' processes by carry.mjs, not to node), 2 mutants at a time. carry.mjs runs
+          # cargo-mutants (exit 0 / 2 missed / 3 timeouts are results, anything else fails) on this shard's mutants that no
+          # earlier result vouches for and writes the COMPLETE shard (carried results included) to $RUNNER_TEMP/mut/mutants.out.
+          # the 6 GiB cap is per process, and nextest runs several test processes per mutant: a runaway in shared code can sum
+          # past the hosted runner's 16 GiB and starve the runner agent ("lost communication", run 41891707650 shards 66/68).
+          # A cgroup holds the whole tree to 13 GiB with no swap, so the kernel kills the biggest test and the runner lives.
+          # Used only where sudo + systemd-run work (hosted runners); elsewhere the per-process cap alone. A test killed this way
+          # (or aborted by the per-process cap) decides nothing: see "run errors" below.
+          # OOMPolicy=continue: systemd's default (stop) answers one OOM kill by sending SIGTERM to the whole scope, which ends the shard.
+          scope=(); props=(); export MEMEV="" CARRY_ULIMIT_KB=6291456
+          try=(-p MemoryMax=13G -p MemorySwapMax=0 -p OOMPolicy=continue)
+          if sudo -n systemd-run --scope -q "${try[@]}" --uid="$(id -u)" --gid="$(id -g)" -- true 2>/dev/null; then
+            props=("${try[@]}")
+            MEMEV="$RUNNER_TEMP/mut-memory.events"; rm -f "$MEMEV"
+            # sudo resets the environment (sudo-rs on ubuntu-26.04 ignores -E), so the scope gets all of it as arguments
+            mapfile -d '' -t envs < <(env -0)
+            scope=(sudo -n env "${envs[@]}" systemd-run --scope -q "${props[@]}" --uid="$(id -u)" --gid="$(id -g)" --)
+            # fail in seconds, not at the end of a shard, if the cap or the attribution file cannot work in the scope
+            "${scope[@]}" bash -c '[ "$CARRY_ULIMIT_KB" = 6291456 ] && [ "$MEMEV" = "$1" ] && [ -r "/sys/fs/cgroup$(cut -d: -f3- /proc/self/cgroup | head -1)/memory.events" ]' bash "$MEMEV" \
+              || { echo "::error::the memory scope did not get its environment or memory.events"; exit 1; }
+          fi
+          echo "memory scope: ${props[*]:-none}"
+          # the mutation drivers run under inscope.sh, which re-enters this scope (SCOPE_PROPS) per invocation
+          # a mutant that stops a loop advancing hangs every test that reaches it; a deadline test then FAILS in seconds, but
+          # nextest's fail-fast waits for the tests still running, so the run would end as a timeout anyway. nextest terminates
+          # a test that runs past its slow-timeout (reported TIMEOUT, a failure): each limit sits well under the mutant's
+          # cargo-mutants timeout (5x the baseline suite, min 60 s) and far over the crate's slowest real test. A mutant whose
+          # only failures are these terminations has no plain FAIL line, so it is a run error (gate below), never a kill.
+          # The proof crates' fuzz_decoder tests are wall-clock tests (an abort hunt over child processes, a 20 s fuzz budget that
+          # asserts a minimum execution count): they run alone (all test threads), or the unmutated baseline fails under load
+          # (run 42434682442: stark hostile_counts timed out at 40 s, folding fuzz got 173 executions). Stark's limit is 3 x 90 s.
+          NXC="$RUNNER_TEMP/nextest-mutants.toml"
+          printf '%s\n' '[profile.default]' 'slow-timeout = { period = "40s", terminate-after = 2 }' \
+            '[[profile.default.overrides]]' "filter = 'package(stark-pca)'" 'slow-timeout = { period = "90s", terminate-after = 3 }' \
+            '[[profile.default.overrides]]' "filter = 'package(pca-folding-ivc)'" 'slow-timeout = { period = "600s", terminate-after = 3 }' \
+            '[[profile.default.overrides]]' "filter = 'binary(fuzz_decoder) | (package(atlas-pca) & test(/^fuzz_decoder::/))'" 'threads-required = "num-test-threads"' > "$NXC"
+          cat "$NXC"
+          { echo "MEMEV=$MEMEV"; echo "CARRY_ULIMIT_KB=$CARRY_ULIMIT_KB"; echo "NXC=$NXC"; echo "SCOPE_PROPS=${props[*]}"; echo "RUSTFLAGS=${RUSTFLAGS:-}"; } >> "$GITHUB_ENV"
+      - name: Decide the slice (reaching tests first, then the full suite for anything not caught)
+        run: |
+          "$MONO/tools/pca-audit/rust-mutate/inscope.sh" node "$MONO/tools/pca-audit/rust-mutate/schema-run.mjs" --bundle="$RUNNER_TEMP/bundle" \
+            --run=${{ matrix.r }} --runs=${{ matrix.runs }} --out="$RUNNER_TEMP/sres" --run-errors="$RUNNER_TEMP/sres/run-errors.json" \
+            -j=2 --min-timeout=60 --multiplier=5 -- --config-file "$NXC"
+          # every cgroup OOM kill must show as a SIGKILLed test in some outcome, as in the shards
+          node -e '
+            const fs = require("fs"), T = process.env.RUNNER_TEMP, s = Number(fs.readFileSync(T + "/sres/sigkilled.txt", "utf8"));
+            if (!process.env.MEMEV) process.exit(0);
+            if (!fs.existsSync(process.env.MEMEV)) { console.error("::error::the memory scope left no memory.events"); process.exit(1); }
+            const k = Number((/^oom_kill (\d+)$/m.exec(fs.readFileSync(process.env.MEMEV, "utf8")) || [])[1] || 0);
+            console.log(`cgroup oom_kill ${k}, ${s} outcome(s) with a SIGKILLed test`);
+            if (k > 0 && s === 0) { console.error("::error::" + k + " OOM kill(s) in the memory scope that no outcome shows as a SIGKILLed test"); process.exit(1); }
+          '
+          rm -rf "$RUNNER_TEMP/sres/logs"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sres-${{ matrix.key }}-${{ matrix.g }}-${{ matrix.r }}
+          path: ${{ runner.temp }}/sres/
+
+  # the shard matrix: a schema crate's fallback mutants and samples (schema-collect.mjs fbplan) plus the proof crates' shards
+  fbplan:
+    if: ${{ !cancelled() && needs.schema.result == 'success' }}
+    needs: [reuse, plan, schema]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship tooling
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - uses: actions/download-artifact@v4
+        with:
+          name: mut-list
+          path: mut-list
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dec-*
+          path: decs
+      - id: m
+        run: node "$MONO/tools/pca-audit/rust-mutate/schema-collect.mjs" fbplan --list=mut-list --decs=decs --crates="$CRATES" --run-id="$GITHUB_RUN_ID" --names-out=fb-names >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fb-names
+          path: fb-names/
+
+  # exactly one decision per planned mutant of the schema crate, the samples identical both ways; then its two report shards
+  collect:
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
+    needs: [reuse, plan, schema, run, fbplan, shard]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      KEY: ${{ fromJSON(needs.plan.outputs.scrate).key }}
+      DIR: ${{ fromJSON(needs.plan.outputs.scrate).dir }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Flagship tooling
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - uses: actions/download-artifact@v4
+        with:
+          name: mut-list
+          path: mut-list
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dec-*
+          path: decs
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: sres-*
+          path: sres
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: fres-${{ env.KEY }}-*
+          path: fres
+      - name: Collect
+        run: |
+          node "$MONO/tools/pca-audit/rust-mutate/schema-collect.mjs" collect --list=mut-list --decs=decs --sres=sres --fres=fres --dir="$DIR" --key="$KEY" --out=col
+          for k in 1 2; do
+            node .github/scripts/mutation-shard-report.mjs --crate="$KEY" --shard=$k --of=2 --tool=cargo-mutants \
+              --counts=col/counts-$k.json --survivors=col/survivors-$k.json --out=col/shard-$k.json
+            mkdir -p "out-$k"; cp col/shard-$k.json col/run-errors-$k.json "out-$k/"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ env.KEY }}-1
+          path: out-1/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ env.KEY }}-2
+          path: out-2/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mut-results-${{ env.KEY }}-all
+          path: col/mut-results/
+          retention-days: 30
+
+  # Code the Linux shards never compile: the files of modules declared under #[cfg(windows)] / #[cfg(not(unix))] (CRATES `win`; the
+  # file guard checks that list against the tree). cargo-mutants and stmt-mut mutate source text without evaluating cfg, so on Linux
+  # every mutant of these files would build unchanged and survive: the Linux plan leaves them out, and here BOTH tools mutate them,
+  # each mutant judged by the tests that exercise it (no ledger: every mutant must be caught). Each job uploads a winonly-* report
+  # (file, tool, shard k/n, the slice's planned count, this shard's list, outcomes, survivors); the merge checks that every file has
+  # every shard of both tools and no Linux result (win-only-check.mjs) and counts these mutants once, from here. A slice must name a
+  # file that holds only Windows-compiled code (a Unix arm in the same file would survive as unbuilt). macOS has no macOS-only Rust
+  # code (no cfg(target_os) anywhere in the crate).
+  # Cost: cargo-mutants' build phase is `cargo nextest run --no-run` with --cargo-arg only (the args after `--` reach the test phase
+  # alone), so a slice that named its tests after `--` rebuilt and relinked all ~290 integration test binaries for every mutant, and
+  # with -j2 the second worker copied the tree and rebuilt every dependency too (run 45813609817: 609-809 s baselines, 1004 s for
+  # one mutant, three slices cut at 60 min). Now the slice's test targets reach the build as well (--cargo-arg; stmt-run passes its
+  # nextest args to both), both tools work in place (one target/: dependencies built once by the baseline, CARGO_INCREMENTAL=1
+  # reuses the crate's unchanged codegen units), and a slice is split into k/n shards so each job stays well inside the limit.
+  windows:
+    name: windows-only ${{ matrix.slice }} ${{ matrix.tool }} ${{ matrix.k }}/${{ matrix.n }}
+    needs: reuse
+    if: ${{ needs.reuse.outputs.skip != 'true' }}
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      CARGO_INCREMENTAL: '1'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # the win module (DACL file/dir creation, tightening; private_file.rs keeps the Unix arms): ~40 + ~15 mutants
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: cm, targets: '--lib', features: '', k: 0, n: 6 }
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: cm, targets: '--lib', features: '', k: 1, n: 6 }
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: cm, targets: '--lib', features: '', k: 2, n: 6 }
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: cm, targets: '--lib', features: '', k: 3, n: 6 }
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: cm, targets: '--lib', features: '', k: 4, n: 6 }
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: cm, targets: '--lib', features: '', k: 5, n: 6 }
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: stmt, targets: '--lib', features: '', k: 0, n: 2 }
+          - { slice: private_file, file: '**/private_file_windows.rs', tool: stmt, targets: '--lib', features: '', k: 1, n: 2 }
+          # MoveFileExW write-through replace (its own file: durable_rename.rs holds the Unix arms, which Windows never compiles)
+          - { slice: durable_rename, file: '**/durable_rename_windows.rs', tool: cm, targets: '--lib', features: '', k: 0, n: 1 }
+          - { slice: durable_rename, file: '**/durable_rename_windows.rs', tool: stmt, targets: '--lib', features: '', k: 0, n: 1 }
+          # the whole non-Unix durable-state stub (lib.rs swaps it in for durable_state.rs): 15 mutants (12 unviable)
+          - { slice: durable_state_stub, file: '**/durable_state_stub.rs', tool: cm, targets: '--lib --test durable_state_stub_windows', features: '', k: 0, n: 2 }
+          - { slice: durable_state_stub, file: '**/durable_state_stub.rs', tool: cm, targets: '--lib --test durable_state_stub_windows', features: '', k: 1, n: 2 }
+          - { slice: durable_state_stub, file: '**/durable_state_stub.rs', tool: stmt, targets: '--lib --test durable_state_stub_windows', features: '', k: 0, n: 1 }
+          # cfg(not(unix)) exit-status arm of the crash-after-admission worker (its own file); only the cross-process SQLite
+          # conformance test spawns and kills workers (tests/store_conformance.rs never reaches it)
+          - { slice: killed_by_signal, file: '**/store_conformance_not_unix.rs', tool: cm, targets: '--test ref_state_guard', features: 'sqlite', k: 0, n: 1 }
+          - { slice: killed_by_signal, file: '**/store_conformance_not_unix.rs', tool: stmt, targets: '--test ref_state_guard', features: 'sqlite', k: 0, n: 1 }
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-mutants@27.1.0,cargo-nextest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Full shared corpus from the flagship
+        run: .github/scripts/mutation-layout.sh "$CRATE" crates/atlas-pca
+        env:
+          IN_REPO: '1'
+      - name: Statement mutator (stmt-mut), built as the Linux shards build it
+        if: ${{ matrix.tool == 'stmt' }}
+        run: |
+          cargo build -q --release --manifest-path "$MONO/tools/pca-audit/rust-mutate/stmt-mut/Cargo.toml" --target-dir "$RUNNER_TEMP/stmt-mut-target"
+          echo "STMT_TOOL=$RUNNER_TEMP/stmt-mut-target/release/stmt-mut.exe" >> "$GITHUB_ENV"
+      - name: Mutate
+        id: mutate
+        env:
+          FILE: ${{ matrix.file }}
+          TARGETS: ${{ matrix.targets }}
+          FEATURES: ${{ matrix.features }}
+          K: ${{ matrix.k }}
+          N: ${{ matrix.n }}
+        run: |
+          ft=(); [ -z "$FEATURES" ] || ft=(--features "$FEATURES")
+          sel=(-p atlas-pca --file "$FILE" "${ft[@]}")
+          # a Windows-only file with no cargo-mutants mutant is a plan error, not a pass (the file guard holds the same rule)
+          cargo mutants "${sel[@]}" --list > "$RUNNER_TEMP/all.txt"
+          [ -s "$RUNNER_TEMP/all.txt" ] || { echo "::error::no mutants generated for ${{ matrix.slice }} on Windows"; exit 1; }
+          rc=0
+          if [ "${{ matrix.tool }}" = cm ]; then
+            cargo mutants "${sel[@]}" --shard "$K/$N" --sharding round-robin --list > "$RUNNER_TEMP/list.txt"
+            echo "planned=$(wc -l < "$RUNNER_TEMP/all.txt")" >> "$GITHUB_OUTPUT"
+            echo "listed=$(wc -l < "$RUNNER_TEMP/list.txt")" >> "$GITHUB_OUTPUT"
+            echo "cargo-mutants: $(wc -l < "$RUNNER_TEMP/list.txt") of $(wc -l < "$RUNNER_TEMP/all.txt") (shard $K/$N)"; cat "$RUNNER_TEMP/list.txt"
+            ca=(); for a in $TARGETS; do ca+=("--cargo-arg=$a"); done
+            # the Linux shards' profile (no debug info, optimized dependencies): the default debug build of every test binary
+            # overran the PDB limit (LNK1140) and the disk (LNK1180); the test targets are named for the build and the test phase
+            cargo mutants "${sel[@]}" --shard "$K/$N" --sharding round-robin --in-place --profile mutants --test-tool nextest \
+              "${ca[@]}" --minimum-test-timeout 60 --output "$RUNNER_TEMP/out" || rc=$?
+          else
+            S="$MONO/tools/pca-audit/rust-mutate/stmt-run.mjs"
+            node "$S" list --tool="$STMT_TOOL" --pkg=atlas-pca --file="$FILE" --features="$FEATURES" > "$RUNNER_TEMP/stmt.json"
+            node -e '
+              const p = require(process.argv[1]), k = +process.env.K, n = +process.env.N;
+              const mine = p.mutants.filter((_, i) => i % n === k);
+              require("fs").appendFileSync(process.env.GITHUB_OUTPUT, `planned=${p.count}\nlisted=${mine.length}\n`);
+              console.log(`statement mutants: ${mine.length} of ${p.count} (shard ${k}/${n})`); for (const m of mine) console.log(m.name);
+            ' "$RUNNER_TEMP/stmt.json"
+            # $TARGETS unquoted on purpose: one nextest argument per word
+            node "$S" run --tool="$STMT_TOOL" --pkg=atlas-pca --file="$FILE" --features="$FEATURES" --in-place --shard="$K" --of="$N" \
+              --out="$RUNNER_TEMP/out" --run-errors="$RUNNER_TEMP/run-errors.json" --min-timeout=60 --multiplier=5 -- --cargo-profile mutants $TARGETS || rc=$?
+          fi
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          # 0 / 2 (missed) / 3 (timeout) are results, reported below; anything else is a tool failure
+          case $rc in 0|2|3) ;; *) echo "::error::the mutation tool failed (exit $rc)"; exit "$rc" ;; esac
+      - name: Report (winonly-*, for the merge)
+        env:
+          FILE: ${{ matrix.file }}
+          SLICE: ${{ matrix.slice }}
+          TOOL: ${{ matrix.tool }}
+          K: ${{ matrix.k }}
+          N: ${{ matrix.n }}
+          PLANNED: ${{ steps.mutate.outputs.planned }}
+          LISTED: ${{ steps.mutate.outputs.listed }}
+        run: |
+          node -e '
+            const fs = require("fs"), path = require("path"), d = path.join(process.env.RUNNER_TEMP, "out", "mutants.out"), pre = "crates/atlas-pca/";
+            const norm = (s) => s.split("\\").join("/");
+            const rd = (f) => fs.existsSync(path.join(d, f)) ? fs.readFileSync(path.join(d, f), "utf8").split("\n").filter(Boolean).map(norm) : [];
+            const counts = { caught: rd("caught.txt").length, missed: rd("missed.txt").length, timeout: rd("timeout.txt").length, unviable: rd("unviable.txt").length };
+            const want = process.env.FILE.replace(/^\*\*\//, "");
+            const src = new Map(); const line = (f, n) => { if (!src.has(f)) src.set(f, fs.readFileSync(f, "utf8").split("\n")); return (src.get(f)[n - 1] || "").trim(); };
+            let file = "";
+            const parse = (l) => {
+              const m = /^(.+?):(\d+):(\d+): (.*)$/.exec(l); if (!m) throw new Error("unparsed: " + l);
+              if (!m[1].startsWith(pre) || !m[1].endsWith("/" + want)) throw new Error("mutant outside the slice file " + want + ": " + l);
+              file = m[1].slice(pre.length); return m;
+            };
+            for (const k of ["caught", "missed", "timeout", "unviable"]) rd(k + ".txt").forEach(parse);
+            const surv = [...rd("missed.txt"), ...rd("timeout.txt")].map((l) => { const m = parse(l); return { crate: process.env.CRATE, file: m[1].slice(pre.length), mutant: m[4], line: line(m[1], +m[2]), lineno: +m[2] }; });
+            for (const s of surv) console.log(`::error::SURVIVED on Windows: ${s.file}:${s.lineno} ${s.mutant}`);
+            const r = { crate: process.env.CRATE, os: "windows", tool: process.env.TOOL === "cm" ? "cargo-mutants" : "stmt", file: file || "src/" + want,
+              k: +process.env.K, n: +process.env.N, planned: +process.env.PLANNED, listed: +process.env.LISTED, counts, survivors: surv };
+            fs.writeFileSync(`winonly-${process.env.SLICE}-${process.env.TOOL}-${process.env.K}.json`, JSON.stringify(r, null, 1));
+            console.log(JSON.stringify({ file: r.file, tool: r.tool, shard: `${r.k}/${r.n}`, planned: r.planned, listed: r.listed, counts }));
+          '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: winonly-${{ env.CRATE }}-${{ matrix.slice }}-${{ matrix.tool }}-${{ matrix.k }}
+          path: winonly-${{ matrix.slice }}-${{ matrix.tool }}-${{ matrix.k }}.json
+      - name: Every mutant caught
+        if: ${{ steps.mutate.outputs.rc != '0' }}
+        run: |
+          cat "$RUNNER_TEMP"/out/mutants.out/missed.txt "$RUNNER_TEMP"/out/mutants.out/timeout.txt 2>/dev/null || true
+          echo "::error::Windows-only mutants survived (exit ${{ steps.mutate.outputs.rc }}); there is no ledger on Windows"
+          exit 1
+
+  merge:
+    name: merge ${{ matrix.key }}
+    needs: [reuse, plan, snapshot, shard, windows, collect]
+    if: ${{ needs.reuse.outputs.skip != 'true' && (always() && needs.plan.result == 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.crates) }}
+    env:
+      KEY: ${{ matrix.key }}
+      DIR: ${{ matrix.dir }}
+      SHARDS: ${{ matrix.of }}
+    steps:
+      # the shards do not wait for the snapshot job, so its file guard can only fail the gate here
+      - name: The file guard passed
+        if: needs.snapshot.result != 'success'
+        run: |
+          echo "::error::the snapshot job, which holds the file guard, did not pass: ${{ needs.snapshot.result }}"
+          exit 1
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -210,14 +1099,110 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: reports
-          pattern: shard-*
+          pattern: shard-${{ matrix.key }}-*
+      - uses: actions/download-artifact@v4
+        with:
+          name: mut-plan
+          path: mut-plan
+      # the racy run-error entries below may match 0 only when the mutant was generated AND plainly killed in this run
+      - uses: actions/download-artifact@v4
+        with:
+          path: mut-res
+          pattern: mut-results-${{ matrix.key }}-*
+      # the Windows-only files' reports (the windows job); a failed or cancelled Windows job leaves a report missing, which the
+      # check below refuses
+      - uses: actions/download-artifact@v4
+        if: ${{ matrix.win != '' }}
+        with:
+          path: reports
+          pattern: winonly-${{ matrix.key }}-*
+      - name: Every planned mutant is reported (with a negative control)
+        run: node "$MONO/tools/pca-audit/rust-mutate/plan-check.mjs" --reports=reports --plan="mut-plan/$KEY.json" --shards="$SHARDS"
+      - name: Windows-only files mutated on Windows by both tools, every shard, none on Linux (with a negative control)
+        if: ${{ !cancelled() && matrix.win != '' }}
+        run: |
+          node "$MONO/tools/pca-audit/rust-mutate/win-only-check.mjs" --self-test
+          node "$MONO/tools/pca-audit/rust-mutate/win-only-check.mjs" --reports=reports --crate="$KEY" --win="${{ matrix.win }}"
       - name: Merge shards and check the ledger
+        if: ${{ !cancelled() }}
         run: >
-          node .github/scripts/mutation-merge.mjs --crate="$CRATE" --shards="$SHARDS" --reports=reports
-          --checker="$MONO/tools/pca-audit" --src="$GITHUB_WORKSPACE/crates/atlas-pca"
+          node .github/scripts/mutation-merge.mjs --crate="$KEY" --shards="$SHARDS" --reports=reports
+          --checker="$MONO/tools/pca-audit" --src="$GITHUB_WORKSPACE/$DIR"
+      # gate honesty: a run-error mutant (its tests died by a signal: OOM kill, failed allocation, stack overflow) was counted
+      # caught though no test decided it. Each must be in mutation-run-errors.json with a proof that the mutant itself causes
+      # it (the unmutated suite passes under the same caps: cargo-mutants' baseline run); an unlisted one or a stale entry fails.
+      # An entry marked racy may also match 0 only if its mutant was generated and plainly caught in this run (mut-results).
+      - name: Run errors (signal-killed tests) and timeouts are each proven mutant-caused
+        if: ${{ !cancelled() }}
+        run: |
+          node -e '
+            const fs = require("fs"), path = require("path");
+            const got = []; let shards = 0;
+            const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (/^run-errors-\d+\.json$/.test(e.name)) { shards++; got.push(...JSON.parse(fs.readFileSync(p, "utf8"))); } } };
+            walk("reports");
+            const want = Number(process.env.SHARDS);
+            if (shards !== want) { console.error(`::error::run-error lists from ${shards}/${want} shards (a missing list is a failure)`); process.exit(1); }
+            const led = JSON.parse(fs.readFileSync(process.env.DIR + "/mutation-run-errors.json", "utf8"));
+            const key = (m) => [m.file, m.fn, m.text, m.mutant].join(" | ");
+            const res = []; const rw = (d) => { for (const x of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, x.name); if (x.isDirectory()) rw(p); else if (x.name === "results.json") res.push(...JSON.parse(fs.readFileSync(p, "utf8"))); } };
+            if (fs.existsSync("mut-res")) rw("mut-res");
+            const srcLines = new Map(); const srcLine = (f, n) => { if (!srcLines.has(f)) srcLines.set(f, fs.existsSync(f) ? fs.readFileSync(f, "utf8").split("\n") : []); return (srcLines.get(f)[n - 1] || "").trim(); };
+            const pre = process.env.DIR + "/";
+            const killedCount = (e) => res.filter((r) => { const m = r.status === "caught" && /^(.+?):(\d+):\d+: (.*)$/.exec(r.name || ""); if (!m) return false; const f = m[1].startsWith(pre) ? m[1].slice(pre.length) : m[1]; return f === e.file && m[3] === e.mutant && srcLine(path.join(process.env.DIR, f), +m[2]) === e.text; }).length;
+            const have = new Map(); for (const m of got) have.set(key(m), (have.get(key(m)) || 0) + 1);
+            let bad = 0; const used = new Set();
+            for (const e of led) {
+              if (!e.reason) { console.error("::error::run-error ledger entry without a reason: " + key(e)); bad++; }
+              // a timeout entry proves the MUTANT does not terminate (e.g. a loop counter that no longer advances); the unmutated
+              // suite passing within the same limit is the baseline of the shard
+              if (e.kind === "timeout" && !(typeof e.proof === "string" && e.proof.trim())) { console.error("::error::timeout ledger entry without a proof: " + key(e)); bad++; }
+              const n = have.get(key(e)) || 0, k = e.multiplicity || 1;
+              // racy: some of the k sites may be plainly caught instead of erroring (a test FAILs before another overflows); then every site
+              // must be accounted for: n run errors + matching mutants plainly caught this run (same file, mutant text and source line)
+              // >= k, and n <= k. A mutant that was not generated is a stale entry. A non-racy entry covers exactly k.
+              if (e.racy === true) {
+                const kc = killedCount(e);
+                if (n > k || n + kc < k) { console.error(`::error::racy run-error ledger entry covers ${k}: ${n} run error(s) + ${kc} plainly caught this run (not generated, or not killed): ${key(e)}`); bad++; }
+              } else if (n !== k) { console.error(`::error::run-error ledger entry covers ${k}, the run has ${n}: ${key(e)}`); bad++; }
+              const src = path.join(process.env.DIR, e.file);
+              if (!fs.existsSync(src) || !fs.readFileSync(src, "utf8").split("\n").some((l) => l.trim() === e.text)) { console.error("::error::run-error ledger entry whose line is gone (stale): " + key(e)); bad++; }
+              used.add(key(e));
+            }
+            for (const [k, n] of have) if (!used.has(k)) { const g = got.find((m) => key(m) === k); console.error(`::error::UNPROVEN ${g.kind === "timeout" ? "timeout" : "run error"} (x${n}, ${g.kind}${g.evidence ? ", " + g.evidence : ""}), no test decided it: ${k}`); bad++; }
+            console.log(`${got.length} run-error mutant(s) over ${shards} shards, ${led.length} ledger entries, ${bad} problem(s)`);
+            process.exit(bad ? 1 : 0);
+          '
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: survivors-merged
+          name: survivors-merged-${{ matrix.key }}
           path: reports/survivors-merged.json
           if-no-files-found: ignore
+      - name: Merge result for the release evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          # the release evidence report reads `mutation-summary` (atlas-pca); the proof crates' carry their key
+          name: ${{ matrix.key == 'rust-pca' && 'mutation-summary' || format('mutation-summary-{0}', matrix.key) }}
+          path: reports/mutation-summary.json
+          if-no-files-found: ignore
+
+  reuse-record:
+    name: reuse record
+    needs: [reuse, snapshot, plan, natives, schema, run, fbplan, shard, collect, merge, windows]
+    # only a run whose jobs all passed (skipped by their own conditions is fine), that was not partial and not itself a reuse, leaves a record
+    if: ${{ !cancelled() && needs.reuse.outputs.skip != 'true' && needs.reuse.outputs.hash != '' && !(false) && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && needs.merge.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - id: rec
+        env:
+          GATE_FULL: ${{ inputs.full || (startsWith(github.ref_name, 'ci/') && endsWith(github.ref_name, '-rc') || startsWith(github.ref_name, 'ci/gate-')) || contains(github.event.head_commit.message, '[force-full]') }}
+          HASH: ${{ needs.reuse.outputs.hash }}
+        run: node .github/scripts/ci-reuse.mjs record --workflow=mutation --hash="$HASH" --out="$RUNNER_TEMP/reuse-record"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.rec.outputs.artifact }}
+          path: ${{ runner.temp }}/reuse-record/
+          retention-days: 21

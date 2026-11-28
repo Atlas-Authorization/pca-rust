@@ -37,11 +37,11 @@ fn suite_refusal_wording() {
     assert_eq!(suite_refusal(Some(&json!("ed25519"))), "unsupported_suite: ed25519");
     assert_eq!(suite_refusal(Some(&json!("ml-dsa-65"))), "unsupported_suite: ml-dsa-65");
     assert_eq!(suite_refusal(Some(&json!("less-cat1"))), "unsupported_suite: less-cat1");
-    // anything else is unknown, with the JSON text of the value
-    assert_eq!(suite_refusal(Some(&json!("rsa"))), "unknown signature alg '\"rsa\"'");
+    // anything else is unknown, with the value as JavaScript's String() prints it
+    assert_eq!(suite_refusal(Some(&json!("rsa"))), "unknown signature alg 'rsa'");
     assert_eq!(suite_refusal(Some(&json!(5))), "unknown signature alg '5'");
     assert_eq!(suite_refusal(Some(&Value::Null)), "unknown signature alg 'null'");
-    assert_eq!(suite_refusal(None), "unknown signature alg ''");
+    assert_eq!(suite_refusal(None), "unknown signature alg 'undefined'");
 }
 
 #[test]
@@ -79,7 +79,7 @@ fn an_intent_without_a_fidelity_is_below_every_floor() {
     let commit = intent_goal_commit(r, md, salt).unwrap();
     let grant = json!({"caveats": [{"type": "envelope", "goal_commit": commit}]});
     let intent = json!({"ref": r, "map_digest": md, "goal_salt": salt, "residual_risk_ppm": 0});
-    let pol = IntentPolicy { require: true, min_fidelity_ppm: Some(0.0), max_residual_risk_ppm: None };
+    let pol = IntentPolicy { require: true, min_fidelity_ppm: Some(0.0), max_residual_risk_ppm: None, ..Default::default() };
     let e = decide_intent(Some(&intent), &grant, Some(&pol), None).unwrap().unwrap_err();
     assert!(e.contains("fidelity -1 ppm is below the policy minimum 0"), "{e}");
     let with = json!({"ref": r, "map_digest": md, "goal_salt": salt, "residual_risk_ppm": 0, "fidelity_ppm": 0});

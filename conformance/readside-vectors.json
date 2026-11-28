@@ -1,0 +1,3107 @@
+{
+  "keys": {
+    "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+    "rs": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+    "other": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk"
+  },
+  "digests": {
+    "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+    "receipt_refs": [
+      "C6vCHfnigX9XHC5iJC_fcCV_WLVHY1wiUlrelgdXxzA",
+      "TAsV874BO3E6EJc2mGxilgY_9Empupr26doApxts4ZI",
+      "ltB2PL9Na3zE8npGxmLx-YlXXauZDmwNN97Gr_AWF54",
+      "PpSt-2PRZkT8wao0k4PAyCn4v8xkV0OvaYCmssDIaTk"
+    ],
+    "chain_labels": {
+      "labels": [
+        "public",
+        "ref"
+      ]
+    }
+  },
+  "grants": {
+    "main": {
+      "body": {
+        "v": 1,
+        "id": "rg-support-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "reads": [
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "support"
+            ],
+            "modes": {
+              "pii": "last4",
+              "financial": "bucket:100",
+              "secret": "drop",
+              "public": "show",
+              "ref": "token",
+              "fingerprint": "hash"
+            },
+            "default_mode": "drop"
+          },
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "billing"
+            ],
+            "modes": {
+              "pii": "show",
+              "financial": "show"
+            },
+            "default_mode": "drop"
+          }
+        ],
+        "caps": {
+          "pii": 3,
+          "financial": 2
+        },
+        "sinks": {
+          "external_communication": {
+            "allow": [
+              "public",
+              "ref"
+            ],
+            "escalate": [
+              "fingerprint"
+            ]
+          },
+          "internal_note": {
+            "allow": [
+              "fingerprint",
+              "pii",
+              "public",
+              "ref"
+            ],
+            "escalate": []
+          }
+        }
+      },
+      "sig": "OLrdqlIHo2bbl-L0SvJoh25tD3ZYQ130kBDB702iYIUbl06wJLO3CdJZJjz_emVmYxjtwBaluTU1yJHctewNDg"
+    },
+    "tampered": {
+      "body": {
+        "v": 1,
+        "id": "rg-support-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "reads": [
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "support"
+            ],
+            "modes": {
+              "pii": "last4",
+              "financial": "bucket:100",
+              "secret": "drop",
+              "public": "show",
+              "ref": "token",
+              "fingerprint": "hash"
+            },
+            "default_mode": "drop"
+          },
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "billing"
+            ],
+            "modes": {
+              "pii": "show",
+              "financial": "show"
+            },
+            "default_mode": "drop"
+          }
+        ],
+        "caps": {
+          "pii": 99
+        },
+        "sinks": {
+          "external_communication": {
+            "allow": [
+              "public",
+              "ref"
+            ],
+            "escalate": [
+              "fingerprint"
+            ]
+          },
+          "internal_note": {
+            "allow": [
+              "fingerprint",
+              "pii",
+              "public",
+              "ref"
+            ],
+            "escalate": []
+          }
+        }
+      },
+      "sig": "OLrdqlIHo2bbl-L0SvJoh25tD3ZYQ130kBDB702iYIUbl06wJLO3CdJZJjz_emVmYxjtwBaluTU1yJHctewNDg"
+    },
+    "wrong_domain": {
+      "body": {
+        "v": 1,
+        "id": "rg-support-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "reads": [
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "support"
+            ],
+            "modes": {
+              "pii": "last4",
+              "financial": "bucket:100",
+              "secret": "drop",
+              "public": "show",
+              "ref": "token",
+              "fingerprint": "hash"
+            },
+            "default_mode": "drop"
+          },
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "billing"
+            ],
+            "modes": {
+              "pii": "show",
+              "financial": "show"
+            },
+            "default_mode": "drop"
+          }
+        ],
+        "caps": {
+          "pii": 3,
+          "financial": 2
+        },
+        "sinks": {
+          "external_communication": {
+            "allow": [
+              "public",
+              "ref"
+            ],
+            "escalate": [
+              "fingerprint"
+            ]
+          },
+          "internal_note": {
+            "allow": [
+              "fingerprint",
+              "pii",
+              "public",
+              "ref"
+            ],
+            "escalate": []
+          }
+        }
+      },
+      "sig": "GqG5Uwq6Dtv_siBaNkdSgJVEQ3JWf3R5VgoYM3hA_7XVh-kQo4_DZJWRyq9GX1CG_i8Fi5Dg2woWWPCnw98WBw"
+    },
+    "bad_mode": {
+      "body": {
+        "v": 1,
+        "id": "rg-support-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "reads": [
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "support"
+            ],
+            "modes": {
+              "pii": "last4",
+              "financial": "bucket:100",
+              "secret": "drop",
+              "public": "show",
+              "ref": "token",
+              "fingerprint": "hash"
+            },
+            "default_mode": "reveal"
+          }
+        ],
+        "caps": {
+          "pii": 3,
+          "financial": 2
+        },
+        "sinks": {
+          "external_communication": {
+            "allow": [
+              "public",
+              "ref"
+            ],
+            "escalate": [
+              "fingerprint"
+            ]
+          },
+          "internal_note": {
+            "allow": [
+              "fingerprint",
+              "pii",
+              "public",
+              "ref"
+            ],
+            "escalate": []
+          }
+        }
+      },
+      "sig": "OLrdqlIHo2bbl-L0SvJoh25tD3ZYQ130kBDB702iYIUbl06wJLO3CdJZJjz_emVmYxjtwBaluTU1yJHctewNDg"
+    },
+    "overlap": {
+      "body": {
+        "v": 1,
+        "id": "rg-support-1",
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "issued_at": 1799996400000,
+        "expires_at": 1800003600000,
+        "reads": [
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "support"
+            ],
+            "modes": {
+              "pii": "last4",
+              "financial": "bucket:100",
+              "secret": "drop",
+              "public": "show",
+              "ref": "token",
+              "fingerprint": "hash"
+            },
+            "default_mode": "drop"
+          },
+          {
+            "verb": "customers.get",
+            "resource_prefix": "customers/",
+            "purposes": [
+              "billing"
+            ],
+            "modes": {
+              "pii": "show",
+              "financial": "show"
+            },
+            "default_mode": "drop"
+          }
+        ],
+        "caps": {
+          "pii": 3,
+          "financial": 2
+        },
+        "sinks": {
+          "external_communication": {
+            "allow": [
+              "pii"
+            ],
+            "escalate": [
+              "pii"
+            ]
+          }
+        }
+      },
+      "sig": "DvzIjJgw2X1q9UI96yXmARyM4vY6-THxR0PLYvONe1wYVAWTinUlaCR3RqlCM_tPSiy1aPgx1eSYJb_Z79QhCQ"
+    }
+  },
+  "redact": [
+    {
+      "name": "support-view",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "balance": 12300,
+          "cust_ref": "tok_Eawjl-vINRTpRtMssyGWnz",
+          "device": "5rEU7JQKQJJnD3nKCC4OBTJ2u5zkyy5UbpWcZHJp4zI",
+          "name": "Ada",
+          "ssn": "****6789"
+        },
+        "fields": {
+          "api_key": {
+            "class": "secret",
+            "action": "dropped",
+            "kind": null,
+            "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+          },
+          "balance": {
+            "class": "financial",
+            "action": "masked",
+            "kind": "bucket",
+            "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+          },
+          "cust_ref": {
+            "class": "ref",
+            "action": "masked",
+            "kind": "token",
+            "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+          },
+          "device": {
+            "class": "fingerprint",
+            "action": "masked",
+            "kind": "hash",
+            "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+          },
+          "extra": {
+            "class": "unclassified",
+            "action": "dropped",
+            "kind": null,
+            "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+          },
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "phone": {
+            "class": "pii",
+            "action": "dropped",
+            "kind": null,
+            "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "masked",
+            "kind": "last4",
+            "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+          }
+        },
+        "labels": [
+          "financial",
+          "fingerprint",
+          "pii",
+          "public",
+          "ref"
+        ],
+        "counts": {
+          "financial": 1,
+          "ref": 1,
+          "fingerprint": 1,
+          "public": 1,
+          "pii": 1
+        }
+      }
+    },
+    {
+      "name": "billing-purpose-shows-pii-and-financial",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "billing",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "balance": "financial"
+          },
+          "required": []
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "balance": 12345
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "balance": 12345,
+          "ssn": "123-45-6789"
+        },
+        "fields": {
+          "balance": {
+            "class": "financial",
+            "action": "shown",
+            "kind": null,
+            "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+          },
+          "name": {
+            "class": "public",
+            "action": "dropped",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "shown",
+            "kind": null,
+            "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+          }
+        },
+        "labels": [
+          "financial",
+          "pii"
+        ],
+        "counts": {
+          "financial": 1,
+          "pii": 1
+        }
+      }
+    },
+    {
+      "name": "purpose-without-scope",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "marketing",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "no_read_scope",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "verb-without-scope",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.list",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "no_read_scope",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "resource-outside-prefix",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "orders/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "no_read_scope",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "tighten-only-stricter-applies",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {
+          "pii": "drop"
+        },
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "balance": 12300,
+          "cust_ref": "tok_Eawjl-vINRTpRtMssyGWnz",
+          "device": "5rEU7JQKQJJnD3nKCC4OBTJ2u5zkyy5UbpWcZHJp4zI",
+          "name": "Ada"
+        },
+        "fields": {
+          "api_key": {
+            "class": "secret",
+            "action": "dropped",
+            "kind": null,
+            "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+          },
+          "balance": {
+            "class": "financial",
+            "action": "masked",
+            "kind": "bucket",
+            "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+          },
+          "cust_ref": {
+            "class": "ref",
+            "action": "masked",
+            "kind": "token",
+            "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+          },
+          "device": {
+            "class": "fingerprint",
+            "action": "masked",
+            "kind": "hash",
+            "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+          },
+          "extra": {
+            "class": "unclassified",
+            "action": "dropped",
+            "kind": null,
+            "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+          },
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "phone": {
+            "class": "pii",
+            "action": "dropped",
+            "kind": null,
+            "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "dropped",
+            "kind": null,
+            "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+          }
+        },
+        "labels": [
+          "financial",
+          "fingerprint",
+          "public",
+          "ref"
+        ],
+        "counts": {
+          "financial": 1,
+          "ref": 1,
+          "fingerprint": 1,
+          "public": 1
+        }
+      }
+    },
+    {
+      "name": "tighten-weaker-ignored",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {
+          "pii": "show",
+          "secret": "show"
+        },
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "balance": 12300,
+          "cust_ref": "tok_Eawjl-vINRTpRtMssyGWnz",
+          "device": "5rEU7JQKQJJnD3nKCC4OBTJ2u5zkyy5UbpWcZHJp4zI",
+          "name": "Ada",
+          "ssn": "****6789"
+        },
+        "fields": {
+          "api_key": {
+            "class": "secret",
+            "action": "dropped",
+            "kind": null,
+            "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+          },
+          "balance": {
+            "class": "financial",
+            "action": "masked",
+            "kind": "bucket",
+            "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+          },
+          "cust_ref": {
+            "class": "ref",
+            "action": "masked",
+            "kind": "token",
+            "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+          },
+          "device": {
+            "class": "fingerprint",
+            "action": "masked",
+            "kind": "hash",
+            "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+          },
+          "extra": {
+            "class": "unclassified",
+            "action": "dropped",
+            "kind": null,
+            "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+          },
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "phone": {
+            "class": "pii",
+            "action": "dropped",
+            "kind": null,
+            "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "masked",
+            "kind": "last4",
+            "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+          }
+        },
+        "labels": [
+          "financial",
+          "fingerprint",
+          "pii",
+          "public",
+          "ref"
+        ],
+        "counts": {
+          "financial": 1,
+          "ref": 1,
+          "fingerprint": 1,
+          "public": 1,
+          "pii": 1
+        }
+      }
+    },
+    {
+      "name": "tighten-hash-over-last4",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {
+          "pii": "hash"
+        },
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "balance": 12300,
+          "cust_ref": "tok_Eawjl-vINRTpRtMssyGWnz",
+          "device": "5rEU7JQKQJJnD3nKCC4OBTJ2u5zkyy5UbpWcZHJp4zI",
+          "name": "Ada",
+          "phone": "dVCNCUdHikyYvlwgiRTPfoh1MI_f4G5RErXqyo-0aHo",
+          "ssn": "Sg_MQDOd7I3EIre5HXRgx20TdqXlVlWvsu5cAnwZ9y0"
+        },
+        "fields": {
+          "api_key": {
+            "class": "secret",
+            "action": "dropped",
+            "kind": null,
+            "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+          },
+          "balance": {
+            "class": "financial",
+            "action": "masked",
+            "kind": "bucket",
+            "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+          },
+          "cust_ref": {
+            "class": "ref",
+            "action": "masked",
+            "kind": "token",
+            "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+          },
+          "device": {
+            "class": "fingerprint",
+            "action": "masked",
+            "kind": "hash",
+            "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+          },
+          "extra": {
+            "class": "unclassified",
+            "action": "dropped",
+            "kind": null,
+            "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+          },
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "phone": {
+            "class": "pii",
+            "action": "masked",
+            "kind": "hash",
+            "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "masked",
+            "kind": "hash",
+            "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+          }
+        },
+        "labels": [
+          "financial",
+          "fingerprint",
+          "pii",
+          "public",
+          "ref"
+        ],
+        "counts": {
+          "financial": 1,
+          "ref": 1,
+          "fingerprint": 1,
+          "public": 1,
+          "pii": 2
+        }
+      }
+    },
+    {
+      "name": "tighten-invalid-mode",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {
+          "pii": "reveal"
+        },
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "required-field-dropped-escalates",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name",
+            "api_key"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "escalate",
+        "code": "required_dropped",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "required-field-absent-escalates",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint",
+            "email": "pii"
+          },
+          "required": [
+            "email"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "escalate",
+        "code": "required_dropped",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "enumeration-cap-reached",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {
+          "pii": 3
+        }
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "read_cap",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {
+          "pii": 3
+        }
+      }
+    },
+    {
+      "name": "enumeration-cap-exactly-met",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {
+          "pii": 2
+        }
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "balance": 12300,
+          "cust_ref": "tok_Eawjl-vINRTpRtMssyGWnz",
+          "device": "5rEU7JQKQJJnD3nKCC4OBTJ2u5zkyy5UbpWcZHJp4zI",
+          "name": "Ada",
+          "ssn": "****6789"
+        },
+        "fields": {
+          "api_key": {
+            "class": "secret",
+            "action": "dropped",
+            "kind": null,
+            "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+          },
+          "balance": {
+            "class": "financial",
+            "action": "masked",
+            "kind": "bucket",
+            "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+          },
+          "cust_ref": {
+            "class": "ref",
+            "action": "masked",
+            "kind": "token",
+            "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+          },
+          "device": {
+            "class": "fingerprint",
+            "action": "masked",
+            "kind": "hash",
+            "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+          },
+          "extra": {
+            "class": "unclassified",
+            "action": "dropped",
+            "kind": null,
+            "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+          },
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "phone": {
+            "class": "pii",
+            "action": "dropped",
+            "kind": null,
+            "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "masked",
+            "kind": "last4",
+            "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+          }
+        },
+        "labels": [
+          "financial",
+          "fingerprint",
+          "pii",
+          "public",
+          "ref"
+        ],
+        "counts": {
+          "pii": 3,
+          "financial": 1,
+          "ref": 1,
+          "fingerprint": 1,
+          "public": 1
+        }
+      }
+    },
+    {
+      "name": "short-string-cannot-be-last4",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "1234"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "name": "Ada"
+        },
+        "fields": {
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "dropped",
+            "kind": null,
+            "vd": "2Oubuyul7HqBoUd5_TcvG9fPHTLanTq0jerSeBQbP_0"
+          }
+        },
+        "labels": [
+          "public"
+        ],
+        "counts": {
+          "public": 1
+        }
+      }
+    },
+    {
+      "name": "last4-of-a-number-is-dropped",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": 123456789
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "name": "Ada"
+        },
+        "fields": {
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "dropped",
+            "kind": null,
+            "vd": "-lpUUeDnDimKPp0mzmn50STUdYokGGnl5IuKzPD0zbg"
+          }
+        },
+        "labels": [
+          "public"
+        ],
+        "counts": {
+          "public": 1
+        }
+      }
+    },
+    {
+      "name": "last4-counts-code-points",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "café-éééé"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "name": "Ada",
+          "ssn": "****éééé"
+        },
+        "fields": {
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "ssn": {
+            "class": "pii",
+            "action": "masked",
+            "kind": "last4",
+            "vd": "sXcscRR7cUP8LNit25c0Pk8DQHSnO0BMzYC33YmS2hI"
+          }
+        },
+        "labels": [
+          "pii",
+          "public"
+        ],
+        "counts": {
+          "public": 1,
+          "pii": 1
+        }
+      }
+    },
+    {
+      "name": "bucket-negative-is-dropped",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "balance": "financial"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "balance": -5
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "name": "Ada"
+        },
+        "fields": {
+          "balance": {
+            "class": "financial",
+            "action": "dropped",
+            "kind": null,
+            "vd": "GHIergdcF_mruQyNzwKMzvrojr1Hfk4iYXXqJwUykxQ"
+          },
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          }
+        },
+        "labels": [
+          "public"
+        ],
+        "counts": {
+          "public": 1
+        }
+      }
+    },
+    {
+      "name": "bucket-rounds-down",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "balance": "financial"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "balance": 199
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "balance": 100,
+          "name": "Ada"
+        },
+        "fields": {
+          "balance": {
+            "class": "financial",
+            "action": "masked",
+            "kind": "bucket",
+            "vd": "ci3gdYIRK7ixfbuTPr2Wv4Se8g-Q8zSxfD-rjnwhPfc"
+          },
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          }
+        },
+        "labels": [
+          "financial",
+          "public"
+        ],
+        "counts": {
+          "financial": 1,
+          "public": 1
+        }
+      }
+    },
+    {
+      "name": "class-without-a-mode-uses-the-default",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "note": "other"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "note": "x"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "view": {
+          "name": "Ada"
+        },
+        "fields": {
+          "name": {
+            "class": "public",
+            "action": "shown",
+            "kind": null,
+            "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+          },
+          "note": {
+            "class": "other",
+            "action": "dropped",
+            "kind": null,
+            "vd": "xpXePxxPWxRPkn45B-yqzqNtdlt_6-34e3Nv2U5TYvQ"
+          }
+        },
+        "labels": [
+          "public"
+        ],
+        "counts": {
+          "public": 1
+        }
+      }
+    },
+    {
+      "name": "weak-salt",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "short",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "record-with-a-float",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "balance": 1.5
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "now-missing",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": null,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "now-not-an-integer",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1.5,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "principal-not-a-key",
+      "grant": "main",
+      "input": {
+        "principal": "x",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "unpinned-principal",
+      "grant": "main",
+      "input": {
+        "principal": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "expired-grant",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800003600000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "expired",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "grant-not-yet",
+      "grant": "main",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1799996399999,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "not_yet",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "tampered-grant",
+      "grant": "tampered",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "grant-signed-under-another-domain",
+      "grant": "wrong_domain",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "grant-with-an-unknown-mode",
+      "grant": "bad_mode",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_grant",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    },
+    {
+      "name": "grant-allowing-and-escalating-one-label",
+      "grant": "overlap",
+      "input": {
+        "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+        "now": 1800000000000,
+        "verb": "customers.get",
+        "resource": "customers/77",
+        "purpose": "support",
+        "schema": {
+          "fields": {
+            "name": "public",
+            "ssn": "pii",
+            "phone": "pii",
+            "balance": "financial",
+            "api_key": "secret",
+            "cust_ref": "ref",
+            "device": "fingerprint"
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "record": {
+          "name": "Ada",
+          "ssn": "123-45-6789",
+          "phone": "555",
+          "balance": 12345,
+          "api_key": "sk_live_x",
+          "cust_ref": "c_77",
+          "device": "dev-1",
+          "extra": "not in the schema"
+        },
+        "tighten": {},
+        "salt": "a-per-read-secret-salt",
+        "counts": {}
+      },
+      "expect": {
+        "decision": "deny",
+        "code": "bad_grant",
+        "view": {},
+        "fields": {},
+        "labels": [],
+        "counts": {}
+      }
+    }
+  ],
+  "sinks": [
+    {
+      "name": "no-reads-no-labels",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [],
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "labels": []
+      }
+    },
+    {
+      "name": "public-and-ref-may-leave",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "labels": [
+          "public",
+          "ref"
+        ]
+      }
+    },
+    {
+      "name": "pii-may-not-leave",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "api_key": {
+              "class": "secret",
+              "action": "dropped",
+              "kind": null,
+              "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+            },
+            "balance": {
+              "class": "financial",
+              "action": "masked",
+              "kind": "bucket",
+              "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+            },
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "device": {
+              "class": "fingerprint",
+              "action": "masked",
+              "kind": "hash",
+              "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+            },
+            "extra": {
+              "class": "unclassified",
+              "action": "dropped",
+              "kind": null,
+              "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            },
+            "phone": {
+              "class": "pii",
+              "action": "dropped",
+              "kind": null,
+              "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+            },
+            "ssn": {
+              "class": "pii",
+              "action": "masked",
+              "kind": "last4",
+              "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+            }
+          },
+          "labels": [
+            "financial",
+            "fingerprint",
+            "pii",
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "0Nof7YDToHVll2QV7OPwfostnGEr2LRotctzDH5Xm5S_Z71fvY2CTMYIbbMrNjiPwAYz6s3Dxe8hnROWHXJWDA"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "label_flow",
+        "labels": [
+          "financial",
+          "fingerprint",
+          "pii",
+          "public",
+          "ref"
+        ]
+      }
+    },
+    {
+      "name": "internal-note-does-not-list-financial",
+      "grant": "main",
+      "sink": "internal_note",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "api_key": {
+              "class": "secret",
+              "action": "dropped",
+              "kind": null,
+              "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+            },
+            "balance": {
+              "class": "financial",
+              "action": "masked",
+              "kind": "bucket",
+              "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+            },
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "device": {
+              "class": "fingerprint",
+              "action": "masked",
+              "kind": "hash",
+              "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+            },
+            "extra": {
+              "class": "unclassified",
+              "action": "dropped",
+              "kind": null,
+              "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            },
+            "phone": {
+              "class": "pii",
+              "action": "dropped",
+              "kind": null,
+              "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+            },
+            "ssn": {
+              "class": "pii",
+              "action": "masked",
+              "kind": "last4",
+              "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+            }
+          },
+          "labels": [
+            "financial",
+            "fingerprint",
+            "pii",
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "0Nof7YDToHVll2QV7OPwfostnGEr2LRotctzDH5Xm5S_Z71fvY2CTMYIbbMrNjiPwAYz6s3Dxe8hnROWHXJWDA"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "label_flow",
+        "labels": [
+          "financial",
+          "fingerprint",
+          "pii",
+          "public",
+          "ref"
+        ]
+      }
+    },
+    {
+      "name": "fingerprint-escalates",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "device": {
+              "class": "fingerprint",
+              "action": "masked",
+              "kind": "hash",
+              "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "fingerprint",
+            "public"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "nBU3ngL_I5YyKLRSpBA1k7Xgqj-AIjgXEe5cA6m_jFp7gxginzI1_i77Gi4Er4gWyJ7CpJgBSrl5XiHYOPomAA"
+        }
+      ],
+      "expect": {
+        "decision": "escalate",
+        "code": "label_escalate",
+        "labels": [
+          "fingerprint",
+          "public"
+        ]
+      }
+    },
+    {
+      "name": "chain-of-two-public-reads",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        },
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/78",
+          "purpose": "support",
+          "seq": 1,
+          "prev": "TAsV874BO3E6EJc2mGxilgY_9Empupr26doApxts4ZI",
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999990000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "8n3md5YC8r858bqMfe7vLZfqlqwE_Tl4o5UHai1bI0_yLqyr1wK288ag3jPa9D8Yw0n5skA02p-L7ZeKsDwiAg"
+        }
+      ],
+      "expect": {
+        "decision": "allow",
+        "code": null,
+        "labels": [
+          "public",
+          "ref"
+        ]
+      }
+    },
+    {
+      "name": "now-missing",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": null,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "labels": []
+      }
+    },
+    {
+      "name": "rs-signer-not-a-key",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "x",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_request",
+        "labels": []
+      }
+    },
+    {
+      "name": "unknown-sink",
+      "grant": "main",
+      "sink": "billing_export",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "unknown_sink",
+        "labels": []
+      }
+    },
+    {
+      "name": "proto-named-sink",
+      "grant": "main",
+      "sink": "__proto__",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "unknown_sink",
+        "labels": []
+      }
+    },
+    {
+      "name": "receipt-signed-by-an-unpinned-key",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "labels": []
+      }
+    },
+    {
+      "name": "receipt-of-another-grant",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "BrhRoCXvxQ0IgDbveGB1Q8j3uFSBr4QHPQzUasAadnc",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999999999,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "Wb73PEELDr5DJNCKdoHmJ3QmVehErGPsvjh9rSeH1ZwartOTY9hw8YwiBQniGGZBMbtVeXWZmhS_PvItDo6wDw"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "labels": []
+      }
+    },
+    {
+      "name": "receipt-chain-gap",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/78",
+          "purpose": "support",
+          "seq": 1,
+          "prev": "TAsV874BO3E6EJc2mGxilgY_9Empupr26doApxts4ZI",
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999990000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "8n3md5YC8r858bqMfe7vLZfqlqwE_Tl4o5UHai1bI0_yLqyr1wK288ag3jPa9D8Yw0n5skA02p-L7ZeKsDwiAg"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "labels": []
+      }
+    },
+    {
+      "name": "receipt-hiding-a-label",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "api_key": {
+              "class": "secret",
+              "action": "dropped",
+              "kind": null,
+              "vd": "R_Yij9qWWNsCDYHz01HGcIQfGWfYDOj4uMp6puAZar0"
+            },
+            "balance": {
+              "class": "financial",
+              "action": "masked",
+              "kind": "bucket",
+              "vd": "uBazaCJf91x07BmPm0tpuvLZYAjWMqb94mD3uAiBUog"
+            },
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "device": {
+              "class": "fingerprint",
+              "action": "masked",
+              "kind": "hash",
+              "vd": "TaZtE5qIKT5jDLulEjIqg3Jes8W9c1bvQyJ2N0KXdkI"
+            },
+            "extra": {
+              "class": "unclassified",
+              "action": "dropped",
+              "kind": null,
+              "vd": "W0I63ebjqvrIXsspPVKQ7TwGUPhHJ7xWHkzDkwlICAg"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            },
+            "phone": {
+              "class": "pii",
+              "action": "dropped",
+              "kind": null,
+              "vd": "lUUqL9hzCPPqI_E2bkPm3qbVW4fnGasLoLzz9eXmi9A"
+            },
+            "ssn": {
+              "class": "pii",
+              "action": "masked",
+              "kind": "last4",
+              "vd": "inzAauIKjgcW2whCbjUnLtCEaOJrok1DhXRZC6Fy87Q"
+            }
+          },
+          "labels": [],
+          "issued_at": 1799999999999,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "20Zqv7bvdfEF_T3Iqi35pR2FEmjW21vJ7volojYcFS4CVrWveQkiwWZJO3EYsSdyF0UjpDxJ9C6oFNB5SaIYCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "labels": []
+      }
+    },
+    {
+      "name": "receipt-from-the-future",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1799999970000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_receipt",
+        "labels": []
+      }
+    },
+    {
+      "name": "tampered-grant",
+      "grant": "tampered",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "labels": []
+      }
+    },
+    {
+      "name": "unpinned-principal",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "ptJFXqOldxq6n8sDeSQRTJL58yUEn2tCaec52QSLuGk",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800000000000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "bad_signature",
+        "labels": []
+      }
+    },
+    {
+      "name": "expired-grant",
+      "grant": "main",
+      "sink": "external_communication",
+      "principal": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "rs_signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+      "now": 1800003600000,
+      "receipts": [
+        {
+          "v": 1,
+          "grant": "aZY8k6OG6W2fES6BX--sQp79aYoYB_RJlT85sS9_0vs",
+          "verb": "customers.get",
+          "resource": "customers/77",
+          "purpose": "support",
+          "seq": 0,
+          "prev": null,
+          "fields": {
+            "cust_ref": {
+              "class": "ref",
+              "action": "masked",
+              "kind": "token",
+              "vd": "G-ZcqQ2sVQ2ogcEaimc7bWEfd_3uYMJJ-YjxfANsJzU"
+            },
+            "name": {
+              "class": "public",
+              "action": "shown",
+              "kind": null,
+              "vd": "Um6kUjDnGwftjbC1ujTctdyBcJzioyzl_RoxqAm353c"
+            }
+          },
+          "labels": [
+            "public",
+            "ref"
+          ],
+          "issued_at": 1799999980000,
+          "signer": "6yzxO_euOl9hQWih-wknLTl3HsS4UjcngV5GbK-O4WM",
+          "sig": "e9BeaxbOqPLH5J-o3jNYTNZhRhhn9PdA4ZFkbQ8SAMbbBqe8QKyvC_5hqo4VBSaCR82OPsmIN6B2LjfkHpeKCQ"
+        }
+      ],
+      "expect": {
+        "decision": "deny",
+        "code": "expired",
+        "labels": []
+      }
+    }
+  ]
+}

@@ -20,7 +20,9 @@ const crate = opt('crate'), shards = Number(opt('shards')), reports = opt('repor
 if (!crate || !(shards >= 1) || !reports || !checker || !src) { console.error('usage: mutation-merge.mjs --crate= --shards= --reports= --checker= --src='); process.exit(2); }
 
 const found = new Map();
-const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (/^shard-\d+\.json$/.test(e.name)) found.set(p, JSON.parse(fs.readFileSync(p, 'utf8'))); } };
+const win = []; // winshard-<n>.json: a windows-latest run of files with Windows-only branches (see the cross-OS rule below)
+const winOnly = []; // winonly-*.json: files only Windows compiles, mutated on windows-latest alone (no Linux results for them)
+const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (/^shard-\d+\.json$/.test(e.name)) found.set(p, JSON.parse(fs.readFileSync(p, 'utf8'))); else if (/^winshard-\d+\.json$/.test(e.name)) win.push([p, JSON.parse(fs.readFileSync(p, 'utf8'))]); else if (/^winonly-.*\.json$/.test(e.name)) winOnly.push([p, JSON.parse(fs.readFileSync(p, 'utf8'))]); } };
 if (fs.existsSync(reports)) walk(reports);
 const errors = [];
 const byShard = new Map();
@@ -38,9 +40,51 @@ for (let k = 1; k <= shards; k++) {
   for (const [s, n] of Object.entries(r.counts ?? {})) totals[s] = (totals[s] ?? 0) + n;
   survivors.push(...r.survivors);
 }
+// Windows-only files: their mutants exist on Windows alone, so their counts and survivors join the totals here, once (their
+// completeness, both tools and no Linux result, is the crate's own check before this merge)
+for (const [p, r] of winOnly) {
+  if (r.crate !== crate || r.os !== 'windows') { errors.push(`${p}: report of another run (crate ${r.crate}, os ${r.os})`); continue; }
+  for (const [s, n] of Object.entries(r.counts ?? {})) totals[s] = (totals[s] ?? 0) + n;
+  survivors.push(...(r.survivors ?? []));
+}
+if (winOnly.length) console.log(`windows-only reports: ${winOnly.length}, ${winOnly.reduce((a, [, r]) => a + Object.values(r.counts ?? {}).reduce((x, y) => x + y, 0), 0)} mutant(s)`);
+// Cross-OS rule: a file named in a Windows report's `scope` is mutated on Linux AND on Windows, and a mutant counts as a survivor only
+// when it survived on every OS that ran it (Linux cannot execute the Windows branches, Windows cannot execute the POSIX ones). A
+// Windows report that failed, or of another run, fails the merge like a missing shard.
+const idOf = (s) => [s.file, s.mutant, String(s.line ?? '').trim(), s.occurrence ?? 1].join('\u0000');
+// A scope entry is a file ("AtlasPca/OwnerOnly.cs": all of it) or a part of one ("AtlasPca/DurableState.cs#682-802": lines 682..802, a
+// survivor's `lineno`); the parts of a file must partition its lines exactly, so a missing or overlapping part fails the merge.
+const winScope = new Map(); // file -> [[first, last]] lines (last = Infinity: the whole file)
+const winSurv = new Set();
+for (const [p, r] of win) {
+  if (r.of !== shards || r.crate !== crate) { errors.push(`${p}: report of another run (crate ${r.crate}, of ${r.of})`); continue; }
+  if (r.ok !== true) { errors.push(`${p}: tool error (${r.error ?? 'ok != true'})`); continue; }
+  for (const f of r.scope ?? []) {
+    const m = /^(.*)#(\d+)-(\d+)$/.exec(f);
+    const file = m ? m[1] : f;
+    if (!winScope.has(file)) winScope.set(file, []);
+    winScope.get(file).push(m ? [Number(m[2]), Number(m[3])] : [1, Infinity]);
+  }
+  for (const s of r.survivors) winSurv.add(idOf(s));
+}
+for (const [file, spans] of winScope) {
+  spans.sort((a, b) => a[0] - b[0]);
+  let lines = null;
+  try { lines = fs.readFileSync(path.join(src, file), 'utf8').split('\n').length; } catch { errors.push(`windows scope ${file}: no such source file`); continue; }
+  const whole = spans.length === 1 && spans[0][0] === 1 && spans[0][1] === Infinity;
+  const tiles = spans.every(([a, b], i) => a === (i === 0 ? 1 : spans[i - 1][1] + 1) && b >= a) && spans[spans.length - 1][1] === lines;
+  if (!whole && !tiles) errors.push(`windows parts of ${file} do not partition its ${lines} lines: ${spans.map(([a, b]) => `${a}-${b}`).join(', ')}`);
+}
+const winHas = (s) => (winScope.get(s.file) ?? []).some(([a, b]) => b === Infinity || (s.lineno >= a && s.lineno <= b));
+if (win.length) {
+  const before = survivors.length;
+  const keep = survivors.filter((s) => !winHas(s) || winSurv.has(idOf(s)));
+  survivors.length = 0; survivors.push(...keep);
+  console.log(`windows reports: ${win.length}, scope ${[...winScope.keys()].join(', ')}; ${before - survivors.length} Linux survivor(s) killed on Windows`);
+}
 const tool = [...byShard.values()][0]?.tool ?? '?';
 console.log(`${crate}: ${tool}, ${byShard.size}/${shards} shard reports, counts ${JSON.stringify(totals)}, ${survivors.length} survivor(s)`);
-if (errors.length) { console.error(errors.join('\n')); console.error('FAIL: incomplete run'); summary('FAIL (incomplete run)'); process.exitCode = 1; }
+if (errors.length) { console.error(errors.join('\n')); console.error('FAIL: incomplete run'); summary('FAIL (incomplete run)'); evidence('fail', null); process.exitCode = 1; }
 else merge();
 
 function merge() {
@@ -69,6 +113,7 @@ const unlisted = (r.stderr ?? '').split('\n').filter((l) => l.startsWith('UNLIST
 const stale = (r.stderr ?? '').split('\n').filter((l) => l.startsWith('STALE')).length;
 console.log(`ledger entries for ${crate}: ${merged}; unlisted survivors: ${unlisted}; stale entries: ${stale}`);
 summary(rc === 0 ? 'PASS' : `FAIL (${unlisted} unlisted survivor(s), ${stale} stale entr${stale === 1 ? 'y' : 'ies'})`);
+evidence(rc === 0 ? 'pass' : 'fail', merged, { unlisted, stale });
 // exitCode, not process.exit(): exit() right after a large stderr write to a pipe drops the unflushed tail of the list
 process.exitCode = rc;
 }
@@ -78,4 +123,16 @@ function summary(verdict) {
   if (!f) return;
   const rows = Object.entries(totals).map(([s, n]) => `| ${s} | ${n} |`).join('\n');
   fs.appendFileSync(f, `### Mutation: ${crate} (${tool})\n\n**${verdict}**: ${survivors.length} survivor(s) over ${shards} shard(s)\n\n| status | mutants |\n|---|---|\n${rows}\n\n`);
+}
+
+// reports/mutation-summary.json: the merge result for the release evidence report (uploaded as the mutation-summary artifact).
+// score = detected / (detected + undetected) over the tool's counts (killed / caught / timeout vs survived / missed / no
+// tests); every undetected mutant of a passing merge is a listed equivalent.
+function evidence(verdict, listed, extra = {}) {
+  const sum = (re) => Object.entries(totals).filter(([k]) => re.test(k)).reduce((a, [, n]) => a + n, 0);
+  const det = sum(/^(killed|killed\((deadline|crash)\)|caught|timeout)$/i), und = sum(/^(survived|missed|no[ _-]?tests?|no[ _-]?coverage|nocov)$/i);
+  const score = det + und ? `${((100 * det) / (det + und)).toFixed(1)} %` : null;
+  fs.mkdirSync(reports, { recursive: true });
+  fs.writeFileSync(path.join(reports, 'mutation-summary.json'), JSON.stringify({ crate, tool, shards, shard_reports: byShard.size, verdict, score,
+    counts: totals, survivors: survivors.length, listed_equivalents: listed, ...extra }, null, 1) + '\n');
 }

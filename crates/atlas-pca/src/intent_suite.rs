@@ -51,7 +51,7 @@ pub(crate) fn verify_pinned_suite(
         return Ok(verify_suite(Some(&alg_v), identity, None, msg, sig, pq_sig));
     }
     let artifact = match artifact_pq {
-        Some(Value::String(p)) if !p.is_empty() => p.as_str(),
+        Some(Value::String(p)) => p.as_str(), // an empty key is refused below: caller_vouched("") is None
         _ => return Ok(false),
     };
     match pin {

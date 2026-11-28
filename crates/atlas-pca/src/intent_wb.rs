@@ -8,14 +8,14 @@ use serde_json::{Map, Value};
 use super::intent_strict::*;
 use super::MAX_SAFE;
 
-const FACT_DOMAIN: &str = "atlas-pca/fact/v1\0";
+pub(crate) const FACT_DOMAIN: &str = "atlas-pca/fact/v1\0";
 const FACT_REF_DOMAIN: &str = "atlas-pca/fact-ref/v1";
-const OFFER_SET_DOMAIN: &str = "atlas-pca/offer-set/v1\0";
+pub(crate) const OFFER_SET_DOMAIN: &str = "atlas-pca/offer-set/v1\0";
 const OFFER_SET_REF_DOMAIN: &str = "atlas-pca/offer-set-ref/v1";
-const LABELS_DOMAIN: &str = "atlas-pca/labels/v1\0";
+pub(crate) const LABELS_DOMAIN: &str = "atlas-pca/labels/v1\0";
 const LABELS_REF_DOMAIN: &str = "atlas-pca/labels-ref/v1";
-const CLASSIFIER_DOMAIN: &str = "atlas-pca/intent-classifier/v1\0";
-const CLASSIFIER_REF_DOMAIN: &str = "atlas-pca/intent-classifier-ref/v1";
+pub(crate) const CLASSIFIER_DOMAIN: &str = "atlas-pca/intent-classifier/v1\0";
+pub(crate) const CLASSIFIER_REF_DOMAIN: &str = "atlas-pca/intent-classifier-ref/v1";
 const MAX_COMMITTED_FACTS: usize = 16;
 const MAX_WORLDS: usize = 16;
 const MAX_RELATIONAL: usize = 16;
@@ -27,8 +27,8 @@ const MAX_PROV_PATHS: usize = 32;
 const MAX_PROV_REFS: usize = 8;
 const MAX_COMMITTED_LABELS: usize = 16;
 const MAX_LABEL_FIELDS: usize = 64;
-const MAX_COMMITTED_CLASSES: usize = 8;
-const MAX_CLASSIFIER_LABELS: usize = 32;
+pub(crate) const MAX_COMMITTED_CLASSES: usize = 8;
+pub(crate) const MAX_CLASSIFIER_LABELS: usize = 32;
 const LABEL_REF_PREFIX: &str = "pca-labels:";
 const TAINT_LEVELS: [&str; 5] = ["trusted", "first_party", "tool", "web", "agent"];
 
@@ -71,7 +71,7 @@ pub struct IntentWorldDecision {
     pub reason: String,
 }
 
-fn validate_fact_wire(f: &Value) -> bool {
+pub(crate) fn validate_fact_wire(f: &Value) -> bool {
     let f = match f.as_object() {
         Some(f) => f,
         None => return false,
@@ -451,7 +451,7 @@ fn world_inner(input: &Value) -> Result<IntentWorldDecision, String> {
     Ok(IntentWorldDecision { ok: true, world, single_source, reason: String::new() })
 }
 
-fn validate_offer_set_wire(o: &Value) -> Option<String> {
+pub(crate) fn validate_offer_set_wire(o: &Value) -> Option<String> {
     let o = match o.as_object() {
         Some(o) => o,
         None => return Some("offer set must be an object".into()),
@@ -567,14 +567,15 @@ fn decide_offer_set(
         return Err("offers: the offer set is bound to another session".into());
     }
     let now = match now {
+        // skew is validated policy or the default; checked again here (defence in depth)
         Some(n) if safe_integer_f64(skew) => n as f64,
         _ => return Err("offers: no usable clock (now must be a safe integer): the offer set counts as stale".into()),
     };
     let issued = num(os.get("issued_at")).unwrap_or(f64::NAN);
-    if issued > now + skew {
+    if !(issued <= now + skew) {
         return Err("offers: the offer set is issued in the future".into());
     }
-    if now - issued > num(policy.get("max_age_ms")).unwrap_or(f64::NAN) {
+    if !(now - issued <= num(policy.get("max_age_ms")).unwrap_or(f64::NAN)) {
         return Err("offers: the offer set is stale".into());
     }
     if os.get("complete") != Some(&Value::Bool(true)) {
@@ -596,12 +597,7 @@ fn decide_offer_set(
         return Err("offers: the chosen offer does not satisfy the intent filter".into());
     }
     let price = |x: &Value| nonneg(x.get("price")).unwrap_or(0);
-    let mut min = price(chosen);
-    for x in &offers {
-        if offer_matches(x, &fo) && price(x) < min {
-            min = price(x);
-        }
-    }
+    let min = offers.iter().filter(|x| offer_matches(x, &fo)).map(&price).fold(price(chosen), i64::min);
     Ok(price(chosen) - min)
 }
 
@@ -727,7 +723,7 @@ fn validate_prov_wire(prov: &Value) -> Option<String> {
     None
 }
 
-fn validate_labels_wire(l: &Value) -> bool {
+pub(crate) fn validate_labels_wire(l: &Value) -> bool {
     let l = match l.as_object() {
         Some(l) => l,
         None => return false,
@@ -765,18 +761,12 @@ fn flow_rule_for<'a>(rules: &'a Map<String, Value>, cls: &str) -> Option<&'a str
     if let Some((k, _)) = rules.get_key_value(cls) {
         return Some(k.as_str());
     }
-    let mut best: Option<&str> = None;
-    for p in rules.keys() {
-        if let Some(prefix) = p.strip_suffix('*') {
-            if p.ends_with(".*") && cls.starts_with(prefix) && best.is_none_or(|b| p.encode_utf16().count() > b.encode_utf16().count()) {
-                best = Some(p.as_str());
-            }
-        }
-    }
-    if best.is_some() {
-        return best;
-    }
-    rules.get_key_value("*").map(|(k, _)| k.as_str())
+    // the longest matching `<prefix>.*`: two matching prefixes of one length are the same key, so there is no tie
+    let best = rules
+        .keys()
+        .filter(|p| p.strip_suffix('*').is_some_and(|pre| pre.ends_with('.') && cls.starts_with(pre)))
+        .max_by_key(|p| p.encode_utf16().count());
+    best.or_else(|| rules.get_key_value("*").map(|(k, _)| k)).map(String::as_str)
 }
 
 fn flow_allowed(rules: &Map<String, Value>, cls: &str, origin: &str, aud: &str) -> bool {
@@ -796,10 +786,14 @@ fn parse_label_ref(r: &str) -> Option<(&str, &str)> {
 }
 
 /// Place `value` at the dotted `path` under `root`; false on a collision (`setNested`).
-fn set_nested(root: &mut Map<String, Value>, path: &str, value: Value) -> bool {
+pub(crate) fn set_nested(root: &mut Map<String, Value>, path: &str, value: Value) -> bool {
     let segs: Vec<&str> = path.split('.').collect();
     let mut cur = root;
     for k in &segs[..segs.len() - 1] {
+        // an own member named `__proto__` cannot exist: the reference refuses to walk it
+        if *k == "__proto__" {
+            return false;
+        }
         let next = cur.entry((*k).to_string()).or_insert_with(|| Value::Object(Map::new()));
         cur = match next.as_object_mut() {
             Some(m) => m,
@@ -807,7 +801,7 @@ fn set_nested(root: &mut Map<String, Value>, path: &str, value: Value) -> bool {
         };
     }
     let last = segs[segs.len() - 1];
-    if cur.contains_key(last) {
+    if last == "__proto__" || cur.contains_key(last) {
         return false;
     }
     cur.insert(last.into(), value);
@@ -830,6 +824,18 @@ pub fn decide_param_provenance(input: &Value) -> ProvenanceDecision {
             env: Map::new(),
         },
     }
+}
+
+/// The first pair `(a, b)` of `paths` where `b` lies under `a` (`b` starts with `a.`).
+pub(crate) fn first_overlap(paths: &[String]) -> Option<(&String, &String)> {
+    for a in paths {
+        for b in paths {
+            if b.starts_with(&format!("{a}.")) {
+                return Some((a, b));
+            }
+        }
+    }
+    None
 }
 
 fn prov_inner(input: &Value, labels: &mut Map<String, Value>, classes: &mut Map<String, Value>) -> Result<Result<ProvenanceDecision, String>, String> {
@@ -872,12 +878,8 @@ fn prov_inner(input: &Value, labels: &mut Map<String, Value>, classes: &mut Map<
             return Ok(Err(format!("prov names '{p}', a parameter the action does not carry")));
         }
     }
-    for a in &paths {
-        for b in &paths {
-            if a != b && b.starts_with(&format!("{a}.")) {
-                return Ok(Err(format!("prov paths '{a}' and '{b}' overlap")));
-            }
-        }
+    if let Some((a, b)) = first_overlap(&paths) {
+        return Ok(Err(format!("prov paths '{a}' and '{b}' overlap")));
     }
     let mut receipts: Map<String, Value> = Map::new();
     for r in delivered(input.get("labels"))? {
@@ -898,7 +900,8 @@ fn prov_inner(input: &Value, labels: &mut Map<String, Value>, classes: &mut Map<
         for rv in prov_map.get(p).and_then(Value::as_array).cloned().unwrap_or_default() {
             let r = s(Some(&rv)).unwrap_or("");
             if !r.starts_with(LABEL_REF_PREFIX) {
-                // classifyRef: the registry level when the registry has the ref as an OWN key, else agent
+                // classifyRef: the registry level when the registry has the ref as an OWN key, else agent (rank() reads any
+                // non-level as agent's rank)
                 let lvl = match reg.get(r) {
                     Some(l) if is_taint_level(Some(l)) => s(Some(l)).unwrap_or("agent"),
                     _ => "agent",
@@ -1039,10 +1042,12 @@ fn prov_inner(input: &Value, labels: &mut Map<String, Value>, classes: &mut Map<
 pub struct ClassifierDecision {
     pub ok: bool,
     pub classes: Map<String, Value>,
+    /// classifier id -> label -> the number of distinct-judge votes (on success).
+    pub votes: Map<String, Value>,
     pub reason: String,
 }
 
-fn validate_classifier_policy(p: &Value) -> Option<String> {
+pub(crate) fn validate_classifier_policy(p: &Value) -> Option<String> {
     let cs = match p.as_object().and_then(|p| p.get("classifiers")).and_then(Value::as_array) {
         Some(c) => c,
         None => return Some("classifier policy needs a classifiers list".into()),
@@ -1097,21 +1102,41 @@ fn validate_classifier_policy(p: &Value) -> Option<String> {
     None
 }
 
-fn validate_verdict_wire(v: &Value) -> bool {
-    let v = match v.as_object() {
-        Some(v) => v,
-        None => return false,
-    };
-    closed_members(v, &["v", "kind", "classifier", "session", "content_digest", "label", "measurement", "judge", "sig"], &SUITE_MEMBERS)
-        && same(v.get("v"), Some(&Value::from(1)))
-        && s(v.get("kind")) == Some("pca-intent-classification")
-        && is_name(v.get("classifier"))
-        && b32(v.get("session"))
-        && b32(v.get("content_digest"))
-        && bstr(v.get("label"), 64)
-        && bstr(v.get("measurement"), 256)
-        && b32(v.get("judge"))
-        && v.get("sig").is_some_and(Value::is_string)
+/// `validateClassifierVerdictWire(v)`: `None` = well-formed, else the reference's reason.
+pub(crate) fn verdict_wire_error(v: &Value) -> Option<String> {
+    let Some(v) = v.as_object() else { return Some("verdict must be an object".into()) };
+    if let Some(e) = closed_members_error(v, &["v", "kind", "classifier", "session", "content_digest", "label", "measurement", "judge", "sig"], &SUITE_MEMBERS, "verdict") {
+        return Some(e);
+    }
+    if !same(v.get("v"), Some(&Value::from(1))) || s(v.get("kind")) != Some("pca-intent-classification") {
+        return Some("verdict must be {v: 1, kind: \"pca-intent-classification\"}".into());
+    }
+    if !is_name(v.get("classifier")) {
+        return Some("'verdict.classifier' must match ^[a-z][a-z0-9_]{0,63}$".into());
+    }
+    if !b32(v.get("session")) {
+        return Some("'verdict.session' must be canonical base64url (32 bytes)".into());
+    }
+    if !b32(v.get("content_digest")) {
+        return Some("'verdict.content_digest' must be canonical base64url (32 bytes)".into());
+    }
+    if !bstr(v.get("label"), 64) {
+        return Some("'verdict.label' must be a non-empty string (<= 64 bytes)".into());
+    }
+    if !bstr(v.get("measurement"), 256) {
+        return Some("'verdict.measurement' must be a non-empty string (<= 256 bytes)".into());
+    }
+    if !b32(v.get("judge")) {
+        return Some("'verdict.judge' must be canonical base64url (32 bytes)".into());
+    }
+    if !v.get("sig").is_some_and(Value::is_string) {
+        return Some("'verdict.sig' must be a string".into());
+    }
+    None
+}
+
+pub(crate) fn validate_verdict_wire(v: &Value) -> bool {
+    verdict_wire_error(v).is_none()
 }
 
 /// `classifierCheckActive({committed, policy})`.
@@ -1121,7 +1146,7 @@ pub(crate) fn classifier_check_active(committed: Option<&Value>, classifiers: Op
 
 /// The rule-18 decision on the reference's `ClassifierInput` (`decideClassifierDimensions`). Never panics.
 pub fn decide_classifier_dimensions(input: &Value) -> ClassifierDecision {
-    let fail = |r: String| ClassifierDecision { ok: false, classes: Map::new(), reason: format!("classes: {r}") };
+    let fail = |r: String| ClassifierDecision { ok: false, classes: Map::new(), votes: Map::new(), reason: format!("classes: {r}") };
     if !input.is_object() {
         return fail("input must be an object".into());
     }
@@ -1247,7 +1272,15 @@ pub fn decide_classifier_dimensions(input: &Value) -> ClassifierDecision {
         }
         classes.insert(id.to_string(), Value::String(winners[0].into()));
     }
-    ClassifierDecision { ok: true, classes, reason: String::new() }
+    let mut vote_out = Map::new();
+    for (id, t) in &votes {
+        let mut r = Map::new();
+        for (l, n) in t {
+            r.insert(l.clone(), Value::from(*n));
+        }
+        vote_out.insert(id.clone(), Value::Object(r));
+    }
+    ClassifierDecision { ok: true, classes, votes: vote_out, reason: String::new() }
 }
 
 // ---- activity and decideIntentWB ---------------------------------------------------------------------------------
